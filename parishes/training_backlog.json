@@ -2,15 +2,15 @@
   "generated_at": "2026-10-01",
   "target_date": "2026-09-27",
   "summary": {
-    "downloaded": 176,
+    "downloaded": 178,
     "html_links": 0,
-    "skipped": 137,
+    "skipped": 135,
     "failed": 52,
     "stale_rejected": 16
   },
   "action_counts": {
-    "ok": 163,
-    "skip": 152,
+    "ok": 165,
+    "skip": 150,
     "investigate": 19
   },
   "parishes": [
@@ -253,27 +253,36 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/ardaghandmoydow.json",
       "recipe": {
-        "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=24",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.ardaghmoydow.com/parish-news.html",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
+        "has_terminal": true,
+        "operator_notes": [
+          "01/10/2026 hunt: official card parishardaghmoydow.com is dead \u2014 live twin is ardaghmoydow.com.",
+          "Proved PDF /pdf/270926.pdf GET 200 application/pdf 515,839 bytes; weekend Masses Sat 26th / Sun 27th Sep for Ardagh, Moydow, Legan, Ballycloghan.",
+          "Shared bulletin with Legan & Ballycloghan \u2014 harvest once here; leganballycloghan is alias_of this key.",
+          "Filenames are DDMMYY.pdf under /pdf/ \u2014 score filename date; listing page can lag."
+        ],
+        "do_not": [
+          "Do not pin 270926.",
+          "Do not also harvest the same PDF under leganballycloghan.",
+          "Do not use the dead parishardaghmoydow.com host."
+        ],
+        "recorded_date": "2026-10-01"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "official card website http://www.parishardaghmoydow.com is dead (URLError) \u2014 diocese card link only"
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ardara",
@@ -6767,27 +6776,35 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/kilronan.json",
       "recipe": {
-        "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=9",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.parishofkilronan.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
+        "has_terminal": true,
+        "operator_notes": [
+          "01/10/2026 hunt: official card kilronanparish.ie is dead \u2014 live twin is parishofkilronan.ie.",
+          "Proved PDF /wp-content/uploads/27.09.2026.pdf GET 200 application/pdf 302,429 bytes; page text '27th Sep 2026' / Keadue Arigna Ballyfarnon.",
+          "site_type:http_scrape_newest_pdf \u2014 score DD.MM.YYYY filename; do not pin."
+        ],
+        "do_not": [
+          "Do not pin 27.09.2026.",
+          "Do not use the dead kilronanparish.ie host.",
+          "Do not use the diocese card URL as start_url."
+        ],
+        "recorded_date": "2026-10-01"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "official card website http://www.kilronanparish.ie is dead (URLError) \u2014 diocese card link only"
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "kilsaran",
@@ -7135,11 +7152,11 @@
     },
     {
       "parish_key": "leganballycloghan",
-      "display_name": "Legan & Ballycloghan",
+      "display_name": "Legan & Ballycloghan (bulletin with Ardagh and Moydow)",
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/leganballycloghan.json",
       "recipe": {
-        "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=13",
+        "start_url": "https://www.ardaghmoydow.com/parish-news.html",
         "site_type": "link_only",
         "playbook_type": "link_only",
         "status": "inactive",
@@ -7150,7 +7167,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-29"
+        "recorded_date": "2026-10-01"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -7159,7 +7176,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official directory \u2014 diocese card link only"
+      "suggested_reason": "Legan and Ballycloghan Mass intentions are in the Ardagh & Moydow shared newsletter PDF \u2014 harvest once under ardaghandmoydow"
     },
     {
       "parish_key": "lifford",
