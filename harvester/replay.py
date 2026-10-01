@@ -2262,6 +2262,7 @@ async def _try_wp_json_newest_media(
     *,
     href_patterns: list[str],
     target_date: date,
+    href_skip_patterns: list[str] | None = None,
 ) -> tuple[str, str] | None:
     """Download the newest dated media PDF from /wp-json/wp/v2/media.
 
@@ -2295,7 +2296,12 @@ async def _try_wp_json_newest_media(
         return None
     if not isinstance(items, list):
         return None
-    hrefs: list[str] = []
+    # Prefer a date parsed from the filename/title; when the weekly file is
+    # named like Athlone I-Sept2726.pdf (no parseable day), fall back to the
+    # WP media `date` field — never the /uploads/2024/11/ folder year, which
+    # would lose to an older PalmSunday-29th-March-2026.pdf (proved 01/10/2026).
+    scored: list[tuple[date, str]] = []
+    ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
     for item in items:
         if not isinstance(item, dict):
             continue
@@ -2308,10 +2314,29 @@ async def _try_wp_json_newest_media(
         blob = f"{src} {slug} {title}"
         if not src or _is_non_bulletin_url(src):
             continue
+        if _href_is_skipped(blob, href_skip_patterns or []):
+            continue
         if href_patterns and not _href_matches_patterns(blob, href_patterns):
             continue
-        hrefs.append(src)
-    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+        path = urlparse(src).path.lower()
+        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")):
+            continue
+        filename = src.rsplit("/", 1)[-1]
+        found = (
+            extract_date_from_slug(filename)
+            or extract_date_from_string(filename)
+            or extract_date_from_string(title)
+            or liturgical_date_from_text(filename, target_date.year)
+            or liturgical_date_from_text(title, target_date.year)
+        )
+        if found is None:
+            raw_media = str(item.get("date") or "")[:10]
+            try:
+                found = date.fromisoformat(raw_media)
+            except ValueError:
+                found = None
+        if found and found <= ahead:
+            scored.append((found, src))
     if not scored:
         return None
     _best_date, pdf_url = max(scored)
@@ -4352,11 +4377,17 @@ async def replay_recipe(
             for p in (recipe.get("href_patterns") or [])
             if str(p).strip()
         ] or ["sunday", "bulletin", "newsletter"]
+        href_skip_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("href_skip_patterns") or [])
+            if str(p).strip()
+        ]
         found = await _try_wp_json_newest_media(
             start_url,
             dest,
             href_patterns=href_patterns,
             target_date=target_date,
+            href_skip_patterns=href_skip_patterns or None,
         )
         if found:
             return dest, found[1], found[0]

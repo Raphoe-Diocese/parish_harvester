@@ -2017,5 +2017,65 @@ class CappaghExtensionlessBulletinTests(unittest.TestCase):
         self.assertEqual(max(scored)[1], self.THIS_WEEK)
 
 
+class AthloneWpJsonMediaDateFallbackTests(unittest.TestCase):
+    """I-Sept2726.pdf has no parseable day; media library date must win over PalmSunday."""
+
+    def test_media_date_beats_older_filename_date(self) -> None:
+        import asyncio
+        from unittest.mock import patch
+
+        from harvester.replay import _try_wp_json_newest_media
+
+        payload = [
+            {
+                "source_url": (
+                    "https://stmarysathlone.ie/wp-content/uploads/2024/11/"
+                    "PalmSunday-29th-March-2026.pdf"
+                ),
+                "date": "2026-03-27T14:47:11",
+                "slug": "palmsunday",
+                "title": {"rendered": "PalmSunday"},
+            },
+            {
+                "source_url": (
+                    "https://stmarysathlone.ie/wp-content/uploads/2024/11/"
+                    "I-Sept2726.pdf"
+                ),
+                "date": "2026-09-25T15:08:25",
+                "slug": "i-sept2726",
+                "title": {"rendered": "I – Sept27’26"},
+            },
+        ]
+        api_body = json.dumps(payload).encode()
+        pdf_body = b"%PDF-1.4 fake content for athlone test"
+
+        def fake_fetch(url, **_kwargs):
+            if "wp-json" in url:
+                return api_body, {"content-type": "application/json"}
+            if str(url).endswith(".pdf"):
+                return pdf_body, {"content-type": "application/pdf"}
+            return None
+
+        dest = Path("_tmp_athlone_wp_json_test.pdf")
+        try:
+            with patch(
+                "harvester.replay._fetch_bytes_with_retries",
+                side_effect=fake_fetch,
+            ):
+                found = asyncio.run(
+                    _try_wp_json_newest_media(
+                        "https://stmarysathlone.ie/",
+                        dest,
+                        href_patterns=[".pdf"],
+                        target_date=date(2026, 9, 27),
+                        href_skip_patterns=["palm"],
+                    )
+                )
+            self.assertIsNotNone(found)
+            self.assertIn("I-Sept2726.pdf", found[0])
+        finally:
+            dest.unlink(missing_ok=True)
+
+
 if __name__ == "__main__":
     unittest.main()
