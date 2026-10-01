@@ -48,6 +48,40 @@ _DMY_ISO_RE = re.compile(
 # day-of-month filenames like "9th-August-2026.pdf" (antrimparish) aren't
 # mistaken for a Sunday-count and lose their real day — that regression let
 # antrimparish silently fall back to day=1 (2026-08-01 instead of 2026-08-09)
+# Athlone letter-month weekly files: I-Sept2726.pdf / H-Aug3026.pdf / G-July2626.pdf
+_ATHLONE_LETTER_MONTH_RE = re.compile(
+    r"(?:^|[^a-z0-9])(?:[a-z]-)?"
+    r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|"
+    r"aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+    r"(3[01]|[12]\d|0?[1-9])(\d{2})(?:\.pdf)?$",
+    re.IGNORECASE,
+)
+_MONTH_NAME_TO_NUM = {
+    "jan": 1,
+    "january": 1,
+    "feb": 2,
+    "february": 2,
+    "mar": 3,
+    "march": 3,
+    "apr": 4,
+    "april": 4,
+    "may": 5,
+    "jun": 6,
+    "june": 6,
+    "jul": 7,
+    "july": 7,
+    "aug": 8,
+    "august": 8,
+    "sep": 9,
+    "sept": 9,
+    "september": 9,
+    "oct": 10,
+    "october": 10,
+    "nov": 11,
+    "november": 11,
+    "dec": 12,
+    "december": 12,
+}
 # and only "passed" by accident, via the 8-day grace window, rather than the
 # correct in_bulletin_week match (found 2026-08-10 while auditing every
 # grace-window "ok" for hidden freshness bugs).
@@ -197,7 +231,22 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
                 ordinal_match and slug_day.start(1) == ordinal_match.start(1)
             ):
                 return _safe_date(folder_year, folder_month, int(slug_day.group(1)))
-            return _safe_date(folder_year, folder_month, 1)
+            # Athlone-style weekly files: I-Sept2726.pdf / H-Aug3026.pdf live
+            # forever under /uploads/2024/11/. The folder year is not the
+            # bulletin week — parse Month+Day+YY from the basename instead
+            # (found 01/10/2026: folder day=1 → 2024-11-01 stale-rejected a
+            # genuine 27/09/2026 PDF).
+            letter_month = _ATHLONE_LETTER_MONTH_RE.search(basename)
+            if letter_month:
+                month = _MONTH_NAME_TO_NUM[letter_month.group(1).lower()]
+                day = int(letter_month.group(2))
+                year = 2000 + int(letter_month.group(3))
+                parsed = _safe_date(year, month, day)
+                if parsed:
+                    return parsed
+            # No day in the filename — do not invent the 1st of an old upload
+            # folder (same Athlone trap). Fall through for body-text / unknown.
+            return None
         except (TypeError, ValueError):
             pass
 
