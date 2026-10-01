@@ -2,15 +2,15 @@
   "generated_at": "2026-10-01",
   "target_date": "2026-09-27",
   "summary": {
-    "downloaded": 181,
+    "downloaded": 182,
     "html_links": 0,
-    "skipped": 132,
+    "skipped": 131,
     "failed": 52,
     "stale_rejected": 16
   },
   "action_counts": {
-    "ok": 168,
-    "skip": 147,
+    "ok": 169,
+    "skip": 146,
     "investigate": 19
   },
   "parishes": [
@@ -8532,27 +8532,37 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/newtowncashel.json",
       "recipe": {
-        "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=33",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://newtowncashel.ie/local-news?category=Church+Newsletter&format=json",
+        "site_type": "http_scrape_newest_images",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
+        "has_terminal": true,
+        "operator_notes": [
+          "01/10/2026 hunt: official directory had no parish website \u2014 live host is newtowncashel.ie (Squarespace).",
+          "Church Newsletter category posts full-page Newsletter_YYYYMMDD.png on images.squarespace-cdn.com (this week Newsletter_20260927.png, GET 200 image/png ~3.5MB).",
+          "Listing HTML hides Newsletter hrefs; ?format=json exposes CDN URLs. site_type:http_scrape_newest_images scrapes that JSON and converts the newest dated PNG to PDF.",
+          "Do not pin one week's UUID path \u2014 UUID changes every upload."
+        ],
+        "do_not": [
+          "Do not pin Newsletter_20260927.png or the UUID folder.",
+          "Do not use the diocese card URL as start_url.",
+          "Do not invent a Facebook bulletin.",
+          "Do not scrape only the HTML category page \u2014 Newsletter URLs are in ?format=json."
+        ],
+        "recorded_date": "2026-10-01"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "image",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official directory \u2014 diocese card link only"
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "newtownforbes",
