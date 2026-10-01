@@ -1713,6 +1713,14 @@ _WP_UPLOAD_IMAGE_RE = re.compile(
     r"(?P<name>[A-Za-z0-9_.%\-]+\.(?:png|jpe?g))",
     re.IGNORECASE,
 )
+# Squarespace Church Newsletter PNGs (Newtowncashel): absolute CDN URLs with
+# Newsletter_YYYYMMDD in the basename. Query/srcset tails are stripped.
+_SQUARESPACE_DATED_NEWSLETTER_IMAGE_RE = re.compile(
+    r"(?P<url>https?://images\.squarespace-cdn\.com/content/"
+    r"[^\s\"'<>]+/(?P<name>Newsletter_\d{8}\.(?:png|jpe?g)))"
+    r"(?:\?[^\s\"'<>]*)?",
+    re.IGNORECASE,
+)
 _RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)
 
 
@@ -2662,7 +2670,7 @@ def _extract_scored_upload_images(
     href_patterns: list[str],
     target_date: date,
 ) -> list[tuple[date, str]]:
-    """Newest-first bulletin page images from raw HTML (no Playwright)."""
+    """Newest-first bulletin page images from raw HTML/JSON text (no Playwright)."""
     from .bulletin_freshness import extract_bulletin_date
 
     scored: list[tuple[date, str]] = []
@@ -2687,6 +2695,22 @@ def _extract_scored_upload_images(
         )
         if found <= target_date + timedelta(days=3):
             scored.append((found, url))
+    # Squarespace ?format=json / HTML embeds Newsletter_YYYYMMDD.png on CDN.
+    for match in _SQUARESPACE_DATED_NEWSLETTER_IMAGE_RE.finditer(html or ""):
+        url = match.group("url")
+        name = match.group("name")
+        if url in seen:
+            continue
+        seen.add(url)
+        if href_patterns and not _href_matches_patterns(url, href_patterns):
+            continue
+        if _is_non_bulletin_url(url):
+            continue
+        found = extract_date_from_string(name) or extract_bulletin_date(url)
+        if found is None:
+            continue
+        if found <= target_date + timedelta(days=3):
+            scored.append((found, url))
     return scored
 
 
@@ -2698,10 +2722,11 @@ async def _try_http_scrape_newest_images(
     target_date: date,
     count: int = 1,
 ) -> tuple[str, str] | None:
-    """Fetch listing HTML and stack the newest week's page images into a PDF.
+    """Fetch listing HTML/JSON and stack the newest week's page images into a PDF.
 
-    Built for Derriaghy (Playwright navigation times out) and Iskaheen
-    (stacked August scans on /bulletin). Never opens a browser.
+    Built for Derriaghy (Playwright navigation times out), Iskaheen
+    (stacked August scans on /bulletin), and Squarespace Church Newsletter
+    image posts (Newtowncashel ``?format=json``). Never opens a browser.
     """
     listing_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
@@ -2713,7 +2738,17 @@ async def _try_http_scrape_newest_images(
     if not listing_result:
         return None
     listing_body, listing_headers = listing_result
-    if "text/html" not in (listing_headers.get("content-type") or "").lower():
+    content_type = (listing_headers.get("content-type") or "").lower()
+    head = listing_body.lstrip()[:64]
+    looks_text = (
+        "text/html" in content_type
+        or "json" in content_type
+        or "text/plain" in content_type
+        or head[:1] in {b"{", b"["}
+        or head.lower().startswith(b"<!doctype html")
+        or head.lower().startswith(b"<html")
+    )
+    if not looks_text:
         return None
     listing_html = listing_body.decode("utf-8", errors="ignore")
     scored = _extract_scored_upload_images(

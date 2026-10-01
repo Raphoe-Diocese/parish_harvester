@@ -1,19 +1,34 @@
 {
+  "version": 2,
   "parish_key": "newtowncashel",
   "display_name": "Newtowncashel",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=33",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official directory — diocese card link only",
+  "start_url": "https://newtowncashel.ie/local-news?category=Church+Newsletter&format=json",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": [
+    "newsletter_"
+  ],
+  "image_count": 1,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "https://images.squarespace-cdn.com/content/v1/69c01534a155cc487bfc777e/a72faaf6-6df1-4dbb-a782-f883729f8b8e/Newsletter_20260927.png",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=33"
+      "action": "image",
+      "url": "https://images.squarespace-cdn.com/content/v1/69c01534a155cc487bfc777e/a72faaf6-6df1-4dbb-a782-f883729f8b8e/Newsletter_20260927.png"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: official directory had no parish website — live host is newtowncashel.ie (Squarespace).",
+    "Church Newsletter category posts full-page Newsletter_YYYYMMDD.png on images.squarespace-cdn.com (this week Newsletter_20260927.png, GET 200 image/png ~3.5MB).",
+    "Listing HTML hides Newsletter hrefs; ?format=json exposes CDN URLs. site_type:http_scrape_newest_images scrapes that JSON and converts the newest dated PNG to PDF.",
+    "Do not pin one week's UUID path — UUID changes every upload."
+  ],
+  "do_not": [
+    "Do not pin Newsletter_20260927.png or the UUID folder.",
+    "Do not use the diocese card URL as start_url.",
+    "Do not invent a Facebook bulletin.",
+    "Do not scrape only the HTML category page — Newsletter URLs are in ?format=json."
+  ]
 }

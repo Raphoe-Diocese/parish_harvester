@@ -2079,3 +2079,30 @@ class AthloneWpJsonMediaDateFallbackTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class NewtowncashelSquarespaceImageTests(unittest.TestCase):
+    LISTING = "https://newtowncashel.ie/local-news?category=Church+Newsletter&format=json"
+    THIS_WEEK = (
+        "https://images.squarespace-cdn.com/content/v1/69c01534a155cc487bfc777e/"
+        "a72faaf6-6df1-4dbb-a782-f883729f8b8e/Newsletter_20260927.png"
+    )
+    LAST_WEEK = (
+        "https://images.squarespace-cdn.com/content/v1/69c01534a155cc487bfc777e/"
+        "b82a44cc-7210-4b38-a886-04e1ea005d78/Newsletter_20260920.png"
+    )
+
+    def test_scores_newsletter_yyyymmdd_from_squarespace_json(self) -> None:
+        blob = (
+            f'{{"items":[{{"image":"{self.THIS_WEEK}?format=2500w"}},'
+            f'{{"image":"{self.LAST_WEEK}?format=1000w"}}]}}'
+        )
+        scored = _extract_scored_upload_images(
+            blob,
+            self.LISTING,
+            href_patterns=["newsletter_"],
+            target_date=date(2026, 9, 27),
+        )
+        urls = [url for _found, url in scored]
+        self.assertIn(self.THIS_WEEK, urls)
+        self.assertIn(self.LAST_WEEK, urls)
+        self.assertEqual(max(item[0] for item in scored), date(2026, 9, 27))

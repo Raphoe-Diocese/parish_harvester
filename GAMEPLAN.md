@@ -1,8 +1,20 @@
+﻿## 01/10/2026 night — Newtowncashel Squarespace newsletter (Frank go)
+- Proved this-week Church Newsletter image `Newsletter_20260927.png` on newtowncashel.ie (Squarespace CDN).
+- Wired `http_scrape_newest_images` against `?format=json`; engine now accepts JSON bodies and scores `Newsletter_YYYYMMDD` CDN URLs.
+- Contacts host updated to newtowncashel.ie. Harvest dispatch next; live count still **12/37** until ok + Pages.
+## 01/10/2026 late — Ardagh again (Frank: 9/37 not enough)
+- Different tactics: hostname blast + wp-json media + predicted /pdf/DDMMYY even when HTML archive looks dead.
+- **Proved this week (27/09/2026) and wired + harvested ok:** Athlone, Carrick-on-Shannon, Drumshanbo.
+- Athlone needed two engine fixes: wp-json media-date when filename has no day; letter-month freshness (`I-Sept2726` → 27/09/2026) so folder `/2024/11/` does not stale-reject.
+- **Live-proved** 01/10: https://www.parishpress.ie/ Ardagh card **12/37** (was 9/37).
+- Leftovers still no this-week file: Abbeylara, Moate 2015, Drumlish Newsletter800, Aughavas NL1773, Killenummery Novena, most NX hosts. Do not invent Facebook PDFs.
+
 ## 01/10/2026 afternoon — Ardagh hunt keep going (Frank)
 - Found + wired two more this-week PDFs:
   - **Kilronan** `parishofkilronan.ie` `/wp-content/uploads/27.09.2026.pdf` (27th Sep 2026).
   - **Ardagh and Moydow** `ardaghmoydow.com/pdf/270926.pdf` — shared with **Legan & Ballycloghan** (alias).
-- Still no this-week file for most leftovers. **Not live count until** harvest after push.
+- Harvest [36871087038](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36871087038) success: both **ok**. **Live-proved** 01/10: homepage Ardagh **9/37**.
+- Still no this-week file for most leftovers.
 
 ## 01/10/2026 — Ardagh deeper hunt (Frank next)
 - Goal: more this-week Ardagh PDFs beyond 6 ok.
@@ -22109,4 +22121,5 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
 
