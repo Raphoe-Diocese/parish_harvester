@@ -1,19 +1,32 @@
 {
+  "version": 2,
   "parish_key": "athlone",
   "display_name": "Athlone",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=25",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "official card links the diocese site itself — no parish website",
+  "start_url": "https://stmarysathlone.ie/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "https://stmarysathlone.ie/wp-content/uploads/2024/11/I-Sept2726.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=25"
+      "action": "download",
+      "url": "https://stmarysathlone.ie/wp-content/uploads/2024/11/I-Sept2726.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: official card had no parish website — live host is stmarysathlone.ie.",
+    "Proved I-Sept2726.pdf GET 200 application/pdf 765,498 bytes; text 'ANNIVERSARIES FOR THE WEEK AHEAD Monday 28th September - Sunday 4th October' and 'this weekend 25th-27th of September' — this week 27/09/2026.",
+    "Weekly files live in wp-json/wp/v2/media under /wp-content/uploads/2024/11/ with letter-month names (I-Sept2726.pdf). This-weeks HTML page embeds a viewer with no raw .pdf href.",
+    "site_type:wp_json_newest_media — do not pin one week's filename."
+  ],
+  "do_not": [
+    "Do not pin I-Sept2726.pdf or use_captured_url.",
+    "Do not use the diocese card URL as start_url.",
+    "Do not invent a Facebook bulletin."
+  ]
 }

@@ -1,19 +1,33 @@
 {
+  "version": 2,
   "parish_key": "drumshanbo",
   "display_name": "Drumshanbo",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=32",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official directory — diocese card link only",
+  "start_url": "https://drumshanboparish.ie/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    ".pdf",
+    "2026"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "https://drumshanboparish.ie/wp-content/uploads/2026/09/27092026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=32"
+      "action": "download",
+      "url": "https://drumshanboparish.ie/wp-content/uploads/2026/09/27092026.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: official directory had no website — kitchen-sink found drumshanboparish.ie (home page is broken 'No Results' but wp-json media works).",
+    "Proved 27092026.pdf GET 200 application/pdf 275,024 bytes; text 'Twenty Sixth Sunday in Ordinary Time: Masses 28th Sept to 4th October 2026' / Parish Office 0719641010 — this week 27/09/2026.",
+    "site_type:wp_json_newest_media picks newest dated PDF (some weeks are JPEG scans only)."
+  ],
+  "do_not": [
+    "Do not pin 27092026.pdf.",
+    "Do not use the diocese card URL as start_url.",
+    "Do not invent a Facebook bulletin.",
+    "Do not treat the broken home page as proof the parish has no site."
+  ]
 }

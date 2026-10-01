@@ -1,19 +1,32 @@
 {
+  "version": 2,
   "parish_key": "carrickonshannon",
   "display_name": "Carrick-on-Shannon (Kiltoghert)",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "http://www.carrickonshannonparish.com",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "parishnews.htm has no file; pastnews.htm stops at Dec 2021",
+  "start_url": "http://carrickonshannonparish.com/pdf/270926.pdf",
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 8,
+  "playbook_type": "dated_pdf_bulletin",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "http://carrickonshannonparish.com/pdf/270926.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "http://www.carrickonshannonparish.com"
+      "action": "download",
+      "url": "http://carrickonshannonparish.com/pdf/270926.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: parishnews.htm / pastnews.htm look dead (archive stops 2021) but weekly file is still /pdf/DDMMYY.pdf over HTTP — same Longford pattern.",
+    "Proved 270926.pdf GET 200 application/pdf 404,972 bytes; text 'SATURDAY 26th & SUNDAY 27th SEPTEMBER' / KILTOGHERT PARISH — this week 27/09/2026.",
+    "HTTPS TLS fails on this host — keep http://.",
+    "site_type:predicted_dated_pdf — do not trust the HTML archive list alone."
+  ],
+  "do_not": [
+    "Do not skip because pastnews.htm stops at 2021.",
+    "Do not pin use_captured_url to one week's filename.",
+    "Do not force https:// on this host.",
+    "Do not invent a Facebook bulletin."
+  ]
 }
