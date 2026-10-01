@@ -54,6 +54,10 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-10-01 · **Armagh live** on parishpress.ie: `armagh` in `LIVE_DIOCESES` + St Patrick's cathedral hero + regenerated `docs/index.html` (8 cards, coming soon 18) + `docs/dioceses/armagh/index.html` (7 of 61). **Not live yet** until push + Pages. · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/armagh/`
+
+- [ ] **todo** · 2026-10-01 · **Ardagh deeper hunt** — Frank wants many more than 6/40. Truth: Longford/Edgeworthstown/Rathowen/Mohill (+aliases) already wired; leftovers mostly Facebook / no this-week PDF. Do not invent. · kitchen-sink / `docs/DIOCESE_HUNT.md`
+
 - [ ] **doing** · 2026-09-30 · Homepage live grid back to **4 cards per row** (Frank undid 5). Generator + `docs/index.html`. **Not live yet** until push + Pages. · `harvester/site_builder.py`, `docs/index.html`
 
 - [x] **done** · 2026-09-29 · Homepage live grid briefly **5** across — Frank asked to revert 30/09. Was live-proved then undone. · `harvester/site_builder.py`, `docs/index.html`

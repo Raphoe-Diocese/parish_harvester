@@ -32,7 +32,7 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross", "achonry", "ardagh-and-clonmacnoise"}
+LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross", "achonry", "ardagh-and-clonmacnoise", "armagh"}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
 OCR_DIOCESE_KEYS = {
@@ -43,6 +43,7 @@ OCR_DIOCESE_KEYS = {
     "cork-and-ross": "cork_and_ross",
     "achonry": "achonry",
     "ardagh-and-clonmacnoise": "ardagh",
+    "armagh": "armagh",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -50,6 +51,7 @@ GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harve
 EVIDENCE_DIOCESE_KEYS = {
     "achonry": "achonry_diocese",
     "ardagh-and-clonmacnoise": "ardagh_diocese",
+    "armagh": "armagh_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",
@@ -186,6 +188,20 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Ardagh and Clonmacnoise Diocese",
         title="St Mel's Cathedral, Longford",
         subtitle="This week's Ardagh and Clonmacnoise parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="armagh",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/"
+            "Armagh_Roman_Catholic_Cathedral_of_St._Patrick_2013_09_24.jpg/"
+            "1280px-Armagh_Roman_Catholic_Cathedral_of_St._Patrick_2013_09_24.jpg"
+        ),
+        credit="Photo: Andreas F. Borchert / Wikimedia Commons / CC BY-SA 3.0",
+        position="center 25%",
+        gradient="linear-gradient(135deg, #1a2030 0%, #3a4a6b 55%, #8aa0c8 100%)",
+        eyebrow="Armagh Diocese",
+        title="St Patrick's Cathedral, Armagh",
+        subtitle="This week's Armagh parish bulletins.",
     ),
 ]
 

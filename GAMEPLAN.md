@@ -1,3 +1,7 @@
+## 01/10/2026 — Armagh live (this turn)
+- Frank: Armagh live. Added ``armagh`` to ``LIVE_DIOCESES`` + hero slide (St Patrick's RC cathedral) + OCR/evidence maps. Regenerated ``docs/index.html`` (8 live cards, coming soon 18) and ``docs/dioceses/armagh/index.html`` (7 of 61). Tests updated. **Not live yet** until push + Pages prove.
+- **Ardagh:** harvest truth after hunt wiring is **6 ok** (Cloghan & Banagher, Ferbane, Longford, Edgeworthstown, Mohill, Rathowen) of ~40 — most leftovers are Facebook-only / no this-week PDF. Deeper kitchen-sink is **Next** when Frank says go. Do not invent bulletins.
+
 ## 30/09/2026 night — Ardagh hunt (Frank go)
 - Goal: find more this-week Ardagh PDFs beyond Cloghan & Banagher + Ferbane (was 2/40).
 - **Proved this week (27/09/2026) and wired:**
