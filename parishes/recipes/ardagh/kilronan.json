@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "kilronan",
   "display_name": "Kilronan (Keadue, Arigna, Ballyfarnon)",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=9",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "official card website http://www.kilronanparish.ie is dead (URLError) — diocese card link only",
+  "start_url": "https://www.parishofkilronan.ie/newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "/wp-content/uploads/",
+    ".pdf"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "https://www.parishofkilronan.ie/wp-content/uploads/27.09.2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=9"
+      "action": "download",
+      "url": "https://www.parishofkilronan.ie/wp-content/uploads/27.09.2026.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: official card kilronanparish.ie is dead — live twin is parishofkilronan.ie.",
+    "Proved PDF /wp-content/uploads/27.09.2026.pdf GET 200 application/pdf 302,429 bytes; page text '27th Sep 2026' / Keadue Arigna Ballyfarnon.",
+    "site_type:http_scrape_newest_pdf — score DD.MM.YYYY filename; do not pin."
+  ],
+  "do_not": [
+    "Do not pin 27.09.2026.",
+    "Do not use the dead kilronanparish.ie host.",
+    "Do not use the diocese card URL as start_url."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

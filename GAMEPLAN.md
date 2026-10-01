@@ -1,8 +1,15 @@
+## 01/10/2026 afternoon — Ardagh hunt keep going (Frank)
+- Found + wired two more this-week PDFs:
+  - **Kilronan** `parishofkilronan.ie` `/wp-content/uploads/27.09.2026.pdf` (27th Sep 2026).
+  - **Ardagh and Moydow** `ardaghmoydow.com/pdf/270926.pdf` — shared with **Legan & Ballycloghan** (alias).
+- Still no this-week file for most leftovers. **Not live count until** harvest after push.
+
 ## 01/10/2026 — Ardagh deeper hunt (Frank next)
 - Goal: more this-week Ardagh PDFs beyond 6 ok.
 - **Proved + wired:** **Newtownforbes (Clonguish)** — `clonguishparish.ie` Docdownloads; PDF `Clonguish Newsletter 27.09.202611719.pdf` (27th September 2026 text). Official card had no site.
+- Harvest [36860073239](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36860073239) success: ``newtownforbes`` **ok**. **Live-proved** 01/10: homepage Ardagh **7/37** on https://www.parishpress.ie/
 - Re-checked leftovers: Drumlish still max 22-Sep (stale); Aughavas still NL1773 July; Abbeylara stops July 2025; Carrick archive 2021; Moate newsletter index is 2015 files; Athlone St Mary's archive dead; Drumshanbo host up but empty; most other leftovers no hostname.
-- **Not live count until** ``ardagh_diocese`` harvest after push. Do not invent Facebook bulletins.
+- Do not invent Facebook bulletins.
 
 ## 01/10/2026 — Armagh live (LIVE-PROVED)
 - Frank: Armagh live. ``armagh`` in ``LIVE_DIOCESES`` + St Patrick's cathedral hero + regenerated viewer/index. Push ``98136bf4`` + Pages [36796997185](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36796997185).

@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "ardaghandmoydow",
   "display_name": "Ardagh and Moydow",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=24",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "official card website http://www.parishardaghmoydow.com is dead (URLError) — diocese card link only",
+  "start_url": "https://www.ardaghmoydow.com/parish-news.html",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "/pdf/",
+    ".pdf"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "https://www.ardaghmoydow.com/pdf/270926.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=24"
+      "action": "download",
+      "url": "https://www.ardaghmoydow.com/pdf/270926.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: official card parishardaghmoydow.com is dead — live twin is ardaghmoydow.com.",
+    "Proved PDF /pdf/270926.pdf GET 200 application/pdf 515,839 bytes; weekend Masses Sat 26th / Sun 27th Sep for Ardagh, Moydow, Legan, Ballycloghan.",
+    "Shared bulletin with Legan & Ballycloghan — harvest once here; leganballycloghan is alias_of this key.",
+    "Filenames are DDMMYY.pdf under /pdf/ — score filename date; listing page can lag."
+  ],
+  "do_not": [
+    "Do not pin 270926.",
+    "Do not also harvest the same PDF under leganballycloghan.",
+    "Do not use the dead parishardaghmoydow.com host."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
