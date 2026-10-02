@@ -1,4 +1,30 @@
-﻿## 01/10/2026 night — Kiltubrid HTML news (Frank keep going)
+## 02/10/2026 — Cashel & Emly hunt START (Frank: other dioceses)
+
+- Goal: start next A–Z diocese after Armagh/Ardagh. **Cashel & Emly** (gameplan Next).
+- Official directory https://cashel-emly.ie/parish/ — **46** A-Z cards (browser 02/10). Evidence + contacts written.
+- Proved this-week files + recipes wired (not harvested / not LIVE yet):
+  - **Thurles** `thurlesparish.ie` Newsletter-27th-September-2026.pdf
+  - **Emly** `emly.ie` Emly-Parish-Bulletin-27th-September-2026-sent.docx (kitchen-sink; card had no site)
+- 44 other parishes = skip/link_only until a this-week file is proved. Do not invent Facebook PDFs.
+- Harvest choice + Sunday matrix: `cashel_and_emly_diocese`. Recipe folder `cashel_and_emly`.
+- **Not live** — not in LIVE_DIOCESES until a successful harvest + Pages. Still in coming-soon on parishpress.
+- **Next (when Frank says go):** commit/push + dispatch `cashel_and_emly_diocese` harvest; then kitchen-sink more sites. Parked: Elphin; Legan alias push; Ardagh leftovers until Sunday.
+
+## 02/10/2026 mid-morning — Ardagh hunt empty; Legan alias wired
+
+- Goal: more this-week Ardagh bulletins (Frank continue).
+- Re-hunt 02/10: Drumlish still Newsletter800 (Last-Modified 22 Sep); Newsletter801 404. Aughavas still NL1773 (16 Jul); NL1774 404. Abbeylara stops July 2025. Killenummery novena/images only. No new this-week PDF proved on skip leftovers (most diocese-card / no website).
+- **Live still 14/37** on https://www.parishpress.ie/ (opened 02/10) — no new PDF to wire.
+- Bookkeeping (not a new bulletin): recipe already had `leganballycloghan` alias_of `ardaghandmoydow`, but `ALIAS_TO_CANONICAL` was missing it so Legan inflated M. Wired alias + combined display name. Local week summary now **14/36**. Tests `test_parish_aliases` green. **Not live yet** until commit + push + Pages.
+- **Next (when Frank says go):** commit/push Legan alias for live 14/36, or wait for Sunday posts / Drumlish Newsletter801. Do not invent Facebook PDFs.
+
+﻿## 02/10/2026 morning — Ardagh hunt again (Frank go)
+- Kitchen-sink leftovers: hostname blast + web search + Clonmacnois blog + Killenummery + Dromard.
+- **No new this-week file proved.** Annaduff/Bornacoola hosts are empty landers; Granard parking page; Clonmacnois blog stopped Sept 2024; Killenummery still Novena flyer only; Dromard bot-wall / connection timeout; Drumlish still Newsletter800 dated 22-Sep (stale); Aughavas still July.
+- Do not invent Facebook PDFs.
+- **Live-proved** 02/10: https://www.parishpress.ie/ Ardagh card **14/37** (Cashel + Kiltubrid now on the card).
+## 01/10/2026 night — Kiltubrid HTML news (Frank keep going)
+- Harvest [36930698934](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36930698934) success: `kiltubrid` **ok**. Ardagh ok now **14** in parish_status. Live card not re-proved this turn.
 - Kitchen-sink found `kiltubridparish.com/news/` (official card had no site).
 - Proved top heading **Sunday, 27th September 2026** with Mass Times & Intentions (Rantogue/Drumcong).
 - Wired `html_text_bulletin` print_to_pdf + skip_listing_nav. Harvest next.
@@ -22126,6 +22152,8 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
+
 
 
 

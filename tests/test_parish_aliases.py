@@ -40,6 +40,7 @@ class ParishAliasTests(unittest.TestCase):
                 "streete": "rathowen",
                 "fenagh": "mohill",
                 "gortletteragh": "mohill",
+                "leganballycloghan": "ardaghandmoydow",
             },
         )
 
@@ -241,6 +242,28 @@ class ParishAliasTests(unittest.TestCase):
         )
         self.assertEqual(good.status, "ok")
         self.assertEqual(good.error, "")
+
+
+    def test_legan_shares_ardagh_and_moydow(self) -> None:
+        self.assertTrue(is_alias_key("leganballycloghan"))
+        self.assertEqual(canonical_key("leganballycloghan"), "ardaghandmoydow")
+        self.assertEqual(
+            combined_display_name("ardaghandmoydow"),
+            "Ardagh and Moydow (Legan & Ballycloghan)",
+        )
+        legan = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "ardagh" / "leganballycloghan.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        host = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "ardagh" / "ardaghandmoydow.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(legan.get("alias_of"), "ardaghandmoydow")
+        self.assertTrue(legan.get("skip"))
+        self.assertNotEqual(host.get("skip"), True)
 
 
 if __name__ == "__main__":
