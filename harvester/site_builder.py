@@ -48,6 +48,7 @@ LIVE_DIOCESES = {
     "ferns",
     "killala",
     "killaloe",
+    "kilmore",
 }
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
@@ -334,6 +335,20 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Killaloe Diocese",
         title="Cathedral of Saints Peter and Paul, Ennis",
         subtitle="This week's Killaloe parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="kilmore",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/"
+            "Cavan_-_Cathedral_of_Saint_Patrick_and_Saint_Felim_-_20231116102819.jpg/"
+            "1280px-Cavan_-_Cathedral_of_Saint_Patrick_and_Saint_Felim_-_20231116102819.jpg"
+        ),
+        credit="Photo: Olliebailie / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #1a2218 0%, #3a5830 55%, #a8c890 100%)",
+        eyebrow="Kilmore Diocese",
+        title="Cathedral of St Patrick and St Felim, Cavan",
+        subtitle="This week's Kilmore parish bulletins.",
     ),
 ]
 
