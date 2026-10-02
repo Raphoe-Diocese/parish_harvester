@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Kilbarron Text Bulletin — 14/08/2026</title>
+  <title>Kilbarron Text Bulletin — 02/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -87,9 +142,14 @@
       margin-top: 1.5em;
     }
     .ocr-body h3.b-head, .ocr-body .b-head {
-      font-size: 1.12em;
-      color: #134e9c;
-      margin: 1.1em 0 0.35em;
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
     }
     .ocr-body h4.b-sub, .ocr-body .b-sub {
       font-size: 1.04em;
@@ -102,6 +162,9 @@
       font-weight: 700;
       line-height: 1.35;
       max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
     }
     .ocr-body h3.ocr-page-heading,
     .ocr-body .page-label {
@@ -167,6 +230,49 @@
     .ocr-body > :first-child {
       margin-top: 0;
     }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
 
     .ocr-body {
       padding: 4px 2px 8px;
@@ -222,68 +328,18 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
   <div class="page">
     <div class="top" id="ocr-top">
       <div class="top-left">
-        <a class="back-link" href="kilbarron.html">← Viewer</a>
-        <span class="title-line">KILBARRON Text Bulletin · 14/08/2026</span>
+        <a class="back-link" href="kilbarron.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">KILBARRON Text Bulletin · 02/10/2026</span>
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -303,91 +359,8 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
-<p>Kilbarron<br>
-https://www.kilbarron.org/bulletin<br>
-Page 18<br>
-M<br>
-ass Times<br>
-Saturday 8th 6pm Joe McGinley, Towney &amp; Dublin – Anniversary<br>
-Sunday 9th 11am<br>
-Monday 10th NO MASS<br>
-Tuesday 1th 10am<br>
-Wednesda y 12th 10am John &amp; Agnes Cunningham, Bavin –<br>
-Anniversaries<br>
-Thursday 13th 10am<br>
-Friday 14th 10am<br>
-Saturday 15th 6pm Siobhan McBrearty – First Anniversary<br>
-Denis &amp; Theresa McBrearty – Anniversaries<br>
-Patrick &amp; Mary Kane – Anniversaries<br>
-Mary B &amp; Michael McCloskey – Anniversaries<br>
-Sunday 16th 11am<br>
-St Carthas Church, Kilcar<br>
-Fr Willie Peoples P.P<br>
-074 9738007<br>
-/<br>
-087 7449461<br>
-stcarthaschurch@gmail.com<br>
-Sunday 9th August 2026<br>
-Live Streaming:<br>
-www.mcn.live<br>
-St Peregrine<br>
-A blessing with the relic of St Peregrine can be obtained after Mass every Friday at 10am.<br>
-This kindly Saint, born in Italy in 1260, is the Patron Saint of cancer patients.<br>
-Parish Collection - € 1855 We Remember:<br>
-Recently Deceased –<br>
-Nora Shovlin, Bavin<br>
-Mabel Byrne, Coguish<br>
-Bríd Byrne, Sheltered Houses<br>
-Suaimhneas Síoraí<br>
-Scéim Fostaíochta Pobail /<br>
-Community Employment Scheme<br>
-Tá folúntais ar an Scéim fá láthair i<br>
-nGleann agus Cill Chartha.<br>
-There are vacancies on the CE<br>
-Scheme in Glencolmcille and Kilcar<br>
-To check eligibility, please contact<br>
-James at<br>
-087 6788188<br>
-Áislann Chill Chartha<br>
-Friday 1th September Onoir &amp; Friday 25th September Frankie Gavan &amp; Catherine<br>
-Mc Hugh. All tickets available at reception.<br>
-Enrolment for our winter classes are now being taken for:<br>
-adult &amp; children ’s art 🎨, knitting &amp; crochet, photography, computer &amp;<br>
-accounts &amp; Irish classes for all levels (these classes are subject to numbers)<br>
-A History of Textiles (Scéal na dTeicstílí) is now available at Áislann Chill Chartha<br>
-reception! This beautifully crafted book explores the rich textile heritage of all our<br>
-local parishes. Overseas postage available —pop in or contact us to order.<br>
-For all info call<br>
-074 9738376<br>
-or message our media pages.<br>
-Áislann Golf Classic Friday 14th August 2026. Bundoran Golf Club.<br>
-To register a team (teams of 4) &amp; to book a tee time contact:<br>
-Contact Matthew.<br>
-071 9841302<br>
-Aislann Thomas<br>
-074 9738376<br>
-E:<br>
-eolas@aislann.ie<br>
-Patrick<br>
-087 2506443<br>
-Confessions will be heard after all Masses during the week<br>
-Eddie Stones<br>
-A Day of Healing &amp;<br>
-Prayer will take place<br>
-with Eddie Stone in the<br>
-House of Prayer on<br>
-Saturday August 15th.<br>
-A bus will leave<br>
-Letterkenny collecting<br>
-people in Ballybofey &amp;<br>
-Donegal Town too.<br>
-A priest will accompany<br>
-the group.<br>
-For more details, please<br>
-call:<br>
-086 3936547<br>
-Eucharistic Adoration Wednesday from 10.30am – 3.30pm</p></div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-kilbarron" data-parish-name="Kilbarron"><h2 class="ocr-parish-name">Kilbarron</h2><p class="ocr-parish-date">02/10/2026</p></header>
+<div class="ocr-failed-banner" role="status">⚠️ This week&#x27;s PDF page for Kilbarron could not be cut from the collated bulletin</div></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -535,23 +508,104 @@ Eucharistic Adoration Wednesday from 10.30am – 3.30pm</p></div>
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
   </script>
   <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
-    (function () {
-      var btn = document.getElementById('scroll-top-btn');
-      if (!btn) return;
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function shown() {
-        var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240);
-      }
-      window.addEventListener('scroll', shown, { passive: true });
-      shown();
-      btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-      });
-    })();
-    </script>
 </body>
 </html>
