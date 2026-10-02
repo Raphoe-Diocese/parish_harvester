@@ -54,6 +54,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **todo** · 2026-10-02 · **Killala not live.** Hunt wired (`killala` in `OCR_DIOCESE_KEYS` and `EVIDENCE_DIOCESE_KEYS` only). Not in `LIVE_DIOCESES`. No diocese page regenerated. Not on https://www.parishpress.ie/ until a harvest writes `docs/dioceses/killala/` and a later live step. · `harvester/site_builder.py`, `parishes/killala_diocese_bulletin_urls.txt`
+
 - [x] **done** · 2026-10-01 · **Armagh live** on parishpress.ie: `armagh` in `LIVE_DIOCESES` + St Patrick's cathedral hero + regenerated index/viewer. Push `98136bf4` + Pages [36796997185](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36796997185). **Live-proved** 01/10: homepage Armagh **7/61**, coming soon (18); https://www.parishpress.ie/dioceses/armagh/. · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/armagh/`
 
 - [ ] **todo** · 2026-10-01 · **Ardagh deeper hunt** — Clonguish live (7/37). Wired Kilronan + Ardagh/Moydow(+Legan alias) this turn — need harvest. Leftovers mostly no site / Facebook / stale. Do not invent. · kitchen-sink / `docs/DIOCESE_HUNT.md`

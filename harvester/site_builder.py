@@ -65,6 +65,7 @@ OCR_DIOCESE_KEYS = {
     "ferns": "ferns",
     "galway": "galway",
     "kerry": "kerry",
+    "killala": "killala",
     "killaloe": "killaloe",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
@@ -81,6 +82,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "ferns": "ferns_diocese",
     "galway": "galway_diocese",
     "kerry": "kerry_diocese",
+    "killala": "killala_diocese",
     "killaloe": "killaloe_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",

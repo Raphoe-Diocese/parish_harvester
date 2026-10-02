@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "parish_key": "crossmolina",
+  "display_name": "Crossmolina",
+  "diocese": "killala",
+  "start_url": "https://www.churchtv.ie/crossmolina/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Crossmolina",
+    "Newsletter",
+    ".pdf"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-02",
+  "example_url": "https://www.churchtv.ie/wp-content/uploads/2021/02/4th-October-Crossmolina-Parish-Newsletter-1.pdf",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.churchtv.ie/crossmolina/"
+    }
+  ],
+  "operator_notes": [
+    "02/10/2026: the Crossmolina ChurchTV page HTML links one newsletter PDF. Proved GET 200 application/pdf 2265814 bytes, magic %PDF-1.4. File text starts 4TH OCTOBER 2026.",
+    "The upload folder is /wp-content/uploads/2021/02/ even though the bulletin is October 2026. Scrape the page link. Do not date-rewrite the 2021/02 folder.",
+    "crossmolinaparish.com media library lists the same filename and the same 2265814 byte size at /wp-content/uploads/2026/10/. Direct GET of that copy from the hunt VM was SiteGround HTTP 202."
+  ],
+  "do_not": [
+    "Do not pin 4th-October-Crossmolina-Parish-Newsletter-1.pdf.",
+    "Do not treat /2021/02/ as the bulletin year.",
+    "Do not harvest Facebook.",
+    "Do not use the diocese Facebook page as this parish link."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
+}
