@@ -38,6 +38,7 @@ _DIOCESE_LABELS: dict[str, str] = {
     "kerry_diocese": "Kerry Diocese",
     "killala_diocese": "Killala Diocese",
     "killaloe_diocese": "Killaloe Diocese",
+    "kilmore_diocese": "Kilmore Diocese",
     "raphoe_diocese": "Raphoe Diocese",
 }
 
@@ -58,6 +59,7 @@ _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
     "kerry": "Kerry Diocese",
     "killala": "Killala Diocese",
     "killaloe": "Killaloe Diocese",
+    "kilmore": "Kilmore Diocese",
     "raphoe": "Raphoe Diocese",
 }
 

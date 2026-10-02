@@ -1,3 +1,9 @@
+## 03/10/2026 — Kilmore hunt START
+
+- Official https://www.kilmorediocese.ie/parishes-by-name/ — 36 named parishes.
+- Proved: **Crosserlough** Sunday-4th-October-2026.pdf GET 200 application/pdf 237706 bytes.
+- Town key `kilmoreparish`. Harvest choice `kilmore_diocese`. Not live.
+
 ## 02/10/2026 — Killala hunt START
 
 - Official https://www.killaladiocese.org/parishes-ministries/parish-details/ — **22** parishes. Folder `killala`, harvest choice `killala_diocese`. Town key `killalaparish`.
