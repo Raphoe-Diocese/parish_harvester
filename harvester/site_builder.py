@@ -46,6 +46,7 @@ OCR_DIOCESE_KEYS = {
     "armagh": "armagh",
     "cashel-and-emly": "cashel_and_emly",
     "cloyne": "cloyne",
+    "dromore": "dromore",
     "elphin": "elphin",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
@@ -57,6 +58,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "armagh": "armagh_diocese",
     "cashel-and-emly": "cashel_and_emly_diocese",
     "cloyne": "cloyne_diocese",
+    "dromore": "dromore_diocese",
     "elphin": "elphin_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",

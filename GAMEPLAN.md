@@ -1,3 +1,18 @@
+## 02/10/2026 — Dromore hunt START (Frank keep going after Cloyne push)
+
+- Cloyne pushed `7eaa7e48`. Harvest: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37021377920
+- Goal: next remaining diocese **Dromore** (official 23; tables name 22 after Shankill split).
+- Official https://www.dromorediocese.org/parishes/ browser 02/10.
+- Proved this-week (27/09/2026) + recipes (**5**):
+  - **Newry** `27-09-26-Newry-Bulletin_Small.pdf` (expired TLS)
+  - **Tullylish** `bulletin 27.09.26pub1.pdf`
+  - **Clonduff** `Sunday-27th-September-2026.pdf` (listing /about/bulletin)
+  - **St Peter's Lurgan** `27th_September_2026[2026-9-27].pdf` (listing /newsletter/)
+  - **St Paul's Lurgan** `newsletter_paul/27th_September_2026[2026-9-27].pdf` (separate archive)
+- Town parish key `dromoreparish` (Clogher already has `dromore`).
+- Drumgooland/Dromara share a site — both skip until a dated weekly file is proved.
+- Harvest choice: `dromore_diocese`. **Not live yet.**
+
 ## 02/10/2026 — Cloyne hunt START (Frank: keep going / no waiting)
 
 - Elphin harvest already **success**: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37004821053
