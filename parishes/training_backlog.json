@@ -2,15 +2,15 @@
   "generated_at": "2026-10-02",
   "target_date": "2026-09-27",
   "summary": {
-    "downloaded": 190,
+    "downloaded": 191,
     "html_links": 0,
-    "skipped": 271,
+    "skipped": 270,
     "failed": 55,
     "stale_rejected": 16
   },
   "action_counts": {
-    "ok": 176,
-    "skip": 287,
+    "ok": 177,
+    "skip": 286,
     "investigate": 22
   },
   "parishes": [
@@ -8485,32 +8485,37 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/kilbarron.json",
       "recipe": {
-        "start_url": "https://www.facebook.com/kilbarronparishpastoralcouncil",
-        "site_type": "facebook_page",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://kilbarronparish.ie/bulletin/raphoe/kilbarron",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "CASUALTY 2026-08-18: https://www.kilbarron.org/ and /bulletin and the old /s/20260619153721555.pdf all return HTTP 404 Squarespace 'Website Expired'. The diocese directory still lists that URL and a Facebook page (kilbarronparishpastoralcouncil). No ParishPress bulletin.pdf, no replacement domain found. Same class as ballintra/carrigart \u2014 Facebook-only, cannot weekly-harvest.",
-          "2026-08-19: kilbarron.org still Squarespace expired. kilbarron.ie is a Hosting Ireland registrar holding page (not a parish site). kilbarronparish.com / .ie DNS NXDOMAIN. Facebook still the only possible source \u2014 Frank: one public screenshot of this week's bulletin on facebook.com/kilbarronparishpastoralcouncil would unlock a manual override; nothing public to harvest without it."
+          "02/10/2026: Frank pushed permanent weekly link https://kilbarronparish.ie/bulletin/raphoe/kilbarron. Evidence file already had it; recipe was still skip/Facebook \u2014 that is why harvest never tried it.",
+          "Proved 02/10/2026: permanent path GET 200 \u2192 \u2026/parish-bulletins/unassigned/raphoe/kilbarron/bulletin.pdf application/pdf 1613143 bytes.",
+          "Same pattern as Newtown Killea. use_target_url keeps the permanent path as-is (no date rewrite).",
+          "Old kilbarron.org Squarespace site is dead \u2014 do not point back there."
         ],
         "do_not": [
-          "Do not keep pointing the recipe at kilbarron.org \u2014 the Squarespace site is gone, not a selector problem."
+          "Do not set skip true / Facebook-only while this permanent link works.",
+          "Do not point start_url at https://www.kilbarron.org/ or Facebook.",
+          "Do not pin a dated wp-content/uploads/YYYY/MM/ filename.",
+          "Do not add a ?t= cache-buster on bulletin.pdf."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-10-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Website expired \u2014 Facebook only, cannot auto-harvest"
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "kilbegnet",
@@ -11620,7 +11625,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -13066,7 +13071,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
