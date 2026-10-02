@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Parish Press Uploader
  * Description: Secure bulletin upload system with PWA support. No passwords - uses secure shareable links.
- * Version: 16.0.1
+ * Version: 16.0.11
  * Author: Parish Press
  * Requires PHP: 7.0
  * License: GPL2
@@ -22,7 +22,9 @@ define('PPU_DIR', WP_CONTENT_DIR . '/uploads/parish-bulletins/');
 define('PPU_URL', content_url('/uploads/parish-bulletins/'));
 define('PPU_ARCHIVE_DIR', WP_CONTENT_DIR . '/uploads/parish-bulletins-archive/');
 define('PPU_ARCHIVE_URL', content_url('/uploads/parish-bulletins-archive/'));
-define('PPU_VER', '16.0.1');
+define('PPU_VER', '16.0.11');
+// Auto-shrink: longest side 2000px, JPEG 75%. PDFs over 1.5 MB are rebuilt.
+// Word .doc/.docx are stored as uploaded.
 define('PPU_PLUGIN_FILE', __FILE__);
 
 
@@ -2182,7 +2184,7 @@ $manifest_url = add_query_arg([
 
 <div class="box">
     <h1>📤 <?php echo esc_html($p_name); ?></h1>
-    <p class="subtitle">Upload your weekly bulletin</p>
+    <p class="subtitle">Upload your weekly bulletin. Large photos and big PDFs are reduced automatically (longest side 2000 pixels). Word files are saved as they are.</p>
     
     <div class="status-box"><?php echo $active_html; echo $views_html; ?></div>
 
@@ -2436,45 +2438,124 @@ window.rotate = function(i, deg) {
                 filename = 'bulletin.' + blob.name.split('.').pop().toLowerCase();
                 btn.innerText = 'Uploading...';
             } else {
-                btn.innerText = 'Creating PDF...';
+                btn.innerText = 'Reducing file size...';
                 
                 const PDFLib = window.PDFLib;
                 const pdf = await PDFLib.PDFDocument.create();
+                const SHRINK_EDGE = 2000;
+                const JPEG_QUALITY = 0.75;
+                const PDF_SHRINK_OVER = 1.5 * 1024 * 1024;
+
+                function blobFromCanvas(canvas) {
+                    return new Promise(function(resolve, reject) {
+                        canvas.toBlob(function(out) {
+                            if (!out) reject(new Error('Could not shrink this page.'));
+                            else resolve(out);
+                        }, 'image/jpeg', JPEG_QUALITY);
+                    });
+                }
+
+                function shrinkImageFile(file) {
+                    return new Promise(function(resolve, reject) {
+                        const url = URL.createObjectURL(file);
+                        const img = new Image();
+                        img.onload = function() {
+                            let w = img.naturalWidth || img.width;
+                            let h = img.naturalHeight || img.height;
+                            const edge = Math.max(w, h);
+                            if (edge > SHRINK_EDGE) {
+                                const scale = SHRINK_EDGE / edge;
+                                w = Math.max(1, Math.round(w * scale));
+                                h = Math.max(1, Math.round(h * scale));
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = w;
+                            canvas.height = h;
+                            const ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, w, h);
+                            ctx.drawImage(img, 0, 0, w, h);
+                            URL.revokeObjectURL(url);
+                            blobFromCanvas(canvas).then(resolve, reject);
+                        };
+                        img.onerror = function() {
+                            URL.revokeObjectURL(url);
+                            reject(new Error('Could not read photo: ' + file.name));
+                        };
+                        img.src = url;
+                    });
+                }
+
+                async function ensurePdfJs() {
+                    if (window.pdfjsLib) return;
+                    await new Promise(function(resolve, reject) {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                        script.onload = resolve;
+                        script.onerror = function() {
+                            reject(new Error('Could not load the PDF shrink tool. Check the internet and try again.'));
+                        };
+                        document.head.appendChild(script);
+                    });
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                }
+
+                async function drawJpegOnA4(jpegBlob, rotation) {
+                    const bytes = await jpegBlob.arrayBuffer();
+                    const img = await pdf.embedJpg(bytes);
+                    const page = pdf.addPage([595, 842]);
+                    const fitted = img.scaleToFit(555, 802);
+                    page.drawImage(img, {
+                        x: (595 - fitted.width) / 2,
+                        y: (842 - fitted.height) / 2,
+                        width: fitted.width,
+                        height: fitted.height
+                    });
+                    if (rotation) page.setRotation(PDFLib.degrees(rotation));
+                }
+
+                async function shrinkPdfBuffer(buffer, rotation) {
+                    await ensurePdfJs();
+                    const src = await window.pdfjsLib.getDocument({ data: buffer }).promise;
+                    if (pdf.getPageCount() + src.numPages > MAXPG) {
+                        throw new Error('Too many pages. Maximum: ' + MAXPG);
+                    }
+                    for (let i = 1; i <= src.numPages; i++) {
+                        const srcPage = await src.getPage(i);
+                        const base = srcPage.getViewport({ scale: 1 });
+                        const scale = SHRINK_EDGE / Math.max(base.width, base.height);
+                        const vp = srcPage.getViewport({ scale: scale });
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(1, Math.round(vp.width));
+                        canvas.height = Math.max(1, Math.round(vp.height));
+                        await srcPage.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+                        await drawJpegOnA4(await blobFromCanvas(canvas), rotation);
+                    }
+                }
                 
                 for (let f of files) {
-                    const buffer = await f.arrayBuffer();
-                    
-                    if (f.type === 'application/pdf' || f.name.match(/\.pdf$/i)) {
-                        const srcPdf = await PDFLib.PDFDocument.load(buffer);
-                        if (pdf.getPages().length + srcPdf.getPageCount() > MAXPG) {
-                            throw new Error('Too many pages. Maximum: ' + MAXPG);
-                        }
-                        const pages = await pdf.copyPages(srcPdf, srcPdf.getPageIndices());
-                        pages.forEach(p => { if (f.rotation !== 0) { p.setRotation(PDFLib.degrees(f.rotation)); } pdf.addPage(p); });
-                    } else {
-                        if (pdf.getPages().length >= MAXPG) {
-                            throw new Error('Too many pages. Maximum: ' + MAXPG);
-                        }
-                        
-                        let img;
-                        if (f.type === 'image/png' || f.name.match(/\.png$/i)) {
-                            img = await pdf.embedPng(buffer);
+                    const isPdf = (f.type === 'application/pdf' || (f.name && f.name.match(/\.pdf$/i)));
+                    if (isPdf) {
+                        const buffer = await f.arrayBuffer();
+                        if (f.size > PDF_SHRINK_OVER) {
+                            await shrinkPdfBuffer(buffer, f.rotation || 0);
                         } else {
-                            img = await pdf.embedJpg(buffer);
+                            const srcPdf = await PDFLib.PDFDocument.load(buffer);
+                            if (pdf.getPageCount() + srcPdf.getPageCount() > MAXPG) {
+                                throw new Error('Too many pages. Maximum: ' + MAXPG);
+                            }
+                            const pages = await pdf.copyPages(srcPdf, srcPdf.getPageIndices());
+                            pages.forEach(function(p) {
+                                if (f.rotation) p.setRotation(PDFLib.degrees(f.rotation));
+                                pdf.addPage(p);
+                            });
                         }
-                        
-                        const page = pdf.addPage([595, 842]); // A4
-                        const { width, height } = img.scaleToFit(555, 802);
-                        page.drawImage(img, {
-                            x: (595 - width) / 2,
-                            y: (842 - height) / 2,
-                            width: width,
-                            height: height
-                        });
-                        
-                        if (f.rotation !== 0) {
-                            page.setRotation(PDFLib.degrees(f.rotation));
+                    } else {
+                        if (pdf.getPageCount() >= MAXPG) {
+                            throw new Error('Too many pages. Maximum: ' + MAXPG);
                         }
+                        const jpeg = await shrinkImageFile(f);
+                        await drawJpegOnA4(jpeg, f.rotation || 0);
                     }
                 }
                 

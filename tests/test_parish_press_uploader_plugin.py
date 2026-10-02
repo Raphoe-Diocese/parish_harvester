@@ -15,8 +15,8 @@ class TestParishPressUploaderPlugin(unittest.TestCase):
     def test_plugin_header_and_version(self) -> None:
         text = PLUGIN.read_text(encoding="utf-8")
         self.assertIn("Plugin Name: Parish Press Uploader", text)
-        self.assertIn("Version: 16.0.1", text)
-        self.assertIn("define('PPU_VER', '16.0.1')", text)
+        self.assertIn("Version: 16.0.11", text)
+        self.assertIn("define('PPU_VER', '16.0.11')", text)
         self.assertNotIn("malicious infection", text.lower())
 
     def test_settings_link_and_side_menu_are_registered(self) -> None:
@@ -38,6 +38,15 @@ class TestParishPressUploaderPlugin(unittest.TestCase):
         self.assertIn("scope: '/bulletin-upload/'", text)
         self.assertIn("Service-Worker-Allowed: /bulletin-upload/", text)
         self.assertNotIn("scope: '/' })", text)
+
+    def test_auto_shrink_photos_and_fat_pdfs_only(self) -> None:
+        text = PLUGIN.read_text(encoding="utf-8")
+        self.assertIn("const SHRINK_EDGE = 2000", text)
+        self.assertIn("const JPEG_QUALITY = 0.75", text)
+        self.assertIn("const PDF_SHRINK_OVER = 1.5 * 1024 * 1024", text)
+        self.assertIn("function shrinkImageFile", text)
+        self.assertIn("async function shrinkPdfBuffer", text)
+        self.assertIn("Word documents cannot be merged", text)
 
     def test_upload_does_not_wipe_options_on_activate(self) -> None:
         text = PLUGIN.read_text(encoding="utf-8")
