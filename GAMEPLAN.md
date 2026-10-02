@@ -1,3 +1,27 @@
+## 02/10/2026 — Kilbarron permanent link (Frank)
+
+- Evidence already had `https://kilbarronparish.ie/bulletin/raphoe/kilbarron` (extension push).
+- Recipe was still `skip: true` / Facebook — harvest never tries skipped recipes. That is why the push looked ignored.
+- Fix: recipe → `permanent_redirect_document` (same pattern as Newtown Killea). Proved PDF 1613143 bytes.
+- Override skip = turn off `skip` in the recipe (or push a real harvestable recipe from Send & test). Evidence URL alone is not enough.
+
+## 02/10/2026 — Ferns hunt START (while Dromore harvests)
+
+- Official https://ferns.ie/diocese-of-ferns-parishes/ — site says **49 parishes** / 96 churches (browser 02/10). List is church-level (~91 links).
+- Dublin full kitchen-sink parked (too big for this 16GB laptop) — Ferns next.
+- Proved this-week (27/09/2026) so far:
+  - **New Ross** `Newsletter-Sunday-27th-September-2026.pdf` GET 200 application/pdf 1712073 bytes (newrossparish.ie; homepage already shows 4 Oct).
+  - **Gorey (St Michael's)** `Newsletter_270926.jpg` GET 200 image/jpeg 1324354 bytes (stmichaelsgorey.ie newsletter page).
+- Also noted websites (not yet this-week proved): wexfordparish.com (403 HTTP), fernsparish.ie (current = 3–4 Oct; archive gap), kilmoreparish.com, bunclodyparish.org (DNS fail on guessed host).
+- **Not committed / not live.** Keep hunting before recipes.
+
+## 02/10/2026 — Dromore pushed + harvest dispatched
+
+- Commit on main after rebase: `277f7e9b` (Dromore evidence + 5 harvestable recipes + 17 skip).
+- Harvest: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37024422361 (`dromore_diocese`). **Not live.**
+- Cloyne harvest earlier: success https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37021377920
+- Next while waiting: **Ferns** (Dublin too big for this 16GB laptop — park full Dublin kitchen-sink for cloud).
+
 ## 02/10/2026 — Dromore hunt START (Frank keep going after Cloyne push)
 
 - Cloyne pushed `7eaa7e48`. Harvest: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37021377920

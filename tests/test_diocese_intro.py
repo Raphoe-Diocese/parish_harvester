@@ -172,10 +172,10 @@ class DioceseIntroTests(unittest.TestCase):
         self.assertEqual(share_url({}, {}), "")
         self.assertEqual(
             share_url(
-                {"url": "https://www.kilbarron.org/bulletin"},
-                {"start_url": "https://www.facebook.com/kilbarronparishpastoralcouncil"},
+                {"url": "https://example.com/bulletin"},
+                {"start_url": "https://www.facebook.com/exampleparish"},
             ),
-            "https://www.facebook.com/kilbarronparishpastoralcouncil",
+            "https://www.facebook.com/exampleparish",
         )
         summary = build_diocese_week_summary(
             "raphoe",
@@ -193,9 +193,12 @@ class DioceseIntroTests(unittest.TestCase):
             "https://www.facebook.com/paroisteghaothdobhair",
         )
         self.assertIn("https://www.facebook.com/paroisteghaothdobhair", html)
-        kilbarron = [item for item in summary.never_publish if item.name == "Kilbarron"]
-        self.assertEqual(len(kilbarron), 1)
-        self.assertIn("facebook.com/kilbarronparishpastoralcouncil", kilbarron[0].url)
+        # Kilbarron unlocked 02/10/2026 (permanent link). Until harvest lands a
+        # this-week PDF it may still sit in never_publish — but never Facebook.
+        kilbarron_never = [item for item in summary.never_publish if item.name == "Kilbarron"]
+        if kilbarron_never:
+            self.assertIn("kilbarronparish.ie/bulletin/raphoe/kilbarron", kilbarron_never[0].url)
+            self.assertNotIn("facebook.com", kilbarron_never[0].url)
         mevagh = [item for item in summary.never_publish if item.name == "Mevagh"]
         self.assertEqual(len(mevagh), 1)
         self.assertIn("facebook.com", mevagh[0].url)

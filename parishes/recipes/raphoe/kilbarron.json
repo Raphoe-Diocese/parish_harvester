@@ -1,26 +1,34 @@
 {
+  "version": 3,
   "parish_key": "kilbarron",
   "display_name": "Kilbarron",
   "diocese": "raphoe",
-  "recorded_date": "2026-08-18",
-  "start_url": "https://www.facebook.com/kilbarronparishpastoralcouncil",
-  "site_type": "facebook_page",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Website expired — Facebook only, cannot auto-harvest",
+  "start_url": "https://kilbarronparish.ie/bulletin/raphoe/kilbarron",
+  "site_type": "permanent_redirect_document",
+  "playbook_type": "direct_download",
+  "recorded_date": "2026-10-02",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "fallback_document_urls": [
+    "https://kilbarronparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/kilbarron/bulletin.pdf"
+  ],
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.facebook.com/kilbarronparishpastoralcouncil"
+      "action": "download",
+      "url": "https://kilbarronparish.ie/bulletin/raphoe/kilbarron",
+      "use_target_url": true
     }
   ],
-  "version": 2,
   "operator_notes": [
-    "CASUALTY 2026-08-18: https://www.kilbarron.org/ and /bulletin and the old /s/20260619153721555.pdf all return HTTP 404 Squarespace 'Website Expired'. The diocese directory still lists that URL and a Facebook page (kilbarronparishpastoralcouncil). No ParishPress bulletin.pdf, no replacement domain found. Same class as ballintra/carrigart — Facebook-only, cannot weekly-harvest.",
-    "2026-08-19: kilbarron.org still Squarespace expired. kilbarron.ie is a Hosting Ireland registrar holding page (not a parish site). kilbarronparish.com / .ie DNS NXDOMAIN. Facebook still the only possible source — Frank: one public screenshot of this week's bulletin on facebook.com/kilbarronparishpastoralcouncil would unlock a manual override; nothing public to harvest without it."
+    "02/10/2026: Frank pushed permanent weekly link https://kilbarronparish.ie/bulletin/raphoe/kilbarron. Evidence file already had it; recipe was still skip/Facebook — that is why harvest never tried it.",
+    "Proved 02/10/2026: permanent path GET 200 → …/parish-bulletins/unassigned/raphoe/kilbarron/bulletin.pdf application/pdf 1613143 bytes.",
+    "Same pattern as Newtown Killea. use_target_url keeps the permanent path as-is (no date rewrite).",
+    "Old kilbarron.org Squarespace site is dead — do not point back there."
   ],
   "do_not": [
-    "Do not keep pointing the recipe at kilbarron.org — the Squarespace site is gone, not a selector problem."
+    "Do not set skip true / Facebook-only while this permanent link works.",
+    "Do not point start_url at https://www.kilbarron.org/ or Facebook.",
+    "Do not pin a dated wp-content/uploads/YYYY/MM/ filename.",
+    "Do not add a ?t= cache-buster on bulletin.pdf."
   ]
 }
