@@ -101,7 +101,7 @@ class LandingPageTests(unittest.TestCase):
             # one-click link to its collated (mega) bulletin and its text
             # bulletin — not a full-size "coming soon" card.
             self.assertIn("Live dioceses", index_html)
-            self.assertEqual(index_html.count("live-card\""), 8)
+            self.assertEqual(index_html.count("live-card\""), 13)
             self.assertIn("Clogher Diocese", index_html)
             self.assertIn("Derry Diocese", index_html)
             self.assertIn("Down &amp; Connor Diocese", index_html)
@@ -111,6 +111,11 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Achonry Diocese", index_html)
             self.assertIn("Ardagh and Clonmacnoise Diocese", index_html)
             self.assertIn("Armagh Diocese", index_html)
+            self.assertIn("Cashel &amp; Emly Diocese", index_html)
+            self.assertIn("Cloyne Diocese", index_html)
+            self.assertIn("Dromore Diocese", index_html)
+            self.assertIn("Elphin Diocese", index_html)
+            self.assertIn("Ferns Diocese", index_html)
             # Live cards must be A–Z by short name (not discovery order).
             live_headings = re.findall(
                 r'<article class="live-card">.*?<h2[^>]*>(.*?)</h2>',
@@ -165,7 +170,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertFalse((docs / "subscribe" / "index.html").exists())
 
             # The other dioceses collapse into one small expandable list.
-            self.assertIn("More dioceses — coming soon (18)", index_html)
+            self.assertIn("More dioceses — coming soon (13)", index_html)
             self.assertNotIn("Parish of Raphoe", index_html)
 
             links = re.findall(r'href="dioceses/([a-z0-9-]+)/"', index_html)

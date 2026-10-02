@@ -32,7 +32,21 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross", "achonry", "ardagh-and-clonmacnoise", "armagh"}
+LIVE_DIOCESES = {
+    "raphoe",
+    "derry",
+    "down-and-connor",
+    "clogher",
+    "cork-and-ross",
+    "achonry",
+    "ardagh-and-clonmacnoise",
+    "armagh",
+    "cashel-and-emly",
+    "cloyne",
+    "dromore",
+    "elphin",
+    "ferns",
+}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
 OCR_DIOCESE_KEYS = {
@@ -49,6 +63,7 @@ OCR_DIOCESE_KEYS = {
     "dromore": "dromore",
     "elphin": "elphin",
     "ferns": "ferns",
+    "galway": "galway",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -62,6 +77,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "dromore": "dromore_diocese",
     "elphin": "elphin_diocese",
     "ferns": "ferns_diocese",
+    "galway": "galway_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",

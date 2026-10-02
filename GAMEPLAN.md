@@ -1,3 +1,24 @@
+## 02/10/2026 — Five more dioceses turned LIVE on the homepage
+
+- LIVE_DIOCESES now includes Cashel & Emly, Cloyne, Dromore, Elphin, Ferns (plus the 8 already live).
+- Homepage rebuilt: coming soon 18 to 13. Diocese viewer pages generated for those five.
+- Not on parishpress.ie until this commit is pushed and Pages finishes.
+- Dromore mega PDF file is missing from the repo (pages index only). Card will be live; PDF may 404 until a re-harvest writes the file.
+- Galway recipes still local, not pushed.
+
+## 02/10/2026 — Galway hunt START (Frank: keep adding dioceses)
+
+- Ferns harvest success: New Ross **ok** 04/10, Gorey **ok** 27/09. Run 37035577603.
+- Next: **Galway, Kilmacduagh and Kilfenora** only (joint directory with Clonfert — Clonfert parked).
+- Official https://www.galwaydiocese.ie/find-your-parish/ — 37 Galway deanery rows.
+- Proved + recipes: **Claregalway** 4 Oct images; **Kinvara** 4 Oct images. Ballinderreen skip (same host).
+- Harvest choice: `galway_diocese`. **Not live.**
+
+## 02/10/2026 — Ferns pushed + harvest dispatched
+
+- Commit `bd09b25b`. Harvest: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37035577603 (`ferns_diocese`). **Not live.**
+- 49 hosts; harvestable New Ross + Gorey. Kilbarron already **ok**.
+
 ## 02/10/2026 — Kilbarron harvest OK
 
 - Run https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37026158431 — parish_status outcome **ok**, url kilbarronparish.ie permanent link.
