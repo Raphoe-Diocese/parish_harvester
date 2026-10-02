@@ -1,3 +1,9 @@
+## 02/10/2026 — Kerry hunt + Facebook push
+
+- Pushed parish Facebook fix `75759754` (Cloyne 31, Armagh 22). Elphin cards only had the diocese page, so those links stay on the parish card.
+- Down and Connor diocese Facebook removed `a19d7d99`. St Peter's Belfast keeps its own page.
+- Kerry: 53 parishes on https://www.dioceseofkerry.ie/parish-map/. 26 newsletter PDFs proved on the diocese cards (mostly 04/10/2026). Not live.
+
 ## 02/10/2026 — Five more dioceses turned LIVE on the homepage
 
 - LIVE_DIOCESES now includes Cashel & Emly, Cloyne, Dromore, Elphin, Ferns (plus the 8 already live).
