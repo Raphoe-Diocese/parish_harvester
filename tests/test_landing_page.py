@@ -356,7 +356,7 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertNotIn("Jane Doe", markup)
 
     def test_default_hero_slides_are_real_cathedral_photos_with_cc_credit(self) -> None:
-        self.assertEqual(len(site_builder.HERO_SLIDES), 8)
+        self.assertEqual(len(site_builder.HERO_SLIDES), 13)
         for slide in site_builder.HERO_SLIDES:
             self.assertTrue(slide.image and slide.image.startswith("https://upload.wikimedia.org/"))
             self.assertTrue(slide.credit and "Wikimedia Commons" in slide.credit)
@@ -372,6 +372,11 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertIn("Cathedral of the Annunciation and St Nathy, Ballaghaderreen", titles)
         self.assertIn("St Mel's Cathedral, Longford", titles)
         self.assertIn("St Patrick's Cathedral, Armagh", titles)
+        self.assertIn("Cathedral of the Assumption, Thurles", titles)
+        self.assertIn("St Colman's Cathedral, Cobh", titles)
+        self.assertIn("Cathedral of St Patrick and St Colman, Newry", titles)
+        self.assertIn("Cathedral of the Immaculate Conception, Sligo", titles)
+        self.assertIn("St Aidan's Cathedral, Enniscorthy", titles)
 
         eyebrows = {slide.eyebrow for slide in site_builder.HERO_SLIDES}
         self.assertEqual(
@@ -385,6 +390,11 @@ class HeroSliderRenderTests(unittest.TestCase):
                 "Achonry Diocese",
                 "Ardagh and Clonmacnoise Diocese",
                 "Armagh Diocese",
+                "Cashel and Emly Diocese",
+                "Cloyne Diocese",
+                "Dromore Diocese",
+                "Elphin Diocese",
+                "Ferns Diocese",
             },
         )
 

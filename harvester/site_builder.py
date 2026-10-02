@@ -231,6 +231,74 @@ HERO_SLIDES: list[HeroSlide] = [
         title="St Patrick's Cathedral, Armagh",
         subtitle="This week's Armagh parish bulletins.",
     ),
+    HeroSlide(
+        diocese_key="cashel-and-emly",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/"
+            "Thurles_-_Cathedral_of_the_Assumption%2C_Thurles_-_20200803112839.jpg/"
+            "1280px-Thurles_-_Cathedral_of_the_Assumption%2C_Thurles_-_20200803112839.jpg"
+        ),
+        credit="Photo: Dieglop / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 40%",
+        gradient="linear-gradient(135deg, #2a2218 0%, #6b5430 55%, #d4b56a 100%)",
+        eyebrow="Cashel and Emly Diocese",
+        title="Cathedral of the Assumption, Thurles",
+        subtitle="This week's Cashel and Emly parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="cloyne",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/"
+            "St_Colman%27s_Cathedral%2C_Cobh.jpg/"
+            "1280px-St_Colman%27s_Cathedral%2C_Cobh.jpg"
+        ),
+        credit="Photo: DeFacto / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 20%",
+        gradient="linear-gradient(135deg, #1a2430 0%, #3a5a78 55%, #9ec0d8 100%)",
+        eyebrow="Cloyne Diocese",
+        title="St Colman's Cathedral, Cobh",
+        subtitle="This week's Cloyne parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="dromore",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/e/e0/"
+            "Newry_Cathedral_-_geograph.org.uk_-_1497510.jpg"
+        ),
+        credit="Photo: Henry Clark / Wikimedia Commons / CC BY-SA 2.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #241818 0%, #6b3030 55%, #d48a7a 100%)",
+        eyebrow="Dromore Diocese",
+        title="Cathedral of St Patrick and St Colman, Newry",
+        subtitle="This week's Dromore parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="elphin",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/"
+            "County_Sligo_-_Cathedral_of_the_Immaculate_Conception%2C_Sligo_-_20240616012546.jpg/"
+            "1280px-County_Sligo_-_Cathedral_of_the_Immaculate_Conception%2C_Sligo_-_20240616012546.jpg"
+        ),
+        credit="Photo: Olliebailie / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #1a2420 0%, #3a5a48 55%, #9ec8b0 100%)",
+        eyebrow="Elphin Diocese",
+        title="Cathedral of the Immaculate Conception, Sligo",
+        subtitle="This week's Elphin parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="ferns",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/4/47/"
+            "St_Aidan%27s_Cathedral%2C_Enniscorthy_-_geograph.org.uk_-_1543592.jpg"
+        ),
+        credit="Photo: Eirian Evans / Wikimedia Commons / CC BY-SA 2.0",
+        position="center 25%",
+        gradient="linear-gradient(135deg, #241c14 0%, #6b4a28 55%, #d4b080 100%)",
+        eyebrow="Ferns Diocese",
+        title="St Aidan's Cathedral, Enniscorthy",
+        subtitle="This week's Ferns parish bulletins.",
+    ),
 ]
 
 
