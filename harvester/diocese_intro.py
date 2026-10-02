@@ -113,6 +113,7 @@ _DIOCESE_FACEBOOK = (
     "facebook.com/dioceseofcloyne",
     "facebook.com/achonryelphin",
     "facebook.com/archdioceseofarmagh",
+    "facebook.com/downandconnor",
 )
 
 
