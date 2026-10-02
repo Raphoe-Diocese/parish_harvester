@@ -98,7 +98,27 @@ _DIOCESE_PAGE_HOSTS = (
     "clogherdiocese.ie",
     "downandconnordiocese.com",
     "derrydiocese.org",
+    "cloynediocese.ie",
+    "achonryelphin.ie",
+    "armagharchdiocese.org",
+    "cashel-emly.ie",
+    "ferns.ie",
+    "dromorediocese.org",
+    "clonfertgalway.ie",
+    "galwaydiocese.ie",
 )
+
+# Footer / site-wide diocese Facebook pages. Never use these as a parish link.
+_DIOCESE_FACEBOOK = (
+    "facebook.com/dioceseofcloyne",
+    "facebook.com/achonryelphin",
+    "facebook.com/archdioceseofarmagh",
+)
+
+
+def _is_diocese_facebook(url: str) -> bool:
+    text = (url or "").lower().split("?", 1)[0].rstrip("/")
+    return any(text.endswith(page) or page in text for page in _DIOCESE_FACEBOOK)
 
 NEVER_PUBLISH_HEADING = (
     "Parishes that share news on Facebook or their website"
@@ -147,16 +167,22 @@ def share_url(
     contact_facebook: str = "",
     contact_website: str = "",
 ) -> str:
-    """Reader link: proven Facebook, else parish website, else official diocese page."""
+    """Reader link: parish Facebook, else parish website, else official diocese page.
+
+    A diocese Facebook page (Cloyne, Armagh, Achonry & Elphin footer) is not
+    a parish link. Skip it so the reader is not dumped on the diocese page.
+    """
     candidates = _candidate_urls(
         row,
         recipe,
         extra=[contact_facebook, contact_website],
     )
     for href in candidates:
-        if "facebook.com" in _host(href):
+        if "facebook.com" in _host(href) and not _is_diocese_facebook(href):
             return href
     for href in candidates:
+        if _is_diocese_facebook(href):
+            continue
         if _host(href) and _host(href) not in _DIOCESE_PAGE_HOSTS:
             return href
     for href in candidates:

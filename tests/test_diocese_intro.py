@@ -177,6 +177,23 @@ class DioceseIntroTests(unittest.TestCase):
             ),
             "https://www.facebook.com/exampleparish",
         )
+        self.assertEqual(
+            share_url(
+                {},
+                {"start_url": "https://cloynediocese.ie/parishes/aghabullogue"},
+                contact_facebook="https://www.facebook.com/DioceseOfCloyne",
+                contact_website="https://cloynediocese.ie/parishes/aghabullogue",
+            ),
+            "https://cloynediocese.ie/parishes/aghabullogue",
+        )
+        self.assertEqual(
+            share_url(
+                {},
+                {"start_url": "https://cloynediocese.ie/parishes/aghabullogue"},
+                contact_facebook="https://www.facebook.com/p/Aghabullogue-Parish-100071862515023/",
+            ),
+            "https://www.facebook.com/p/Aghabullogue-Parish-100071862515023/",
+        )
         summary = build_diocese_week_summary(
             "raphoe",
             diocese_display_name="Raphoe Diocese",
