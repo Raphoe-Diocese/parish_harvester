@@ -46,6 +46,8 @@ LIVE_DIOCESES = {
     "dromore",
     "elphin",
     "ferns",
+    "killala",
+    "killaloe",
 }
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
@@ -302,6 +304,34 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Ferns Diocese",
         title="St Aidan's Cathedral, Enniscorthy",
         subtitle="This week's Ferns parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="killala",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/"
+            "Ballina_St._Muredach%27s_Cathedral_2013_09_14.jpg/"
+            "1280px-Ballina_St._Muredach%27s_Cathedral_2013_09_14.jpg"
+        ),
+        credit="Photo: Andreas F. Borchert / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #1a2430 0%, #3a5878 55%, #9eb8d4 100%)",
+        eyebrow="Killala Diocese",
+        title="St Muredach's Cathedral, Ballina",
+        subtitle="This week's Killala parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="killaloe",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/"
+            "Ennis_-_Ennis_Cathedral_-_20180705195117.jpg/"
+            "1280px-Ennis_-_Ennis_Cathedral_-_20180705195117.jpg"
+        ),
+        credit="Photo: Ruhrfisch / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #241c18 0%, #6b4030 55%, #d4a080 100%)",
+        eyebrow="Killaloe Diocese",
+        title="Cathedral of Saints Peter and Paul, Ennis",
+        subtitle="This week's Killaloe parish bulletins.",
     ),
 ]
 
