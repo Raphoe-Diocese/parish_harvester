@@ -1,3 +1,16 @@
+## 02/10/2026 — Cloyne hunt START (Frank: keep going / no waiting)
+
+- Elphin harvest already **success**: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37004821053
+- Goal: next A–Z diocese **Cloyne** while not idle.
+- Official https://cloynediocese.ie/parishes/ — **46** cards (browser 02/10). Evidence + contacts + recipes written.
+- Proved this-week + recipe: **Mitchelstown** `mitchelstownparish.ie/images/2026-09-27.pdf`
+- 45 skip. 18 cards list a Parish Website (kitchen-sink still open). Milford card site is community council — not used. Cloyne town key = `cloyneparish`.
+- Harvest choice + matrix: `cloyne_diocese`. **Not live / not committed yet.**
+
+## 02/10/2026 — Elphin harvest dispatched
+
+- Harvest: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37004821053 (`elphin_diocese`). Not live until success + LIVE_DIOCESES later.
+
 ## 02/10/2026 — Elphin hunt START (Frank: crack on while Cashel harvest runs)
 
 - Goal: next diocese while Cashel harvest runs. **Elphin** (joint Achonry+Elphin site; Achonry 23 excluded).
