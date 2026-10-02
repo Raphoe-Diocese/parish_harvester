@@ -45,6 +45,7 @@ OCR_DIOCESE_KEYS = {
     "ardagh-and-clonmacnoise": "ardagh",
     "armagh": "armagh",
     "cashel-and-emly": "cashel_and_emly",
+    "elphin": "elphin",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -54,6 +55,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "ardagh-and-clonmacnoise": "ardagh_diocese",
     "armagh": "armagh_diocese",
     "cashel-and-emly": "cashel_and_emly_diocese",
+    "elphin": "elphin_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",

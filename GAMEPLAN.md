@@ -1,3 +1,19 @@
+## 02/10/2026 — Elphin hunt START (Frank: crack on while Cashel harvest runs)
+
+- Goal: next diocese while Cashel harvest runs. **Elphin** (joint Achonry+Elphin site; Achonry 23 excluded).
+- Official joint A-Z https://achonryelphin.ie/find-your-parish/ — **38** Elphin cards. Evidence + contacts written.
+- Proved this-week + recipes wired (not harvested / not LIVE yet):
+  - **Boyle** `boyleparish.ie` Newsletter-Sunday-27th-September-2026.pdf
+  - **Sligo Cathedral** `sligocathedral.ie` Twenty-Sixth Sunday 27th September 2026 PDF
+- 36 skip/link_only. Castlerea card website is community school — not used. Do not invent Facebook PDFs.
+- Harvest choice + Sunday matrix: `elphin_diocese`. Recipe folder `elphin`. Athlone key = `athloneelphin` (Ardagh already has `athlone`).
+- **Not live.** **Next:** commit/push + harvest when Frank says go.
+
+## 02/10/2026 — Cashel push + harvest dispatched
+
+- Commit `2be77a95` pushed to main. Includes Cashel & Emly recipes (Thurles + Emly harvestable; 44 skip) + Legan→Ardagh & Moydow alias.
+- Harvest dispatched: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36997850896 (`cashel_and_emly_diocese`). Not live until that run succeeds + LIVE_DIOCESES later.
+
 ## 02/10/2026 — Cashel & Emly hunt START (Frank: other dioceses)
 
 - Goal: start next A–Z diocese after Armagh/Ardagh. **Cashel & Emly** (gameplan Next).
