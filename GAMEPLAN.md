@@ -1,3 +1,17 @@
+## 02/10/2026 — Uploader auto-shrink (16.0.11)
+
+**The real goal, in one sentence:** a 10 MB one-page photo bulletin is reduced before it is saved, and stays readable.
+
+Built on the GitHub plugin **16.0.1**. Frank’s Desktop file `parish-press-uploader-16.0.10.zip` is **not on this machine**, so this zip does not include whatever else is only inside that Desktop copy.
+
+**Shrink:** longest side **2000 pixels**, JPEG **75%**. Photos and camera pictures always. A PDF is rebuilt only when that file is **over 1.5 MB**. A smaller PDF is kept as-is. Word `.doc` / `.docx` is saved as uploaded.
+
+**Next:** Frank installs `parish-press-uploader-16.0.11.zip` only if 16.0.10 has no extra fixes he still needs. Live bulletins not touched.
+
+**Parked:** none.
+
+---
+
 ## 02/10/2026 — Elphin hunt START (Frank: crack on while Cashel harvest runs)
 
 - Goal: next diocese while Cashel harvest runs. **Elphin** (joint Achonry+Elphin site; Achonry 23 excluded).
