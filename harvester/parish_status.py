@@ -33,6 +33,7 @@ _DIOCESE_LABELS: dict[str, str] = {
     "down_and_connor": "Down & Connor Diocese",
     "dromore_diocese": "Dromore Diocese",
     "elphin_diocese": "Elphin Diocese",
+    "ferns_diocese": "Ferns Diocese",
     "raphoe_diocese": "Raphoe Diocese",
 }
 
@@ -48,6 +49,7 @@ _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
     "down_and_connor": "Down & Connor Diocese",
     "dromore": "Dromore Diocese",
     "elphin": "Elphin Diocese",
+    "ferns": "Ferns Diocese",
     "raphoe": "Raphoe Diocese",
 }
 

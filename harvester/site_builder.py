@@ -48,6 +48,7 @@ OCR_DIOCESE_KEYS = {
     "cloyne": "cloyne",
     "dromore": "dromore",
     "elphin": "elphin",
+    "ferns": "ferns",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -60,6 +61,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "cloyne": "cloyne_diocese",
     "dromore": "dromore_diocese",
     "elphin": "elphin_diocese",
+    "ferns": "ferns_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",

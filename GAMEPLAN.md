@@ -1,3 +1,17 @@
+## 02/10/2026 — Kilbarron harvest OK
+
+- Run https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37026158431 — parish_status outcome **ok**, url kilbarronparish.ie permanent link.
+- Lesson: evidence URL push alone does not unskip; recipe `skip` must be cleared.
+
+## 02/10/2026 — Ferns hunt wired (continue after Kilbarron ok)
+
+- Kilbarron harvest **ok**: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37026158431
+- Ferns evidence + recipes written. Official list ~91 church rows / site says 49 parishes.
+- Proved this-week + recipes:
+  - **New Ross** PDF 27/09/2026
+  - **Gorey** image Newsletter_270926.jpg
+- Keys: `fernsparish` (town), `kilmoreferns` (avoid clash). Harvest choice: `ferns_diocese`. **Not committed / not live.**
+
 ## 02/10/2026 — Kilbarron permanent link (Frank)
 
 - Evidence already had `https://kilbarronparish.ie/bulletin/raphoe/kilbarron` (extension push).
