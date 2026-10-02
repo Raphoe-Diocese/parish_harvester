@@ -46,6 +46,8 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Ardagh Kilronan live twin | Official `kilronanparish.ie` dead. Live: `parishofkilronan.ie/newsletter/` with `/wp-content/uploads/DD.MM.YYYY.pdf`. | `http_scrape_newest_pdf`; score filename. |
 | Ardagh Kiltubrid overwritten /news/ | Official card no site. Live `kiltubridparish.com/news/` stacks Sunday HTML (Mass Times & Intentions). | `html_text_bulletin` print_to_pdf + skip_listing_nav. |
 | Ardagh Moydow + Legan shared PDF | Official `parishardaghmoydow.com` dead. Live: `ardaghmoydow.com/pdf/DDMMYY.pdf`. Same file covers Ardagh, Moydow, Legan, Ballycloghan. | Harvest under `ardaghandmoydow`; alias `leganballycloghan`. |
+| Killala ChurchTV Crossmolina | Current PDF is linked on `churchtv.ie/crossmolina/` but stored under `/wp-content/uploads/2021/02/` while the filename is the real Sunday (`4th-October-…pdf`, proved 04/10/2026). | `http_scrape_newest_pdf` the page. Do not date-rewrite the 2021/02 folder. |
+| Killala Mayo.ie newsletters | Belmullet PDF and Ballycroy PNG live on `mayo.ie` parish-newsletter pages. The getmedia GUID changes every week. The date is in the link text and the filename. | Scrape the listing. Do not pin the GUID. PNG is not a PDF/JPEG recipe. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
@@ -63,6 +65,8 @@ Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garriso
 ## Onboarding pack (one day)
 
 Do **not** start until Frank names the diocese. Kitchen-sink search is the command above. This pack is how that diocese becomes a folder harvest can see.
+
+Killala onboarding started 02/10/2026 (folder `killala`, stem `killala_diocese`, town key `killalaparish`). Official list: https://www.killaladiocese.org/parishes-ministries/parish-details/ (22). Not on the public homepage until a harvest writes `docs/dioceses/killala/`. Do not store `facebook.com/dioceseofkillala` as a parish Facebook. `ballycastleparish.com` is Down and Connor (Antrim), not Mayo Ballycastle.
 
 Today’s live matrix: `clogher`, `cork_and_ross`, `derry`, `down_and_connor`, `raphoe`. **Achonry** onboarding started 27/09/2026 (folder `achonry`, stem `achonry_diocese`) — not live on the public site until first harvest writes `docs/dioceses/achonry/`. Official Achonry cards: https://achonrydiocese.org/parishes/ (23). Joint Achonry+Elphin A–Z: https://achonryelphin.ie/find-your-parish/ — Elphin is a separate diocese letter, do not mix into Achonry evidence. Frank named **Cork** (17/09/2026) — that is **Cork and Ross**, not Cloyne. Harvest `--diocese` uses the **evidence stem**, not the folder name: `achonry_diocese`, `ardagh_diocese`, `armagh_diocese`, `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`, `cork_and_ross`.
 

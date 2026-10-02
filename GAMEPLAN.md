@@ -1,3 +1,13 @@
+## 02/10/2026 — Killala hunt START
+
+- Official https://www.killaladiocese.org/parishes-ministries/parish-details/ — **22** parishes. Folder `killala`, harvest choice `killala_diocese`. Town key `killalaparish`.
+- Proved this weekend:
+  - **Belmullet** `Belmullet-04-10-2026.pdf` GET 200 application/pdf 259218 bytes %PDF (04/10/2026).
+  - **Crossmolina** ChurchTV `4th-October-Crossmolina-Parish-Newsletter-1.pdf` GET 200 application/pdf 2265814 bytes %PDF. File text 4TH OCTOBER 2026. Folder is `/2021/02/` — do not date-rewrite it.
+  - **Kilmoremoy (Ballina)** `newsletter-56.pdf` PDF text 27th September 2026. Media library application/pdf 2656319 bytes. Hunt VM GET was SiteGround HTTP 202, so magic bytes were not saved here.
+- **Ballycroy** 04/10/2026 file is PNG (143365 bytes), not PDF/JPEG — skip.
+- **Not live.** Not in `LIVE_DIOCESES`.
+
 ## 02/10/2026 — Kerry hunt + Facebook push
 
 - Pushed parish Facebook fix `75759754` (Cloyne 31, Armagh 22). Elphin cards only had the diocese page, so those links stay on the parish card.
@@ -24,6 +34,16 @@
 
 - Commit `bd09b25b`. Harvest: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37035577603 (`ferns_diocese`). **Not live.**
 - 49 hosts; harvestable New Ross + Gorey. Kilbarron already **ok**.
+
+## 02/10/2026 — Killala hunt START
+
+- Official https://www.killaladiocese.org/parishes-ministries/parish-details/ — **22** parishes. Folder `killala`, harvest choice `killala_diocese`. Town key `killalaparish`.
+- Proved this weekend:
+  - **Belmullet** `Belmullet-04-10-2026.pdf` GET 200 application/pdf 259218 bytes %PDF (04/10/2026).
+  - **Crossmolina** ChurchTV `4th-October-Crossmolina-Parish-Newsletter-1.pdf` GET 200 application/pdf 2265814 bytes %PDF. File text 4TH OCTOBER 2026. Folder is `/2021/02/` — do not date-rewrite it.
+  - **Kilmoremoy (Ballina)** `newsletter-56.pdf` PDF text 27th September 2026. Media library application/pdf 2656319 bytes. Hunt VM GET was SiteGround HTTP 202, so magic bytes were not saved here.
+- **Ballycroy** 04/10/2026 file is PNG (143365 bytes), not PDF/JPEG — skip.
+- **Not live.** Not in `LIVE_DIOCESES`.
 
 ## 02/10/2026 — Kilbarron harvest OK
 
