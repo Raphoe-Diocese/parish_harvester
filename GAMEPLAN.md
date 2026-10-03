@@ -1,3 +1,9 @@
+## 03/10/2026 — Keep going (Frank)
+
+- Ashbourne recipe switched to `wp_json_newest_media` after harvest 37124522917 failed listing scrape. Do not pin 26th-sunday-a-2026.pdf.
+- Harvest `all` (5 at a time) still running: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37125353930
+- Cloud leftover skip hunt still in flight. New cloud hunt: Dublin, Ossory, Tuam, Waterford and Lismore only. Not LIVE.
+
 ## 03/10/2026 — Cloud leftover SKIP unskip (this week proved)
 
 - Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 weekend files. No harvest.yml. Not added to LIVE_DIOCESES.
