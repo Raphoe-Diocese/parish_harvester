@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Armagh Diocese Text Bulletin — 03/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="armagh-2026-10-03.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">ARMAGH Text Bulletin · 03/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-armagh" data-parish-name="Armagh"><h2 class="ocr-parish-name">Armagh</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<h3 class="b-head">Mass Times</h3>
+<p>St Patrick ’s Cathedral Monday - Saturday: 10am Sunday Vigil: 6.30pm Sunday: 11am, 12.30pm &amp; 5.30pm St Malachy ’s Church Tuesday—Friday: 8am Mon, Wed &amp; Fri: 7:30pm Tues &amp; Thurs: Prayer Service - 7:30pm Sunday: 8am &amp; 9.30am Church of the Immaculate Conception Sunday: 10am St Colmcille ’s Church Saturday: 6pm Confessions in St Malachy ’s Church on Saturdays @ 12 noon. St Patrick ’s Cathedral: <a href="tel:+442837522638" style="color:#1d4ed8;font-weight:600;">028 3752 2638</a> St Malachy ’s Church: <a href="tel:+442837510516" style="color:#1d4ed8;font-weight:600;">028 3751 0516</a> Sacristans: Roger Duggan, Gary McGuirk &amp; Jimmy McKee Eucharistic Adoration takes place each day in St Malachy's Church from after Mass (8:30am weekdays) until evening (7pm weekdays - 5pm weekend). Please sign the attendance sheet in the Church &amp; encourage family &amp; friends to engage with this special apostolate. Adoration from 7 - 10pm each Tuesday &amp; Thursday in the Adoration Chapel. Prayer for Vocations O Jesus, send labourers into your fields, which are awaiting holy apostles, saintly priests, heroic missionaries and dedicated sisters and brothers. Enkindle in the hearts ofmenand women the spark of a vocation. Grant that Christian families may desire to give your Church, helpers in the work of tomorrow. Amen. Divine Mercy for Peace Our Monday, Wednesday and Friday afternoon hour of mercy continues in the Cathedral at 3pm. We dedicate this hour to prayer for world peace during this difficult moment in our world where war and violence affect so many. All welcome. Mass of Thanksgiving To mark Bishop Michael ’s appointment as Bishop of Derry and to give thanks for his service to the Archdiocese of Armagh we will celebrate a Mass of Thanksgiving in the Cathedral on Wednesday 9th September at 7:30pm, followed by refreshments in St Patrick ’s Grammar School. All are welcome. *Please note there will be no Mass in St Malachy ’s on this evening* Parish Ministries We are currently seeking Altar Servers, Readers and Eucharistic Ministers in the Parish. Training will begin early in September for those interested. P5/P6 children interested in becoming Altar Servers are asked to Contact the Parish Office. Those interested in becoming Readers or Eucharistic Ministers are also asked to leave their names in the Parish Office or speak to any of the Priests / Deacons Armagh Parish Week of Hope “Anchored in Christ - Alive in Hope ” will take place from 27th September - 4th October. More information to follow. Novena for St Teresa of Calcutta continues until 4th September. The novena is prayed before the 10am Mass each day. Mass for the Feast Day will be celebrated on 5th September at 10am. All welcome to join. Novena Prayer St Teresa of Calcutta, you allowed the thirsting love of Jesus on the Cross to become a living flame with you, andso became the light of His love to all. Obtain from the Heart of Jesus (here make your request) Teach me to allow Jesus to penetrate and possess my whole being so completely that my life, too, may radiate His light and love to others. Amen. Baptism Baptisms take place each Saturday at 5pm in St Colmcille ’s Church, 5:30pm in St Malachy ’s Church and on Sunday after 10am Mass in the Church of the Immaculate Conception, Tullysaran. Bookings can be made through the Parish Office on <a href="tel:+442837522813" style="color:#1d4ed8;font-weight:600;">02837522813</a>. Baptism generally book up one month in advance, so please contact early to avoid disappointment. Divine Mercy Monthly Mass will take place on Thursday 3rd September in St Colmcille ’s Church, Knockaconey with our Parish Youth Group LEAP. Confessions/Rosary starts at 7pm with Divine Mercy Chaplet/Mass from 7.30pm. Come let us thank the merciful Lord for a successful and safe summer holidays granted to our families and ourselves. Armagh Parish Holy Spirit Prayer Group will be meeting again after the summer break on Tuesday 1st September in the Synod hall at 8pm with Rosary at 7.45. All welcome. Monthly Rosary We gather on the first Saturday of each month at the grotto at St. Malachy ’s Church to pray a rosary for peace in the world andforthe protection of life from conception to natural death. Our next gathering is on Saturday 5th September at 3pm. All welcome. Vocations Society of St. Joseph The opening year Mass will take place on Wednesday 2nd September at 7.30 pmin St. Malachy's Church, immediately followed by a short meeting in the Parochial Hall. New Members are very welcome to join us in Praying for Vocations to the Priesthood &amp; Religious Life. Itisnot necessary to</p>
+<h3 class="b-head">contact</h3>
+<p>existing Members, just come along. OCIA Programme The Order of Christian Initiation Programme is designed to accompany adults who are interested in joining the Catholic Faith. This programme is an opportunity for adults who may not have any formal catechesis in the faith to learn about the faith while developing their relationship with Jesus. Our Parish Programme will begin in September and anyone interested in joining are asked to speak toanyofthe Priests or Deacons or leave your name in the Parish Office. Please encourage anyone who you know that might be interested to discuss the programme with us. Children ’s Book Willie Nugent ’s children ’s story book “From the topofgas lane tothetopofthe world ” isnowon sale in Macari ’s, Raffles, Curran ’s Spar shop, Dessie ’s and Trimprint. Priced £5. Proceeds in aid of “ Little Heroes “ Royal Belfast Hospital for Sick Children. Annual Hospice Coffee Morning will take place on 10th September from 10am-1pm in Co. Armagh Golf Club. All welcome. A Student's Prayer fora New School Year Lord Jesus, Iaskfor Your help as I begin this new school year. Allow me to experience Your presence in the many blessings You put before me. Open my eyes tothenew challenges and exciting opportunities that this new school year brings. Open my heart and mind to new friends and new teachers. Give me a generous spirit to be enthusiastic with my studies and courage to accept new opportunities. Help metobe attentive to my teachers andletme experience Your presence inmynew friends. Jesus, inspire metodomy best this year! Amen. Prayer for Today Loving God, help me to understand that the one thing you want from meismy presence. Help me to realise that my presence is the one gift I can give and that it is often the only gift that matters. Help metoletgoof stress, worry, hurt, pain and grudges. All I need is to be more aware of Your presence in my life today and always. Amen. Parish Contacts Parochial House: <a href="tel:+442837522802" style="color:#1d4ed8;font-weight:600;">028 3752 2802</a> Emergency Phone: <a href="tel:+3537596899" style="color:#1d4ed8;font-weight:600;">07596 899</a> 031 • Fr Barry Matthews, Adm E: <a href="mailto:barrynmatthews@gmail.com" target="_blank" rel="noopener noreferrer">barrynmatthews@gmail.com</a> • Fr David Nugent, CC E: <a href="mailto:frdavidnugent@gmail.com" target="_blank" rel="noopener noreferrer">frdavidnugent@gmail.com</a> • Fr James Adawai, SMMM, CC E: <a href="mailto:jfaustin84@gmail.com" target="_blank" rel="noopener noreferrer">jfaustin84@gmail.com</a> • Fr Giacomo Taffi, CC E: <a href="mailto:taffi94@gmail.com" target="_blank" rel="noopener noreferrer">taffi94@gmail.com</a> • Fr. Gabriel Neal E: <a href="mailto:gabrielneal366@gmail.com" target="_blank" rel="noopener noreferrer">gabrielneal366@gmail.com</a> • Deacon Paul Mallon E: <a href="mailto:paul.mallon@tudublin.ie" target="_blank" rel="noopener noreferrer">paul.mallon@tudublin.ie</a> • Deacon Eunan McCreesh E: <a href="mailto:eunan.mccreesh@gmail.com" target="_blank" rel="noopener noreferrer">eunan.mccreesh@gmail.com</a></p>
+<h3 class="b-head">Parish Office</h3>
+<p>Cathedral Gate Lodge, 41a Cathedral Rd. Tel: <a href="tel:+442837522813" style="color:#1d4ed8;font-weight:600;">028 3752 2813</a> Opening Hours: Mon - Fri: 10am-3pm • Caroline Caherty, Finance Manager <a href="mailto:armaghparishfinance@gmail.com" target="_blank" rel="noopener noreferrer">armaghparishfinance@gmail.com</a> • Claire Corr, Parish Secretary <a href="mailto:armaghparishoffice@gmail.com" target="_blank" rel="noopener noreferrer">armaghparishoffice@gmail.com</a> • Thecla Brolly &amp; Moneena Delaney Parish Safeguarding Reps <a href="mailto:armaghparishsafeguarding@gmail.com" target="_blank" rel="noopener noreferrer">armaghparishsafeguarding@gmail.com</a> Baptisms &amp; Weddings To book a baptism or wedding, please contact the Parish Office. <a href="https://www.armaghparish.net" target="_blank" rel="noopener noreferrer">www.armaghparish.net</a> SVP Helpline : 07733 482604 Dear Friends, “Thewayyou think isnot God’swaybutman’sway. ” The words of Jesus in today ’s Gospel are stark, but they also speak a truth that is as relevant toourworld today as it was when they were first spoken. Jesus speaks to every generation, and these words challenge us to look honestly at the values and priorities that shape our lives. We live in an increasingly secularised world, one which can place great emphasis o n material success, possessions, comfort and personal fulfilment. And, ifweare honest, it is very easy forallofusto become caught up in those things from time to time. So perhaps the question for us today is simply: How does God think? Each of us might answer that question differently, but Scripture gives us some impor tant insights. We know that God is just, yet infinitely merciful to those who seek His fo rgiveness. We know that He is compassionate and that He never abandons us. We believe that Godhas a plan for each of our lives, a plan which ultimately leads us towards the greatest blessing of all: eternal happiness with Him. God has also given each of us the precious gift of free will. But free will, like every gift and every power, carries with it a responsibility. We are called touseour freedom wisely and to make choices that reflect not simply what the world tells us is important, but what God asks of us. So perhaps today we might ask ourselves some honest questions: Do I seek God ’s mercy and forgiveness? Do Itryto follow His ways in the decisions I make? Do my priorities reflect the Gospel? Am I preparing my heart for eternity, oram I becoming too focused on the things of this world? Last week, I set myself—and allofusasa community—a simple challenge: that we would try to bring a little more goodness and kindness into our world through small acts and words of kindness. I have been doing reasonably well with That challenge so far, and I have come to realise that perhaps itisa challenge worth continuing. So, for another week, I invite you to join me. Look for an opportunity each daytobe kind, to encourage someone, to forgive, to help, or simply to make someone ’sdaya little brighter. They may seem like small things, but perhaps that is precisely the point. They are small ways in which we can begin to think less like the world and more like God—an d allow His goodness to be seen through us. “Thewayyou think isnot God’swaybutman’sway. ” May our thoughts, our choices and our lives increasingly reflect the mind and heart of Christ. With every blessing, Fr Barry Matthews Adm.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>&amp; Month ’s Mind Masses should be left in the Parish Office no later than 12noon on the Thursday of the week before the anniversary isduetobe remembered, this includes Saturday Anniversaries. Anniversaries are read outatall Masses on weekday or one Sunday Mass. Months Minds will be remembered at the 12:30pm Mass on Sunday following the Months Mind. We request that you leave your anniversary in as early as possible to avoid disappointment. St Patrick ’s Cathedral Gift Shop The Cathedral Gift Shop is open each day from 10.30am – 1.30pm and it stocks a lovely variety of cards and gifts for special occasions, including traditional Irish crafts and gifts and souvenir booklets on the Cathedral. Parish Office The Parish Office will be closed on Monday 31st August and will reopen on Tuesday 1st September at 10am. Weekly Collection £5625 &amp; €163.55</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>We pray for: Paddy Houlahan, Joseph McKenna, Immaculata O ’Donnell, Eithne Vallely, Dessie McQuade, Paul Clarke, Patricia Mooney and Arthur McAnerney.</p>
+<h3 class="b-head">MONTHS MIND</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-carlingford-omeath" data-parish-name="Carlingford &amp; Omeath"><h2 class="ocr-parish-name">Carlingford &amp; Omeath</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>CARLINGFORD &amp; OMEATH PARISH Website: <a href="https://www.carlingfordandomeathparish.com/" target="_blank" rel="noopener noreferrer">https://www.carlingfordandomeathparish.com/</a> E-mail: <a href="mailto:candoparish@gmail.com" target="_blank" rel="noopener noreferrer">candoparish@gmail.com</a> Follow us on Facebook @ candoparish Fr. Magnus Ogbonna MSP, PP, Carlingford &amp; Omeath Parish. Tel: <a href="tel:+353429373111" style="color:#1d4ed8;font-weight:600;">042 9373111</a>. Fr. Christy McElwee IC PE Parochial House, Omeath. Tel: <a href="tel:+353429375198" style="color:#1d4ed8;font-weight:600;">042 9375198</a>. Parish Office: Parochial House, Carlingford. Tel: <a href="tel:+353429373111" style="color:#1d4ed8;font-weight:600;">042 9373111</a>. Parish Office Hours: Mon, Wed, Thurs &amp; Fri 9.30am to 1.30pm PARISH BULLETIN – Sunday 27th September 2026 Twenty-Sixth Sunday in Ordinary Time/ A World Day of Migrants and Refugees ST. MICHAEL’S CHURCH, CARLINGFORD Mass Intentions Saturday 26th Sept 6.00pm Special Intention Sunday 27th Sept 11.30am Special Intention Wednesday 30th Sept 9.00am Special Intention 11.00am School Mass Friday 02nd Oct 9.00am Parish List Of The Dead Saturday 03rd Oct 6.00pm Nora Toner (mm) Sunday 04th Oct 11.30am Marian Varley; Kathleen &amp; Henry Harold ST. LAURENCE’S CHURCH, OMEATH Mass Intentions Sunday 27th Sept 10.00am Annie McGuigan (mm); Dette Quinn; John Elmore &amp; dec family members; Sorley Largey Tuesday 29th Sept 10.00am Special Intention Thursday 01st Oct 7.00pm Parish List Of The Dead Sunday 04th Oct 10.00am Laurence O’Hanlon (mm); Elizabeth Sloan; Patsy &amp; Mary Hanratty Recently deceased : Pray for : Fr Mark O’Hagan ( Ardee/ Dundalk / Coalisland); Bernadette Mooney (nee Ryan) (Grange/ Meath); Joan Reid (Scotland); Michelle O’Neill (Omeath/ Dublin); Mary Elizabeth McKevitt Denham (Carlingford / Yorkshire, UK) ; Nora Toner (nee Lyons) (Carlingford/ Cork); Laurence O’Hanlon (Omeath) ; May they Rest in Peace Amen. Streamed on the Webcam Weekly: <a href="https://www.churchmedia.tv/carlingford" target="_blank" rel="noopener noreferrer">https://www.churchmedia.tv/carlingford</a> Weekend Masses: Vigil: Saturday 6.00pm: Sunday 11.30am</p>
+<h3 class="b-head">Weekday Masses</h3>
+<p>Wed &amp; Fri 9.00am Streamed on the Webcam Weekly: <a href="https://www.churchmedia.tv/omeath" target="_blank" rel="noopener noreferrer">https://www.churchmedia.tv/omeath</a> Sunday: Mass 10.00am</p>
+<h3 class="b-head">Weekday Masses</h3>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Weekly Collection: €1395 &amp; £103 Parish Weekly Envelopes Ifyoudonot have an envelope number and/or would like to receive aboxof envelopes for weekly donations to the Parish, please, contact the parish office. Donating to the Parish online: bank transfers, i Donate. Details areonthe Parish website. Standing order forms are also available at the back ofthetwo churches. You can also donate by cheque or cash. And by participating in the weekly envelope contributions andthetax relief donations for the Parish. Parish i Donate QR Code Adoration of the Blessed Sacrament St. Michael’s Church, Carlingford. Every Thursday from 2.00pm-4.00pm. Confessions: Feel free to approach a priest of the Parish for the Sacrament of Reconciliation. Parish Baptisms require at least 1 months’ notice in advance. Please contact the parish office for bookings in the Parochial House Carlingford, <a href="tel:+353429373111" style="color:#1d4ed8;font-weight:600;">042 9373111</a>. The Holy Rosary is recited after the 9.00am Mass in Carlingford on Wednesdays &amp; Fridays. In Omeath after 10.00am Mass on Tuesday’s . All welcome. Mass Cards &amp; Mass Bouquets are available in The Parochial House, Carlingford. Altar Society Carlingford: Kate O’Toole 02nd Oct- 16th Oct Cooley Peninsula First Saturday Devotion Please join us for the next First Saturday Devotion which will be held in Carlingford, Saturday 03rd October 5pm , followed by Holy Mass at 6pm and confessions. Start of the School Year Mass in Omeath Tuesday 6th October at 10.00am, in memory of Donna McGuinness. Wishing all travellers on the Annual Parish Pilgrimage to Lourdes a safe and peaceful journey. Communion Calls : The priests will be visiting the sick and house bound this week. Church Gate Collection: next weekend is for St Vincent de Paul, <a href="tel:+353879656852" style="color:#1d4ed8;font-weight:600;">0879656852</a>. Parish Lotto: 24/09/2026 1, 3, 8, 23 Congratulations to Clodagh our weekly winner of €20. Next week’s draw: Thur 01st Oct, Jackpot €575. Join nowfora chance of winning. Your support will be of great help to the Parish as we work together to promote God’s kingdom among us. Our Parish Lotto website <a href="https://www.ourfundraiser.ie/org/candoparish" target="_blank" rel="noopener noreferrer">www.ourfundraiser.ie/org/candoparish</a> Divine Mercy Chaplet - Saint James's Church Grange at 7.30 pm on Sunday Nights. If anyone would like a book to follow the Divine Mercy Chaplet in their homes, please contact: <a href="tel:+353851833110" style="color:#1d4ed8;font-weight:600;">0851833110</a>. Welcome To “Taize Prayer Around The Cross”, In Candlelight “Bethany” 34 Point Road, A91 WOC 9. On 2nd October 8pm-9pm Followed By a Cuppa. Cooley Community Projects Ltd Vacancies: 3 x Environmental positions in Cooley closing date 02.10.2026 2 x Grounds person positions 1 in Carlingford, 1 in Cooley closing date 09.10.2026 1 x Environmental position in Carlingford closing date 20.10.2026 1 x Environmental position in Omeath closing date 01.10.2026 1x Administration position in Omeath closing date 20.10.2026 Please contact Ambrose Kane <a href="tel:+353429376077" style="color:#1d4ed8;font-weight:600;">042 93 76077</a> Email: <a href="mailto:cooleyceltd@gmail.com" target="_blank" rel="noopener noreferrer">cooleyceltd@gmail.com</a> Introductory Irish For beginners classes commencing on Saturday 3rd October for 4 weeks from 11.30am to 1pm in the Dolmen Centre . €15 per person for the 4 weeks. Intermediate Level Irish Language classes aimed at those who are working at, or slightly beyond Fáinne Airgid Level commencing on Monday 5th October for 6 weeks from 7pm to 8pm here in the Dolmen Centre. €25 per person for the 6 weeks. Intermediate Plus aimed at those working towards Fáinne Óir commencing</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>Monday 5th October for 6 weeks from 8pm to 9pm. €25 per person for the 6 weeks. Contact <a href="tel:+353429375422" style="color:#1d4ed8;font-weight:600;">0429375422</a> or by email to <a href="mailto:info@dbusiness.ie" target="_blank" rel="noopener noreferrer">info@dbusiness.ie</a> The Multiple Sclerosis Carlingford Greenway Walk takes place on Thur 1st Oct at 7pm. The walk is from the Marina to Greer’s Quay and return. All support welcome. Sponsor cards available. Ph <a href="tel:+353874163098" style="color:#1d4ed8;font-weight:600;">0874163098</a>/ <a href="tel:+353861505865" style="color:#1d4ed8;font-weight:600;">0861505865</a> for information. Dominican Pilgrimage to Knock - Sunday, October 11th, 2026. Enquiries: Laurena GSD Creative Drama &amp; Dance Speech &amp; Drama Discover your talent, build confidence, and shine on stage. No experience required. Just bring your creativity. Mullaghbouy Community Centre Every Thursday; Tots/Junior/Senior infants 3- 3:45pm Junior 2: 1st-3rd class 3:50- 4:50pm Senior Drama 4th-6th class 4:50- 5:50pm Taking new bookings, info: <a href="tel:+353871914076" style="color:#1d4ed8;font-weight:600;">087-1914076</a> <a href="mailto:gsdschoolofdrama@gmail.com" target="_blank" rel="noopener noreferrer">gsdschoolofdrama@gmail.com</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-clogherhead" data-parish-name="Clogherhead"><h2 class="ocr-parish-name">Clogherhead</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 5</p>
+<p>Parish websites: <a href="https://www.monasterboiceparish.com" target="_blank" rel="noopener noreferrer">www.monasterboiceparish.com</a> <a href="https://www.termonfechinparish.ie" target="_blank" rel="noopener noreferrer">www.termonfechinparish.ie</a> Sunday Cycle A/Weekday Cycle 2/Psalter Week 2 Masses Times - Clogherhead Parish Sunday 27 September @ 10.45am Ss Peter &amp; Paul’s Church Walshestown ~ Sunday 27 September @ 12 noon St Michael’s Church Clogherhead ~ Vera Byrne (10 Av.) • John &amp; Jean McKeown + Rev Fr Willi am Murtaghth Monday 28 September @ 9am Clogherhead ~ Tuesday 29 September @ 9am St Michael’s Church Clogherhead ~ @ 9am Clogherhead ~ Sunday 04 October @ 10.45am Walshestown ~ Tony McDonnell (6 Av.) th Sunday 04 October @ 12 noon Clogherhead ~ Marie Walsh (Month’s Mind) • Tony McCullough (1 Anniversary) &amp; Alan McCullough • Phil Kirk • Rosaleen Brown (16 Av.) • Larry, Maggie, Jane, Sr. Annette &amp; Noel Kirwan • Laurence &amp; Maeve Kirwanst th Masses Times - Monasterboice Parish Sunday 27 September @ 9.45am Fieldstown ˜ Sunday 27 September @ 11.30am Church of Our Lady of the Immaculate Conception Tenure ~ Clint Englishby • Caroline Quinn Tuesday 29 September @ 9.30am Tenure ˜ Wednesday 30 September @ 9.30am Fieldstown ~ Friday 2 October @ 7pm Tenure ˜ Sunday 4 October @ 9.45am Fieldstown ˜ Sunday 4 October @ 11.30am Church of Our Lady of the Immaculate Concept ion Tenure ~ Seamus Davis (1 Anniversary) st</p>
+<h3 class="b-head">Recently Deceased</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-cooley" data-parish-name="Cooley"><h2 class="ocr-parish-name">Cooley</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 6</p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>4 2 long established communities encounter and befriend newcomers, fostering diversity - which is a gift and a source of renewal. One example is Irene Nunes, who came from Brazil to Ballyhaunis thirteen years ago. Irene and her family were warmly welcomed by the local parish, where she now serves as a sacristan and member of the Parish Pastoral Council. She speaks of the strong sense of belonging and community that she and other Brazilians have experienced in the parish, exemplified by a celebration where five Brazilian couples were married at the same ceremony in Saint Patrick’s Church. This experience of radical hospitality reflects early Christian communities, where cultural and ethnic divisions were overcome through shared faith in Jesus. The Church in Ireland now experiences this same sense of welcome and renewal through the presence of immigrants. Encounter: Moving from Welcome to Belonging Irish Catholic Bishops strongly encourage a “culture of encounter” that goes beyond mere tolerance of newcomers. Such a culture fosters authentic participation and integration. Polite tolerance can leave migrants feeling isolated, but true Christian encounter involves mutual enrichment, where established communities and newcomers share and learn from each other. It is noted that the Irish Council of Churches and the Irish Inter-Church Meeting, bodies which facilitate dialogue between allofthe Churches across the island, have recently produced resources to help enhance such encounter and belonging. Pope Francis emphasises the need to engage with others deeply, not just seeing but truly listening and connecting with them. This spirit of encounter reflects the early Christian understanding that believers are ‘foreigners and exiles’ in the world, called to form connections beyond borders. Challenges to Integration Immigration to Ireland is high at present, though notatthe levels previously seen through the peak of the Celtic Tiger era. In the most recent year for which there are statistics (up to April 2024), 149,200 people came to live in Ireland. However, 69,900 people left Ireland in the same period. The figures for Northern Ireland are lower, with the most recent statistics suggesting a net immigration of 2,300 people in 2022. These numbers contain a great diversity. It includes Irish citizens returning to live here, people on employment visas coming to take up particular roles, EU citizens availing of the freedom of movement, people from Britain who benefit from the Common Travel Area and many others besides. A significant factor in the numbers coming to Ireland in recent years were Ukrainians who are fleeing the Russian invasion of February 2022. Their numbers constitute a net figure of just over 81,000. The number of people who come seeking International Protection is a small proportion of the overall number – about 14,000. According to the European Union statistics body, the number of people found to have been here in Ireland illegally in 2023 was 1,485 people. Oneofthe reasons why the topic of immigration can be contentious is that differences within the meaning of the term are not always acknowledged. “Immigrant” often means someone who has made a permanent home inanew country. “Migrant” often means someone who is only based inthenew country for a period. “Asylum seeker” refers to someone who is claiming protection outside their country of origin, which is different from a “refugee”, who is someone whohashad that claim confirmed. It is important to note that the formal definition of refugee does not include anybody displaced within their own country, or who travels abroad to escape poverty or famine. 2Reflect: When have you felt truly encountered, listened to, and valued? How did that impact you? Caption Irene Nunes, her husband and four other Brazilian coupl es who were married by Canon Stephen Farragher PP in Ballyhaun is, Co Mayo, Archdiocese of Tuam, in May 2023. Our Church’s universality ensures that every parish is connected globally. Furthermore, Church teachings affirm the dignity of every person - including that of the migrant - and remind us that every person possesses inalienable rights and deserve respect and welcome. 1 2 3 4 5</p>
+<hr>
+<p class="page-label">Page 8</p>
+<p>4 While these definitions are important from a legal perspective, we should not allow them to obscure what matters most to Christians: regardless of where a person was born or what passport they carry: they are our neighbour. An example of the challenges to integration is Patrick’s story. Patrick was born in Nigeria and grew upina loving Catholic home before marrying and coming to work in Ireland in 2002. He tells us that adjusting to Irish society was challenging but heandhis family gradually integrated ‘through a long process of acculturation’. He adds, ‘we have four children, all born in Ireland, who identify more as Irish than Nigerian. After my wife’s passing, we navigated through difficult times but also enjoyed good moments together. Finding employment was a difficult challenge but Igot help and training through State sponsored FÁS courses and Iamnowinmy third and, hopefully, most lasting job.’ While Patrick is aware of the cultural differences he has experienced in work, in Church and with neighbours, he concludes that despite all of this, ‘coming to Ireland has been a blessing. We have the freedom to practice our faith andweare happy, although we miss Nigeria and find travel there expensive.’ It is common to hear people talk about the costs of immigration. But almost one-in-five workers in the Irish economy are ‘non-Irish-nationals’. Our economy could not function without the people working in the sectors of hospitality, education, healthcare and technology, who have come here from elsewhere. Economists describe our economy as “at full employment” anditis still growing. There is clearly an inescapable need for migration. Noonecanbut doubt that these newcomers have become foundational to the positive operation of our society. Reflect: How have migrants blessed your life? Building a Friendly Society Ireland faces significant challenges, such as homelessness, strained health services, and an education system struggling to meet demands. However, these issues have been on the landscape for some time - they have not been caused by migration. Migrants can help address these needs, contributing positively to society. It is important to approach immigration policies in a way that serves the common good, which includes both migrants and citizens. We are fortunate to live in a country with a stable democracy and a vibrant civil society, and we encourage all citizens to participate in such political debate to the fullest of their abilities and convictions. Pope Francis urges political leaders to prioritise effective solutions to social and economic exclusion, emphasising “political charity” to overcome individualism. Christians are called to support this vision collectively. Reflect: Howcanyou encourage constructive debate on the things that really matter in our society? A Call to Parishes: Community Sponsored Programme As Irish society changes, the Church is tasked with welcoming and integrating migrants. Pope Francis warns against building “walls in the heart” and encourages a culture of openness, reflecting Jesus’ inclusive ministry and his command ‘Ephphatha’ – be opened! (Mark 7:31-37). Parishes are urged to oppose fear and recognise the image of God (Genesis 1:27) in every migrant, regardless of nationality. One practical response is the Community Sponsorship Programme, where local communities sponsor and resettle refugee families. This scheme is supported by the Government of Ireland andledbythe Irish Red Cross and partners. One example of this is the parish of Clane in Co Kildare, which successfully welcomed a Syrian family in 2019, and it provides a model for how parishes can respond to refugee needs with hospitality and support. 3Caption Pope Francis greets pilgrims in Croke Park, Dublin, during the Holy Father’s visit to Ireland for the 9th World Meeting of Families in August 2018. Reflect: How can migrants in your parish help shape the journey from welcome to belonging?6 7</p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>4 4 Conclusion Migration presents many challenges for all involved: immigrants seeking safety and a better future, as well as for those who welcome them, and the governments and communities responsible for providing shelter and support. As migration to Ireland increases, it brings both difficulties and opportunities for society. While the changes ahead remain uncertain, the teachings of the Gospel provide timeless guidance on addressing these challenges. Catholic Social Teaching emphasises the dignity of every human being and the common good, offering a foundation for action. The Church sees the “travail of migrants” as a violation of human dignity, and urges us to welcome migrants soasto support the defence of their inalienable rights. The patron saints of immigrants and refugees, such as Saint Patrick, Saint Frances Xavier Cabrini and Saint Josephine Bakhita, remind usofthe Christian call to compassion, love, and service to the marginalised. As we face the ongoing realities of migration, displacement, and human trafficking, we must draw from these sources of faith for guidance. May we always welcome and advocate for migrants. In doing so, we fulfil our shared role as a “migrant pilgrim people,” continuing the Irish tradition of openness, encounter, and hospitality, and bearing witness to God’s eternal love. 41 Central Statistics Office (CSO), ‘Population and Migration Estimates, April 2024’, Key Findings Population and Migration Estimates, April 2024 - Central Statistics Office 2 Hayley Halpin, “How much immigration is there in Northern Ireland?”, BBC News, August 11, 2024, <a href="https://www.bbc.com/news/articles/" target="_blank" rel="noopener noreferrer">https://www.bbc.com/news/articles/</a> cgm7vn2kegjo In Northern Ireland, where the arrangements are different because they are not members of the European Union, the number of Ukrainians increased by just over 1,000, totalling 3,149 people in the most recent statistics. Kurtis Reid, “Refugees on missing their homeland two years after start of war: ‘I’m very grateful to the people here’.” Belfast Telegraph, February 24, 2024. <a href="https://www.belfasttelegraph.co.uk/news/" target="_blank" rel="noopener noreferrer">https://www.belfasttelegraph.co.uk/news/</a> northern-ireland/refugees-on-missing-their-homeland-two-years-after- start-of-war-im-very-grateful-to-the-people-here/a15315517.html 3 According to the Central Statistics Office (CSO), upto 2 June 2024, 107,406 people arrived in Ireland from Ukraine under the Temporary Protection Directive. Of these, some 76% had ‘administrative data’ after 31 March 2024. See, Arrivals from Ukraine in Ireland Series 13 - Central Statistics Office 4 International Protection Office (IPO), ‘Monthly Statistical Report, August 2024’, 20240910 IPO Website Stats Aug 2024 FINAL.pd f 5 Eurostat, ‘Third country nationals found to be illegally present – annual data’ Statistics | Eurostat (europa.eu) 6 Tom Healy, “The Benefits and Costs of Immigration in Ireland,” Slí Chaol (blog), April 4, 2024, <a href="https://slichaol.blogspot.com/2024/04/the-benefits-and-costs-of-" target="_blank" rel="noopener noreferrer">https://slichaol.blogspot.com/2024/04/the-benefits-and-costs-of-</a> immigration.html. 7 For further information, visit Community Sponsorship Ireland - Irish Red Cross 8 Dicastery for the Doctrine of the Faith, Dignitas Infinita: Declaration on Human Dignity (Rome: Libreria Editrice Vaticana, 2024), §40. This Pastoral Letter has been designed bythe CCOandrep roduction is welcome. Please credit as the source: The Irish Catholic Bishops’ Conference. For further info rmation email <a href="mailto:info@catholicbishops.ie" target="_blank" rel="noopener noreferrer">info@catholicbishops.ie</a> Caption Brother Kevin Crowley OFMCapas CEOofthe Capuchin Day Centre, and Archbishop Diarmuid Martin of Dublin, greet Pope Francis during the Holy Father’s visit to Ireland for the 9th World Meeting of Families in August 2018. 8Index Front page caption Pope Francis with the sculpture ‘Angels Unawares’ b y Timothy Schmalz, which was installed in September 2 019 in Saint Peter's Square, Vatican City, to mark the 105th World Migrant and R efugee Day. Permission for publication has been granted to the Catholic Commun ications Office by Timothy Schmalz. All other images have been sourced from the Catholi c Communications Office archive.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-middle-killeavy-newry" data-parish-name="Middle Killeavy (Newry)"><h2 class="ocr-parish-name">Middle Killeavy (Newry)</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 10</p>
+<p>LATELY DECEASED: Fr Mark O’Hagan, P. P. Ardee; Michael McKeown, Forest Hills; Dolores Spencer, Dublin Road; MASS INTENTIONS: Saturday 26th 6.15pm Joe Larkin 1st Ann. Declan McGivern Sunday 27th 10.30am Priest’s Intentions Sunday 27th 12noon Priest’s Intentions Monday 28th 10.30am P riest’s Intentions Tuesday 29th 10.30am Parish Mass Intentions Wednesday 30th 10.30am P riest’s Intentions Thursday 1st 10.30am Priest’s Intentions Friday 2nd 10.30am November List of the Dead Saturday 3rd 10.30am Priest’s Intentions Saturday 3rd 6.15pm Priest’s Intentions Sunday 4th 10.30am Priest’s Intentions Sunday 4th 12noon Colum Powell 1st Anniversary Brian &amp; R ita Bunkham; Mary &amp; Michael McEv oy MINISTERS OF THE EUCHARIST – OCTOBER 6.15 pm 10.30am 12noon 3rd / 4th Barbara Goss James Magee Fiona Campbell 10th /11th Eilish Morley Pat McKay Theresa Dillon 17th /18th Bronagh Carville Ann Rocks James Lannon 24th /25th Eilish Smyth Sheila Murphy Bronagh Strain 31st /1st Eamon Murphy Donna Magee Margaret Heaney MINISTERS OF THE WORD - OCTOBER 6.15pm 10.30am 12noon Paul Matthews Anna Rose Magee Sarah McArdle PARISH COLLECTION: last weekend raised – Weekly Collection: £1,667 &amp; €68 (Env: £983; Loose Plate £684 &amp; €68). Thank you for your continued support. FIRST SATURDAY DEVOTIONS: will take place in our church on Saturday 3rd October, with a period of Meditation from 9.45am – 10am, followed by the Rosary (10am), Mass (10.30am) and Sacrament of Reconciliation (11am). These will be undertaken with the intention of making reparation to the Immaculate Heart of Mary, as requested by Our Lady during her apparitions at Fatima, and also to promote Vocations CUAN MHUIRE – CAFÉ: (200 Dublin Rd Newry) is open Monday to Saturday, 10am – 2pm. Your support greatly helps the work of Cuan Mhuire BLESSING OF ROSES: will take place at all Masses next Weekend (3rd/4th October). SEASON OF CREATION : In his message for the “Season of Creation ”, Pope Leo XIV calls us to appreciate the gift of life amid suffering that is itself a plea for healing and peace which we believe flows from the enduring love of Christ. Consistent in his advocacy for peace, Pope Leo alerts ustothe terror of war arising from the contradictory desires within us. Such internal turmoil results in social and ecological destruction to create wounds that require healing. Pope Leo invites us to ‘transform harm into life’ in accordance with the prophetic call to “beat swords into ploughshares” ( Is 2:4 ). Pope Leo concludes that it’s only with God’s help that we can courageously seek peace and the care of creation. The Season of Creation concludes with the, Feast of Saint Francis of Assisi on 4 October 2026. BETHANY HOUSE OF PRAYER: invite youtoa candlelit “Prayer Around the Cross” , with the music of Taizé, on Friday 2nd October 8pm. Followed by tea/coffee. (34 Point Rd, Dundalk) HUMAN LIFE INTERNATIONAL, IRELAND: As part of his tour of Ireland, Fr Lawrence Carney (international speaker and popular author), will speak in the Canal Court Hotel, Newry, on Tuesday 29th September at 6:45pm. A first-class relic of St Thérèse of Lisieux will be present. Admission is free. EVORA HOSPICE CHURCH DOOR COLLECTION: A church-door collection for the local Hospice will be held after Masses in our parish next weekend (3rd / 4th October). All donations to this collection are gratefully received. 2026 marks the 37th year of Evora Hospice Care (formerly Southern Area Hospice Services) and this year over £4 million must be raised to continue providing the specialist palliative care to patients and their families across Down, Armagh and Tyrone. In 2025, collections in parishes across the Southern Trust Area raised over £37,358 for our Hospice and with your support again this year we hope to build on this amount. Thank you for your support. EVORA HOSPICE MEMORY TREE: Remember someone special by dedicating a light on the Evora Hospice Memory Tree. Your dedication is a meaningful way to remember a loved one while supporting the care provided by Evora Hospice. For more information, please visit the Evora Hospice website or contact our Fundraising Office on <a href="tel:+442830267711" style="color:#1d4ed8;font-weight:600;">028 3026 7711</a>. Thank you for your continued support PRECIOUS LIFE : invite you to join them tomorrow, Monday 28th, at 6.15pm, at Primark/Bank Buildings, Donegal Place, Belfast , to walk together to Belfast City Hall for a peaceful “Choose Life Witness”, opposing the planned illumination for so- called “International Safe Abortion Day.” ANAM CARA, ARMAGH , who support bereaved parents, will hold their next Parent Support Evening on Wednesday 30th September at 7.30 pm, inthe Armagh City Hotel. This event is free and open to all bereaved parents regardless oftheage your child died, the circumstances of their death, or whether their death was recent or not. They also offer an online support service and can be contacted at <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> or on 003531 4045378. Parish of Middle Killeavy <a href="https://www.newrymiddlekilleavy.com" target="_blank" rel="noopener noreferrer">www.newrymiddlekilleavy.com</a> PARISH OFFICE : Tel:<a href="tel:+442830252459" style="color:#1d4ed8;font-weight:600;">028 30252459</a> Email : <a href="mailto:assumptionnewry@gmail.com" target="_blank" rel="noopener noreferrer">assumptionnewry@gmail.com</a> Facebook: Parish of Middle Killeavy 27TH SEPTEMBER 2026 26TH SUNDAY IN ORDINARY TIME PARISH TEAM: Fr Liam (<a href="tel:+442830262376" style="color:#1d4ed8;font-weight:600;">028 30262376</a>); Fr Saji (<a href="tel:+442830267032" style="color:#1d4ed8;font-weight:600;">028 30267032</a>)</p>
+<h3 class="b-head">PARISH OFFICE</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-monasterboice-tenure" data-parish-name="Monasterboice (Tenure)"><h2 class="ocr-parish-name">Monasterboice (Tenure)</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 11</p>
+<p>Parish websites: <a href="https://www.monasterboiceparish.com" target="_blank" rel="noopener noreferrer">www.monasterboiceparish.com</a> <a href="https://www.termonfechinparish.ie" target="_blank" rel="noopener noreferrer">www.termonfechinparish.ie</a> Sunday Cycle A/Weekday Cycle 2/Psalter Week 2 Masses Times - Clogherhead Parish Sunday 27 September @ 10.45am Ss Peter &amp; Paul’s Church Walshestown ~ Sunday 27 September @ 12 noon St Michael’s Church Clogherhead ~ Vera Byrne (10 Av.) • John &amp; Jean McKeown + Rev Fr Willi am Murtaghth Monday 28 September @ 9am Clogherhead ~ Tuesday 29 September @ 9am St Michael’s Church Clogherhead ~ Thursday 01 October @ 9am Clogherhead ~ Sunday 04 October @ 10.45am Walshestown ~ Tony McDonnell (6 Av.) th Sunday 04 October @ 12 noon Clogherhead ~ Marie Walsh (Month’s Mind) • Tony McCullough (1 Anniversary) &amp; Alan McCullough • Phil Kirk • Rosaleen Brown (16 Av.) • Larry, Maggie, Jane, Sr. Annette &amp; Noel Kirwan • Laurence &amp; Maeve Kirwanst th Masses Times - Monasterboice Parish Sunday 27 September @ 9.45am Fieldstown ˜ Sunday 27 September @ 11.30am Church of Our Lady of the Immaculate Conception Tenure ~ Clint Englishby • Caroline Quinn Tuesday 29 September @ 9.30am Tenure ˜ Wednesday 30 September @ 9.30am Fieldstown ~ Friday 2 October @ 7pm Tenure ˜ Sunday 4 October @ 9.45am Fieldstown ˜ Sunday 4 October @ 11.30am Church of Our Lady of the Immaculate Concept ion Tenure ~ Seamus Davis (1 Anniversary) st</p>
+<h3 class="b-head">Recently Deceased</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-whitecross-loughgilly" data-parish-name="Whitecross (Loughgilly)"><h2 class="ocr-parish-name">Whitecross (Loughgilly)</h2><p class="ocr-parish-date">03/10/2026</p></header>
+<p class="page-label">Page 12</p>
+<p>ADORATION: Tuesday 7pm – 8pm in Assisi Centre. First Friday-6pm – 7pm in St Brigid’s Church BAPTISMS: 1st Saturday of the Month in St Malachy’s at 5.00pm. ( Book on Parish Website)</p>
+<h3 class="b-head">PARISH OFFICE</h3>
+<p>HOURS Tuesday, Wednesday &amp; Thursday 10.00am - 2.00pm SVP Helpline: <a href="tel:+3537561011117" style="color:#1d4ed8;font-weight:600;">07561011117</a> NORMAL WEEKDAY MASS TIMES: Tuesday: St Brigid’s @ 10.00am Wednesday: St Teresa’s @ 7.00pm Thursday: St Malachy’s @ 10.00am First Friday only: St Brigid’s @ 7.00pm (In the event of a Funeral, 10am Mass will be cancelled) PARISH PRIEST Very Rev. Malachy Murphy PP CONTACT US: <a href="tel:+442837507214" style="color:#1d4ed8;font-weight:600;">02837507214</a> <a href="https://www.parishofloughgilly.com" target="_blank" rel="noopener noreferrer">www.parishofloughgilly.com</a> E-mail: <a href="mailto:info@parishofloughgilly.com" target="_blank" rel="noopener noreferrer">info@parishofloughgilly.com</a> Facebook: Loughgilly Parish CONFESSIONS : Each Saturday at 5.30pm SATURDAY VIGIL MASS: St Malachy’s @ 6.00pm SUNDAY MORNING MASS: St Brigid’s @ 10.00am St Teresa’s @11.30am Parish Bulletin – Sunday 4th Oct 2026 OUR RECENTLY DECEASED: Michael John McGuinness, Mary McCone, Fr Mark O’Hagan PP. LOUGHGILLY PARISH ANNIVERSARIES: Saturday 3rd October – St. Malachy’s @ 6pm Terence McCooey Sunday 4th October – St. Brigid’s @ 10am Lugano Mwakoysa Seamus &amp; Elizabeth McParland &amp; DM Saturday 10th October – St. Malachy’s @ 6pm Barry Malone Sally McVerry Sunday 11th October – St. Brigid’s @ 10am Mary McElroy Sunday 11th October – St. Teresa’s @ 11.30am Mary McCone MM Tom Ferris Margaret &amp; Arthur McSherry PARISH COLLECTIONS 27th Sept - Main Collection - £1486.82 – 106 Env FIRST WEDNESDAY Mass on 7th October will be offered for Mass Bouquets intentions in Tullyherron 7pm. PASTORAL LETTER – “Go, Rebuild My Church” Archbishop Eamon has, following the Diocesan Congress, written a Pastoral Letter to the people of the Archdiocese. This letter is available on our Facebook Page and Website, copies have also been left for People in the Church Porches. We encourage everyone to read this letter. COME AND LISTEN…. A series of Scripture based talks for Adults and Young People. Beginning on Monday 5th October at 7pm and continuing each Monday and Thursday in Newry Parish Centre. Get to know a bit more of your faith through the word of God. November Parish List of the Dead As we approach the month of Holy Souls, we invite you to remember your deceased family members and friends. The Parish List of the Dead and envelopes are now available in each of our parish churches. Please take a List, carefully write down the names of those you wish to remember, and return it with your Mass Offering before 1st November . You can drop the envelopes into the collection baskets, to the Sacristy, Parochial House or the</p>
+<h3 class="b-head">parish office</h3></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
