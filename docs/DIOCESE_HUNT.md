@@ -51,6 +51,10 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Meath Wix map is not a parish list | https://www.dioceseofmeath.ie/map-of-parishes is Wix CMS (68 parish rows). urllib/SSR showed almost no cards. Second official list: `/priests`. Pastoral areas page has no parish hrefs. | Browser / kitchen-sink the remaining parishes. Do not harvest `facebook.com/dioceseofmeath`. |
 | Meath `/current-newsletter/` | Athboy, Dunshaughlin, Kells, Kilbeggan redirect to this-week PDF (same as Kildare). | `permanent_redirect_document` on `/current-newsletter/`. Do not pin the dated file. |
 | Meath Squarespace listing with no `.pdf` href | Tullamore `/parish-weekly-bulletin` titles the Sunday file as an article. The PDF is on an inner `/s/` page. | Skip until a listing scrape works. Do not pin `/s/Bulletin-…pdf`. |
+| `mcn.live` /Camera/ | Webcam page. Weekly PDF is in the church profile JSON (Glenfin and others Frank trained). | `mcn_live_parish_page`. Do not harvest the stream. Do not pin a dated file. |
+| `churchmedia.tv` | “View Our Latest Newsletter” on the livestream page (Portaferry). | `churchmedia_newsletter`. Do not pin `/newsletter/<token>`. |
+| `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the page. Do not invent a PDF. Do not harvest the stream. |
+| `/current-newsletter/` | Same path every week; redirects to this Sunday’s PDF (Naas / Kildare / Meath). | `permanent_redirect_document`. Do not pin the dated upload. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 

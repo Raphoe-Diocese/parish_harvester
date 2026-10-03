@@ -15,6 +15,19 @@
   - **Trim** Wix hashed PDF 663153 bytes. Text 4 - 10 October 2026.
 - Harvestable keys: ashbourne, athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar, ratoath, trim. Skip: 58. Do not pin dated names or Wix hashes. Do not store facebook.com/dioceseofmeath.
 
+## 03/10/2026 — Cloud hunt (laptop off)
+
+- Frank: find bulletins in the cloud, not this PC.
+- Cloud skip-parish hunt: [Cloud this-week bulletin hunt](bc-e3974aa5-d22f-46ef-99e7-1da3bb40e296). Meath hunt still separate.
+- No scrape on the 16GB laptop this turn.
+
+## 03/10/2026 — Recipe Brain START (Frank: remember every trick, hunt constantly)
+
+- Written agreement (23/09): click memory, fingerprint, picker challenge, Guess must not invent dates. Stale-harder already live-proved 29/09.
+- Started today: `docs/RECIPE_BRAIN.md`, `harvester/recipe_brain.py` (MCN, Mayo.ie, ChurchMedia, ChurchServices, /current-newsletter/). Catalog also in `site_memory.js` and `site_patterns.json`.
+- **Not finished.** 24/7 is Sunday harvest on GitHub Actions, not this laptop. Google/Bing/Yahoo kitchen-sink stays on cloud hunts.
+- Next: Actions skip-parish hub scan. Meath cloud hunt PR #276.
+
 ## 03/10/2026 — Kildare and Leighlin hunt START
 
 - Official https://www.kandle.ie/find-your-parish/ — 58 parishes. Harvest choice `kildare_and_leighlin_diocese`. Not live.

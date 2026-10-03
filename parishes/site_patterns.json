@@ -2,6 +2,72 @@
   "version": 1,
   "description": "Learned site layout patterns — updated when recipes are pushed from the Parish Trainer extension. No AI keys required.",
   "patterns": {
+    "mcn_live+direct_download": {
+      "page_type": "mcn_live_parish_page",
+      "recipe_flow": "direct_download",
+      "label": "MCN camera page newsletter (not the webcam)",
+      "advice": "Weekly PDF is on the mcn.live /Camera/ page via profile JSON. Do not pin a dated file. Do not harvest the stream.",
+      "operator_notes": [
+        "Frank trained this. Harvest uses mcn_live_parish_page.",
+        "Start at the camera URL."
+      ],
+      "do_not": [
+        "Do not harvest the webcam video.",
+        "Do not pin a dated newsletter filename."
+      ],
+      "html_fingerprint": "mcn_live_parish_page",
+      "html_markers": ["mcn.live", "/Camera/"],
+      "example_parishes": ["glenfin-parish"],
+      "success_count": 1
+    },
+    "churchmedia+direct_download": {
+      "page_type": "churchmedia_newsletter",
+      "recipe_flow": "direct_download",
+      "label": "churchmedia.tv latest newsletter",
+      "advice": "Use getChannelAbout. Do not pin /newsletter/<token>.….pdf.",
+      "operator_notes": [
+        "Portaferry proved this. Token dies on the next upload."
+      ],
+      "do_not": ["Do not pin the churchmedia newsletter token."],
+      "html_fingerprint": "churchmedia_newsletter",
+      "html_markers": ["churchmedia.tv", "getChannelAbout"],
+      "example_parishes": ["portaferryparish"],
+      "success_count": 1
+    },
+    "mayo_ie+direct_download": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "direct_download",
+      "label": "Mayo County Council parish-newsletters",
+      "advice": "Scrape the mayo.ie listing. Date is in the link text. Do not pin the getmedia GUID.",
+      "operator_notes": [
+        "Belmullet proved GET 200 application/pdf on 04/10/2026."
+      ],
+      "do_not": [
+        "Do not pin the getmedia GUID.",
+        "Do not treat a PNG as a PDF recipe."
+      ],
+      "html_fingerprint": "mayo_ie_newsletters",
+      "html_markers": ["mayo.ie", "getmedia", "parish-newsletters"],
+      "example_parishes": ["belmullet"],
+      "success_count": 1
+    },
+    "churchservices_tv+pointer": {
+      "page_type": "webcam_pointer",
+      "recipe_flow": "html_capture",
+      "label": "churchservices.tv webcam — pointer only",
+      "advice": "Look for a newsletter on the same page. Else keep the real parish site. Do not invent a PDF.",
+      "operator_notes": [
+        "Webcam first. Not a bulletin file by itself."
+      ],
+      "do_not": [
+        "Do not harvest the livestream as a bulletin.",
+        "Do not invent a PDF because a webcam exists."
+      ],
+      "html_fingerprint": "churchservices_tv_pointer",
+      "html_markers": ["churchservices.tv"],
+      "example_parishes": [],
+      "success_count": 0
+    },
     "faithful_ie_family_list+click_then_pdf": {
       "page_type": "pdf_link_list",
       "recipe_flow": "click_then_pdf",
