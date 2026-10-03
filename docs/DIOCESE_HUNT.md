@@ -61,6 +61,25 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the page. Do not invent a PDF. Do not harvest the stream. |
 | `/current-newsletter/` | Same path every week; redirects to this Sunday’s PDF (Naas / Kildare / Meath). | `permanent_redirect_document`. Do not pin the dated upload. |
 
+## Ardagh leftover skips (re-hunted 03/10/2026, cloud only)
+
+Official https://www.ardaghdiocese.org/parishes/ and parish-details. Folder `ardagh`, harvest `--diocese ardagh_diocese`. Clonguish is already live under `newtownforbes` — do not redo. Do not pin dated filenames. mcn.live JSON not webcam; churchmedia.tv getChannelAbout do not pin token; mayo.ie do not pin GUID; churchservices.tv pointer only.
+
+**Unskipped this hunt: none.** GET 200 + `%PDF` / `image/jpeg` + date on the file was not proved for any leftover skip.
+
+Leave skipped (why):
+
+- **abbeylara** — abbeylaraparish.com WP posts stop 13 July 2025.
+- **annaduff, ballinahownboherpullough, ballinalee, ballymachugh, ballymahon, bornacoola, carrickedmondabbeyshrule, clonmacnois, colmcille, granard, kenagh, killashee, killoe, lanesboro, mullahoranloughduff** — diocese card has no parish website; guessed `.ie`/`.com` hosts NXDOMAIN or parking. Granard MCN camera has no newsletter JSON. Killoe churchservices.tv is webcam only. Lanesboro joeobrien.ie notes are not a parish PDF. Ballinahown village weekly news is community notes, not the parish bulletin.
+- **clonmacnois** — shannonbridge.blogspot.com last bulletin 15 September 2024.
+- **dromard** — dromard.ie church-bulletins page says COMING SOON; ChurchTV Moyne/Legga webcam, no PDF.
+- **kilenummerykillery** — killenummery.com/newsletter empty; WP media is Novena flyers.
+- **loughgownamullinalaghta** — loughgownaparish.com dead (NXDOMAIN).
+- **moatemounttemple** — parishofmoate.com HTTP 500; archive HTML is old undated editions.
+- Shared aliases (harvest the host parish once): **fenagh**, **gortletteragh** → mohill; **leganballycloghan** → ardaghandmoydow; **streete** → rathowen.
+
+Do not invent Facebook PDFs. Do not harvest Anglican twins.
+
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
 Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garrison, Brookeboro-Fivemiletown, Cleenish (`parishofcleenish.com` is a COVID ticket page), Clogher town, Eskra, Inniskeen (Kavanagh bulletin **404**), Killeevan, Latton, Pettigo, Rockcorry, Trillick, Tydavnet. Shared (leave skipped): Clontibret → Castleblayney / Muckno; Tyholland → Monaghan & Rackwallace (`past-newsletters`). Killanny `/parish-bulletin` is harvested as stale HTML (May / 2021 lockdown text) until they overwrite it.
