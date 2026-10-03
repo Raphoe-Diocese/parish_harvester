@@ -32,6 +32,7 @@ _DIOCESE_LABELS: dict[str, str] = {
     "derry_diocese": "Derry Diocese",
     "down_and_connor": "Down & Connor Diocese",
     "dromore_diocese": "Dromore Diocese",
+    "dublin_diocese": "Dublin Archdiocese",
     "elphin_diocese": "Elphin Diocese",
     "ferns_diocese": "Ferns Diocese",
     "galway_diocese": "Galway, Kilmacduagh and Kilfenora Diocese",
@@ -42,7 +43,10 @@ _DIOCESE_LABELS: dict[str, str] = {
     "kilmore_diocese": "Kilmore Diocese",
     "limerick_diocese": "Limerick Diocese",
     "meath_diocese": "Meath Diocese",
+    "ossory_diocese": "Ossory Diocese",
     "raphoe_diocese": "Raphoe Diocese",
+    "tuam_diocese": "Tuam Archdiocese",
+    "waterford_and_lismore_diocese": "Waterford and Lismore Diocese",
 }
 
 _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
@@ -56,6 +60,7 @@ _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
     "derry": "Derry Diocese",
     "down_and_connor": "Down & Connor Diocese",
     "dromore": "Dromore Diocese",
+    "dublin": "Dublin Archdiocese",
     "elphin": "Elphin Diocese",
     "ferns": "Ferns Diocese",
     "galway": "Galway, Kilmacduagh and Kilfenora Diocese",
@@ -66,7 +71,10 @@ _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
     "kilmore": "Kilmore Diocese",
     "limerick": "Limerick Diocese",
     "meath": "Meath Diocese",
+    "ossory": "Ossory Diocese",
     "raphoe": "Raphoe Diocese",
+    "tuam": "Tuam Archdiocese",
+    "waterford_and_lismore": "Waterford and Lismore Diocese",
 }
 
 NO_EVIDENCE_ERROR = (

@@ -41,6 +41,9 @@ class ParishAliasTests(unittest.TestCase):
                 "fenagh": "mohill",
                 "gortletteragh": "mohill",
                 "leganballycloghan": "ardaghandmoydow",
+                "grangepark": "edenmore",
+                "moone": "narraghmore",
+                "butlerstown": "stpaulswaterford",
             },
         )
 

@@ -37,6 +37,10 @@ CONTACTS_PATH_BY_DIOCESE = {
     "derry": REPO_ROOT / "parishes" / "derry_diocese_contacts.json",
     "down_and_connor": REPO_ROOT / "parishes" / "down_and_connor_contacts.json",
     "meath": REPO_ROOT / "parishes" / "meath_diocese_contacts.json",
+    "dublin": REPO_ROOT / "parishes" / "dublin_diocese_contacts.json",
+    "ossory": REPO_ROOT / "parishes" / "ossory_diocese_contacts.json",
+    "tuam": REPO_ROOT / "parishes" / "tuam_diocese_contacts.json",
+    "waterford_and_lismore": REPO_ROOT / "parishes" / "waterford_and_lismore_diocese_contacts.json",
     "raphoe": REPO_ROOT / "parishes" / "raphoe_diocese_contacts.json",
 }
 
