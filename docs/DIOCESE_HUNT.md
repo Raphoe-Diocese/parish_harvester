@@ -55,6 +55,7 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | `churchmedia.tv` | “View Our Latest Newsletter” on the livestream page (Portaferry). | `churchmedia_newsletter`. Do not pin `/newsletter/<token>`. |
 | `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the page. Do not invent a PDF. Do not harvest the stream. |
 | `/current-newsletter/` | Same path every week; redirects to this Sunday’s PDF (Naas / Kildare / Meath). | `permanent_redirect_document`. Do not pin the dated upload. |
+| Askea `/newsletters/` dated folder | Holy Family Askea + Bennekerry + Tinryland. Listing HTML has `…/newsletters/YYYY/MM/YYYYMMDD-….pdf`. `/current-newsletter/` is **404**. | `http_scrape_newest_pdf` on `/newsletters/`. Score **filename**. Harvest once under `askea`. Alias Bennekerry + Tinryland. Do not pin `20261004-…pdf`. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 

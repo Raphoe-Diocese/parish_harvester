@@ -1,19 +1,38 @@
 {
+  "version": 2,
   "parish_key": "askea",
   "display_name": "Askea",
   "diocese": "kildare_and_leighlin",
+  "start_url": "https://askeaparish.ie/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "newsletters",
+    "Sunday",
+    "October",
+    "September",
+    "2026"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/askea/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "example_url": "https://askeaparish.ie/wp-content/uploads/newsletters/2026/10/20261004-TwentySeventhSundayinOrdinarytime.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/askea/"
+      "url": "https://askeaparish.ie/newsletters/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "03/10/2026 leftover skip hunt: askeaparish.ie/newsletters/ lists dated PDFs. Proved 20261004-TwentySeventhSundayinOrdinarytime.pdf GET 200 application/pdf 423807 bytes %PDF-1.7. File text 4th October 2026. Same file covers Askea, Bennekerry and Tinryland. /current-newsletter/ is 404. Do not pin the dated name."
+  ],
+  "do_not": [
+    "Do not pin the dated PDF.",
+    "Do not harvest Bennekerry or Tinryland as a second copy of this file.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
