@@ -1,3 +1,9 @@
+## 03/10/2026 — Cloud leftover SKIP unskip (this week proved)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 weekend files. No harvest.yml. Not added to LIVE_DIOCESES.
+- Unskipped after GET 200 + magic: **stnicholas** (04/10 PDF 612760), **monaleen** (27/09 PDF 1899455), **bagenalstown** / **borris** / **mountmellick** (current-newsletter 27/09), **edenderry** (04/10 JPEG 1808833), **portarlington** (MCN 04/10 PDF 1303113), **dingle** (04/10 PDF 158377), **rathmore** (MCN 04/10 PDF 249160), **stjosephgalway** (MCN 04/10 PDF 306650), **galwaycathedral** (27/09 PDF 8272157).
+- **stmarys** stays skip (same Pastoral Unit 1 file as St Nicholas). Castlemaine HTML dated post left skip (would pin a dated slug). Kilcock current-newsletter was 20/09. Abbeyleix still June 2020. Ballycroy still PNG. Meath not touched.
+
 ## 03/10/2026 — Meath LIVE (homepage) + harvest in fives
 
 - Frank: turn Meath on; harvest would take too long as one lump.
@@ -5,8 +11,9 @@
 - Do **not** click five separate Harvest buttons. Those share one GitHub lock (`harvest-full`) and would wait in a line, then fight over `main`.
 - One `harvest.yml` run with diocese **all** already starts **5 dioceses at a time** (matrix `max-parallel: 5`), then one stitch writes the mega PDFs. That is the parallel harvest.
 - Homepage card rebuilt locally: Meath live, coming soon (9). Count 0/67 until the Meath harvest writes status.
-- This turn: one `meath_diocese` harvest only (9 harvestable PDFs). Not five buttons. Not `all`.
-- Not on parishpress.ie until this commit is on main and Pages finishes.
+- Meath harvest 37124522917 success: 8 ok (athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar 04/10, ratoath, trim). ashbourne failed (listing had no dated PDF matching sunday/newsletter). skip 58.
+- Live-proved on https://www.parishpress.ie/ (Meath Diocese + coming soon (9)). Card count updates after Pages of this harvest.
+- Next: merge PR #277 (11 unskips) then one `all` harvest (5 at a time). Not five buttons.
 - Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
 
 ## 03/10/2026 — Meath hunt START
