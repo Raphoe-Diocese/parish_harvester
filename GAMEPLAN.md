@@ -1,11 +1,17 @@
 ## 03/10/2026 — Dublin / Ossory / Tuam / Waterford hunt START
 
-- Cloud only. No laptop scrape. Not LIVE. Did not dispatch harvest.yml. Did not redo Meath/Limerick/Kildare/Kerry/Galway/Kilmore/Killala leftover skips.
+- Cloud only. No laptop scrape. Did not redo Meath/Limerick/Kildare/Kerry/Galway/Kilmore/Killala leftover skips.
 - Official lists: Dublin A-Z 194 cards; Ossory 42; Tuam parish-details 51; Waterford parishID 45.
 - Harvest week Sunday 04/10/2026, also 27/09/2026 and 03–05/10/2026. Unskip only after GET 200 and magic %PDF or JPEG, date on the file.
 - Unskipped **37** (aliases skip, not harvested twice): Dublin 25; Ossory 5 (inistioge, rathdowney, stcanices, stjohns, thomastown); Tuam 5 (athenry, castlebar, carnacon/Ballintubber, headford, tuamparish); Waterford 2 (tramore, stpaulswaterford). Shared: grangepark to edenmore, moone to narraghmore, butlerstown to stpaulswaterford.
 - Left skip: remaining official cards. Typical why: no parish website; Facebook only; vocations.ie footer; Ossory 403; JS listing with no dated file; Knocklyon weekly page still August; Castlecomer PDF filename undated; Dungarvan Faith-at-Home JPEG not a bulletin; Louisburgh banner JPEG; Pro-Cathedral closed Aug 2026 no this-week PDF.
 - Folder keys: dublin, ossory, tuam, waterford_and_lismore. Harvest stems dublin_diocese / ossory_diocese / tuam_diocese / waterford_and_lismore_diocese.
+- PR #281 merged 03/10/2026. Turning LIVE this turn.
+
+## 03/10/2026 — Stitch fix (keep going)
+
+- 5-wide harvest 37125353930: every diocese slice succeeded; **stitch failed** `ModuleNotFoundError: No module named 'harvester'` (same bug as draft PR #243).
+- Fix: repo root on `sys.path` in `scripts/merge_diocese_harvests.py`, plus `PYTHONPATH` on the stitch step so `site_builder.run` also finds the package. Mega PDF stays on.
 
 ## 03/10/2026 — Leftover skip hunt (cloud, after PR #277)
 
