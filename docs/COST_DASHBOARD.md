@@ -1,6 +1,6 @@
 # 💷 Cost Dashboard
 
-_Auto-generated at 2026-10-03T14:16:29Z UTC._
+_Auto-generated at 2026-10-03T15:54:38Z UTC._
 
 _This file is rewritten on every harvest and OCR run. Do not edit manually._
 
