@@ -1,3 +1,9 @@
+## 03/10/2026 — Cloud hunt (laptop off)
+
+- Frank: find bulletins in the cloud, not this PC.
+- Cloud skip-parish hunt: [Cloud this-week bulletin hunt](bc-e3974aa5-d22f-46ef-99e7-1da3bb40e296). Meath hunt still separate.
+- No scrape on the 16GB laptop this turn.
+
 ## 03/10/2026 — Recipe Brain START (Frank: remember every trick, hunt constantly)
 
 - Written agreement (23/09): click memory, fingerprint, picker challenge, Guess must not invent dates. Stale-harder already live-proved 29/09.
