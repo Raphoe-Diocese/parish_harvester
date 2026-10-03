@@ -116,6 +116,12 @@ _YEAR_MONTHNAME_DAY_RE = re.compile(
     rf"(20\d{{2}})[_\-\s]?({_MONTH_ALT})[_\-\s]?(\d{{1,2}})(?:st|nd|rd|th)?(?!\d)",
     re.IGNORECASE,
 )
+# Our Lady of the Rosary, Limerick: OLR-News-2026-10-Oct-04.pdf is 4 Oct 2026.
+# The slug matcher otherwise reads the inner "10-Oct-04" as 10 Oct 2004.
+_YEAR_MONTHNUM_MONTHNAME_DAY_RE = re.compile(
+    rf"(20\d{{2}})-(\d{{1,2}})-({_MONTH_ALT})-(\d{{1,2}})(?!\d)",
+    re.IGNORECASE,
+)
 
 # Tawnawilly listing 2026-09-06: Sunday-Sept-06-26.pdf (Month-DD-YY),
 # not Sunday-6th-Sept.pdf (that name 404s).
@@ -398,6 +404,22 @@ def extract_date_from_string(text: str) -> date | None:
         if plausible:
             today = date.today()
             return min(plausible, key=lambda d: abs((d - today).days))
+
+    # OLR-News-2026-10-Oct-04.pdf: year, month number, month name, day.
+    m = _first_match_outside_hash(_YEAR_MONTHNUM_MONTHNAME_DAY_RE, text, spans)
+    if m:
+        month = _MONTH_MAP.get(m.group(3).lower())
+        try:
+            month_num = int(m.group(2))
+        except ValueError:
+            month_num = 0
+        if month and month == month_num:
+            try:
+                candidate = date(int(m.group(1)), month, int(m.group(4)))
+                if _is_plausible_bulletin_year(candidate.year):
+                    return candidate
+            except ValueError:
+                pass
 
     # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
     slug_date = extract_date_from_slug(text)

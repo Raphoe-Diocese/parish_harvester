@@ -11,6 +11,7 @@
 - Official https://www.limerickdiocese.org/our-diocese/parish-directory/ — 60 parishes. Harvest choice `limerick_diocese`. Not live.
 - Proved: **Adare** Newsletter-Sunday-3-4-October-2026.pdf GET 200 application/pdf 702163 bytes. **Our Lady of the Rosary** OLR-News-2026-10-Oct-04.pdf GET 200 application/pdf 307013 bytes. **Abbeyfeale** 27/09/2026 file GET 200 application/pdf 914184 bytes.
 - Askeaton’s only dated PDF is 5 October 2025. Not used.
+- Harvest 03/10/2026: Adare ok 04/10/2026. Abbeyfeale ok 27/09/2026. Our Lady of the Rosary failed because the homepage has no PDF and the filename was read as 10/10/2004. Fix: start at /newsletters/ and read 2026-10-Oct-04 as 04/10/2026.
 - Diocese Facebook and the school site stsenansed.ie are not stored as parish links.
 
 ## 03/10/2026 — Kilmore hunt START

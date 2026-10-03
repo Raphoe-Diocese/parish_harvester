@@ -31,6 +31,14 @@ class CloudFolderTests(unittest.TestCase):
         self.assertEqual(format_cloud_folder_label(date(2027, 6, 14)), "27.06.14.pdf")
         self.assertEqual(format_cloud_folder_label(date(2030, 3, 8), with_pdf=False), "30.03.08")
 
+    def test_olr_year_monthnum_monthname_day_is_4_oct_2026(self) -> None:
+        self.assertEqual(
+            extract_date_from_string(
+                "OLR-News-2026-10-Oct-04.pdf"
+            ),
+            date(2026, 10, 4),
+        )
+
     def test_extract_date_from_string_yy_mm_dd(self) -> None:
         self.assertEqual(extract_date_from_string("folder/26.06.14.pdf"), date(2026, 6, 14))
         self.assertEqual(extract_date_from_string("29.01.05"), date(2029, 1, 5))
