@@ -1,3 +1,12 @@
+## 03/10/2026 — Leftover skip hunt (cloud, after PR #277)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Did not redo PR #277 keys. Did not reopen St Marys Limerick, Castlemaine, Kilcock, Abbeyleix, Ballycroy, Killannin. Meath not touched. LIVE_DIOCESES unchanged. harvest.yml not dispatched.
+- **Unskipped (proved GET 200 %PDF, date on the file):**
+  - **askea** — https://askeaparish.ie/wp-content/uploads/newsletters/2026/10/20261004-TwentySeventhSundayinOrdinarytime.pdf — 423807 bytes — 04/10/2026 — `http_scrape_newest_pdf` on `/newsletters/`. Same file names Askea, Bennekerry and Tinryland. `/current-newsletter/` 404.
+- **Left skip on purpose (aliases, not a second harvest):** bennekerry, tinryland (`alias_of` askea).
+- **Left skip (proved but not this-week PDF/JPEG, or already parked):** Kill Ardclough PNG 27/09 (1450457 bytes image/png, not JPEG). Newbridge churchmedia PDF CreationDate 26/09/2026 (232617 bytes) — too old. Knocknagree MCN 27/09 245582 bytes is Rathmore (PR #277). Limerick Cathedral 27/09 exists only behind hashed `fileID` — do not pin. Kenmare diocese card still June 2026. Listowel card: no newsletter uploaded. Askeaton 2025. Mayo leftover Killala still PNG / no extra this-week PDF. Remaining Limerick / Kildare / Kerry / Galway / Kilmore / Killala skips: diocese cards, Facebook, schools, HTML-only, stale, or no weekly file.
+- Laptop: merge PR #279. Do not start a second harvest while 37125353930 is still running.
+
 ## 03/10/2026 — Keep going (Frank)
 
 - Ashbourne recipe switched to `wp_json_newest_media` after harvest 37124522917 failed listing scrape. Do not pin 26th-sunday-a-2026.pdf.
