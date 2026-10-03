@@ -1,19 +1,40 @@
 {
+  "version": 2,
   "parish_key": "dingle",
   "display_name": "Dingle",
   "diocese": "kerry",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://www.dioceseofkerry.ie/parish/dingle/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week PDF proved on the Kerry parish card on 02/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://dingleparish.ie/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x",
+    "-1024x"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-03",
+  "example_url": "https://dingleparish.ie/wp-content/uploads/2026/10/October-4th-2026.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dioceseofkerry.ie/parish/dingle/"
+      "url": "https://dingleparish.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "03/10/2026 cloud hunt: live parish site is dingleparish.ie (not the Kerry diocese card). Keep Fógraí / Irish as Irish.",
+    "Proved October-4th-2026.pdf GET 200 application/pdf 158377 bytes, magic %PDF. Filename date is 04/10/2026.",
+    "wp-json/wp/v2/media also lists JPEG previews of the same week — skip those. The HTML Fógraí post is the same week but is not the harvest file.",
+    "Same week PDF is also on mcn.live/Camera/paroiste-naomh-muire-dingle (church id 394). Harvest the parish WP PDF once. Do not pin dated filenames or CloudFront UUIDs."
+  ],
+  "do_not": [
+    "Do not pin October-4th-2026.pdf.",
+    "Do not pick the JPEG preview of the PDF.",
+    "Do not harvest Facebook.",
+    "Do not translate Fógraí."
+  ]
 }

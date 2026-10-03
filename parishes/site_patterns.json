@@ -2,6 +2,54 @@
   "version": 1,
   "description": "Learned site layout patterns — updated when recipes are pushed from the Parish Trainer extension. No AI keys required.",
   "patterns": {
+    "mcn_live_parish_page+mcn_pdf_near_camera": {
+      "page_type": "mcn_live_parish_page",
+      "recipe_flow": "mcn_pdf_near_camera",
+      "label": "MCN.live camera page with JSON newsletter",
+      "advice": "Weekly newsletter is JSON beside the camera, not the webcam. Use site_type mcn_live_parish_page. Do not pin the CloudFront UUID.",
+      "operator_notes": [
+        "03/10/2026 cloud hunt: diocese cards with no site still had this-week PDFs on mcn.live/Camera/.",
+        "GET the camera HTML, read hfChurchId, POST /Website/ProfileDataByJson/{id}, then GET newsletter.newsLetterUrl.",
+        "Proved: Portarlington id 354 (04/10/2026, 1303113 bytes), Rathmore id 620 (04/10/2026, 249160 bytes), Galway St Joseph id 342 (04/10/2026, 306650 bytes).",
+        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera."
+      ],
+      "do_not": [
+        "Do not pin a CloudFront UUID PDF.",
+        "Do not screenshot the webcam.",
+        "Do not harvest Facebook."
+      ],
+      "html_fingerprint": "mcn_live_parish_page",
+      "html_markers": [
+        "mcn.live/Camera/",
+        "hfChurchId"
+      ],
+      "example_parishes": [
+        "portarlington",
+        "rathmore",
+        "stjosephgalway"
+      ],
+      "success_count": 3
+    },
+    "permanent_redirect_document+direct_download": {
+      "page_type": "permanent_redirect_document",
+      "recipe_flow": "direct_download",
+      "label": "Kandle /current-newsletter/ permanent redirect",
+      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Do not pin the dated uploads path.",
+      "operator_notes": [
+        "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
+        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only."
+      ],
+      "do_not": [
+        "Do not pin the dated PDF filename.",
+        "Do not unskip when the redirect is a stale year (Abbeyleix still pointed at June 2020)."
+      ],
+      "example_parishes": [
+        "bagenalstown",
+        "borris",
+        "mountmellick"
+      ],
+      "success_count": 3
+    },
     "faithful_ie_family_list+click_then_pdf": {
       "page_type": "pdf_link_list",
       "recipe_flow": "click_then_pdf",

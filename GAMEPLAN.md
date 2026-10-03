@@ -1,3 +1,9 @@
+## 03/10/2026 — Cloud leftover SKIP unskip (this week proved)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 weekend files. No harvest.yml. Not added to LIVE_DIOCESES.
+- Unskipped after GET 200 + magic: **stnicholas** (04/10 PDF 612760), **monaleen** (27/09 PDF 1899455), **bagenalstown** / **borris** / **mountmellick** (current-newsletter 27/09), **edenderry** (04/10 JPEG 1808833), **portarlington** (MCN 04/10 PDF 1303113), **dingle** (04/10 PDF 158377), **rathmore** (MCN 04/10 PDF 249160), **stjosephgalway** (MCN 04/10 PDF 306650), **galwaycathedral** (27/09 PDF 8272157).
+- **stmarys** stays skip (same Pastoral Unit 1 file as St Nicholas). Castlemaine HTML dated post left skip (would pin a dated slug). Kilcock current-newsletter was 20/09. Abbeyleix still June 2020. Ballycroy still PNG. Meath not touched.
+
 ## 03/10/2026 — Kildare and Leighlin hunt START
 
 - Official https://www.kandle.ie/find-your-parish/ — 58 parishes. Harvest choice `kildare_and_leighlin_diocese`. Not live.

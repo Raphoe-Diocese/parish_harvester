@@ -48,6 +48,10 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Ardagh Moydow + Legan shared PDF | Official `parishardaghmoydow.com` dead. Live: `ardaghmoydow.com/pdf/DDMMYY.pdf`. Same file covers Ardagh, Moydow, Legan, Ballycloghan. | Harvest under `ardaghandmoydow`; alias `leganballycloghan`. |
 | Killala ChurchTV Crossmolina | Current PDF is linked on `churchtv.ie/crossmolina/` but stored under `/wp-content/uploads/2021/02/` while the filename is the real Sunday (`4th-October-…pdf`, proved 04/10/2026). | `http_scrape_newest_pdf` the page. Do not date-rewrite the 2021/02 folder. |
 | Killala Mayo.ie newsletters | Belmullet PDF and Ballycroy PNG live on `mayo.ie` parish-newsletter pages. The getmedia GUID changes every week. The date is in the link text and the filename. | Scrape the listing. Do not pin the GUID. PNG is not a PDF/JPEG recipe. |
+| `mcn_live_parish_page` leftover skips | Diocese card has no site. `mcn.live/Cameras?County=` still lists a camera. JSON newsletter is beside the camera. | `site_type mcn_live_parish_page`. 03/10/2026: Portarlington, Rathmore, Galway St Joseph this-week PDFs. Do not pin CloudFront UUIDs. Same bytes on two Rathmore cameras = harvest once. |
+| Kildare `/current-newsletter/` leftovers | Same Pattern F as Arles/Naas. GET 200 `%PDF` then unskip. | 03/10/2026: Bagenalstown, Borris, Mountmellick were 27/09/2026 weekend files. Abbeyleix still redirected to June 2020 — leave skip. |
+| Limerick kitchen-sink | Official card is limerickdiocese.org. Live files: `saintnicholasparish.ie/parish-newsletter/` (04/10/2026 PDF, also St Mary's) and `monaleenparish.ie` wp-json PDF (27/09/2026). | Harvest St Nicholas once. `stmarys` stays skip as bulletin with St Nicholas. |
+| Dingle Fógraí | `dingleparish.ie` wp-json media has `October-4th-2026.pdf` plus JPEG previews. HTML Fógraí post is the same week. Keep Irish. | `wp_json_newest_media`, skip jpg. Do not pin the dated PDF. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
