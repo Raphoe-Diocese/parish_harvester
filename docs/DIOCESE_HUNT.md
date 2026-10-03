@@ -48,6 +48,9 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Ardagh Moydow + Legan shared PDF | Official `parishardaghmoydow.com` dead. Live: `ardaghmoydow.com/pdf/DDMMYY.pdf`. Same file covers Ardagh, Moydow, Legan, Ballycloghan. | Harvest under `ardaghandmoydow`; alias `leganballycloghan`. |
 | Killala ChurchTV Crossmolina | Current PDF is linked on `churchtv.ie/crossmolina/` but stored under `/wp-content/uploads/2021/02/` while the filename is the real Sunday (`4th-October-…pdf`, proved 04/10/2026). | `http_scrape_newest_pdf` the page. Do not date-rewrite the 2021/02 folder. |
 | Killala Mayo.ie newsletters | Belmullet PDF and Ballycroy PNG live on `mayo.ie` parish-newsletter pages. The getmedia GUID changes every week. The date is in the link text and the filename. | Scrape the listing. Do not pin the GUID. PNG is not a PDF/JPEG recipe. |
+| Meath Wix map is not a parish list | https://www.dioceseofmeath.ie/map-of-parishes is Wix CMS (68 parish rows). urllib/SSR showed almost no cards. Second official list: `/priests`. Pastoral areas page has no parish hrefs. | Browser / kitchen-sink the remaining parishes. Do not harvest `facebook.com/dioceseofmeath`. |
+| Meath `/current-newsletter/` | Athboy, Dunshaughlin, Kells, Kilbeggan redirect to this-week PDF (same as Kildare). | `permanent_redirect_document` on `/current-newsletter/`. Do not pin the dated file. |
+| Meath Squarespace listing with no `.pdf` href | Tullamore `/parish-weekly-bulletin` titles the Sunday file as an article. The PDF is on an inner `/s/` page. | Skip until a listing scrape works. Do not pin `/s/Bulletin-…pdf`. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 

@@ -1,3 +1,20 @@
+## 03/10/2026 — Meath hunt START
+
+- Official https://www.dioceseofmeath.ie/ — map https://www.dioceseofmeath.ie/map-of-parishes (Wix, 68 CMS rows; urllib/SSR only showed Tullamore + Tubber). Second list: https://www.dioceseofmeath.ie/priests. Pastoral areas page has no parish websites.
+- Parish count in this pack: **67** (GCatholic parish-marked churches). catholicbishops.ie says 69 parishes. Folder `meath`, harvest choice `meath_diocese`. No town parish named Meath (no `meathparish` key). **Not live.** Not in `LIVE_DIOCESES`.
+- Collisions renamed: `eglishmeath` (Armagh `eglish`), `taghmonmeath` (Ferns `taghmon`). Drogheda split `holyfamilydrogheda` / `stmarysdrogheda`. Killucan-Raharney key `killucan`. Mullingar key `mullingar` (free).
+- Proved this weekend (GET 200 application/pdf, magic %PDF):
+  - **Mullingar** Newsletter-04-10-2026.pdf 288271 bytes. Irish text 4ú Deireadh Fómhair 2026.
+  - **Kells** Sunday_4_October_2026 PDF 945527 bytes. Text 4TH OCTOBER 2026. `/current-newsletter/` redirect.
+  - **Kilbeggan** Bulletin-October-4th-2026.pdf 936565 bytes. `/current-newsletter/` redirect.
+  - **Dunshaughlin** 04.10.2026b.pdf 970255 bytes. `/current-newsletter/` redirect.
+  - **Ashbourne** 26th-sunday-a-2026.pdf 367275 bytes. Text 27th September 2026.
+  - **Athboy** Sunday-27th-September-2026-Bulletin.pdf 290637 bytes. `/current-newsletter/` redirect.
+  - **Dunboyne** Wix hashed PDF 635878 bytes. Text 3rd–11th October 2026.
+  - **Ratoath** Wix hashed PDF 327937 bytes. Text 4TH OCTOBER.
+  - **Trim** Wix hashed PDF 663153 bytes. Text 4 - 10 October 2026.
+- Harvestable keys: ashbourne, athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar, ratoath, trim. Skip: 58. Do not pin dated names or Wix hashes. Do not store facebook.com/dioceseofmeath.
+
 ## 03/10/2026 — Kildare and Leighlin hunt START
 
 - Official https://www.kandle.ie/find-your-parish/ — 58 parishes. Harvest choice `kildare_and_leighlin_diocese`. Not live.
