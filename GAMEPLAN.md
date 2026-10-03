@@ -1,3 +1,14 @@
+## 03/10/2026 — Meath LIVE (homepage) + harvest in fives
+
+- Frank: turn Meath on; harvest would take too long as one lump.
+- `meath` added to `LIVE_DIOCESES` + Mullingar cathedral photo (Wikimedia CC BY-SA 4.0, GET 200 image/jpeg).
+- Do **not** click five separate Harvest buttons. Those share one GitHub lock (`harvest-full`) and would wait in a line, then fight over `main`.
+- One `harvest.yml` run with diocese **all** already starts **5 dioceses at a time** (matrix `max-parallel: 5`), then one stitch writes the mega PDFs. That is the parallel harvest.
+- Homepage card rebuilt locally: Meath live, coming soon (9). Count 0/67 until the Meath harvest writes status.
+- This turn: one `meath_diocese` harvest only (9 harvestable PDFs). Not five buttons. Not `all`.
+- Not on parishpress.ie until this commit is on main and Pages finishes.
+- Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
+
 ## 03/10/2026 — Meath hunt START
 
 - Official https://www.dioceseofmeath.ie/ — map https://www.dioceseofmeath.ie/map-of-parishes (Wix, 68 CMS rows; urllib/SSR only showed Tullamore + Tubber). Second list: https://www.dioceseofmeath.ie/priests. Pastoral areas page has no parish websites.
