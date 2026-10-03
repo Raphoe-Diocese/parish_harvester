@@ -73,6 +73,7 @@ OCR_DIOCESE_KEYS = {
     "killaloe": "killaloe",
     "kilmore": "kilmore",
     "limerick": "limerick",
+    "meath": "meath",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -92,6 +93,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "killala": "killala_diocese",
     "killaloe": "killaloe_diocese",
     "kilmore": "kilmore_diocese",
+    "meath": "meath_diocese",
     "limerick": "limerick_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",

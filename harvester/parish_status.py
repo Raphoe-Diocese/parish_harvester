@@ -41,6 +41,7 @@ _DIOCESE_LABELS: dict[str, str] = {
     "killaloe_diocese": "Killaloe Diocese",
     "kilmore_diocese": "Kilmore Diocese",
     "limerick_diocese": "Limerick Diocese",
+    "meath_diocese": "Meath Diocese",
     "raphoe_diocese": "Raphoe Diocese",
 }
 
@@ -64,6 +65,7 @@ _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
     "killaloe": "Killaloe Diocese",
     "kilmore": "Kilmore Diocese",
     "limerick": "Limerick Diocese",
+    "meath": "Meath Diocese",
     "raphoe": "Raphoe Diocese",
 }
 

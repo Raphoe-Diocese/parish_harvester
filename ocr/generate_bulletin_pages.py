@@ -36,6 +36,7 @@ CONTACTS_PATH_BY_DIOCESE = {
     "cork_and_ross": REPO_ROOT / "parishes" / "cork_and_ross_contacts.json",
     "derry": REPO_ROOT / "parishes" / "derry_diocese_contacts.json",
     "down_and_connor": REPO_ROOT / "parishes" / "down_and_connor_contacts.json",
+    "meath": REPO_ROOT / "parishes" / "meath_diocese_contacts.json",
     "raphoe": REPO_ROOT / "parishes" / "raphoe_diocese_contacts.json",
 }
 
