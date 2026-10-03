@@ -1,3 +1,11 @@
+## 03/10/2026 — Kildare and Leighlin hunt START
+
+- Official https://www.kandle.ie/find-your-parish/ — 58 parishes. Harvest choice `kildare_and_leighlin_diocese`. Not live.
+- Town key `kildareparish`. Cathedral key `carlowcathedral`.
+- Proved current-newsletter redirects to an October 2026 PDF: Arles, Baltinglass, Balyna, Carlow Cathedral, Clane & Rathcoffey, Clonmore, Leighlin, Naas, Portlaoise, Rathvilly-Kiltegan, Tullow.
+- Sallins and Two Mile House use the Naas website. Harvested once, under Naas.
+- School sites on the diocese cards are not stored. Portlaoise file is 8126423 bytes.
+
 ## 03/10/2026 — Limerick hunt START
 
 - Official https://www.limerickdiocese.org/our-diocese/parish-directory/ — 60 parishes. Harvest choice `limerick_diocese`. Not live.
