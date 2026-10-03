@@ -61,6 +61,11 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the page. Do not invent a PDF. Do not harvest the stream. |
 | `/current-newsletter/` | Same path every week; redirects to this Sunday’s PDF (Naas / Kildare / Meath). | `permanent_redirect_document`. Do not pin the dated upload. |
 | Askea `/newsletters/` dated folder | Holy Family Askea + Bennekerry + Tinryland. Listing HTML has `…/newsletters/YYYY/MM/YYYYMMDD-….pdf`. `/current-newsletter/` is **404**. | `http_scrape_newest_pdf` on `/newsletters/`. Score **filename**. Harvest once under `askea`. Alias Bennekerry + Tinryland. Do not pin `20261004-…pdf`. |
+| Dublin official A-Z | https://www.dublindiocese.ie/parishes/parishes-a-z/ — 194 territorial `/parish/<slug>/` cards. Website is the table Website cell. Footer Payzone/Crosscare/vocations are not parish sites. | Scrape the card. Do not store facebook.com/dublindiocese. |
+| Upload folder is not the Sunday | Balally PDF lives in `/wp-content/uploads/2020/06/` with filename `4th-October-2026-…`. Tuam cathedral PDF lives in `/2026/06/` with filename `Newsletter-October-4th-2026.pdf`. | Score filename date. Do not date-rewrite the folder. Same lesson as Killala ChurchTV `/2021/02/`. |
+| Ossory cards 403 | ossory.ie parish pages often hit SiteGround captcha from cloud IP. | Kitchen-sink `{parish}parish.ie`. Do not pin dated names. Castlecomer listing titles Twenty sixth Sunday but the PDF filename has no date — leave skip until the file itself is dated. |
+| Tuam vocations.ie | Many parish-details cards repeat vocations.ie from the diocese footer. | Ignore. Use the real parish host (castlebarparish.ie, tuamparish.com, athenryparish.ie). |
+| Shared Dublin / Waterford files | Edenmore + Grange Park same stbenedicts-stmonicas PDF. Narraghmore + Moone same listing. St Paul’s + Butlerstown same stpaulsandbutlerstown.ie PDF. | Harvest once. Alias the other key. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 

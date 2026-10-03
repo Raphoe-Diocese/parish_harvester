@@ -25,6 +25,9 @@ ALIAS_TO_CANONICAL: dict[str, str] = {
     "fenagh": "mohill",
     "gortletteragh": "mohill",
     "leganballycloghan": "ardaghandmoydow",
+    "grangepark": "edenmore",
+    "moone": "narraghmore",
+    "butlerstown": "stpaulswaterford",
 }
 
 # Harvest / workflow input names that are not skip-aliases. Bruckless is the
@@ -47,6 +50,9 @@ COMBINED_DISPLAY_NAMES: dict[str, str] = {
     "rathowen": "Rathowen & Streete",
     "mohill": "Mohill (Fenagh & Gortletteragh)",
     "ardaghandmoydow": "Ardagh and Moydow (Legan & Ballycloghan)",
+    "edenmore": "Edenmore (Grange Park)",
+    "narraghmore": "Narraghmore and Moone",
+    "stpaulswaterford": "St Paul's (Butlerstown)",
 }
 
 # Display-name spellings that must collapse to the same grid / jump row.
@@ -105,6 +111,16 @@ _NAME_TO_CANONICAL: dict[str, str] = {
     "legan & ballycloghan (bulletin with ardagh and moydow)": "ardaghandmoydow",
     "ardagh and moydow": "ardaghandmoydow",
     "ardagh and moydow (legan & ballycloghan)": "ardaghandmoydow",
+    "grange park": "edenmore",
+    "grangepark": "edenmore",
+    "edenmore": "edenmore",
+    "edenmore (grange park)": "edenmore",
+    "moone": "narraghmore",
+    "narraghmore": "narraghmore",
+    "narraghmore and moone": "narraghmore",
+    "butlerstown": "stpaulswaterford",
+    "st paul's": "stpaulswaterford",
+    "st paul's (butlerstown)": "stpaulswaterford",
 }
 _NAME_TO_CANONICAL_NORM: dict[str, str] = {
     re.sub(r"[^a-z0-9]+", "", key): value for key, value in _NAME_TO_CANONICAL.items()

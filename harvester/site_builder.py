@@ -65,6 +65,7 @@ OCR_DIOCESE_KEYS = {
     "cashel-and-emly": "cashel_and_emly",
     "cloyne": "cloyne",
     "dromore": "dromore",
+    "dublin": "dublin",
     "elphin": "elphin",
     "ferns": "ferns",
     "galway": "galway",
@@ -75,6 +76,9 @@ OCR_DIOCESE_KEYS = {
     "kilmore": "kilmore",
     "limerick": "limerick",
     "meath": "meath",
+    "ossory": "ossory",
+    "tuam": "tuam",
+    "waterford-and-lismore": "waterford_and_lismore",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -86,6 +90,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "cashel-and-emly": "cashel_and_emly_diocese",
     "cloyne": "cloyne_diocese",
     "dromore": "dromore_diocese",
+    "dublin": "dublin_diocese",
     "elphin": "elphin_diocese",
     "ferns": "ferns_diocese",
     "galway": "galway_diocese",
@@ -95,6 +100,9 @@ EVIDENCE_DIOCESE_KEYS = {
     "killaloe": "killaloe_diocese",
     "kilmore": "kilmore_diocese",
     "meath": "meath_diocese",
+    "ossory": "ossory_diocese",
+    "tuam": "tuam_diocese",
+    "waterford-and-lismore": "waterford_and_lismore_diocese",
     "limerick": "limerick_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
