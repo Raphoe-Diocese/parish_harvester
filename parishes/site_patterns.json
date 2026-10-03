@@ -2,53 +2,91 @@
   "version": 1,
   "description": "Learned site layout patterns — updated when recipes are pushed from the Parish Trainer extension. No AI keys required.",
   "patterns": {
-    "mcn_live_parish_page+mcn_pdf_near_camera": {
+    "mcn_live+direct_download": {
       "page_type": "mcn_live_parish_page",
-      "recipe_flow": "mcn_pdf_near_camera",
-      "label": "MCN.live camera page with JSON newsletter",
-      "advice": "Weekly newsletter is JSON beside the camera, not the webcam. Use site_type mcn_live_parish_page. Do not pin the CloudFront UUID.",
+      "recipe_flow": "direct_download",
+      "label": "MCN camera page newsletter (not the webcam)",
+      "advice": "Weekly PDF is on the mcn.live /Camera/ page via profile JSON. Do not pin a dated file. Do not harvest the stream.",
       "operator_notes": [
-        "03/10/2026 cloud hunt: diocese cards with no site still had this-week PDFs on mcn.live/Camera/.",
-        "GET the camera HTML, read hfChurchId, POST /Website/ProfileDataByJson/{id}, then GET newsletter.newsLetterUrl.",
-        "Proved: Portarlington id 354 (04/10/2026, 1303113 bytes), Rathmore id 620 (04/10/2026, 249160 bytes), Galway St Joseph id 342 (04/10/2026, 306650 bytes).",
-        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera."
+        "Frank trained this. Harvest uses mcn_live_parish_page.",
+        "Start at the camera URL."
       ],
       "do_not": [
-        "Do not pin a CloudFront UUID PDF.",
-        "Do not screenshot the webcam.",
-        "Do not harvest Facebook."
+        "Do not harvest the webcam video.",
+        "Do not pin a dated newsletter filename."
       ],
       "html_fingerprint": "mcn_live_parish_page",
       "html_markers": [
-        "mcn.live/Camera/",
-        "hfChurchId"
+        "mcn.live",
+        "/Camera/"
       ],
       "example_parishes": [
-        "portarlington",
-        "rathmore",
-        "stjosephgalway"
+        "glenfin-parish"
       ],
-      "success_count": 3
+      "success_count": 1
     },
-    "permanent_redirect_document+direct_download": {
-      "page_type": "permanent_redirect_document",
+    "churchmedia+direct_download": {
+      "page_type": "churchmedia_newsletter",
       "recipe_flow": "direct_download",
-      "label": "Kandle /current-newsletter/ permanent redirect",
-      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Do not pin the dated uploads path.",
+      "label": "churchmedia.tv latest newsletter",
+      "advice": "Use getChannelAbout. Do not pin /newsletter/<token>.….pdf.",
       "operator_notes": [
-        "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
-        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only."
+        "Portaferry proved this. Token dies on the next upload."
       ],
       "do_not": [
-        "Do not pin the dated PDF filename.",
-        "Do not unskip when the redirect is a stale year (Abbeyleix still pointed at June 2020)."
+        "Do not pin the churchmedia newsletter token."
+      ],
+      "html_fingerprint": "churchmedia_newsletter",
+      "html_markers": [
+        "churchmedia.tv",
+        "getChannelAbout"
       ],
       "example_parishes": [
-        "bagenalstown",
-        "borris",
-        "mountmellick"
+        "portaferryparish"
       ],
-      "success_count": 3
+      "success_count": 1
+    },
+    "mayo_ie+direct_download": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "direct_download",
+      "label": "Mayo County Council parish-newsletters",
+      "advice": "Scrape the mayo.ie listing. Date is in the link text. Do not pin the getmedia GUID.",
+      "operator_notes": [
+        "Belmullet proved GET 200 application/pdf on 04/10/2026."
+      ],
+      "do_not": [
+        "Do not pin the getmedia GUID.",
+        "Do not treat a PNG as a PDF recipe."
+      ],
+      "html_fingerprint": "mayo_ie_newsletters",
+      "html_markers": [
+        "mayo.ie",
+        "getmedia",
+        "parish-newsletters"
+      ],
+      "example_parishes": [
+        "belmullet"
+      ],
+      "success_count": 1
+    },
+    "churchservices_tv+pointer": {
+      "page_type": "webcam_pointer",
+      "recipe_flow": "html_capture",
+      "label": "churchservices.tv webcam — pointer only",
+      "advice": "Look for a newsletter on the same page. Else keep the real parish site. Do not invent a PDF.",
+      "operator_notes": [
+        "Webcam first. Not a bulletin file by itself."
+      ],
+      "do_not": [
+        "Do not harvest the livestream as a bulletin.",
+        "Do not invent a PDF because a webcam exists."
+      ],
+      "html_fingerprint": "churchservices_tv_pointer",
+      "html_markers": [
+        "churchservices.tv"
+      ],
+      "example_parishes": [],
+      "success_count": 0
     },
     "faithful_ie_family_list+click_then_pdf": {
       "page_type": "pdf_link_list",
@@ -121,7 +159,8 @@
       "example_parishes": [
         "ardmoreparish"
       ],
-      "success_count": 1
+      "success_count": 1,
+      "operator_notes": []
     },
     "wix_html+html_capture": {
       "page_type": "wix_html",
@@ -160,7 +199,8 @@
       "example_parishes": [
         "bellaghyparish"
       ],
-      "success_count": 1
+      "success_count": 1,
+      "operator_notes": []
     },
     "oneweb_docx+direct_docx": {
       "page_type": "oneweb_docx",
@@ -268,7 +308,8 @@
         "parishofardstraweast",
         "clonleighparish"
       ],
-      "success_count": 3
+      "success_count": 3,
+      "operator_notes": []
     },
     "image_bulletin+image_capture": {
       "page_type": "image_bulletin",
@@ -284,7 +325,8 @@
         "parishofardstraweast",
         "derriaghycatholicparish"
       ],
-      "success_count": 2
+      "success_count": 2,
+      "operator_notes": []
     },
     "iframe_viewer+html_capture": {
       "page_type": "iframe_viewer",
@@ -295,7 +337,8 @@
         "ardara",
         "clonleighparish"
       ],
-      "success_count": 3
+      "success_count": 3,
+      "operator_notes": []
     },
     "direct_pdf+direct_download": {
       "page_type": "direct_pdf",
@@ -367,7 +410,8 @@
         "parishofardstraweast",
         "ballyclareballygowan"
       ],
-      "success_count": 5
+      "success_count": 5,
+      "operator_notes": []
     },
     "wp_block_file_bulletin+direct_download": {
       "page_type": "wp_block_file_bulletin",
@@ -436,7 +480,8 @@
       "example_parishes": [
         "parishofclaudy"
       ],
-      "success_count": 1
+      "success_count": 1,
+      "operator_notes": []
     },
     "stacked_image_bulletin+image_stack": {
       "page_type": "stacked_image_bulletin",
@@ -475,7 +520,8 @@
       "example_parishes": [
         "parishofardkeen"
       ],
-      "success_count": 1
+      "success_count": 1,
+      "operator_notes": []
     },
     "iframe_viewer+click_then_pdf": {
       "page_type": "iframe_viewer",
@@ -485,7 +531,8 @@
       "example_parishes": [
         "stpatricksbelfast"
       ],
-      "success_count": 1
+      "success_count": 1,
+      "operator_notes": []
     },
     "wp_pdfemb_list+image_capture": {
       "page_type": "wp_pdfemb_list",
@@ -510,7 +557,56 @@
       "example_parishes": [
         "stgerardsparish"
       ],
-      "success_count": 4
+      "success_count": 4,
+      "operator_notes": []
+    },
+    "mcn_live_parish_page+mcn_pdf_near_camera": {
+      "page_type": "mcn_live_parish_page",
+      "recipe_flow": "mcn_pdf_near_camera",
+      "label": "MCN.live camera page with JSON newsletter",
+      "advice": "Weekly newsletter is JSON beside the camera, not the webcam. Use site_type mcn_live_parish_page. Do not pin the CloudFront UUID.",
+      "operator_notes": [
+        "03/10/2026 cloud hunt: diocese cards with no site still had this-week PDFs on mcn.live/Camera/.",
+        "GET the camera HTML, read hfChurchId, POST /Website/ProfileDataByJson/{id}, then GET newsletter.newsLetterUrl.",
+        "Proved: Portarlington id 354 (04/10/2026, 1303113 bytes), Rathmore id 620 (04/10/2026, 249160 bytes), Galway St Joseph id 342 (04/10/2026, 306650 bytes).",
+        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera."
+      ],
+      "do_not": [
+        "Do not pin a CloudFront UUID PDF.",
+        "Do not screenshot the webcam.",
+        "Do not harvest Facebook."
+      ],
+      "html_fingerprint": "mcn_live_parish_page",
+      "html_markers": [
+        "mcn.live/Camera/",
+        "hfChurchId"
+      ],
+      "example_parishes": [
+        "portarlington",
+        "rathmore",
+        "stjosephgalway"
+      ],
+      "success_count": 3
+    },
+    "permanent_redirect_document+direct_download": {
+      "page_type": "permanent_redirect_document",
+      "recipe_flow": "direct_download",
+      "label": "Kandle /current-newsletter/ permanent redirect",
+      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Do not pin the dated uploads path.",
+      "operator_notes": [
+        "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
+        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only."
+      ],
+      "do_not": [
+        "Do not pin the dated PDF filename.",
+        "Do not unskip when the redirect is a stale year (Abbeyleix still pointed at June 2020)."
+      ],
+      "example_parishes": [
+        "bagenalstown",
+        "borris",
+        "mountmellick"
+      ],
+      "success_count": 3
     }
   },
   "parishes": {

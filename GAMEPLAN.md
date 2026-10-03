@@ -4,6 +4,48 @@
 - Unskipped after GET 200 + magic: **stnicholas** (04/10 PDF 612760), **monaleen** (27/09 PDF 1899455), **bagenalstown** / **borris** / **mountmellick** (current-newsletter 27/09), **edenderry** (04/10 JPEG 1808833), **portarlington** (MCN 04/10 PDF 1303113), **dingle** (04/10 PDF 158377), **rathmore** (MCN 04/10 PDF 249160), **stjosephgalway** (MCN 04/10 PDF 306650), **galwaycathedral** (27/09 PDF 8272157).
 - **stmarys** stays skip (same Pastoral Unit 1 file as St Nicholas). Castlemaine HTML dated post left skip (would pin a dated slug). Kilcock current-newsletter was 20/09. Abbeyleix still June 2020. Ballycroy still PNG. Meath not touched.
 
+## 03/10/2026 — Meath LIVE (homepage) + harvest in fives
+
+- Frank: turn Meath on; harvest would take too long as one lump.
+- `meath` added to `LIVE_DIOCESES` + Mullingar cathedral photo (Wikimedia CC BY-SA 4.0, GET 200 image/jpeg).
+- Do **not** click five separate Harvest buttons. Those share one GitHub lock (`harvest-full`) and would wait in a line, then fight over `main`.
+- One `harvest.yml` run with diocese **all** already starts **5 dioceses at a time** (matrix `max-parallel: 5`), then one stitch writes the mega PDFs. That is the parallel harvest.
+- Homepage card rebuilt locally: Meath live, coming soon (9). Count 0/67 until the Meath harvest writes status.
+- Meath harvest 37124522917 success: 8 ok (athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar 04/10, ratoath, trim). ashbourne failed (listing had no dated PDF matching sunday/newsletter). skip 58.
+- Live-proved on https://www.parishpress.ie/ (Meath Diocese + coming soon (9)). Card count updates after Pages of this harvest.
+- Next: merge PR #277 (11 unskips) then one `all` harvest (5 at a time). Not five buttons.
+- Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
+
+## 03/10/2026 — Meath hunt START
+
+- Official https://www.dioceseofmeath.ie/ — map https://www.dioceseofmeath.ie/map-of-parishes (Wix, 68 CMS rows; urllib/SSR only showed Tullamore + Tubber). Second list: https://www.dioceseofmeath.ie/priests. Pastoral areas page has no parish websites.
+- Parish count in this pack: **67** (GCatholic parish-marked churches). catholicbishops.ie says 69 parishes. Folder `meath`, harvest choice `meath_diocese`. No town parish named Meath (no `meathparish` key). **Not live.** Not in `LIVE_DIOCESES`.
+- Collisions renamed: `eglishmeath` (Armagh `eglish`), `taghmonmeath` (Ferns `taghmon`). Drogheda split `holyfamilydrogheda` / `stmarysdrogheda`. Killucan-Raharney key `killucan`. Mullingar key `mullingar` (free).
+- Proved this weekend (GET 200 application/pdf, magic %PDF):
+  - **Mullingar** Newsletter-04-10-2026.pdf 288271 bytes. Irish text 4ú Deireadh Fómhair 2026.
+  - **Kells** Sunday_4_October_2026 PDF 945527 bytes. Text 4TH OCTOBER 2026. `/current-newsletter/` redirect.
+  - **Kilbeggan** Bulletin-October-4th-2026.pdf 936565 bytes. `/current-newsletter/` redirect.
+  - **Dunshaughlin** 04.10.2026b.pdf 970255 bytes. `/current-newsletter/` redirect.
+  - **Ashbourne** 26th-sunday-a-2026.pdf 367275 bytes. Text 27th September 2026.
+  - **Athboy** Sunday-27th-September-2026-Bulletin.pdf 290637 bytes. `/current-newsletter/` redirect.
+  - **Dunboyne** Wix hashed PDF 635878 bytes. Text 3rd–11th October 2026.
+  - **Ratoath** Wix hashed PDF 327937 bytes. Text 4TH OCTOBER.
+  - **Trim** Wix hashed PDF 663153 bytes. Text 4 - 10 October 2026.
+- Harvestable keys: ashbourne, athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar, ratoath, trim. Skip: 58. Do not pin dated names or Wix hashes. Do not store facebook.com/dioceseofmeath.
+
+## 03/10/2026 — Cloud hunt (laptop off)
+
+- Frank: find bulletins in the cloud, not this PC.
+- Cloud skip-parish hunt: [Cloud this-week bulletin hunt](bc-e3974aa5-d22f-46ef-99e7-1da3bb40e296). Meath hunt still separate.
+- No scrape on the 16GB laptop this turn.
+
+## 03/10/2026 — Recipe Brain START (Frank: remember every trick, hunt constantly)
+
+- Written agreement (23/09): click memory, fingerprint, picker challenge, Guess must not invent dates. Stale-harder already live-proved 29/09.
+- Started today: `docs/RECIPE_BRAIN.md`, `harvester/recipe_brain.py` (MCN, Mayo.ie, ChurchMedia, ChurchServices, /current-newsletter/). Catalog also in `site_memory.js` and `site_patterns.json`.
+- **Not finished.** 24/7 is Sunday harvest on GitHub Actions, not this laptop. Google/Bing/Yahoo kitchen-sink stays on cloud hunts.
+- Next: Actions skip-parish hub scan. Meath cloud hunt PR #276.
+
 ## 03/10/2026 — Kildare and Leighlin hunt START
 
 - Official https://www.kandle.ie/find-your-parish/ — 58 parishes. Harvest choice `kildare_and_leighlin_diocese`. Not live.

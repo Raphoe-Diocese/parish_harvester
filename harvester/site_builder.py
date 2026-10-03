@@ -49,6 +49,7 @@ LIVE_DIOCESES = {
     "killala",
     "killaloe",
     "kilmore",
+    "meath",
 }
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
@@ -73,6 +74,7 @@ OCR_DIOCESE_KEYS = {
     "killaloe": "killaloe",
     "kilmore": "kilmore",
     "limerick": "limerick",
+    "meath": "meath",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
@@ -92,6 +94,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "killala": "killala_diocese",
     "killaloe": "killaloe_diocese",
     "kilmore": "kilmore_diocese",
+    "meath": "meath_diocese",
     "limerick": "limerick_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
@@ -353,6 +356,20 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Kilmore Diocese",
         title="Cathedral of St Patrick and St Felim, Cavan",
         subtitle="This week's Kilmore parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="meath",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/"
+            "Cathedral_of_Christ_the_King%2C_Mullingar%2C_2019.jpg/"
+            "1280px-Cathedral_of_Christ_the_King%2C_Mullingar%2C_2019.jpg"
+        ),
+        credit="Photo: Scaramanga731 / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #1c1824 0%, #4a3860 55%, #c4b0d8 100%)",
+        eyebrow="Meath Diocese",
+        title="Cathedral of Christ the King, Mullingar",
+        subtitle="This week's Meath parish bulletins.",
     ),
 ]
 
