@@ -1,3 +1,12 @@
+## 03/10/2026 — Ardagh leftover skips (cloud only)
+
+- This hunt only: leftover `skip` keys in folder `ardagh` (harvest choice `ardagh_diocese`). Official https://www.ardaghdiocese.org/parishes/. Clonguish already live (`newtownforbes`) — not redone. Did not touch `LIVE_DIOCESES`. Did not dispatch `harvest.yml`. Did not invent Facebook PDFs.
+- Harvest week Sunday 04/10/2026; also accepted 27/09/2026 or 03-05/10/2026. Unskip only after GET 200 and body starts `%PDF` or `image/jpeg`.
+- **Unskipped this turn: none.** No leftover skip had a proved this-week PDF or JPEG.
+- Proof: Abbeylara WP still 13 July 2025. Killenummery newsletter empty / Novena flyers. parishofmoate.com HTTP 500. dromard.ie church-bulletins COMING SOON. Clonmacnois blog last 15 Sept 2024. Granard MCN camera id 17 has no newsLetterUrl. churchservices.tv/killoe webcam only. churchmedia getChannelAbout 404. ChurchTV Moyne/Legga/Lanesborough no PDF.
+- Alias leftovers stay skip: fenagh + gortletteragh → mohill; leganballycloghan → ardaghandmoydow; streete → rathowen.
+- **Not live change.** Written in `docs/DIOCESE_HUNT.md`. Next: wait for leftover parishes to post a file.
+
 ## 03/10/2026 — Keep going (Frank)
 
 - Ashbourne recipe switched to `wp_json_newest_media` after harvest 37124522917 failed listing scrape. Do not pin 26th-sunday-a-2026.pdf.
