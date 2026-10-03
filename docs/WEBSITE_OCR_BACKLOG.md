@@ -54,7 +54,7 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **todo** · 2026-10-02 · **Killala not live.** Hunt wired (`killala` in `OCR_DIOCESE_KEYS` and `EVIDENCE_DIOCESE_KEYS` only). Not in `LIVE_DIOCESES`. No diocese page regenerated. Not on https://www.parishpress.ie/ until a harvest writes `docs/dioceses/killala/` and a later live step. · `harvester/site_builder.py`, `parishes/killala_diocese_bulletin_urls.txt`
+- [ ] **todo** · 2026-10-03 · **Meath not live yet.** `meath` is in `LIVE_DIOCESES` with Mullingar cathedral hero. Homepage/viewer not on https://www.parishpress.ie/ until this commit is on main and Pages finishes. Sunday harvest already runs **5 dioceses at a time** (`harvest.yml` matrix `max-parallel: 5`) then one stitch. Do not click five separate Harvest buttons. · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/meath/`
 
 - [x] **done** · 2026-10-01 · **Armagh live** on parishpress.ie: `armagh` in `LIVE_DIOCESES` + St Patrick's cathedral hero + regenerated index/viewer. Push `98136bf4` + Pages [36796997185](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36796997185). **Live-proved** 01/10: homepage Armagh **7/61**, coming soon (18); https://www.parishpress.ie/dioceses/armagh/. · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/armagh/`
 

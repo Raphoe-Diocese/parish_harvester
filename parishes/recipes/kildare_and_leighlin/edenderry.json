@@ -1,19 +1,41 @@
 {
+  "version": 2,
   "parish_key": "edenderry",
   "display_name": "Edenderry",
   "diocese": "kildare_and_leighlin",
+  "start_url": "https://www.edenderryparish.ie/newsletter/",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": [
+    "Edenderry",
+    "Oct",
+    "Sept",
+    ".jpg",
+    "uploads"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/edenderry/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "example_url": "https://www.edenderryparish.ie/wp-content/uploads/2026/10/Edenderry-4th-Oct-2026.jpg",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/edenderry/"
+      "url": "https://www.edenderryparish.ie/newsletter/"
+    },
+    {
+      "action": "image_stack",
+      "count": 2,
+      "position": "first",
+      "selector": "img[src*='Edenderry']",
+      "min_long_side": 500
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "03/10/2026 cloud hunt: edenderryparish.ie/newsletter/. Weekly file is a JPEG, not a PDF.",
+    "Proved Edenderry-4th-Oct-2026.jpg GET 200 image/jpeg 1808833 bytes, magic JPEG. Filename date is 04/10/2026.",
+    "wp-json media lists the same file. Do not pin the dated filename. Do not pick the -300x212 thumbnail."
+  ],
+  "do_not": [
+    "Do not pin Edenderry-4th-Oct-2026.jpg.",
+    "Do not harvest Facebook."
+  ]
 }

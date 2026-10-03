@@ -5,7 +5,32 @@
   - **askea** — https://askeaparish.ie/wp-content/uploads/newsletters/2026/10/20261004-TwentySeventhSundayinOrdinarytime.pdf — 423807 bytes — 04/10/2026 — `http_scrape_newest_pdf` on `/newsletters/`. Same file names Askea, Bennekerry and Tinryland. `/current-newsletter/` 404.
 - **Left skip on purpose (aliases, not a second harvest):** bennekerry, tinryland (`alias_of` askea).
 - **Left skip (proved but not this-week PDF/JPEG, or already parked):** Kill Ardclough PNG 27/09 (1450457 bytes image/png, not JPEG). Newbridge churchmedia PDF CreationDate 26/09/2026 (232617 bytes) — too old. Knocknagree MCN 27/09 245582 bytes is Rathmore (PR #277). Limerick Cathedral 27/09 exists only behind hashed `fileID` — do not pin. Kenmare diocese card still June 2026. Listowel card: no newsletter uploaded. Askeaton 2025. Mayo leftover Killala still PNG / no extra this-week PDF. Remaining Limerick / Kildare / Kerry / Galway / Kilmore / Killala skips: diocese cards, Facebook, schools, HTML-only, stale, or no weekly file.
-- Laptop owner: merge if happy, then dispatch harvest.yml. Do not run a full harvest on the 16GB PC.
+- Laptop: merge PR #279. Do not start a second harvest while 37125353930 is still running.
+
+## 03/10/2026 — Keep going (Frank)
+
+- Ashbourne recipe switched to `wp_json_newest_media` after harvest 37124522917 failed listing scrape. Do not pin 26th-sunday-a-2026.pdf.
+- Harvest `all` (5 at a time) still running: https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/37125353930
+- Cloud leftover skip hunt still in flight. New cloud hunt: Dublin, Ossory, Tuam, Waterford and Lismore only. Not LIVE.
+
+## 03/10/2026 — Cloud leftover SKIP unskip (this week proved)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 weekend files. No harvest.yml. Not added to LIVE_DIOCESES.
+- Unskipped after GET 200 + magic: **stnicholas** (04/10 PDF 612760), **monaleen** (27/09 PDF 1899455), **bagenalstown** / **borris** / **mountmellick** (current-newsletter 27/09), **edenderry** (04/10 JPEG 1808833), **portarlington** (MCN 04/10 PDF 1303113), **dingle** (04/10 PDF 158377), **rathmore** (MCN 04/10 PDF 249160), **stjosephgalway** (MCN 04/10 PDF 306650), **galwaycathedral** (27/09 PDF 8272157).
+- **stmarys** stays skip (same Pastoral Unit 1 file as St Nicholas). Castlemaine HTML dated post left skip (would pin a dated slug). Kilcock current-newsletter was 20/09. Abbeyleix still June 2020. Ballycroy still PNG. Meath not touched.
+
+## 03/10/2026 — Meath LIVE (homepage) + harvest in fives
+
+- Frank: turn Meath on; harvest would take too long as one lump.
+- `meath` added to `LIVE_DIOCESES` + Mullingar cathedral photo (Wikimedia CC BY-SA 4.0, GET 200 image/jpeg).
+- Do **not** click five separate Harvest buttons. Those share one GitHub lock (`harvest-full`) and would wait in a line, then fight over `main`.
+- One `harvest.yml` run with diocese **all** already starts **5 dioceses at a time** (matrix `max-parallel: 5`), then one stitch writes the mega PDFs. That is the parallel harvest.
+- Homepage card rebuilt locally: Meath live, coming soon (9). Count 0/67 until the Meath harvest writes status.
+- Meath harvest 37124522917 success: 8 ok (athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar 04/10, ratoath, trim). ashbourne failed (listing had no dated PDF matching sunday/newsletter). skip 58.
+- Live-proved on https://www.parishpress.ie/ (Meath Diocese + coming soon (9)). Card count updates after Pages of this harvest.
+- Next: merge PR #277 (11 unskips) then one `all` harvest (5 at a time). Not five buttons.
+- Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
+>>>>>>> origin/main
 
 ## 03/10/2026 — Meath hunt START
 

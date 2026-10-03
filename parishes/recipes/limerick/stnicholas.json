@@ -1,19 +1,41 @@
 {
+  "version": 2,
   "parish_key": "stnicholas",
   "display_name": "St Nicholas",
   "diocese": "limerick",
+  "start_url": "http://www.saintnicholasparish.ie/parish-newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "newsletter",
+    "October",
+    "September",
+    "2026"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "recorded_date": "2026-10-03",
-  "start_url": "https://www.limerickdiocese.org/parish/?contentID=AAB1BC03-AA3C-440C-BCD02DA7768C4203",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "example_url": "http://www.saintnicholasparish.ie/publications/newsletter/4th_October_2026[2026-10-4].pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.limerickdiocese.org/parish/?contentID=AAB1BC03-AA3C-440C-BCD02DA7768C4203"
+      "url": "http://www.saintnicholasparish.ie/parish-newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "03/10/2026 cloud hunt: Pastoral Unit 1 weekly PDF on saintnicholasparish.ie/parish-newsletter/ (also the homepage href).",
+    "Proved 4th_October_2026[2026-10-4].pdf GET 200 application/pdf 612760 bytes, magic %PDF. Filename date is 04/10/2026.",
+    "Same listing covers St Mary's. Harvest once here. stmarys stays skip as bulletin with St Nicholas.",
+    "Do not pin the dated publications/newsletter filename."
+  ],
+  "do_not": [
+    "Do not pin 4th_October_2026[2026-10-4].pdf.",
+    "Do not also harvest stmarys from this file.",
+    "Do not use facebook.com/dioceseoflimerick.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
