@@ -30,7 +30,6 @@
 - Live-proved on https://www.parishpress.ie/ (Meath Diocese + coming soon (9)). Card count updates after Pages of this harvest.
 - Next: merge PR #277 (11 unskips) then one `all` harvest (5 at a time). Not five buttons.
 - Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
->>>>>>> origin/main
 
 ## 03/10/2026 — Meath hunt START
 
