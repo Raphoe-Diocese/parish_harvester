@@ -261,6 +261,66 @@
       ],
       do_not: ["Do not pin a dated .rtf.", "Do not invent a PDF filename."],
     },
+    mcn_live_parish_page: {
+      playbook_type: "mcn_pdf_near_camera",
+      site_type: "mcn_live_parish_page",
+      page_type: "mcn_live_parish_page",
+      recipe_flow: "direct_download",
+      label: "MCN camera page newsletter (not the webcam)",
+      operator_notes: [
+        "Frank trained this: the weekly PDF sits on the mcn.live /Camera/ page.",
+        "Harvest reads the church profile JSON, then downloads the newsletter URL.",
+        "Start at the camera URL. Do not pin a dated PDF.",
+      ],
+      do_not: [
+        "Do not harvest the webcam video.",
+        "Do not pin a dated newsletter filename.",
+      ],
+    },
+    churchmedia_newsletter: {
+      playbook_type: "churchmedia_latest_newsletter",
+      site_type: "churchmedia_newsletter",
+      page_type: "churchmedia_newsletter",
+      recipe_flow: "direct_download",
+      label: "churchmedia.tv View Our Latest Newsletter",
+      operator_notes: [
+        "Livestream page. Bulletin is the Latest Newsletter button.",
+        "Harvest uses getChannelAbout. Portaferry proved this.",
+      ],
+      do_not: [
+        "Do not pin /newsletter/<token>.….pdf — the token dies next week.",
+      ],
+    },
+    mayo_ie_newsletters: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Mayo County Council parish-newsletters",
+      operator_notes: [
+        "mayo.ie hosts parish PDFs (Belmullet proved 04/10/2026).",
+        "Date is in the link text and filename. Scrape the listing.",
+      ],
+      do_not: [
+        "Do not pin the getmedia GUID.",
+        "Do not treat a PNG as a PDF recipe.",
+      ],
+    },
+    churchservices_tv_pointer: {
+      playbook_type: "link_only",
+      site_type: "link_only",
+      page_type: "webcam_pointer",
+      recipe_flow: "html_capture",
+      label: "churchservices.tv webcam — pointer only",
+      operator_notes: [
+        "Webcam first. Look on the same page for a real newsletter file.",
+        "Else keep the parish website. Do not invent a PDF.",
+      ],
+      do_not: [
+        "Do not harvest the livestream as a bulletin.",
+        "Do not invent a PDF because a webcam exists.",
+      ],
+    },
     faithful_ie_family_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "pdf_link_list",
@@ -367,6 +427,19 @@
     }
     if (fpId === "faithful_ie_family_newsletters") {
       return CATALOG.faithful_ie_family_newsletters;
+    }
+    const start = String(safeRecipe.start_url || pageCtx?.url || "").toLowerCase();
+    if (start.includes("mcn.live")) {
+      return CATALOG.mcn_live_parish_page;
+    }
+    if (start.includes("churchmedia.tv")) {
+      return CATALOG.churchmedia_newsletter;
+    }
+    if (start.includes("mayo.ie")) {
+      return CATALOG.mayo_ie_newsletters;
+    }
+    if (start.includes("churchservices.tv")) {
+      return CATALOG.churchservices_tv_pointer;
     }
     if (_recipeUsesDatedPdfPath(safeRecipe)) {
       return CATALOG.dated_pdf_bulletin;

@@ -48,6 +48,10 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Ardagh Moydow + Legan shared PDF | Official `parishardaghmoydow.com` dead. Live: `ardaghmoydow.com/pdf/DDMMYY.pdf`. Same file covers Ardagh, Moydow, Legan, Ballycloghan. | Harvest under `ardaghandmoydow`; alias `leganballycloghan`. |
 | Killala ChurchTV Crossmolina | Current PDF is linked on `churchtv.ie/crossmolina/` but stored under `/wp-content/uploads/2021/02/` while the filename is the real Sunday (`4th-October-…pdf`, proved 04/10/2026). | `http_scrape_newest_pdf` the page. Do not date-rewrite the 2021/02 folder. |
 | Killala Mayo.ie newsletters | Belmullet PDF and Ballycroy PNG live on `mayo.ie` parish-newsletter pages. The getmedia GUID changes every week. The date is in the link text and the filename. | Scrape the listing. Do not pin the GUID. PNG is not a PDF/JPEG recipe. |
+| `mcn.live` /Camera/ | Webcam page. Weekly PDF is in the church profile JSON (Glenfin and others Frank trained). | `mcn_live_parish_page`. Do not harvest the stream. Do not pin a dated file. |
+| `churchmedia.tv` | “View Our Latest Newsletter” on the livestream page (Portaferry). | `churchmedia_newsletter`. Do not pin `/newsletter/<token>`. |
+| `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the page. Do not invent a PDF. Do not harvest the stream. |
+| `/current-newsletter/` | Same path every week; redirects to this Sunday’s PDF (Naas / Kildare). | `permanent_redirect_document`. Do not pin the dated upload. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
