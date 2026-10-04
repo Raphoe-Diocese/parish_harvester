@@ -1,3 +1,12 @@
+## 03/10/2026 — Dublin / Ossory / Tuam / Waterford LIVE (homepage)
+
+- Frank: turn them on. PR #281 already merged (37 unskips).
+- Added `dublin`, `ossory`, `tuam`, `waterford-and-lismore` to `LIVE_DIOCESES` + four Wikimedia cathedral heroes (GET 200 JPEG, CC).
+- Regenerated only `docs/index.html` + those four diocese viewers. Homepage now 21 live cards, coming soon (5). Galway / Kerry / Kildare / Kilfenora / Limerick stay coming soon.
+- Stitch fix also on this push (`PYTHONPATH` + repo root in merge script) so the next `all` harvest can stitch.
+- **Not live yet** until push + GitHub Pages. Do not say done on parishpress.ie until the live URL shows the four cards.
+- Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
+
 ## 03/10/2026 — Dublin / Ossory / Tuam / Waterford hunt START
 
 - Cloud only. No laptop scrape. Did not redo Meath/Limerick/Kildare/Kerry/Galway/Kilmore/Killala leftover skips.
