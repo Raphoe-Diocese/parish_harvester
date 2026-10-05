@@ -32,7 +32,8 @@
       "label": "churchmedia.tv latest newsletter",
       "advice": "Use getChannelAbout. Do not pin /newsletter/<token>.….pdf.",
       "operator_notes": [
-        "Portaferry proved this. Token dies on the next upload."
+        "Portaferry proved this. Token dies on the next upload.",
+        "05/10/2026 Galway leftover: Castlegar / Coolough churchmedia slug st-columba. GET 200 application/pdf 633410 bytes; PDF text 4th Oct 2026. Do not pin the token."
       ],
       "do_not": [
         "Do not pin the churchmedia newsletter token."
@@ -43,9 +44,10 @@
         "getChannelAbout"
       ],
       "example_parishes": [
-        "portaferryparish"
+        "portaferryparish",
+        "castlegar"
       ],
-      "success_count": 1
+      "success_count": 2
     },
     "mayo_ie+direct_download": {
       "page_type": "pdf_link_list",
@@ -53,7 +55,8 @@
       "label": "Mayo County Council parish-newsletters",
       "advice": "Scrape the mayo.ie listing. Date is in the link text. Do not pin the getmedia GUID.",
       "operator_notes": [
-        "Belmullet proved GET 200 application/pdf on 04/10/2026."
+        "Belmullet proved GET 200 application/pdf on 04/10/2026.",
+        "05/10/2026 Tuam leftovers: Burrishoole, Kilvine, Ballyhaunis, Balla-Belcarra, Islandeady-Glenisland, Partry-Tourmakeady (27/09) on mayo.ie. Same listing index as Killala."
       ],
       "do_not": [
         "Do not pin the getmedia GUID.",
@@ -66,7 +69,57 @@
         "parish-newsletters"
       ],
       "example_parishes": [
-        "belmullet"
+        "belmullet",
+        "newportburrishoole",
+        "ballindinekilvine",
+        "ballyhaunisannagh",
+        "ballamayoabbey",
+        "islandeadyglenisland",
+        "partryballyovey"
+      ],
+      "success_count": 7
+    },
+    "corofinbelclare_newsletter_pdf+direct_download": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "direct_download",
+      "label": "Corofin Belclare overwritten /newsletter.pdf",
+      "advice": "Homepage links /newsletter.pdf overwritten each week. Date is in the PDF text. Do not pin a dated name.",
+      "operator_notes": [
+        "05/10/2026 Tuam cummerkilmoylan: GET 200 129924 bytes %PDF text 4th October 2026."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "html_fingerprint": "corofinbelclare_newsletter_pdf",
+      "html_markers": [
+        "corofinbelclare.ie",
+        "newsletter.pdf"
+      ],
+      "example_parishes": [
+        "cummerkilmoylan"
+      ],
+      "success_count": 1
+    },
+    "louisburgh_newsletter_list+direct_download": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "direct_download",
+      "label": "Louisburgh /newsletter/ dated PDF list",
+      "advice": "Scrape /newsletter/ for dated PDFs. Homepage banner JPEGs are not the bulletin.",
+      "operator_notes": [
+        "05/10/2026 Tuam louisburghkilgeever: 2026-10-04 PDF 1148823 bytes on /newsletter/."
+      ],
+      "do_not": [
+        "Do not harvest homepage banner JPEGs.",
+        "Do not pin a dated filename."
+      ],
+      "html_fingerprint": "louisburgh_newsletter_list",
+      "html_markers": [
+        "louisburghparish.ie",
+        "/newsletter/"
+      ],
+      "example_parishes": [
+        "louisburghkilgeever"
       ],
       "success_count": 1
     },
@@ -250,6 +303,10 @@
         "Parish Messenger script",
         "Parish Services host"
       ],
+      "bulletin_layout": {
+        "strategy": "newest_dated",
+        "position": "top"
+      },
       "example_parishes": [
         "parishofardstraweast",
         "dmaparish",
@@ -260,7 +317,7 @@
         "parishofsionmills",
         "melmountparish"
       ],
-      "success_count": 4
+      "success_count": 5
     },
     "direct_pdf+click_then_pdf": {
       "page_type": "direct_pdf",
@@ -734,6 +791,33 @@
       ],
       "example_parishes": [
         "moycullen"
+      ],
+      "success_count": 1,
+      "bulletin_layout": {
+        "strategy": "newest_dated",
+        "position": "top"
+      }
+    },
+    "galway_bearna_duilleog+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Galway Bearna / Furbo Weekly Duilleog listing",
+      "advice": "Official clonfertgalway card has no file. Live barnafurboparish.ie Weekly Duilleog lists dated PDFs. Keep Irish. Score filename.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: 4thOct2026.pdf GET 200 application/pdf 614061 bytes. PDF text Sun. 4th October / An Domhnach 4ú Deireadh Fómhair."
+      ],
+      "do_not": [
+        "Do not pin the dated PDF.",
+        "Do not translate Irish / Gaeilge.",
+        "Do not harvest Facebook."
+      ],
+      "html_fingerprint": "galway_bearna_duilleog",
+      "html_markers": [
+        "barnafurboparish.ie",
+        "weekly-duilleog-newsletter"
+      ],
+      "example_parishes": [
+        "bearna"
       ],
       "success_count": 1,
       "bulletin_layout": {
@@ -1229,8 +1313,8 @@
       "combined_key": "parish_messenger_embed+click_then_pdf",
       "display_name": "Camus",
       "start_url_host": "camusparish.com",
-      "updated": "2026-06-15",
-      "step_count": 3,
+      "updated": "2026-10-05",
+      "step_count": 2,
       "playbook_type": "parish_messenger",
       "operator_notes": [
         "Wait for widget to load, then pick newest View Newsletter row.",
@@ -1241,8 +1325,13 @@
       ],
       "html_fingerprint": "parish_messenger_widget",
       "html_markers": [
-        "Parish Messenger script"
-      ]
+        "Parish Messenger script",
+        "Parish Services host"
+      ],
+      "bulletin_layout": {
+        "strategy": "newest_dated",
+        "position": "top"
+      }
     },
     "magheraparishderry": {
       "page_type": "direct_pdf",
