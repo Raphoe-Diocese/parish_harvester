@@ -1,19 +1,40 @@
 {
+  "version": 2,
   "parish_key": "kingscourt",
   "display_name": "Kingscourt-Corlea-Muff",
   "diocese": "meath",
-  "recorded_date": "2026-10-03",
   "start_url": "https://kingscourtparish.ie/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "WP media had Kingscourt-Parish-Bulletin-4th-October-2026.pdf GET 200 application/pdf 302517 bytes %PDF this hunt, embedded in a post iframe, not as a listing href. Do not pin the dated phooriss path.",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    "bulletin",
+    ".pdf"
+  ],
+  "href_skip_patterns": [
+    "gyproc",
+    "jpg",
+    "jpeg",
+    "png"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
       "url": "https://kingscourtparish.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: weekly PDF is WP media, also in a post iframe, not a listing href. Proved Kingscourt-Parish-Bulletin-4th-October-2026.pdf GET 200 302517 bytes magic %PDF-1.7. Filename date 04/10/2026. wp_json_newest_media. Do not pin the dated phooriss path. Skip Gyproc PDFs in the same media library."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not pin the phooriss path.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

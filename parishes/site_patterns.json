@@ -572,7 +572,8 @@
         "03/10/2026 cloud hunt: diocese cards with no site still had this-week PDFs on mcn.live/Camera/.",
         "GET the camera HTML, read hfChurchId, POST /Website/ProfileDataByJson/{id}, then GET newsletter.newsLetterUrl.",
         "Proved: Portarlington id 354 (04/10/2026, 1303113 bytes), Rathmore id 620 (04/10/2026, 249160 bytes), Galway St Joseph id 342 (04/10/2026, 306650 bytes).",
-        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera."
+        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera.",
+        "05/10/2026 Meath leftover: Beauparc id 629 JSON title 4 October 2026, GET 200 150092 bytes %PDF. Kentstown id 628 same bytes. Harvest once under beauparc."
       ],
       "do_not": [
         "Do not pin a CloudFront UUID PDF.",
@@ -587,9 +588,10 @@
       "example_parishes": [
         "portarlington",
         "rathmore",
-        "stjosephgalway"
+        "stjosephgalway",
+        "beauparc"
       ],
-      "success_count": 3
+      "success_count": 4
     },
     "permanent_redirect_document+direct_download": {
       "page_type": "permanent_redirect_document",
@@ -757,6 +759,73 @@
       ],
       "example_parishes": [
         "killeigh"
+      ],
+      "success_count": 1
+    },
+    "meath_navan_squarespace_dated_article+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Squarespace dated bulletin article then /s/ PDF",
+      "advice": "If the listing article slug has the Sunday (04-october-2026), follow it with post_slug_patterns then scrape the inner /s/*.pdf. If the slug is a hash (Tullamore), leave skip. Do not pin /s/.",
+      "operator_notes": [
+        "05/10/2026 Meath leftover: Navan /bulletin/ listing has no .pdf href. Inner /s/04-October-2026.pdf GET 200 670480 bytes %PDF-1.7. Filename 04 October 2026.",
+        "Tullamore listing still uses hashed article slugs. Leave skip. Do not pin Bulletin-04-10-2026-k5he.pdf."
+      ],
+      "do_not": [
+        "Do not pin a dated /s/ filename.",
+        "Do not unskip Tullamore hashed /s/ pins."
+      ],
+      "html_fingerprint": "squarespace_dated_bulletin_s_pdf",
+      "html_markers": [
+        "navanparish.ie/bulletin/",
+        "/s/",
+        ".pdf"
+      ],
+      "example_parishes": [
+        "navan"
+      ],
+      "success_count": 1
+    },
+    "meath_curraha_bulletin_listing+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Curraha /bulletin/ dated Sunday PDFs",
+      "advice": "Scrape /bulletin/ hrefs. Homepage has no .pdf. PDF title can name a second parish — alias that key.",
+      "operator_notes": [
+        "05/10/2026: Sunday-4th-October-2026.pdf GET 200 667553 bytes %PDF-1.5. Title Parishes of Ardcath/Clonalvy and Curraha. Alias ardcath."
+      ],
+      "do_not": [
+        "Do not pin the dated uploads path.",
+        "Do not harvest Ardcath twice."
+      ],
+      "html_markers": [
+        "currahaparish.ie/bulletin/",
+        "Sunday-"
+      ],
+      "example_parishes": [
+        "curraha"
+      ],
+      "success_count": 1
+    },
+    "meath_kingscourt_wp_json_iframe+wp_json_newest_media": {
+      "page_type": "wp_json",
+      "recipe_flow": "direct_download",
+      "label": "WP media bulletin inside a post iframe",
+      "advice": "If the listing has no PDF href but wp-json media has Bulletin-…-4th-October-2026.pdf, use wp_json_newest_media. Do not pin phooriss.",
+      "operator_notes": [
+        "05/10/2026 Kingscourt: GET 200 302517 bytes %PDF-1.7. Skip Gyproc PDFs in the same library."
+      ],
+      "do_not": [
+        "Do not pin the dated phooriss path.",
+        "Do not harvest Facebook."
+      ],
+      "html_markers": [
+        "kingscourtparish.ie",
+        "phooriss",
+        "wp-json/wp/v2/media"
+      ],
+      "example_parishes": [
+        "kingscourt"
       ],
       "success_count": 1
     }
