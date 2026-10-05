@@ -1,19 +1,42 @@
 {
+  "version": 2,
   "parish_key": "dungarvan",
   "display_name": "Dungarvan",
   "diocese": "waterford_and_lismore",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://dungarvanparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://dungarvanparish.ie/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "St.-Marys-Parish-Newsletter",
+    "Parish-Newsletter",
+    "October",
+    ".pdf"
+  ],
+  "href_skip_patterns": [
+    "Faith-at-Home",
+    "Faith-at-Home-Photo",
+    "Youth-Club",
+    "Church-on-Easter"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://dungarvanparish.ie"
+      "url": "https://dungarvanparish.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Waterford leftover hunt: St. Mary's Parish Newsletter October 2026 PDF on the homepage/post. Proved https://dungarvanparish.ie/wp-content/uploads/2026/08/St.-Marys-Parish-Newsletter-October-2026.pdf GET 200 application/pdf 486708 bytes magic %PDF-1.7. Filename date October 2026; CreationDate 20261001. Faith-at-Home weekly PDF/JPEG is not the parish bulletin — leave it out (href_skip_patterns). Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not harvest Faith-at-Home — it is not the parish bulletin.",
+    "Do not pin a dated St.-Marys-Parish-Newsletter filename.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

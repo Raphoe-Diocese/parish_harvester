@@ -1,19 +1,33 @@
 {
+  "version": 2,
   "parish_key": "cummerkilmoylan",
   "display_name": "Cummer & Kilmoylan",
   "diocese": "tuam",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.corofinbelclare.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.corofinbelclare.ie/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "newsletter.pdf",
+    ".pdf"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.corofinbelclare.ie"
+      "url": "https://www.corofinbelclare.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 cloud leftover hunt: proved GET 200 pdf 129924 bytes magic %PDF on https://www.corofinbelclare.ie/newsletter.pdf. PDF text Twenty Seventh Sunday in Ordinary Time - 4th October 2026. Path /newsletter.pdf is overwritten weekly (not a dated pin). Official card was corofinbelclare.ie."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
