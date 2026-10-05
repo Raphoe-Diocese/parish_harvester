@@ -8,7 +8,14 @@
 - **Left skip on purpose (alias, not a second harvest):** stmarys (`alias_of` stnicholas, already); ballinderreen (`alias_of` kinvara, same 04/10 JPEGs).
 - **Left skip (Limerick leftovers, honest why):** askeatonballysteen only 07/12/2025 PDF; bruffparish.ie DNS dead; moyrossparish.com empty; croomparish.ie news still 2021 (Banogue same site); dkrparish.ie GET 202; kilmallockparish.ie no weekly PDF; stsaviourslimerick.com DNS dead; MCN Moyross + Ballingarry cameras have no newsletter JSON; remaining official limerickdiocese.org cards have no this-week twin (Facebook, no site, or no weekly file).
 - **Left skip (Kilfenora / Kilmacduagh leftovers):** ballyvaughan homepage newsletter is 20/09/2026 (too old); lisdoonvarna archive is HTML Sept 26/27 plus PNG screenshots (PNG is not JPEG/PDF; archive is many weeks, not one overwrite); ennistymonparish.ie cert mismatch / no twin; liscannor / kilfenora / carron / gort / kilbeacanty / ardrahan / craughwell / clarinbridge — clonfertgalway cards or stale sites (ardrahan-kilchreest.com newest PDF June 2025; churchmedia Craughwell newsletter_enable 0). Kinvara already harvested.
-- New trick: Mura hashed `fileID` Current Newsletter / dated listing. Written into DIOCESE_HUNT + site_patterns. Mega PDF stays on. Next: merge this PR, then harvest Limerick (and Galway for the alias note). Do not turn LIVE until Frank names it.
+- New trick: Mura hashed `fileID` Current Newsletter / dated listing. Written into DIOCESE_HUNT + site_patterns. Mega PDF stays on. Next: merge this PR. Wait for harvest 37334058753 stitch before starting a Limerick harvest. Do not turn LIVE until Frank names it.
+
+## 05/10/2026 — Kerry / Galway / Kildare LIVE proved
+
+- PR #285 merged `e1dbcea8`. Pages deploy run 37340119370 success.
+- Live-proved on https://www.parishpress.ie/: Galway, Kerry, Kildare cards present; coming soon (2) = Kilfenora & Kilmacduagh, Limerick.
+- Harvest 37334058753 still in progress (Kerry/Galway/Kildare diocese slices already success). Wait for stitch — do not start a second full harvest.
+- Next: Limerick leftover hunt PR #287 (2 unskips). Not LIVE until Frank names them.
 
 ## 05/10/2026 — Kerry / Galway / Kildare LIVE (homepage)
 
@@ -16,7 +23,7 @@
 - Added `kerry`, `galway-kilmacduagh-and-kilfenora`, `kildare-and-leighlin` to `LIVE_DIOCESES` + cathedral heroes (Killarney, Galway, Carlow — GET 200 JPEG CC).
 - Galway public URL uses long key; recipes stay in `parishes/recipes/galway/` via recipe_folder alias (same pattern as Ardagh).
 - Regenerated only `docs/index.html` + those three diocese viewers. Homepage 24 live cards, coming soon (2): Kilfenora & Kilmacduagh, Limerick.
-- **Not live yet** until merge + Pages. Harvest 37334058753 already running for the new recipes.
+- **LIVE proved 05/10/2026** on https://www.parishpress.ie/ (PR #285 `e1dbcea8`, Pages 37340119370).
 - Limerick still not LIVE unless Frank names it.
 
 ## 05/10/2026 — Leftover SKIP hunt (cloud)
