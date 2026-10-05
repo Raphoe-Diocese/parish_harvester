@@ -1,3 +1,24 @@
+## 05/10/2026 — Kerry leftover SKIP hunt (Kenmare + St John's)
+
+- Cloud only. Kerry already LIVE. Folder `parishes/recipes/kerry/`, stem `kerry_diocese`. Did not add LIVE_DIOCESES. Did not regenerate all docs/. Did not dispatch harvest.yml. Did not download mega PDFs. Did not hunt Dublin/Meath/Limerick/Galway/Kildare/Kilfenora. Did not reopen PR #284's 13 unskips.
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Unskip only GET 200 + %PDF/JPEG + date on the file or page.
+- **Unskipped 2**
+  - **kenmare** — https://kenmareparish.ie/wp-content/uploads/2026/10/40-Sunday-4th-October-2026-27th-Sunday-in-Ordinary-Time.pdf — 466594 bytes — 04/10/2026 — `http_scrape_newest_pdf` on kenmareparish.ie newsletters listing. Diocese card still June 2026.
+  - **stjohnskerry** — https://stjohns.ie/wp-content/uploads/2026/10/041026-newsletter-.pdf — 551771 bytes — 04/10/2026 — `wp_json_newest_media` on stjohns.ie. Diocese card had no newsletter. HTML listing still 2025.
+- **Left skip (honest why):**
+  - **adrigole** — diocese card newest PDF 28/06/2026. No live weekly twin proved. Beara MCN/Castletownbere file is already harvested under castletownbere.
+  - **ballylongford** — diocese card newest filename 20-sept-2026. Too old for this harvest week.
+  - **ballymacelligott** — diocese card: no newsletter uploaded. Kitchen-sink only GAA fundraising, not a parish bulletin.
+  - **brosna** — diocese card newest PDF 16-Aug-2026.
+  - **eyeries** — diocese card: no newsletter uploaded. eyeries.ie parish newsletter is shop copies, no this-week PDF.
+  - **glengarriff** — diocese card: no newsletter uploaded. Kenmare PDF is Kenmare parish, not a second harvest.
+  - **kilcummin** — diocese card newest 28-06-2026. kilcumminparish.com listing last dated 23-08-2026. Cloud GET 403.
+  - **knocknagoshel** — diocese card: no newsletter uploaded. No live weekly twin.
+  - **listowel** — diocese card: no newsletter uploaded. listowelparish.com weekly archive newest 20/09/2026. Cloud GET 403. churchmedia.tv is the stream, no this-week PDF proved.
+  - **sneem** — diocese card: no newsletter uploaded. sneem.ie files are Community Notice Board, not the weekly parish bulletin. Do not harvest the Kenmare file twice.
+- Kerry leftover skips after this pass: 10. site_patterns + DIOCESE_HUNT updated same day. Mega PDF stays on in harvest.yml. Irish stays Irish.
+- Next: merge when Frank says. Do not click Harvest (Limerick harvest running).
+
 ## 05/10/2026 — Kerry / Galway / Kildare LIVE (homepage)
 
 - Frank: turn them on after PR #284 unskipped this-week Kerry/Galway/Killeigh leftovers.

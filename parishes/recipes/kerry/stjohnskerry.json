@@ -1,19 +1,42 @@
 {
+  "version": 2,
   "parish_key": "stjohnskerry",
   "display_name": "St John's",
   "diocese": "kerry",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://www.dioceseofkerry.ie/parish/st-johns/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week PDF proved on the Kerry parish card on 02/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://stjohns.ie/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    "newsletter",
+    ".pdf"
+  ],
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x",
+    "-1024x"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
+  "example_url": "https://stjohns.ie/wp-content/uploads/2026/10/041026-newsletter-.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dioceseofkerry.ie/parish/st-johns/"
+      "url": "https://stjohns.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Kerry leftover skip hunt: diocese card says no newsletter uploaded. Live twin is stjohns.ie.",
+    "HTML /newsletter/ only linked an old 2025/07/Newsletter.pdf. wp-json/wp/v2/media?search=newsletter lists 041026-newsletter-.pdf (trailing hyphen in the filename).",
+    "Proved https://stjohns.ie/wp-content/uploads/2026/10/041026-newsletter-.pdf GET 200 application/pdf 551771 bytes %PDF-1.7. Filename 041026 is 04/10/2026. PDF Title 27th Sunday in Ordinary Time. Author St John's Parish. CreationDate 2026-10-02. Keep Irish (9.00am as Gaeilge) as Irish.",
+    "Do not pin the dated filename. Do not harvest Facebook. Church of Ireland traleedingle.ardfert.anglican.org is not this parish."
+  ],
+  "do_not": [
+    "Do not pin 041026-newsletter-.pdf.",
+    "Do not harvest the 2025/07/Newsletter.pdf listing link.",
+    "Do not harvest Facebook.",
+    "Do not harvest the Church of Ireland St John's Ashe Street newsletter.",
+    "Do not translate as Gaeilge."
+  ]
 }
