@@ -1,19 +1,32 @@
 {
+  "version": 2,
   "parish_key": "killeigh",
   "display_name": "Killeigh",
   "diocese": "kildare_and_leighlin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/killeigh/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://killeigh.com/newsletter.html",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/killeigh/"
+      "url": "https://killeigh.com/newsletter.html"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: killeigh.com/newsletter.html is the live weekly newsletter (HTML, not PDF). Proved GET 200 text/html with page text 4th October 2026 TWENTY SEVENTH SUNDAY. print_to_pdf + skip_listing_nav. Keep Irish as Irish. Official kandle.ie card has no file."
+  ],
+  "do_not": [
+    "Do not pin a dated slug.",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest Facebook.",
+    "Do not invent a PDF from the kandle.ie card."
+  ]
 }

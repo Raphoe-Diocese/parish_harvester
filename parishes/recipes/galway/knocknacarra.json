@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "knocknacarra",
   "display_name": "Knocknacarra",
   "diocese": "galway",
-  "recorded_date": "2026-10-02",
   "start_url": "https://www.knocknacarraparish.ie/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 Galway kitchen-sink still open. Do not invent Facebook PDFs.",
+  "playbook_type": "wix_html",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.knocknacarraparish.ie/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='_files/ugd/'][href$='.pdf']",
+      "pick_strategy": "newest_dated",
+      "fallback_selectors": [
+        "a[href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: Wix homepage hashed /_files/ugd/ PDF. Proved GET 200 application/pdf 736508 bytes %PDF. PDF text: 4th October, 2026 Knocknacarra Parish / Par\u00f3iste Naomh Eoin. Date is not in the hash. Click newest_dated. Do not pin the hash."
+  ],
+  "do_not": [
+    "Do not pin a hashed Wix PDF \u2014 it changes every week.",
+    "Do not harvest Facebook."
+  ]
 }
