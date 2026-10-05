@@ -1,19 +1,47 @@
 {
+  "version": 2,
   "parish_key": "killardcloughjohnstown",
   "display_name": "Kill Ardclough & Johnstown",
   "diocese": "kildare_and_leighlin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/kill-ardclough-johnstown/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://parishnewsletter.killparish.ie/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/kill-ardclough-johnstown/"
+      "url": "https://parishnewsletter.killparish.ie/"
+    },
+    {
+      "action": "click",
+      "selector": "article .entry-title a",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "article h2 a",
+        "h2.entry-title a",
+        "a:has-text('October')"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: parishnewsletter.killparish.ie weekly post is HTML (newsletter body is a PNG image on the page, not PDF/JPEG). Proved GET 200 https://parishnewsletter.killparish.ie/04-october-2026/ page text 04 October 2026 Parish Newsletter. Click first_match then print_to_pdf. Do not pin the dated slug. Official killparish.ie missalette JPEG is not the parish newsletter."
+  ],
+  "do_not": [
+    "Do not pin a dated newsletter slug.",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest the missalette JPEG as the bulletin.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }

@@ -54,6 +54,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **NOW · doing** · 2026-10-05 · **Live OCR / mega still show last-month / last-week bulletins.** Frank screenshot 05/10 night: Ardara parish OCR text says **Twenty-fourth Sunday — Week beginning: 13th September 2026** (three weeks behind harvest week 04/10/2026). Same class of bug as West Tyrone 13/09 body in the mega. Root cause: stitch stubbed every `Bulletins/current/*.pdf` as ok (empty URL), so last-week files entered mega → OCR → parishpress.ie. Fix in flight: PR [#302](https://github.com/Raphoe-Diocese/parish_harvester/pull/302) stale mega referee gate (reclassify dated downloaded → stale_rejected; stitch only this-week downloaded). **Not live yet.** Needs: resolve #302 vs main → tests green → merge → Full harvest + OCR/Pages → live-prove Ardara (and other Raphoe OCR) shows this week, not 13/09. Mega PDF stays on. Do not tick done without live URL check. · `scripts/merge_diocese_harvests.py`, `harvester/bulletin_freshness.py`, `tests/test_stale_mega_gate.py`, PR #302
+
 - [x] **done** · 2026-10-05 · **Kerry / Galway / Kildare LIVE proved.** PR #285 merge `e1dbcea8`; Pages deploy 37340119370 success. Live URL https://www.parishpress.ie/ shows Galway, Kerry, Kildare cards; coming soon (2) Kilfenora & Kilmacduagh + Limerick. · `harvester/site_builder.py`, `docs/index.html`
 
 - [x] **done** · 2026-10-05 · **Dublin / Ossory / Tuam / Waterford live** on parishpress.ie. PR #282 merge `e1483013`. Live-proved 05/10: homepage has all four cards + coming soon (5). · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/dublin|ossory|tuam|waterford-and-lismore/`

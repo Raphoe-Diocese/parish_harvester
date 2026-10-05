@@ -32,7 +32,8 @@
       "label": "churchmedia.tv latest newsletter",
       "advice": "Use getChannelAbout. Do not pin /newsletter/<token>.….pdf.",
       "operator_notes": [
-        "Portaferry proved this. Token dies on the next upload."
+        "Portaferry proved this. Token dies on the next upload.",
+        "05/10/2026 Galway leftover: Castlegar / Coolough churchmedia slug st-columba. GET 200 application/pdf 633410 bytes; PDF text 4th Oct 2026. Do not pin the token."
       ],
       "do_not": [
         "Do not pin the churchmedia newsletter token."
@@ -43,9 +44,10 @@
         "getChannelAbout"
       ],
       "example_parishes": [
-        "portaferryparish"
+        "portaferryparish",
+        "castlegar"
       ],
-      "success_count": 1
+      "success_count": 2
     },
     "mayo_ie+direct_download": {
       "page_type": "pdf_link_list",
@@ -655,7 +657,8 @@
       "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Do not pin the dated uploads path.",
       "operator_notes": [
         "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
-        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only."
+        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only.",
+        "05/10/2026 Kildare leftover: Kilcock /current-newsletter/ → 27th-Sunday-in-Ordinary-Time-.pdf 2818821 bytes (04/10 liturgical). Monasterevin /current-newsletter/ → 3341_001.pdf 644493 bytes (listing text 4th October). Abbeyleix still June 2020 — leave skip."
       ],
       "do_not": [
         "Do not pin the dated PDF filename.",
@@ -664,9 +667,59 @@
       "example_parishes": [
         "bagenalstown",
         "borris",
-        "mountmellick"
+        "mountmellick",
+        "kilcockandnewtownparish",
+        "monasterevin"
       ],
-      "success_count": 3
+      "success_count": 5
+    },
+    "kildare_leftover_kitchen_sink+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Kildare leftover live-twin newsletter listing",
+      "advice": "kandle.ie card alone is not enough. Kitchen-sink the parish host. Score filename date. Quote spaces in UploadFiles paths. Do not pin UUID or scanner ids.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: kildareparish.ie/newsletter/ 4th-October PDF 1478663 bytes (alias nurneykildangan). graiguecullenkilleshin.com homepage 4th-October-Newsletter-2026.pdf 534581 bytes (/newsletter/ archive stale). mountrathparish.ie NewsLetters 4th Oct PDF 285268 bytes (alias ballyfin; UUID in name)."
+      ],
+      "do_not": [
+        "Do not pin dated PDF names or UUID/scanner ids.",
+        "Do not harvest shared Naas / Mountrath / Kildare files twice.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "kildareparish",
+        "graiguecullenkilleshin",
+        "mountrath"
+      ],
+      "success_count": 3,
+      "match_hints": [
+        "newsletter",
+        "NewsLetters",
+        "October",
+        "parish"
+      ]
+    },
+    "kildare_kill_parishnewsletter_html+html_text_bulletin": {
+      "page_type": "html_newsletter",
+      "recipe_flow": "html_text_bulletin",
+      "label": "Kill parishnewsletter.killparish.ie HTML weekly post",
+      "advice": "Weekly bulletin is an HTML WP post; body may be a PNG image on the page. Click first_match on the listing then print_to_pdf. Do not pin the dated slug. Missalette JPEG on killparish.ie is not the newsletter.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: https://parishnewsletter.killparish.ie/04-october-2026/ GET 200 text/html. Page text 04 October 2026 Parish Newsletter."
+      ],
+      "do_not": [
+        "Do not pin a dated post slug.",
+        "Do not harvest the missalette JPEG as the bulletin.",
+        "Do not remove skip_listing_nav."
+      ],
+      "example_parishes": [
+        "killardcloughjohnstown"
+      ],
+      "success_count": 1,
+      "match_hints": [
+        "parishnewsletter.killparish.ie",
+        "October"
+      ]
     },
     "wp_json+direct_download": {
       "page_type": "wp_json",
@@ -789,6 +842,33 @@
       ],
       "example_parishes": [
         "moycullen"
+      ],
+      "success_count": 1,
+      "bulletin_layout": {
+        "strategy": "newest_dated",
+        "position": "top"
+      }
+    },
+    "galway_bearna_duilleog+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Galway Bearna / Furbo Weekly Duilleog listing",
+      "advice": "Official clonfertgalway card has no file. Live barnafurboparish.ie Weekly Duilleog lists dated PDFs. Keep Irish. Score filename.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: 4thOct2026.pdf GET 200 application/pdf 614061 bytes. PDF text Sun. 4th October / An Domhnach 4ú Deireadh Fómhair."
+      ],
+      "do_not": [
+        "Do not pin the dated PDF.",
+        "Do not translate Irish / Gaeilge.",
+        "Do not harvest Facebook."
+      ],
+      "html_fingerprint": "galway_bearna_duilleog",
+      "html_markers": [
+        "barnafurboparish.ie",
+        "weekly-duilleog-newsletter"
+      ],
+      "example_parishes": [
+        "bearna"
       ],
       "success_count": 1,
       "bulletin_layout": {
@@ -1946,6 +2026,36 @@
         "Wix static assets",
         "Wix site container"
       ]
+    },
+    "waterford_lismore_leftover_listing": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "direct_download",
+      "label": "Waterford & Lismore leftover parish listings",
+      "advice": "Kitchen-sink the parish host. Clonmel St Mary’s dated /images/ PDFs. Clonmel SS Peter & Paul DDMMYY Web JPEGs under /resources/ (skip .opt thumbs). Dungarvan monthly St Mary’s Parish Newsletter PDF — never Faith-at-Home. Alias Butlerstown to St Paul’s.",
+      "operator_notes": [
+        "05/10/2026 leftover hunt: clonmelstmarys 3rd october 2026.pdf 1429984 bytes; clonmelsspeterpaul 04102026 Web (1).jpg 1041758 bytes; dungarvan St.-Marys-Parish-Newsletter-October-2026.pdf 486708 bytes.",
+        "Faith-at-Home is not the parish bulletin.",
+        "MCN st-paul-s / buttlerstown same bytes as stpaulsandbutlerstown.ie — harvest once."
+      ],
+      "do_not": [
+        "Do not pin dated filenames.",
+        "Do not harvest Faith-at-Home.",
+        "Do not harvest Facebook.",
+        "Do not duplicate St Paul’s for Butlerstown."
+      ],
+      "html_fingerprint": "http_scrape_newest_pdf",
+      "html_markers": [
+        "stmarysparishclonmel.ie",
+        "sspeterandpaul.ie",
+        "dungarvanparish.ie"
+      ],
+      "example_parishes": [
+        "clonmelstmarys",
+        "clonmelsspeterpaul",
+        "dungarvan"
+      ],
+      "success_count": 3,
+      "updated": "2026-10-05"
     }
   }
 }
