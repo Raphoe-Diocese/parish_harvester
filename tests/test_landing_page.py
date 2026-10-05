@@ -101,7 +101,7 @@ class LandingPageTests(unittest.TestCase):
             # one-click link to its collated (mega) bulletin and its text
             # bulletin — not a full-size "coming soon" card.
             self.assertIn("Live dioceses", index_html)
-            self.assertEqual(index_html.count("live-card\""), 17)
+            self.assertEqual(index_html.count("live-card\""), 21)
             self.assertIn("Clogher Diocese", index_html)
             self.assertIn("Derry Diocese", index_html)
             self.assertIn("Down &amp; Connor Diocese", index_html)
@@ -120,6 +120,10 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Killaloe Diocese", index_html)
             self.assertIn("Kilmore Diocese", index_html)
             self.assertIn("Meath Diocese", index_html)
+            self.assertIn("Dublin Diocese", index_html)
+            self.assertIn("Ossory Diocese", index_html)
+            self.assertIn("Tuam Diocese", index_html)
+            self.assertIn("Waterford &amp; Lismore Diocese", index_html)
             # Live cards must be A–Z by short name (not discovery order).
             live_headings = re.findall(
                 r'<article class="live-card">.*?<h2[^>]*>(.*?)</h2>',
@@ -174,7 +178,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertFalse((docs / "subscribe" / "index.html").exists())
 
             # The other dioceses collapse into one small expandable list.
-            self.assertIn("More dioceses — coming soon (9)", index_html)
+            self.assertIn("More dioceses — coming soon (5)", index_html)
             self.assertNotIn("Parish of Raphoe", index_html)
 
             links = re.findall(r'href="dioceses/([a-z0-9-]+)/"', index_html)
@@ -360,7 +364,7 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertNotIn("Jane Doe", markup)
 
     def test_default_hero_slides_are_real_cathedral_photos_with_cc_credit(self) -> None:
-        self.assertEqual(len(site_builder.HERO_SLIDES), 17)
+        self.assertEqual(len(site_builder.HERO_SLIDES), 21)
         for slide in site_builder.HERO_SLIDES:
             self.assertTrue(slide.image and slide.image.startswith("https://upload.wikimedia.org/"))
             self.assertTrue(slide.credit and "Wikimedia Commons" in slide.credit)
@@ -385,6 +389,10 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertIn("Cathedral of Saints Peter and Paul, Ennis", titles)
         self.assertIn("Cathedral of St Patrick and St Felim, Cavan", titles)
         self.assertIn("Cathedral of Christ the King, Mullingar", titles)
+        self.assertIn("St Mary's Pro-Cathedral, Dublin", titles)
+        self.assertIn("St Mary's Cathedral, Kilkenny", titles)
+        self.assertIn("Cathedral of the Assumption, Tuam", titles)
+        self.assertIn("Holy Trinity Cathedral, Waterford", titles)
 
         eyebrows = {slide.eyebrow for slide in site_builder.HERO_SLIDES}
         self.assertEqual(
@@ -407,6 +415,10 @@ class HeroSliderRenderTests(unittest.TestCase):
                 "Killaloe Diocese",
                 "Kilmore Diocese",
                 "Meath Diocese",
+                "Dublin Diocese",
+                "Ossory Diocese",
+                "Tuam Diocese",
+                "Waterford and Lismore Diocese",
             },
         )
 

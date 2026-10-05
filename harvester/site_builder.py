@@ -50,6 +50,10 @@ LIVE_DIOCESES = {
     "killaloe",
     "kilmore",
     "meath",
+    "dublin",
+    "ossory",
+    "tuam",
+    "waterford-and-lismore",
 }
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
@@ -378,6 +382,62 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Meath Diocese",
         title="Cathedral of Christ the King, Mullingar",
         subtitle="This week's Meath parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="dublin",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/"
+            "St_Mary%27s_Pro-Cathedral_Interior%2C_Dublin%2C_Ireland_-_Diliff.jpg/"
+            "1280px-St_Mary%27s_Pro-Cathedral_Interior%2C_Dublin%2C_Ireland_-_Diliff.jpg"
+        ),
+        credit="Photo: Diliff / Wikimedia Commons / CC BY-SA 3.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #1c1824 0%, #3a3860 55%, #b0b0d8 100%)",
+        eyebrow="Dublin Diocese",
+        title="St Mary's Pro-Cathedral, Dublin",
+        subtitle="This week's Dublin parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="ossory",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/"
+            "St_Mary%27s_Cathedral%2C_Kilkenny_-_geograph.org.uk_-_1537876.jpg/"
+            "1280px-St_Mary%27s_Cathedral%2C_Kilkenny_-_geograph.org.uk_-_1537876.jpg"
+        ),
+        credit="Photo: Eirian Evans / Wikimedia Commons / CC BY-SA 2.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #241c14 0%, #584028 55%, #d4b080 100%)",
+        eyebrow="Ossory Diocese",
+        title="St Mary's Cathedral, Kilkenny",
+        subtitle="This week's Ossory parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="tuam",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/"
+            "Tuam_Cathedral_of_the_Assumption_2009_09_14.jpg/"
+            "1280px-Tuam_Cathedral_of_the_Assumption_2009_09_14.jpg"
+        ),
+        credit="Photo: Andreas F. Borchert / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #18241c 0%, #386048 55%, #b0d8c0 100%)",
+        eyebrow="Tuam Diocese",
+        title="Cathedral of the Assumption, Tuam",
+        subtitle="This week's Tuam parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="waterford-and-lismore",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/"
+            "Waterford_Holy_Trinity_Cathedral_2014_09_22.jpg/"
+            "1280px-Waterford_Holy_Trinity_Cathedral_2014_09_22.jpg"
+        ),
+        credit="Photo: Andreas F. Borchert / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #241818 0%, #603838 55%, #d8b0b0 100%)",
+        eyebrow="Waterford and Lismore Diocese",
+        title="Holy Trinity Cathedral, Waterford",
+        subtitle="This week's Waterford and Lismore parish bulletins.",
     ),
 ]
 
