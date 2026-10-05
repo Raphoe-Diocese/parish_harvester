@@ -1,19 +1,50 @@
 {
+  "version": 2,
   "parish_key": "clonmelsspeterpaul",
   "display_name": "Clonmel - SS Peter & Paul",
   "diocese": "waterford_and_lismore",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.sspeterandpaul.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://sspeterandpaul.ie/newsletter.php",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": [
+    "Web",
+    "2026",
+    ".jpg"
+  ],
+  "href_skip_patterns": [
+    ".opt",
+    "christmas",
+    "Retreat",
+    "leaflet",
+    "Knock",
+    "Lourdes"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.sspeterandpaul.ie"
+      "url": "https://sspeterandpaul.ie/newsletter.php"
+    },
+    {
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "selector": "img[src*='resources/'][src*='Web']",
+      "min_long_side": 500
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Waterford leftover hunt: newsletter.php lists DDMMYY Web JPEG scans. Proved https://sspeterandpaul.ie/resources/04102026%20Web%20%281%29.jpg GET 200 image/jpeg 1041758 bytes magic JPEG. Filename date 04/10/2026. Prefer the full /resources/ file, not the .opt thumbnail. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated DDMMYY Web.jpg name.",
+    "Do not harvest the .opt thumbnail as the bulletin.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
