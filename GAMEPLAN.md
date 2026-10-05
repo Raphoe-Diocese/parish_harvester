@@ -1,3 +1,9 @@
+﻿## 05/10/2026 — Stale mega referee gate (NOW)
+
+- Frank: lots of old bulletins in the mega — Recipe Brain was not the gate. Recipe Brain finds/unskips recipes; it does **not** stop last-week PDFs entering the collated mega.
+- Root cause: `scripts/merge_diocese_harvests.py` stubbed **every** `Bulletins/current/*.pdf` as `status=ok` with empty URL for stitch. Stitcher only skips `is_stale`. Safety net also skipped empty-URL stubs. Proved on current `Bulletins/report.json` week **04/10/2026**: **121 / 300** `downloaded` rows are dated last week or older (sample Cork 20/09: ballincollig, aughadown, carrigaline…).
+- Fix on branch `referee-stale-mega-gate`: reclassify stale `downloaded` → `stale_rejected` before stitch; build mega stubs from report `downloaded` only; empty-URL PDF body date can reject. Tests `tests/test_stale_mega_gate.py` + freshness suite green (47).
+- Next: merge PR, then one Full harvest (cloud) so megas rebuild without last week. Do not regenerate all docs/ from this PC. Mega PDF stays on. Galway #298 / Waterford #299 parked until this lands.
 ## 05/10/2026 — Tuam leftover SKIP hunt (cloud)
 
 - Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Tuam already LIVE. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not download mega PDFs. Did not reopen PR #281 keys (athenry, castlebar, carnacon, headford, tuamparish). Did not hunt Dublin/Meath/Kerry/Ossory/Limerick/Galway/Kildare/Waterford this pass. Mega PDF stays on in harvest.yml.

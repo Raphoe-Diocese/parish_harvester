@@ -14,10 +14,13 @@ REPO = Path(__file__).resolve().parent.parent
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from harvester.fetcher import FetchResult  # noqa: E402
-from harvester.parish_status import write_parish_status
-from harvester.report import merge_diocese_reports
-from harvester.stitcher import stitch_mega_pdf
+from harvester.bulletin_freshness import (  # noqa: E402
+    build_mega_stitch_results,
+    reclassify_stale_downloaded_in_report,
+)
+from harvester.parish_status import write_parish_status  # noqa: E402
+from harvester.report import merge_diocese_reports  # noqa: E402
+from harvester.stitcher import stitch_mega_pdf  # noqa: E402
 
 
 def _load_json(path: Path) -> dict:
@@ -92,6 +95,21 @@ def main() -> int:
         raise SystemExit(f"No report.json files under {args.slices_dir}")
 
     merged = merge_diocese_reports(reports)
+    parts = str(merged.get("target_date") or "").split("-")
+    target = (
+        date(int(parts[0]), int(parts[1]), int(parts[2]))
+        if len(parts) == 3
+        else date.today()
+    )
+    # Referee gate: dated last-week rows must not stay "downloaded" or enter mega.
+    stale_moved = reclassify_stale_downloaded_in_report(
+        merged, target, current_dir=args.current_dir
+    )
+    if stale_moved:
+        print(
+            f"  🕐 Stale referee: moved {len(stale_moved)} downloaded → stale_rejected"
+        )
+
     args.report_json.parent.mkdir(parents=True, exist_ok=True)
     args.report_json.write_text(json.dumps(merged, indent=2), encoding="utf-8")
     summary = merged.get("summary") or {}
@@ -100,6 +118,7 @@ def main() -> int:
         f"target_date: {merged.get('target_date')}\n"
         f"downloaded: {summary.get('downloaded', 0)}\n"
         f"failed: {summary.get('failed', 0)}\n"
+        f"stale_rejected: {summary.get('stale_rejected', 0)}\n"
         f"pdfs_copied: {copied}\n",
         encoding="utf-8",
     )
@@ -107,23 +126,21 @@ def main() -> int:
     args.consecutive.write_text(json.dumps(consecutive, indent=2), encoding="utf-8")
     write_parish_status(report_path=args.report_json)
     if args.mega:
-        parts = str(merged.get("target_date") or "").split("-")
-        target = (
-            date(int(parts[0]), int(parts[1]), int(parts[2]))
-            if len(parts) == 3
-            else date.today()
+        # Only report "downloaded" PDFs — never every file left on disk.
+        stubs = build_mega_stitch_results(merged, args.current_dir, target)
+        args.report_json.write_text(json.dumps(merged, indent=2), encoding="utf-8")
+        summary = merged.get("summary") or {}
+        args.report_txt.write_text(
+            "Merged diocese harvest\n"
+            f"target_date: {merged.get('target_date')}\n"
+            f"downloaded: {summary.get('downloaded', 0)}\n"
+            f"failed: {summary.get('failed', 0)}\n"
+            f"stale_rejected: {summary.get('stale_rejected', 0)}\n"
+            f"pdfs_copied: {copied}\n",
+            encoding="utf-8",
         )
-        stubs = []
-        for pdf in sorted(args.current_dir.glob("*.pdf")):
-            stubs.append(
-                FetchResult(
-                    key=pdf.stem,
-                    display_name=pdf.stem.replace("_", " ").title(),
-                    status="ok",
-                    url="",
-                    file_path=pdf,
-                )
-            )
+        write_parish_status(report_path=args.report_json)
+        print(f"  📚 Mega stitch: {len(stubs)} this-week PDF(s) after stale gate")
         stitch_mega_pdf(
             stubs,
             current_dir=args.current_dir,
