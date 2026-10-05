@@ -1,3 +1,16 @@
+## 05/10/2026 night — Armagh continuous hunt pass 1 (cloud)
+
+- Frank: keep going until many more this-week bulletins. Harvest week Sunday 04/10/2026 (also 27/09, 03–05/10). Did not dispatch harvest.yml. Did not regenerate all docs/. Mega PDF stays on.
+- Folder `parishes/recipes/armagh/` (61). Started 10 active / 51 skip.
+- **Unskipped 3** after GET 200 + file type + date:
+  - **beragh** — https://beraghparish.com/pdf/041026.pdf — 422496 bytes — 04/10/2026 — `predicted_dated_pdf` /pdf/DDMMYY.pdf (homepage link text Sunday 4th October 2026).
+  - **dunleer** — http://www.dunleerparish.ie/current-newsletter/ → Twenty_Seventh_Sunday…[2026-10-4].pdf — 429671 bytes — 04/10/2026 — Pattern F.
+  - **cullyhanna** — https://lowercregganparish.com/…/Sunday-4th-October-2026-page-001-scaled.jpg — 890260 bytes — 04/10/2026 — live twin (card was Facebook-only); `http_scrape_newest_images`.
+- **Left skip (honest why / blockers):** keadyparish.net 403 WAF; ballymascanlon.com 403; cookstownparish.com homepage WAF (parish-news HTML still Sept week); redemptoristsdundalk.ie 403; most remaining Facebook-only / no this-week twin. Do not invent.
+- After this pass: harvestable **13** / skip **48**. Aliases 0.
+- Limerick LIVE + Kilfenora honest is separate PR #303.
+- Next: continue Armagh kitchen-sink (Killaloe next after Armagh PR), then Cashel & Emly.
+
 ## 05/10/2026 night — OLD BULLETINS ON LIVE SITE (NOW)
 
 - Frank screenshot: Ardara OCR week beginning 13/09/2026. Fix PR #302 then Full harvest + OCR. Not live yet. See docs/WEBSITE_OCR_BACKLOG.md NOW item.
