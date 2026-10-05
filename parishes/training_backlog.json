@@ -2,17 +2,17 @@
   "generated_at": "2026-10-05",
   "target_date": "2026-10-04",
   "summary": {
-    "downloaded": 280,
+    "downloaded": 291,
     "html_links": 0,
-    "skipped": 925,
-    "failed": 81,
-    "stale_rejected": 23
+    "skipped": 901,
+    "failed": 91,
+    "stale_rejected": 26
   },
   "action_counts": {
-    "ok": 274,
-    "investigate": 74,
-    "skip": 905,
-    "mark_inactive": 5
+    "ok": 288,
+    "investigate": 67,
+    "skip": 884,
+    "mark_inactive": 19
   },
   "parishes": [
     {
@@ -44,10 +44,10 @@
       "learned_pattern": "Kerry diocese parish card Download Newsletter",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "abbeyfeale",
@@ -1099,10 +1099,10 @@
       "learned_pattern": "Kerry diocese parish card Download Newsletter",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Twenty-sieventh-Sunday-in-Ordinary-Time-2026-002.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "antrimparish",
@@ -1418,10 +1418,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/ardfertnewsletter4oct2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "ardfinnan",
@@ -1488,27 +1488,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/ardlea.json",
       "recipe": {
-        "start_url": "https://johnvianneydublin.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://johnvianneydublin.com/newsletters.php",
+        "site_type": "http_scrape_newest_images",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "has_terminal": true,
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing newsletters.php has dated JPEG pages.",
+          "Proved page one GET 200 image/jpeg 208259 bytes magic JPEG. Filename 4 Oct 2026. Page two GET 200 image/jpeg 183665 bytes.",
+          "Stack the newest Sunday images. Do not pin dated jpg names."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "ardmoreparish",
@@ -2560,7 +2567,7 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/08/2026-08-23-1.pdf",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-10-04-1.pdf",
       "suggested_action": "mark_inactive",
       "suggested_reason": "non-automatable source"
     },
@@ -4081,7 +4088,7 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/09/27th-September-2026.pdf",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/4th-Oct.-2026.pdf",
       "suggested_action": "mark_inactive",
       "suggested_reason": "non-automatable source"
     },
@@ -4114,10 +4121,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballyduff",
@@ -4405,27 +4412,32 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/ballyhale.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/ballyhale/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://ballyhaleparish.ie/parish-newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: ballyhaleparish.ie/parish-newsletter/. Proved GET 200 application/pdf 92999 bytes magic %PDF. Filename Ballyhale-Parish-Newsletter-27th-Sunday-in-Ordinary-Time-2026.pdf. Listing text October 4, 2026. CreationDate 20261002. Score liturgical Sunday in the filename. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated or liturgical filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballyhaunisannagh",
@@ -4513,9 +4525,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Twenty-Seventh-Sunday-in-Ordinary-Time-3rd-4th-October-26.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "ballylanders",
@@ -5619,27 +5631,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/beaumont.json",
       "recipe": {
-        "start_url": "https://holychildnativity.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://holychildnativity.ie/newsletters/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing /newsletters/ has NewsletterDD.MM.26.pdf.",
+          "Proved Newsletter04.10.26.pdf GET 200 application/pdf 6206708 bytes magic %PDF. Filename date 04/10/2026.",
+          "Homepage also links the same file. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Dublin leftover parish-host listings after the 03/10 LIVE hunt",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "beauparc",
@@ -5988,27 +6007,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/blackrockdublin.json",
       "recipe": {
-        "start_url": "https://www.sjb.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://sjb.ie/current-newsletter/",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "has_terminal": true,
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: /current-newsletter/ redirects to this-week PDF (same Pattern F as Naas/Meath).",
+          "Proved GET 200 application/pdf 337847 bytes magic %PDF. Redirect file Newsletter-4th-October-2026.-AutoRecovered.pdf date 04/10/2026.",
+          "Do not pin the dated upload."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "blackrock",
@@ -6315,7 +6341,7 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/08/Sun-30th-August-2026.pdf",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Sun-4th-October-2026.pdf",
       "suggested_action": "mark_inactive",
       "suggested_reason": "non-automatable source"
     },
@@ -6473,18 +6499,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/booterstown.json",
       "recipe": {
-        "start_url": "https://www.booterstownparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://booterstownparish.ie/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: weekly PDF is in wp-json media. Listing /newsletter/ is a webp, not the file.",
+          "Proved Sun-4-October-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1675137 bytes magic %PDF. Date 04/10/2026.",
+          "Skip JPEG previews of the same PDF. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -6492,8 +6525,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "bornacoola",
@@ -7439,7 +7472,7 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/09/News-27th-Sept-26.pdf",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/News-4th-Oct-26.pdf",
       "suggested_action": "mark_inactive",
       "suggested_reason": "non-automatable source"
     },
@@ -8564,7 +8597,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -8573,7 +8606,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_reason": "castlecomerparish.ie/current-newsletter/ GET 200 %PDF 217585 bytes but filename Newsletter-2-2.pdf is undated. Listing titles Twenty sixth Sunday / PDF text 26th/27th September 2026. Leave skip until the file itself is dated. Same cluster as Clogh and Muckalee."
     },
     {
       "parish_key": "castleconnell",
@@ -8807,9 +8840,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/4th-October2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "castleknock",
@@ -8929,10 +8962,10 @@
       "learned_pattern": "Kerry diocese parish card Download Newsletter",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/04-Oct-2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "castlepollard",
@@ -9216,9 +9249,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/27th-Sunday-in-Ordinary-Time-4th-October-2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "castletownroche",
@@ -9614,18 +9647,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/churchtown.json",
       "recipe": {
-        "start_url": "https://www.goodshepherdchurchtown.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://churchtownparish.com/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: official card goodshepherdchurchtown.ie redirects to churchtownparish.com.",
+          "Proved Newsletter-Sunday-Message-4th-October-2026.pdf GET 200 application/pdf 1451104 bytes magic %PDF. Date 04/10/2026. Folder /2026/09/ is not the Sunday.",
+          "Score the filename. Do not pin the dated PDF."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -9633,8 +9673,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "churchtownliscarroll",
@@ -13200,10 +13240,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "dmaparish",
@@ -13608,18 +13648,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/donnycarney.json",
       "recipe": {
-        "start_url": "https://www.donnycarneyparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.donnycarneyparish.ie/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: weekly PDF in wp-json media. Homepage dated posts do not always expose the .pdf href.",
+          "Proved Newsletter-online-4.10.2026pub.pdf GET 200 application/pdf 1438926 bytes magic %PDF. Date 04/10/2026.",
+          "Skip JPEG previews. Do not pin the dated filename or the dated post slug."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -13627,8 +13674,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "donore",
@@ -14304,10 +14351,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/3-4-October-2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "drumaroadclanvaraghen",
@@ -14850,10 +14897,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/October-4th-2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "duleek",
@@ -15609,27 +15656,33 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/durrow.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/durrow/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.durrow.ie/category/newsletter/",
+        "site_type": "http_scrape_newest_images",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "has_terminal": true,
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: durrow.ie category/newsletter/. Weekly file is JPEG newsletter-04-oct-2026.jpg under /uploads/2026/09/. Proved GET 200 image/jpeg 98364 bytes magic JPEG. Score the filename, not the folder. Do not pick -300x169 thumbnails."
+        ],
+        "do_not": [
+          "Do not pin newsletter-04-oct-2026.jpg.",
+          "Do not date-rewrite /2026/09/.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "bulletin_format": "image_stack",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "dysart",
@@ -16821,27 +16874,33 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/ferrybank.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/ferrybank/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://ferrybankslieverueparishes.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: ferrybankslieverueparishes.ie/newsletter/. Same PDF covers Ferrybank and Slieverue. Proved GET 200 application/pdf 957745 bytes magic %PDF. Filename Bulletin-4th-October-2026.pdf. Harvest once under ferrybank. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Slieverue as a second copy of this file.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "fethardkillusty",
@@ -16969,18 +17028,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/firhouse.json",
       "recipe": {
-        "start_url": "https://www.firhouseparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://firhouseparish.ie/announcements/weekly-notice/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing /announcements/weekly-notice/.",
+          "Proved 2026-10-04-Weekly-Notice.pdf GET 200 application/pdf 378580 bytes magic %PDF. Date 04/10/2026.",
+          "A separate Weekly-Notice-Partners.pdf is the partnership amalgam. Harvest the parish Weekly-Notice.pdf once. Do not harvest Partners."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -16988,8 +17054,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "firies",
@@ -17082,10 +17148,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Too many pages: 5 pages (max 4)",
       "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_reason": "Too many pages: 5 pages (max 4)"
     },
     {
       "parish_key": "foxford",
@@ -17127,18 +17193,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/foxrock.json",
       "recipe": {
-        "start_url": "https://www.foxrockparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.foxrockparish.ie/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: weekly PDF in wp-json media.",
+          "Proved Newsletter-September-27th-2026.pdf GET 200 application/pdf 367076 bytes magic %PDF. Date 27/09/2026 (accepted weekend file).",
+          "Skip JPEG previews. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -17146,8 +17219,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "francisstreet",
@@ -17767,10 +17840,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/4-Oct-2026.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "glendalough",
@@ -17936,11 +18009,11 @@
     },
     {
       "parish_key": "glenmore",
-      "display_name": "Glenmore",
+      "display_name": "Glenmore (bulletin with Rosbercon)",
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/glenmore.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/glenmore/",
+        "start_url": "https://rosberconparish.ie/newsletter/",
         "site_type": "link_only",
         "playbook_type": "link_only",
         "status": "inactive",
@@ -17951,7 +18024,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -17960,7 +18033,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_reason": "From August 2026 the weekly newsletter is a joint Glenmore and Rosbercon PDF on rosberconparish.ie. Harvest once under rosbercon. glenmoreparish.ie listing was stale (2 August) this hunt."
     },
     {
       "parish_key": "glenravelthebraid",
@@ -18591,18 +18664,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/greenhills.json",
       "recipe": {
-        "start_url": "https://www.holyspiritparishgreenhills.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.holyspiritparishgreenhills.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing /newsletter/.",
+          "Proved Nl041026.pdf GET 200 application/pdf 312247 bytes magic %PDF. Filename date 04/10/2026.",
+          "Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -18610,8 +18690,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "greenlough",
@@ -20187,10 +20267,10 @@
       "learned_pattern": "Kenmare parish newsletters listing",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "kilanerin",
@@ -21204,10 +21284,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "kilgefin",
@@ -22318,7 +22398,7 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/09/27th-September-2026.pdf",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/4th-October-2026.pdf",
       "suggested_action": "mark_inactive",
       "suggested_reason": "non-automatable source"
     },
@@ -22423,27 +22503,33 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/kilmacow.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/kilmacow/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.kilmacowparish.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: live host is kilmacowparish.com not .ie. Listing HTML 403 from cloud IP. wp-json/wp/v2/media lists 4th-October-2026.pdf. Proved GET 200 application/pdf 428974 bytes magic %PDF. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin 4th-October-2026.pdf.",
+          "Do not scrape the HTML listing if it 403s \u2014 use wp-json.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "kilmacrenan",
@@ -23770,11 +23856,11 @@
     },
     {
       "parish_key": "kinsealy",
-      "display_name": "Kinsealy",
+      "display_name": "Kinsealy (bulletin with Portmarnock)",
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/kinsealy.json",
       "recipe": {
-        "start_url": "https://www.portmarnockparish.ie/kinsealy",
+        "start_url": "https://www.portmarnockparish.ie/newsletters/",
         "site_type": "link_only",
         "playbook_type": "link_only",
         "status": "inactive",
@@ -23785,7 +23871,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -23794,7 +23880,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_reason": "Shared this-week Portmarnock newsletter. Harvest once under portmarnock. Do not duplicate."
     },
     {
       "parish_key": "kinvara",
@@ -26788,9 +26874,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/27th-Sunday-in-Ordinary-Time-4th-October-2026-1.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "milltowndublin",
@@ -26798,18 +26884,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/milltowndublin.json",
       "recipe": {
-        "start_url": "https://www.milltownparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://milltownparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing /newsletter/.",
+          "Proved Weekly-Bulletin-Sunday-October-4th-2026.pdf GET 200 application/pdf 655698 bytes magic %PDF. Date 04/10/2026.",
+          "Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -26817,8 +26910,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "milltownkerry",
@@ -26849,10 +26942,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Too many pages: 8 pages (max 4)",
       "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_reason": "Too many pages: 8 pages (max 4)"
     },
     {
       "parish_key": "milltown",
@@ -27368,27 +27461,32 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/mooncoin.json",
       "recipe": {
-        "start_url": "https://mooncoinparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.mooncoinparish.ie/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: mooncoinparish.ie Grapevine. Proved GET 200 application/pdf 420918 bytes magic %PDF. Filename Grapevine - October 4th 2026.pdf. CreationDate 20261002. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated Grapevine filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "moone",
@@ -27714,18 +27812,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/mourneroad.json",
       "recipe": {
-        "start_url": "https://www.mourneroad.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://mourneroad.ie/newsletter-archive",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing /newsletter-archive has YYYYMMDD.pdf. Homepage has no this-week href.",
+          "Proved 20261004.pdf GET 200 application/pdf 1587296 bytes magic %PDF. Filename date 04/10/2026.",
+          "Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -27733,8 +27838,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "moy",
@@ -28720,34 +28825,6 @@
       "suggested_reason": "Official card / search is Facebook-only \u2014 cannot scrape Facebook (checked 29/09/2026)."
     },
     {
-      "parish_key": "newcastledublin",
-      "display_name": "Newcastle",
-      "diocese": "dublin",
-      "recipe_file": "parishes/recipes/dublin/newcastledublin.json",
-      "recipe": {
-        "start_url": "https://www.srbnparishes.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
-        "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
-      },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
-    },
-    {
       "parish_key": "newcastlefourmilewater",
       "display_name": "Newcastle & Fourmilewater",
       "diocese": "waterford_and_lismore",
@@ -28774,6 +28851,34 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+    },
+    {
+      "parish_key": "newcastledublin",
+      "display_name": "Newcastle (bulletin with Saggart)",
+      "diocese": "dublin",
+      "recipe_file": "parishes/recipes/dublin/newcastledublin.json",
+      "recipe": {
+        "start_url": "https://srbnparishes.ie/",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-10-05"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Shared SRBN this-week file with Saggart. Harvest once under saggart. Do not duplicate."
     },
     {
       "parish_key": "newcastlewest",
@@ -29629,10 +29734,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/October-4th-2026-2.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "ourladyhelpofchristiansassociatedparish",
@@ -30458,27 +30563,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/portmarnock.json",
       "recipe": {
-        "start_url": "https://www.portmarnockparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.portmarnockparish.ie/newsletters/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: listing /newsletters/. Same file as Kinsealy. Harvest once here.",
+          "Proved Newsletter 4th October 2026.pdf GET 200 application/pdf 327871 bytes magic %PDF. Date 04/10/2026.",
+          "Do not pin the dated filename. Kinsealy is alias_of this key."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Dublin leftover parish-host listings after the 03/10 LIVE hunt",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "portroe",
@@ -31229,10 +31341,10 @@
         "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "rathnure",
@@ -31763,27 +31875,33 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/rosbercon.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/rosbercon/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://rosberconparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: rosberconparish.ie/newsletter/. Joint Glenmore and Rosbercon newsletter from August 2026. Proved GET 200 application/pdf 296307 bytes magic %PDF. Filename 2026.10.04.pdf. /current-newsletter/ redirects to the same file. Harvest once under rosbercon. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin 2026.10.04.pdf.",
+          "Do not harvest Glenmore as a second copy of this file.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "roscommon",
@@ -32237,27 +32355,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/saggart.json",
       "recipe": {
-        "start_url": "https://www.srbnparishes.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://srbnparishes.ie/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: SRBN hub srbnparishes.ie (Saggart, Rathcoole, Brittas, Newcastle). One weekly PDF.",
+          "Proved 2026-10-Oct-04-News-.pdf GET 200 application/pdf 199631 bytes magic %PDF. Filename date 04/10/2026. Trailing hyphen in the live name.",
+          "Harvest once under saggart. Newcastle is alias_of this key. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Dublin leftover parish-host listings after the 03/10 LIVE hunt",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "saintannesparish",
@@ -33072,11 +33197,11 @@
     },
     {
       "parish_key": "slieverue",
-      "display_name": "Slieverue",
+      "display_name": "Slieverue (bulletin with Ferrybank)",
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/slieverue.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/slieverue/",
+        "start_url": "https://ferrybankslieverueparishes.ie/newsletter/",
         "site_type": "link_only",
         "playbook_type": "link_only",
         "status": "inactive",
@@ -33087,7 +33212,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -33096,7 +33221,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_reason": "Same Ferrybank and Slieverue bulletin on ferrybankslieverueparishes.ie. Harvest once under ferrybank."
     },
     {
       "parish_key": "sligocathedral",
@@ -33219,10 +33344,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Publication-Spa-4-October-2026-1.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "springfield",
@@ -33615,10 +33740,10 @@
       "learned_pattern": "St John's Tralee wp-json newsletter PDFs",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "stjohns",
@@ -35711,9 +35836,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/27th-Sunday-in-Ordinary-Time-4th-October-2026-3-Autosaved.docx-2.docx-E-Autosaved.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "tarmonbarry",
@@ -35961,27 +36086,32 @@
       "diocese": "ossory",
       "recipe_file": "parishes/recipes/ossory/templeorum.json",
       "recipe": {
-        "start_url": "https://ossory.ie/parishes/templeorum/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://templeorumparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Ossory leftover hunt: templeorumparish.ie/newsletter/. /current-newsletter/ redirects to the same week's PDF. Proved GET 200 application/pdf 644060 bytes magic %PDF. Filename 036.-Newsletter-for-Sunday-4th-October-2026.pdf. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Ossory leftover {parish}parish.ie / .com this-week PDF",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "templeport",
@@ -36112,27 +36242,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/terenure.json",
       "recipe": {
-        "start_url": "https://www.stjosephsterenure.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.stjosephsterenure.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: weekly PDF in wp-json media as NLYYYY-MM-DD.pdf. Homepage newsletter links are diocesan safeguarding sheets.",
+          "Proved NL2026-09-27.pdf GET 200 application/pdf 1230623 bytes magic %PDF. Date 27/09/2026 (accepted weekend file).",
+          "Skip JPEG previews. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "Dublin leftover parish-host listings after the 03/10 LIVE hunt",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "termonfechin",
@@ -37320,9 +37457,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Valentia-news-4th-Oct-26.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "valleymount",
