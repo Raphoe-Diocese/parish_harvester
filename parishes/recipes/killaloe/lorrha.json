@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "lorrha",
   "display_name": "Lorrha and Dorrha",
   "diocese": "killaloe",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://www.killaloediocese.ie/parish/lorrha-and-dorrha/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Newest newsletter in the media library is Newsletter-Sunday-25-September-2026.pdf (25/09/2026). Not this weekend.",
+  "start_url": "https://lorrhadorrha.ie/parish-newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "Newsletter",
+    "October",
+    "September",
+    "uploads"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
+  "example_url": "https://lorrhadorrha.ie/wp-content/uploads/2026/10/Newsletter-Sunday-4th-October-2026.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.killaloediocese.ie/parish/lorrha-and-dorrha/"
+      "url": "https://lorrhadorrha.ie/parish-newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 continuous hunt: earlier skip was 25/09 media. Now Newsletter-Sunday-4th-October-2026.pdf on parish-newsletter listing. Proved GET 200 application/pdf 262136 bytes %PDF. Do not pin dated name."
+  ],
+  "do_not": [
+    "Do not pin the dated PDF.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
