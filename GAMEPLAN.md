@@ -10,6 +10,25 @@
 - **Left skip counts after this pass:** galway skip **29** (including ballinderreen alias) / harvestable **8** (6 already active + 2 this pass). Mega PDF stays on.
 - Next: merge this PR then harvest `galway_diocese` when Frank says go. Do not harvest.
 
+## 05/10/2026 — Tuam leftover SKIP hunt (cloud)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Tuam already LIVE. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not download mega PDFs. Did not reopen PR #281 keys (athenry, castlebar, carnacon, headford, tuamparish). Did not hunt Dublin/Meath/Kerry/Ossory/Limerick/Galway/Kildare/Waterford this pass. Mega PDF stays on in harvest.yml.
+- Folder `parishes/recipes/tuam/` stem `tuam_diocese`. 51 recipes. 5 already harvestable from #281. 46 leftover skips at start of this pass.
+- **Unskipped 9** after GET 200 + `%PDF` + date on the file or listing:
+  - **louisburghkilgeever** — https://louisburghparish.ie/wp-content/uploads/2026/10/2026-10-04-27th-Sunday-in-Ord-Times.pdf — 1148823 bytes — 04/10/2026 — scrape `/newsletter/` (not homepage banner JPEGs).
+  - **cummerkilmoylan** — https://www.corofinbelclare.ie/newsletter.pdf — 129924 bytes — 04/10/2026 — overwritten weekly path; PDF text 4th October 2026.
+  - **newportburrishoole** — https://www.mayo.ie/getmedia/…/Burrishoole-04-10-2026.pdf — 190891 bytes — 04/10/2026 — mayo.ie listing.
+  - **islandeadyglenisland** — https://www.mayo.ie/getmedia/…/Islandeady-Glenisland-04-10-2026.pdf — 458477 bytes — 04/10/2026 — mayo.ie listing.
+  - **ballindinekilvine** — https://www.mayo.ie/getmedia/…/Kilvine-04-10-2026.pdf — 420266 bytes — 04/10/2026 — mayo.ie Kilvine listing.
+  - **ballyhaunisannagh** — https://www.mayo.ie/getmedia/…/Ballyhaunis-04-10-2026.pdf — 7106300 bytes — 04/10/2026 — mayo.ie listing.
+  - **ballamayoabbey** — https://www.mayo.ie/getmedia/…/Balla-and-Belcarra-04-10-2026.pdf — 187084 bytes — 04/10/2026 — mayo.ie Balla listing. Mayo Abbey Facefield also has a separate this-week PDF (153432) — harvest Balla once under this key.
+  - **partryballyovey** — https://www.mayo.ie/getmedia/…/Partry-Tourmakeady-27-09-2026.pdf — 260146 bytes — 27/09/2026 — mayo.ie listing.
+  - **annaghdowncorrandulla** — https://www.annaghdownchurch.com/wp-content/uploads/2026/10/Newsletter-October-4th-2026.pdf — 202155 bytes — 04/10/2026 — live twin (official corrandullachurch.com DNS dead).
+- **Left skip on purpose (alias):** kilmeena (`alias_of` westportaughaval). Same Westport Wix newsletter.
+- **Left skip (honest why):** westportaughaval — Wix post 4th October 2026 exists but PDF Viewer Pro has no scrapeable PDF/JPEG href (mayo.ie westport page empty). knocktuam knockshrine.ie newest parish newsletter 26 July 2026. claremorrisparish.com cloud GET 202/403; web archive shows Sept issues but no proved this-week GET PDF this pass. congcrosstheneale archive only to May 2026 / mayo.ie Cong page stale. dunmoreparish.com newest PDF 20/09/2026 (page mentions later dates, files too old). bekan-parish.ie cloud 403; latest listed 16 Aug. clifdenomeyballindoon clifdenparish.com newest Aug 2025. Official islandeady.ie only Nov 2022 (replaced by mayo.ie above). Remaining official tuamarchdiocese.org cards / Facebook / no this-week twin: abbeyknockmoy, achill, aghamore, ancheathruarua, ancnocindreabhn, arainn, aughagowercushlough, ballinloughkiltullagh, ballinrobekilmaine, caherlistranekilcoonadonaghpatrick, clareislandinishturk, clonburcorrnamnaross, crnamoyrus, crossboynetaugheen, dunmore, glenamaddywilliamstown, keelogues, kilconlykilbannon, kilkerrinclonberne, killererin, lackagh, leenanefinneykilbride, letterfrackinishbofinisland, menloughskehanakillascobe, milltowntuam, mooreclonfad, mountbellewmoylough, parkecrimlinturlough, roundfortrobeencarraskilcommon, roundstone. Ignore vocations.ie footer. No Facebook harvest.
+- **Left skip counts after this pass:** tuam skip **37** (including 1 alias kilmeena) / harvestable **14** (5 from #281 + 9 this pass). Mega PDF stays on.
+- Next: merge this PR then harvest `tuam_diocese` after Dublin harvest finishes. Do not dispatch harvest.yml from this agent.
+
 ## 05/10/2026 — Ossory leftover SKIP hunt (cloud)
 
 - Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Ossory already LIVE. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not reopen PR #281 keys (inistioge, rathdowney, stcanices, stjohns, thomastown). Did not hunt Dublin/Meath/Kerry/Limerick/Galway/Kildare this pass.

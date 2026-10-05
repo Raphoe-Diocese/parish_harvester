@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "louisburghkilgeever",
   "display_name": "Louisburgh (Kilgeever)",
   "diocese": "tuam",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.louisburghparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://louisburghparish.ie/newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Newsletter",
+    "Sunday",
+    ".pdf",
+    "2026"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.louisburghparish.ie"
+      "url": "https://louisburghparish.ie/newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 cloud leftover hunt: proved GET 200 pdf 1148823 bytes magic %PDF. File date 04/10/2026 (2026-10-04-27th-Sunday\u2026). PDF text KILLEEN & LOUISBURGH NEWSLETTER 04 October 2026. Scrape /newsletter/. Do not pin the dated filename. Homepage banner JPEGs (1920x700) are not the bulletin."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not harvest homepage banner JPEGs as the bulletin.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

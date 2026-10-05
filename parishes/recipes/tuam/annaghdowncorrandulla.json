@@ -1,19 +1,35 @@
 {
+  "version": 2,
   "parish_key": "annaghdowncorrandulla",
   "display_name": "Annaghdown/Corrandulla",
   "diocese": "tuam",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.corrandullachurch.com",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.annaghdownchurch.com/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Newsletter",
+    "October",
+    "September",
+    ".pdf"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.corrandullachurch.com"
+      "url": "https://www.annaghdownchurch.com/newsletters/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 cloud leftover hunt: live twin annaghdownchurch.com (official corrandullachurch.com DNS dead). Proved Newsletter-October-4th-2026.pdf GET 200 application/pdf 202155 bytes magic %PDF. PDF text Mass Intentions 4th \u2013 11th October 2026 Annaghdown. Keep Irish as Irish. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
