@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "ballyhale",
   "display_name": "Ballyhale",
   "diocese": "ossory",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://ossory.ie/parishes/ballyhale/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG.",
+  "start_url": "https://ballyhaleparish.ie/parish-newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Newsletter",
+    ".pdf",
+    "Sunday",
+    "Ordinary",
+    "2026"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://ossory.ie/parishes/ballyhale/"
+      "url": "https://ballyhaleparish.ie/parish-newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Ossory leftover hunt: ballyhaleparish.ie/parish-newsletter/. Proved GET 200 application/pdf 92999 bytes magic %PDF. Filename Ballyhale-Parish-Newsletter-27th-Sunday-in-Ordinary-Time-2026.pdf. Listing text October 4, 2026. CreationDate 20261002. Score liturgical Sunday in the filename. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated or liturgical filename.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

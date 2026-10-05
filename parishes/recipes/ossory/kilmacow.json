@@ -1,19 +1,42 @@
 {
+  "version": 2,
   "parish_key": "kilmacow",
   "display_name": "Kilmacow",
   "diocese": "ossory",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://ossory.ie/parishes/kilmacow/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG.",
+  "start_url": "https://www.kilmacowparish.com/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    ".pdf",
+    "October",
+    "September",
+    "2026"
+  ],
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://ossory.ie/parishes/kilmacow/"
+      "url": "https://www.kilmacowparish.com/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Ossory leftover hunt: live host is kilmacowparish.com not .ie. Listing HTML 403 from cloud IP. wp-json/wp/v2/media lists 4th-October-2026.pdf. Proved GET 200 application/pdf 428974 bytes magic %PDF. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin 4th-October-2026.pdf.",
+    "Do not scrape the HTML listing if it 403s — use wp-json.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

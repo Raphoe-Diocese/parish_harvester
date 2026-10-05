@@ -1,3 +1,20 @@
+## 05/10/2026 — Ossory leftover SKIP hunt (cloud)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Ossory already LIVE. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not reopen PR #281 keys (inistioge, rathdowney, stcanices, stjohns, thomastown). Did not hunt Dublin/Meath/Kerry/Limerick/Galway/Kildare this pass.
+- Folder `parishes/recipes/ossory/` stem `ossory_diocese`. 42 recipes. 5 already harvestable from #281. 37 leftover skips at start of this pass.
+- **Unskipped 7** after GET 200 + `%PDF`/JPEG + date on the file or listing:
+  - **mooncoin** — https://www.mooncoinparish.ie/grapevine/Grapevine%20-%20October%204th%202026.pdf — 420918 bytes — 04/10/2026 — Grapevine homepage scrape.
+  - **templeorum** — https://templeorumparish.ie/wp-content/uploads/2026/10/036.-Newsletter-for-Sunday-4th-October-2026.pdf — 644060 bytes — 04/10/2026 — `/newsletter/` scrape (`/current-newsletter/` redirects).
+  - **ferrybank** — https://ferrybankslieverueparishes.ie/wp-content/uploads/2026/10/Bulletin-4th-October-2026.pdf — 957745 bytes — 04/10/2026 — shared Ferrybank and Slieverue.
+  - **rosbercon** — https://rosberconparish.ie/wp-content/uploads/2026/10/2026.10.04.pdf — 296307 bytes — 04/10/2026 — joint Glenmore file from Aug 2026.
+  - **ballyhale** — https://ballyhaleparish.ie/wp-content/uploads/2026/10/Ballyhale-Parish-Newsletter-27th-Sunday-in-Ordinary-Time-2026.pdf — 92999 bytes — 04/10/2026 (listing 4 October; liturgical 27th Sunday 2026; CreationDate 20261002).
+  - **kilmacow** — https://www.kilmacowparish.com/wp-content/uploads/2026/10/4th-October-2026.pdf — 428974 bytes — 04/10/2026 — HTML listing 403; wp-json media.
+  - **durrow** — https://www.durrow.ie/wp-content/uploads/2026/09/newsletter-04-oct-2026.jpg — 98364 bytes — 04/10/2026 — JPEG; folder `/2026/09/`.
+- **Left skip on purpose (aliases, not a second harvest):** slieverue (`alias_of` ferrybank), glenmore (`alias_of` rosbercon).
+- **Left skip (honest why):** castlecomer `/current-newsletter/` is still `Newsletter-2-2.pdf` undated (217585 bytes; PDF text 26/27 Sep) — leave skip until the filename is dated; clogh + muckalee same cluster, no dated file of their own. freshford parishoffreshford.com newest `13.09.26.pdf` too old. stmaryscathedral.ie newest Jan 2026. stpatricksparishkilkenny.com listing has dates but no GET PDF this pass. aghaviller stoneyford.ie 03/10 HTML newsletter, no PDF/JPEG. claraparishkilkenny.ie HTTP 202 captcha. Remaining official ossory.ie cards: no this-week twin proved (Facebook, no site, 403, or no weekly file): aghaboe, ballycallan, ballyragget, borrisinossory, callanossory, camross, castletownossory, claraossory, clogh, conahy, danesfort, dunnamaggin, galmoy, gowran, johnstownossory, lisdowney, muckalee, mullinavat, seirkieran, stmaryscathedralossory, stpatricksossory, tullaherin, tullaroan, urlingford, windgap.
+- **Left skip counts after this pass:** ossory skip 30 (including 2 aliases) / harvestable 12 (5 from #281 + 7 this pass). Mega PDF stays on.
+- Next: merge PR #291 then harvest `ossory_diocese` after Kerry 37346761881 and Meath 37347683908. Castlecomer stays skip until the filename is dated.
+
 ## 05/10/2026 — Meath leftover SKIP hunt (cloud)
 
 - Frank: more this-week parish bulletins. Meath only (`parishes/recipes/meath/`, stem `meath_diocese`). Already LIVE. Did not add LIVE_DIOCESES. Did not regenerate all docs/. Did not dispatch harvest.yml. Did not hunt Dublin/Limerick/Kerry/Galway/Kildare/Kilfenora. Did not reopen ashbourne, athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar, ratoath, trim. Did not store facebook.com/dioceseofmeath. Mega PDF stays on.
