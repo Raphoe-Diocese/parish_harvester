@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "mooncoin",
   "display_name": "Mooncoin",
   "diocese": "ossory",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://mooncoinparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.mooncoinparish.ie/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Grapevine",
+    ".pdf",
+    "October",
+    "September",
+    "2026"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://mooncoinparish.ie"
+      "url": "https://www.mooncoinparish.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Ossory leftover hunt: mooncoinparish.ie Grapevine. Proved GET 200 application/pdf 420918 bytes magic %PDF. Filename Grapevine - October 4th 2026.pdf. CreationDate 20261002. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated Grapevine filename.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

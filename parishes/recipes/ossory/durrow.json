@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "durrow",
   "display_name": "Durrow",
   "diocese": "ossory",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://ossory.ie/parishes/durrow/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG.",
+  "start_url": "https://www.durrow.ie/category/newsletter/",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": [
+    "newsletter-",
+    ".jpg"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://ossory.ie/parishes/durrow/"
+      "url": "https://www.durrow.ie/category/newsletter/"
+    },
+    {
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "selector": "img[src*='newsletter-']",
+      "min_long_side": 500
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Ossory leftover hunt: durrow.ie category/newsletter/. Weekly file is JPEG newsletter-04-oct-2026.jpg under /uploads/2026/09/. Proved GET 200 image/jpeg 98364 bytes magic JPEG. Score the filename, not the folder. Do not pick -300x169 thumbnails."
+  ],
+  "do_not": [
+    "Do not pin newsletter-04-oct-2026.jpg.",
+    "Do not date-rewrite /2026/09/.",
+    "Do not harvest Facebook."
+  ]
 }
