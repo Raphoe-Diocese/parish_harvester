@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "christtheking",
   "display_name": "Christ the King",
   "diocese": "limerick",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.limerickdiocese.org/parish/?contentID=E0EA9704-C184-98A4-0A057D26C952ED13",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://www.caherdavinparish.com/parish-information/newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "mura_hashed_dated_link_text",
+  "href_patterns": [
+    "Newsletter",
+    "fileID",
+    "render/file"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
+  "example_url": "https://www.caherdavinparish.com/parish-information/newsletter/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.limerickdiocese.org/parish/?contentID=E0EA9704-C184-98A4-0A057D26C952ED13"
+      "url": "https://www.caherdavinparish.com/parish-information/newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: caherdavinparish.com newsletter listing. Link text Newsletter 270926. Proved hashed file GET 200 application/pdf 860033 bytes %PDF. PDF text Christ the King Caherdavin, Masses Sat 26 / Sun 27. CreationDate 26/09/2026. Accepted weekend file 27/09/2026.",
+    "Score the dated link text. Do not pin the hashed fileID."
+  ],
+  "do_not": [
+    "Do not pin index.cfm/_api/render/file/?method=inline&fileID=… — the id changes every week.",
+    "Do not use facebook.com/dioceseoflimerick.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

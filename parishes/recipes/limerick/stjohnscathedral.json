@@ -1,19 +1,45 @@
 {
+  "version": 2,
   "parish_key": "stjohnscathedral",
   "display_name": "St John's (Cathedral)",
   "diocese": "limerick",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.limerickdiocese.org/parish/?contentID=B4E6D723-96AD-68B3-9C8F8B0EA6410D29",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://www.limerickcathedral.com/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "mura_hashed_current_newsletter",
+  "href_patterns": [
+    "Current Newsletter",
+    "fileID",
+    "render/file"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
+  "example_url": "https://www.limerickcathedral.com/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.limerickdiocese.org/parish/?contentID=B4E6D723-96AD-68B3-9C8F8B0EA6410D29"
+      "url": "https://www.limerickcathedral.com/"
+    },
+    {
+      "action": "click",
+      "selector": "a:has-text(\"Current Newsletter\")",
+      "pick_strategy": "first_match",
+      "fallback_selectors": [
+        "a[href*='_api/render/file'][href*='fileID']"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: limerickcathedral.com Current Newsletter is a Mura hashed fileID. Proved GET 200 application/pdf 2134463 bytes %PDF. PDF text Newsletter Sunday 4th October 2026. CreationDate 02/10/2026.",
+    "Date is in the PDF, not the fileID. Click Current Newsletter. Do not pin the hashed fileID."
+  ],
+  "do_not": [
+    "Do not pin index.cfm/_api/render/file/?method=inline&fileID=… — the id changes every week.",
+    "Do not use facebook.com/dioceseoflimerick.",
+    "Do not harvest Facebook."
+  ]
 }
