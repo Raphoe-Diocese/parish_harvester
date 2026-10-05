@@ -43,6 +43,9 @@ class DioceseWeekSummary:
 _RECIPE_FOLDER_ALIASES = {
     "ardagh-and-clonmacnoise": "ardagh",
     "ardagh_and_clonmacnoise": "ardagh",
+    # Public URL is /dioceses/galway-kilmacduagh-and-kilfenora/; recipes live in galway/.
+    "galway-kilmacduagh-and-kilfenora": "galway",
+    "galway_kilmacduagh_and_kilfenora": "galway",
 }
 
 

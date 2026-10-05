@@ -54,6 +54,9 @@ LIVE_DIOCESES = {
     "ossory",
     "tuam",
     "waterford-and-lismore",
+    "galway-kilmacduagh-and-kilfenora",
+    "kerry",
+    "kildare-and-leighlin",
 }
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
@@ -73,6 +76,7 @@ OCR_DIOCESE_KEYS = {
     "elphin": "elphin",
     "ferns": "ferns",
     "galway": "galway",
+    "galway-kilmacduagh-and-kilfenora": "galway",
     "kerry": "kerry",
     "kildare-and-leighlin": "kildare_and_leighlin",
     "killala": "killala",
@@ -98,6 +102,7 @@ EVIDENCE_DIOCESE_KEYS = {
     "elphin": "elphin_diocese",
     "ferns": "ferns_diocese",
     "galway": "galway_diocese",
+    "galway-kilmacduagh-and-kilfenora": "galway_diocese",
     "kerry": "kerry_diocese",
     "kildare-and-leighlin": "kildare_and_leighlin_diocese",
     "killala": "killala_diocese",
@@ -438,6 +443,48 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Waterford and Lismore Diocese",
         title="Holy Trinity Cathedral, Waterford",
         subtitle="This week's Waterford and Lismore parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="galway-kilmacduagh-and-kilfenora",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/"
+            "Galway_Cathedral_(6915116802).jpg/"
+            "1280px-Galway_Cathedral_(6915116802).jpg"
+        ),
+        credit="Photo: Miguel Mendez / Wikimedia Commons / CC BY 2.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #182028 0%, #385060 55%, #b0c8d8 100%)",
+        eyebrow="Galway Kilmacduagh and Kilfenora Diocese",
+        title="Cathedral of Our Lady Assumed into Heaven and St Nicholas, Galway",
+        subtitle="This week's Galway parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="kerry",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/"
+            "Killarney_-_St._Mary%27s_Cathedral_-_20170430213818.jpg/"
+            "1280px-Killarney_-_St._Mary%27s_Cathedral_-_20170430213818.jpg"
+        ),
+        credit="Photo: Dieglop / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #1c2418 0%, #486038 55%, #b0d8a0 100%)",
+        eyebrow="Kerry Diocese",
+        title="St Mary's Cathedral, Killarney",
+        subtitle="This week's Kerry parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="kildare-and-leighlin",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/"
+            "Carlow_Cathedral_-_geograph.org.uk_-_4195280.jpg/"
+            "1280px-Carlow_Cathedral_-_geograph.org.uk_-_4195280.jpg"
+        ),
+        credit="Photo: Humphrey Bolton / Wikimedia Commons / CC BY-SA 2.0",
+        position="center 25%",
+        gradient="linear-gradient(135deg, #241c18 0%, #604838 55%, #d8c0a0 100%)",
+        eyebrow="Kildare and Leighlin Diocese",
+        title="Cathedral of the Assumption, Carlow",
+        subtitle="This week's Kildare and Leighlin parish bulletins.",
     ),
 ]
 
