@@ -17,7 +17,21 @@
   - **listowel** — diocese card: no newsletter uploaded. listowelparish.com weekly archive newest 20/09/2026. Cloud GET 403. churchmedia.tv is the stream, no this-week PDF proved.
   - **sneem** — diocese card: no newsletter uploaded. sneem.ie files are Community Notice Board, not the weekly parish bulletin. Do not harvest the Kenmare file twice.
 - Kerry leftover skips after this pass: 10. site_patterns + DIOCESE_HUNT updated same day. Mega PDF stays on in harvest.yml. Irish stays Irish.
-- Next: merge when Frank says. Do not click Harvest (Limerick harvest running).
+- Next: merge PR #289. Limerick harvest 37344128063 succeeded. Then harvest `kerry_diocese` for Kenmare + St John's. Do not turn Limerick LIVE until Frank names it.
+
+## 05/10/2026 — Limerick + Kilfenora leftover SKIP hunt (cloud)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not reopen stnicholas, stmarys, monaleen, Castlemaine, Abbeyleix, Ballycroy.
+- Folder: `parishes/recipes/limerick/` (stem `limerick_diocese`). Kilfenora & Kilmacduagh recipes live in `parishes/recipes/galway/` (no separate kilfenora folder).
+- **Unskipped 2** after GET 200 + `%PDF` + date on the file:
+  - **stjohnscathedral** — https://www.limerickcathedral.com/ Current Newsletter (hashed fileID, not pinned) — 2134463 bytes — 04/10/2026 — PDF text Newsletter Sunday 4th October 2026.
+  - **christtheking** — https://www.caherdavinparish.com/parish-information/newsletter/ link text Newsletter 270926 (hashed fileID, not pinned) — 860033 bytes — 27/09/2026 — PDF text Christ the King Caherdavin, Masses Sat 26 / Sun 27.
+- **Left skip on purpose (alias, not a second harvest):** stmarys (`alias_of` stnicholas, already); ballinderreen (`alias_of` kinvara, same 04/10 JPEGs).
+- **Left skip (Limerick leftovers, honest why):** askeatonballysteen only 07/12/2025 PDF; bruffparish.ie DNS dead; moyrossparish.com empty; croomparish.ie news still 2021 (Banogue same site); dkrparish.ie GET 202; kilmallockparish.ie no weekly PDF; stsaviourslimerick.com DNS dead; MCN Moyross + Ballingarry cameras have no newsletter JSON; remaining official limerickdiocese.org cards have no this-week twin (Facebook, no site, or no weekly file).
+- **Left skip (Kilfenora / Kilmacduagh leftovers):** ballyvaughan homepage newsletter is 20/09/2026 (too old); lisdoonvarna archive is HTML Sept 26/27 plus PNG screenshots (PNG is not JPEG/PDF; archive is many weeks, not one overwrite); ennistymonparish.ie cert mismatch / no twin; liscannor / kilfenora / carron / gort / kilbeacanty / ardrahan / craughwell / clarinbridge — clonfertgalway cards or stale sites (ardrahan-kilchreest.com newest PDF June 2025; churchmedia Craughwell newsletter_enable 0). Kinvara already harvested.
+- New trick: Mura hashed `fileID` Current Newsletter / dated listing. Written into DIOCESE_HUNT + site_patterns. Mega PDF stays on. Limerick harvest 37344128063 succeeded after merge #287. Do not turn LIVE until Frank names it.
+
+## 05/10/2026 — Kerry / Galway / Kildare LIVE proved
 
 ## 05/10/2026 — Kerry / Galway / Kildare LIVE (homepage)
 
@@ -25,7 +39,7 @@
 - Added `kerry`, `galway-kilmacduagh-and-kilfenora`, `kildare-and-leighlin` to `LIVE_DIOCESES` + cathedral heroes (Killarney, Galway, Carlow — GET 200 JPEG CC).
 - Galway public URL uses long key; recipes stay in `parishes/recipes/galway/` via recipe_folder alias (same pattern as Ardagh).
 - Regenerated only `docs/index.html` + those three diocese viewers. Homepage 24 live cards, coming soon (2): Kilfenora & Kilmacduagh, Limerick.
-- **Not live yet** until merge + Pages. Harvest 37334058753 already running for the new recipes.
+- **LIVE proved 05/10/2026** on https://www.parishpress.ie/ (PR #285 `e1dbcea8`, Pages 37340119370).
 - Limerick still not LIVE unless Frank names it.
 
 ## 05/10/2026 — Leftover SKIP hunt (cloud)
