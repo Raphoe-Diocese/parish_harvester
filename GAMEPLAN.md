@@ -1,3 +1,14 @@
+## 05/10/2026 — Leftover SKIP hunt (cloud)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Did not redo bohola or PR #277/#279/#281 keys. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/.
+- **Unskipped 16** after GET 200 + `%PDF`/HTML + date on file or page text:
+  - **Kerry (13):** abbeydorney, annascaul, ardfert, ballydonoghue, castlemaine, dromtariffe, duagh, fossa, glenbeigh, kilgarvan, milltownkerry (27/09), spakerry, traleestbrendans — `http_scrape_newest_pdf` on diocese parish cards.
+  - **Galway (2):** moycullen (`04.10.2026.pdf` under stale `/2016/02/`), knocknacarra (Wix hashed PDF text 4th October 2026).
+  - **Kildare (1):** killeigh — HTML `killeigh.com/newsletter.html` print_to_pdf (page text 4th October 2026).
+- **Left skip counts (preferred folders, non-alias after this pass):** limerick 54, kildare 38, kerry 12, galway 31, dublin 169, ossory 37, tuam 46, waterford 43, meath 58, kilmore 35, killala 19.
+- **Left skip (honest why):** Limerick diocese-card-only hosts (no this-week twin proved); Kerry leftovers with no/stale card PDF (adrigole, ballylongford, ballymacelligott, brosna, eyeries, glengarriff, kenmare, kilcummin, knocknagoshel, listowel, sneem, stjohnskerry); Kildare leftovers (abbeyleix June 2020, newbridge churchmedia too old, kilcock stale, raheen separate card); Galway clonfertgalway cards + sites with no this-week PDF; Castlecomer PDF text is 27/09 but filename `Newsletter-2-2.pdf` still undated — leave skip per hunt note until filename dates; Meath/Kilmore/Killala/Dublin leftovers unchanged this pass (Facebook, vocations.ie, undated JS, PNG-only Ballycroy).
+- site_patterns + DIOCESE_HUNT updated same day. PR next.
+
 ## 05/10/2026 — Recipe Brain 24/7 hub scan (Frank)
 
 - Frank: hunt 24/7, learn from past wins, tell the brain on the repo.
