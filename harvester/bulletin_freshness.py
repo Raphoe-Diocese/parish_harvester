@@ -538,6 +538,245 @@ def mark_result_stale(
     return result
 
 
+def _parse_iso_date(raw: object) -> date | None:
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    try:
+        parts = text.split("-")
+        if len(parts) != 3:
+            return None
+        return date(int(parts[0]), int(parts[1]), int(parts[2]))
+    except ValueError:
+        return None
+
+
+def freshness_verdict_for_ok_result(
+    result: FetchResult,
+    target: date,
+    *,
+    report_bulletin_date: date | None = None,
+) -> FreshnessVerdict:
+    """URL / report date / PDF-body freshness for one ok download.
+
+    Order: report ``bulletin_date`` when present, else URL date, else PDF
+    heading when the URL is undated or missing (H1). A this-week heading does
+    not invent ``fresh`` over an unknown URL.
+    """
+    if report_bulletin_date is not None:
+        return verdict_for_extracted_date(report_bulletin_date, target)
+
+    url = (result.url or "").strip()
+    pdf_path = result.file_path
+    pdf_exists = pdf_path is not None and Path(pdf_path).exists()
+
+    if url:
+        verdict = check_bulletin_freshness(url, target)
+        if verdict.status != "unknown":
+            return verdict
+        if pdf_exists:
+            from .fetcher import freshness_after_unknown_url
+
+            return freshness_after_unknown_url(url, Path(pdf_path), target)
+        return verdict
+
+    if pdf_exists:
+        from .fetcher import extract_pdf_bulletin_date
+
+        body_date = extract_pdf_bulletin_date(Path(pdf_path))
+        if body_date is not None:
+            return verdict_for_extracted_date(body_date, target)
+    return FreshnessVerdict(status="unknown", reason="no_date_in_url")
+
+
+def reclassify_stale_downloaded_in_report(
+    report: dict,
+    target: date,
+    *,
+    current_dir: Path | None = None,
+) -> list[dict[str, object]]:
+    """Move stale ``downloaded`` rows to ``stale_rejected``; delete their PDFs.
+
+    Catches rows that kept a dated URL / ``bulletin_date`` as ok (e.g. Cork
+    20/09 still in downloaded for week 04/10) before the mega stitch stubs
+    every file on disk as ok.
+    """
+    from .report import _recompute_summary, _remove_parish_from_sections
+    from .utils import format_uk_date
+
+    downloaded = [
+        item
+        for item in (report.get("downloaded") or [])
+        if isinstance(item, dict) and item.get("parish")
+    ]
+    rejected: list[dict[str, object]] = []
+    kept: list[dict] = []
+    stale_dir = (current_dir.parent / "stale") if current_dir else None
+    if stale_dir is not None:
+        stale_dir.mkdir(parents=True, exist_ok=True)
+
+    for item in downloaded:
+        key = str(item.get("parish") or "").strip()
+        url = str(item.get("url") or "").strip()
+        report_date = _parse_iso_date(item.get("bulletin_date"))
+        pdf_path: Path | None = None
+        if current_dir is not None:
+            file_name = str(item.get("file") or f"{key}.pdf").strip() or f"{key}.pdf"
+            candidate = current_dir / file_name
+            if candidate.exists():
+                pdf_path = candidate
+            elif (current_dir / f"{key}.pdf").exists():
+                pdf_path = current_dir / f"{key}.pdf"
+
+        from .fetcher import FetchResult
+
+        stub = FetchResult(
+            key=key,
+            display_name=str(item.get("display_name") or key),
+            status="ok",
+            url=url,
+            file_path=pdf_path,
+            file_type=str(item.get("file_type") or "pdf"),
+        )
+        verdict = freshness_verdict_for_ok_result(
+            stub, target, report_bulletin_date=report_date
+        )
+        if verdict.status != "stale":
+            kept.append(item)
+            continue
+
+        date_str = (
+            verdict.extracted_date.isoformat() if verdict.extracted_date else "unknown"
+        )
+        error = (
+            f"Stale bulletin rejected for mega PDF "
+            f"(bulletin date {date_str}, {verdict.reason})"
+        )
+        kept_name = None
+        if pdf_path is not None and pdf_path.exists() and stale_dir is not None:
+            dest = stale_dir / pdf_path.name
+            try:
+                pdf_path.replace(dest)
+                kept_name = dest.name
+            except OSError:
+                try:
+                    pdf_path.unlink()
+                except OSError:
+                    pass
+        elif pdf_path is not None and pdf_path.exists():
+            try:
+                pdf_path.unlink()
+            except OSError:
+                pass
+
+        stale_row = {
+            "parish": key,
+            "display_name": stub.display_name,
+            "url": url,
+            "reason": verdict.reason,
+            "retry_strategy": suggest_retry_strategy(stub),
+            "error": error,
+            "bulletin_date": date_str if date_str != "unknown" else None,
+            "bulletin_date_uk": (
+                format_uk_date(date_str) if date_str != "unknown" else None
+            ),
+        }
+        if kept_name:
+            stale_row["file"] = kept_name
+        _remove_parish_from_sections(report, key)
+        if not isinstance(report.get("stale_rejected"), list):
+            report["stale_rejected"] = []
+        report["stale_rejected"].append(
+            {k: v for k, v in stale_row.items() if v is not None}
+        )
+        rejected.append(
+            {
+                "key": key,
+                "display_name": stub.display_name,
+                "url": url,
+                "extracted_date": date_str if date_str != "unknown" else None,
+                "reason": verdict.reason,
+                "retry_strategy": stale_row["retry_strategy"],
+            }
+        )
+
+    report["downloaded"] = kept
+    _recompute_summary(report)
+    return rejected
+
+
+def build_mega_stitch_results(
+    report: dict,
+    current_dir: Path,
+    target: date,
+) -> list[FetchResult]:
+    """Build mega stitch inputs from report ``downloaded`` only (not every PDF).
+
+    Orphan PDFs left on disk from older weeks never become empty-URL ok stubs.
+    Re-runs the safety net and syncs any new stale rejects back into *report*.
+    """
+    from .fetcher import FetchResult
+    from .report import _recompute_summary, _remove_parish_from_sections
+    from .utils import format_uk_date
+
+    results: list[FetchResult] = []
+    by_key: dict[str, dict] = {}
+    for item in report.get("downloaded") or []:
+        if not isinstance(item, dict):
+            continue
+        key = str(item.get("parish") or "").strip()
+        if not key:
+            continue
+        by_key[key] = item
+        file_name = str(item.get("file") or f"{key}.pdf").strip() or f"{key}.pdf"
+        pdf_path = current_dir / file_name
+        if not pdf_path.exists():
+            pdf_path = current_dir / f"{key}.pdf"
+        if not pdf_path.exists():
+            continue
+        results.append(
+            FetchResult(
+                key=key,
+                display_name=str(item.get("display_name") or key),
+                status="ok",
+                url=str(item.get("url") or ""),
+                file_path=pdf_path,
+                file_type=str(item.get("file_type") or "pdf"),
+            )
+        )
+    apply_freshness_safety_net(results, target)
+
+    ok: list[FetchResult] = []
+    for result in results:
+        if result.status == "ok" and not result.is_stale:
+            ok.append(result)
+            continue
+        # Safety net rejected (e.g. undated URL + old PDF heading) — sync report.
+        item = by_key.get(result.key) or {}
+        date_str = None
+        if isinstance(result.diagnosis, dict):
+            date_str = result.diagnosis.get("bulletin_date")
+        stale_row = {
+            "parish": result.key,
+            "display_name": result.display_name,
+            "url": result.url or item.get("url") or "",
+            "reason": result.stale_reason or "date_behind_of_target",
+            "retry_strategy": result.retry_strategy or "manual_review",
+            "error": result.error
+            or "Stale bulletin rejected for mega PDF",
+        }
+        if date_str and date_str != "unknown":
+            stale_row["bulletin_date"] = date_str
+            stale_row["bulletin_date_uk"] = format_uk_date(str(date_str))
+        _remove_parish_from_sections(report, result.key)
+        if not isinstance(report.get("stale_rejected"), list):
+            report["stale_rejected"] = []
+        report["stale_rejected"].append(stale_row)
+
+    _recompute_summary(report)
+    return ok
+
+
 def apply_freshness_safety_net(
     results: list[FetchResult],
     target: date,
@@ -549,10 +788,11 @@ def apply_freshness_safety_net(
     Second-pass gate before mega PDF stitch.
 
     Catches stale ok results that slipped past in-fetch recovery (e.g. undated
-    URL that was actually old, or results rebuilt from cache).
+    URL that was actually old, empty-URL stitch stubs rebuilt from disk, or
+    results rebuilt from cache).
 
-    Undated URLs stay unknown unless a PDF exists and the bulletin heading
-    date is provably old (same rule as H1 ``freshness_after_unknown_url``).
+    Undated / missing URLs stay unknown unless a PDF exists and the bulletin
+    heading date is provably old (same rule as H1 ``freshness_after_unknown_url``).
     A this-week or grace-fresh heading does not invent ``fresh``.
     """
     entries_by_key = entries_by_key or {}
@@ -563,21 +803,13 @@ def apply_freshness_safety_net(
     for result in results:
         if result.is_stale:
             continue
-        if result.status != "ok" or not result.url:
+        if result.status != "ok":
+            continue
+        has_pdf = result.file_path is not None and Path(result.file_path).exists()
+        if not (result.url or "").strip() and not has_pdf:
             continue
 
-        verdict = check_bulletin_freshness(result.url, target)
-        pdf_path = result.file_path
-        if (
-            verdict.status == "unknown"
-            and pdf_path is not None
-            and Path(pdf_path).exists()
-        ):
-            from .fetcher import freshness_after_unknown_url
-
-            verdict = freshness_after_unknown_url(
-                result.url, Path(pdf_path), target
-            )
+        verdict = freshness_verdict_for_ok_result(result, target)
         if verdict.status != "stale":
             continue
 
