@@ -7,37 +7,30 @@
   "steps": [
     {
       "action": "click",
-      "selector": "a[href*=\"pdf\"]",
+      "selector": "a[href$='.pdf']",
+      "href": "https://www.odyc.net/camus/041026.pdf",
       "text": "Click Here To View The Latest Parish Newsletter In Pdf Forma",
-      "pick_strategy": "newest_dated"
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
       "use_captured_url": true
     }
   ],
-  "observed_load_ms": 2406.699951171875,
+  "observed_load_ms": 19180.10009765625,
   "timeout_ms": 55000,
   "total_timeout_s": 250,
   "playbook_type": "parish_messenger",
   "site_type": "parish_messenger",
-  "max_bulletin_pages": 8,
+  "max_bulletin_pages": 16,
   "operator_notes": [
-    "Shared Camus/Clonleigh/Leckpatrick pastoral-area newsletter is genuinely",
-    "6 pages — default cap of 4 was rejecting real content as oversized.",
     "Wait for widget to load, then pick newest View Newsletter row.",
-    "Ignore Gift Aid and Data Entry PDFs in the menu.",
-    "The real newsletter link is hosted on www.odyc.net/camus/<DDMMYY>.pdf —",
-    "NOT under a '/pdf/' folder, so a[href*=\"/pdf/\"] never matched it and",
-    "only ever matched the external drumraghparish.com Privacy Policy link",
-    "(rejected as non-bulletin, producing a hard failure). Widened selector",
-    "to a[href*=\"pdf\"] (substring, no folder assumption) to match it.",
-    "NOTE: this parish shares one PDF (Camus, Clonleigh & Leckpatrick",
-    "pastoral area newsletter) with leckpatrickparish/clonleighparish —",
-    "confirmed byte-identical across all three sites. As of 2026-08-09/10",
-    "the file served under the current week's filename still contains the",
-    "PREVIOUS week's content (2nd August, not 9th) — a parish-secretary",
-    "upload lag, not a scraper bug; flag for human review if recurring."
+    "Ignore Gift Aid and Data Entry PDFs in the menu."
   ],
   "do_not": [
     "Do not pick admin PDFs from the widget list."
@@ -46,5 +39,5 @@
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-08-10"
+  "recorded_date": "2026-10-05"
 }
