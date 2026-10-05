@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "navan",
   "display_name": "Navan (St Mary's)",
   "diocese": "meath",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.navanparish.ie/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "HTML bulletins on navanparish.ie/bulletin (27/09/2026 page exists). No this-week PDF or JPEG proved.",
+  "start_url": "https://www.navanparish.ie/bulletin/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "/s/"
+  ],
+  "post_slug_patterns": [
+    "/bulletin/"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.navanparish.ie/"
+      "url": "https://www.navanparish.ie/bulletin/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: Squarespace /bulletin/ listing has dated article slugs (04-october-2026) but no .pdf href. Follow the newest dated /bulletin/ post, then scrape /s/04-October-2026.pdf. Proved GET 200 670480 bytes magic %PDF-1.7. CDN filename 04 October 2026.pdf. PDF text names Navan Parish. Do not pin the dated /s/ file. This is not Tullamore: Navan slugs carry the Sunday date so listing scrape can score them."
+  ],
+  "do_not": [
+    "Do not pin a dated /s/ filename.",
+    "Do not copy Tullamore hashed article slugs here.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

@@ -1,19 +1,31 @@
 {
+  "version": 2,
   "parish_key": "kilskyre",
   "display_name": "Kilskyre",
   "diocese": "meath",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://kilskyreparish.ie/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week PDF or JPEG proved on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://kilskyreparish.ie/parish-bulletin/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://kilskyreparish.ie/"
+      "url": "https://kilskyreparish.ie/parish-bulletin/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: /parish-bulletin/ is the live weekly HTML bulletin (no PDF). Proved GET 200 text/html with page text Parish Bulletin 4th October 2026 and KILSKYRE & BALLINLOUGH PARISH NOTICES 4TH OCTOBER 2026. print_to_pdf + skip_listing_nav. Older Sundays are links below. Keep Irish as Irish."
+  ],
+  "do_not": [
+    "Do not pin a dated article id.",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest Facebook."
+  ]
 }
