@@ -17,6 +17,21 @@
 - Harvest 37334058753 still in progress (Kerry/Galway/Kildare diocese slices already success). Wait for stitch — do not start a second full harvest.
 - Next: Limerick leftover hunt PR #287 (2 unskips). Not LIVE until Frank names them.
 
+## 05/10/2026 — Meath leftover SKIP hunt (cloud)
+
+- Frank: more this-week parish bulletins. Meath only (`parishes/recipes/meath/`, stem `meath_diocese`). Already LIVE. Did not add LIVE_DIOCESES. Did not regenerate all docs/. Did not dispatch harvest.yml. Did not hunt Dublin/Limerick/Kerry/Galway/Kildare/Kilfenora. Did not reopen ashbourne, athboy, dunboyne, dunshaughlin, kells, kilbeggan, mullingar, ratoath, trim. Did not store facebook.com/dioceseofmeath. Mega PDF stays on.
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Unskip only GET 200 + %PDF/JPEG or proved HTML bulletin + date on the file or page.
+- **Unskipped 6** (harvest once). **Alias 1** left skip:
+  - **curraha** — https://currahaparish.ie/bulletin/ Sunday-4th-October-2026.pdf — 667553 bytes — 04/10/2026 — `http_scrape_newest_pdf`. PDF title Parishes of Ardcath/Clonalvy and Curraha.
+  - **kingscourt** — Kingscourt-Parish-Bulletin-4th-October-2026.pdf — 302517 bytes — 04/10/2026 — `wp_json_newest_media`. Do not pin phooriss.
+  - **navan** — https://www.navanparish.ie/s/04-October-2026.pdf — 670480 bytes — 04/10/2026 — listing scrape via dated `/bulletin/` slug then inner `/s/`. Do not pin `/s/`.
+  - **beauparc** — MCN camera 629 CloudFront NewsLetter — 150092 bytes — 04/10/2026 (JSON title). Kentstown camera 628 same bytes. Harvest once.
+  - **kilskyre** — https://kilskyreparish.ie/parish-bulletin/ HTML GET 200 — page text 4th October 2026 / 4TH OCTOBER 2026 — `print_to_pdf`.
+  - **clara** — https://claraparish.com/wp/category/newsletter/ HTML post Parish Newsletter- 4th October 2026 GET 200 — Mass intentions Sunday 4th October Clara and Horseleap — click first_match then `print_to_pdf`.
+  - **ardcath** stays skip (`alias_of` curraha).
+- **Left skip (honest why):** tullamore — inner `/s/Bulletin-04-10-2026-k5he.pdf` GET 200 402882 bytes %PDF this week but listing article slug is a hash with no Sunday date; user rule leave skip until listing scrape works; do not pin `/s/`. rathkenny — `/parish-bulletin/` still Sunday 30th August 2026. delvin — bulletin.php still 6th September 2026. kinnegad — Google Site newsletter still August 2026. killucan — newsletters.php Easter/2019 PDFs. kilmessan — category/newsletter last 2021. laytown — sacredheartlaytown.com did not resolve this hunt. slane / drumconrath — live sites, no this-week PDF/JPEG proved. MCN slane / rathmolyon / st-catherines — no newsletter JSON. Remaining map-only keys (ballinabrackey, ballivor, ballymore, ballynacargy, bohermeen, carnaross, castlepollard, castletowngeoghegan, castletownkilpatrick, clonmellon, collinstown, coole, dangan, donore, duleek, dunderry, dysart, eglishmeath, holyfamilydrogheda, johnstown, kilbeg, kilcloon, kilcormac, killina, lobinstown, longwood, milltown, mountnugent, moynalty, moynalvey, multyfarnham, nobber, oldcastle, oristown, rathmolyon, rochfortbridge, skryne, stamullen, stmarysdrogheda, taghmonmeath, tubber): official Wix map / no this-week twin proved. No Facebook harvest.
+- Left skip count after this pass (preferred folder, skip true): **52** including ardcath alias. Did not dispatch harvest (Frank already has a full harvest + Limerick queued).
+
 ## 05/10/2026 — Kerry / Galway / Kildare LIVE (homepage)
 
 - Frank: turn them on after PR #284 unskipped this-week Kerry/Galway/Killeigh leftovers.

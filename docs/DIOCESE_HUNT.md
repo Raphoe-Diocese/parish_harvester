@@ -57,7 +57,13 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 
 | Meath Wix map is not a parish list | https://www.dioceseofmeath.ie/map-of-parishes is Wix CMS (68 parish rows). urllib/SSR showed almost no cards. Second official list: `/priests`. Pastoral areas page has no parish hrefs. | Browser / kitchen-sink the remaining parishes. Do not harvest `facebook.com/dioceseofmeath`. |
 | Meath `/current-newsletter/` | Athboy, Dunshaughlin, Kells, Kilbeggan redirect to this-week PDF (same as Kildare). | `permanent_redirect_document` on `/current-newsletter/`. Do not pin the dated file. |
-| Meath Squarespace listing with no `.pdf` href | Tullamore `/parish-weekly-bulletin` titles the Sunday file as an article. The PDF is on an inner `/s/` page. | Skip until a listing scrape works. Do not pin `/s/Bulletin-…pdf`. |
+| Meath Squarespace listing with no `.pdf` href | Tullamore `/parish-weekly-bulletin` titles the Sunday file as an article. The PDF is on an inner `/s/` page. Article slug is a hash with no Sunday date, so `post_slug_patterns` cannot score it. | Skip until a listing scrape works. Do not pin `/s/Bulletin-…pdf`. |
+| Meath Navan Squarespace dated article + `/s/` PDF | `/bulletin/04-october-2026` carries the Sunday in the slug. Inner `/s/04-October-2026.pdf`. | `http_scrape_newest_pdf` + `post_slug_patterns` `/bulletin/`. Do not pin `/s/`. Not the same as Tullamore hashes. |
+| Meath Curraha listing + Ardcath alias | `/bulletin/` has dated Sunday PDF hrefs. PDF title names Ardcath/Clonalvy and Curraha. | `http_scrape_newest_pdf` on `/bulletin/`. Alias `ardcath`. Do not pin dated uploads. |
+| Meath Kingscourt WP media iframe | Weekly PDF is in wp-json media / post iframe, not a listing href. | `wp_json_newest_media` with `bulletin` + skip Gyproc. Do not pin `phooriss` dated names. |
+| Meath Kilskyre Joomla HTML | `/parish-bulletin/` is this week's notices (no PDF). | `html_text_bulletin` print_to_pdf + `skip_listing_nav`. |
+| Meath Clara HTML posts | `/wp/category/newsletter/` newest post is the weekly HTML newsletter. | Click `first_match` then print_to_pdf. Do not pin the dated slug. |
+| Meath Beauparc MCN leftover | Parish site newsletters stale. Camera JSON has this-week PDF. Kentstown camera same bytes. | `mcn_live_parish_page` id 629. Harvest once. Do not pin CloudFront UUID. |
 | `mcn.live` /Camera/ | Webcam page. Weekly PDF is in the church profile JSON (Glenfin and others Frank trained). | `mcn_live_parish_page`. Do not harvest the stream. Do not pin a dated file. |
 | `churchmedia.tv` | “View Our Latest Newsletter” on the livestream page (Portaferry). | `churchmedia_newsletter`. Do not pin `/newsletter/<token>`. |
 | `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the page. Do not invent a PDF. Do not harvest the stream. |
