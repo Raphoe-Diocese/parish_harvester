@@ -604,7 +604,8 @@
       "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Do not pin the dated uploads path.",
       "operator_notes": [
         "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
-        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only."
+        "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only.",
+        "05/10/2026 Kildare leftover: Kilcock /current-newsletter/ → 27th-Sunday-in-Ordinary-Time-.pdf 2818821 bytes (04/10 liturgical). Monasterevin /current-newsletter/ → 3341_001.pdf 644493 bytes (listing text 4th October). Abbeyleix still June 2020 — leave skip."
       ],
       "do_not": [
         "Do not pin the dated PDF filename.",
@@ -613,9 +614,59 @@
       "example_parishes": [
         "bagenalstown",
         "borris",
-        "mountmellick"
+        "mountmellick",
+        "kilcockandnewtownparish",
+        "monasterevin"
       ],
-      "success_count": 3
+      "success_count": 5
+    },
+    "kildare_leftover_kitchen_sink+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Kildare leftover live-twin newsletter listing",
+      "advice": "kandle.ie card alone is not enough. Kitchen-sink the parish host. Score filename date. Quote spaces in UploadFiles paths. Do not pin UUID or scanner ids.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: kildareparish.ie/newsletter/ 4th-October PDF 1478663 bytes (alias nurneykildangan). graiguecullenkilleshin.com homepage 4th-October-Newsletter-2026.pdf 534581 bytes (/newsletter/ archive stale). mountrathparish.ie NewsLetters 4th Oct PDF 285268 bytes (alias ballyfin; UUID in name)."
+      ],
+      "do_not": [
+        "Do not pin dated PDF names or UUID/scanner ids.",
+        "Do not harvest shared Naas / Mountrath / Kildare files twice.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "kildareparish",
+        "graiguecullenkilleshin",
+        "mountrath"
+      ],
+      "success_count": 3,
+      "match_hints": [
+        "newsletter",
+        "NewsLetters",
+        "October",
+        "parish"
+      ]
+    },
+    "kildare_kill_parishnewsletter_html+html_text_bulletin": {
+      "page_type": "html_newsletter",
+      "recipe_flow": "html_text_bulletin",
+      "label": "Kill parishnewsletter.killparish.ie HTML weekly post",
+      "advice": "Weekly bulletin is an HTML WP post; body may be a PNG image on the page. Click first_match on the listing then print_to_pdf. Do not pin the dated slug. Missalette JPEG on killparish.ie is not the newsletter.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: https://parishnewsletter.killparish.ie/04-october-2026/ GET 200 text/html. Page text 04 October 2026 Parish Newsletter."
+      ],
+      "do_not": [
+        "Do not pin a dated post slug.",
+        "Do not harvest the missalette JPEG as the bulletin.",
+        "Do not remove skip_listing_nav."
+      ],
+      "example_parishes": [
+        "killardcloughjohnstown"
+      ],
+      "success_count": 1,
+      "match_hints": [
+        "parishnewsletter.killparish.ie",
+        "October"
+      ]
     },
     "wp_json+direct_download": {
       "page_type": "wp_json",

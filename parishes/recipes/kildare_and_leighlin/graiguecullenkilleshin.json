@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "graiguecullenkilleshin",
   "display_name": "Graiguecullen/Killeshin",
   "diocese": "kildare_and_leighlin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/graiguecullen-killeshin/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://www.graiguecullenkilleshin.com/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "Newsletter",
+    "October",
+    "September",
+    "2026"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/graiguecullen-killeshin/"
+      "url": "https://www.graiguecullenkilleshin.com/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: homepage links 4th-October-Newsletter-2026.pdf. Proved GET 200 application/pdf 534581 bytes %PDF. /newsletter/ archive still showed May 2025. Do not pin the dated name."
+  ],
+  "do_not": [
+    "Do not pin the dated PDF.",
+    "Do not scrape the stale /newsletter/ archive alone.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
