@@ -1,19 +1,33 @@
 {
+  "version": 2,
   "parish_key": "castlegar",
   "display_name": "Castlegar / Coolough",
   "diocese": "galway",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://clonfertgalway.ie/parish/castlegar-coolough/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 Galway kitchen-sink still open. Do not invent Facebook PDFs.",
+  "start_url": "https://churchmedia.tv/st-columba",
+  "site_type": "churchmedia_newsletter",
+  "playbook_type": "churchmedia_latest_newsletter",
+  "churchmedia_slug": "st-columba",
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://clonfertgalway.ie/parish/castlegar-coolough/"
+      "url": "https://churchmedia.tv/st-columba"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: official clonfertgalway card had no file. Kitchen-sink found churchmedia.tv/st-columba (St Columba's Castlegar + Coolough).",
+    "GET /api/getChannelAbout?slug=st-columba → newsletter_enable 1 + newsletter_url. Proved current PDF GET 200 application/pdf 633410 bytes magic %PDF. PDF text 4th Oct 2026 / 27th Sunday in Ordinary Time. Keep Irish (Míle Buíochas).",
+    "Do not pin /newsletter/<token>.st-columba.pdf?cb=."
+  ],
+  "do_not": [
+    "Do not pin the churchmedia newsletter token or ?cb= cache-buster.",
+    "Do not harvest Facebook.",
+    "Do not harvest Coolough separately — same Castlegar weekly file."
+  ]
 }

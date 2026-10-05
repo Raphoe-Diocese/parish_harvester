@@ -1,3 +1,15 @@
+## 05/10/2026 — Galway leftover SKIP hunt (cloud)
+
+- Frank: more this-week parish bulletins. Galway only (`parishes/recipes/galway/`, stem `galway_diocese`). Already LIVE (homepage key galway-kilmacduagh-and-kilfenora). Did not add LIVE_DIOCESES. Did not regenerate all docs/. Did not dispatch harvest.yml. Did not download mega PDFs. Did not hunt Dublin/Meath/Kerry/Ossory/Tuam/Waterford/Limerick/Kildare this pass. Did not reopen moycullen, knocknacarra (PR #284), stjosephgalway, galwaycathedral. ballinderreen stays alias_of kinvara.
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Unskip only GET 200 + %PDF/JPEG + date on the file or page. No Facebook. No pin dated names. Score filename not upload folder.
+- **Unskipped 2**
+  - **bearna** — https://barnafurboparish.ie/wp-content/uploads/2026/10/4thOct2026.pdf — 614061 bytes — 04/10/2026 — Weekly Duilleog listing scrape. Keep Irish.
+  - **castlegar** — churchmedia.tv/st-columba newsletter PDF — 633410 bytes — 04/10/2026 (PDF text 4th Oct 2026). Covers Coolough. Do not pin token.
+- **Left skip on purpose (alias):** ballinderreen (`alias_of` kinvara).
+- **Left skip (honest why):** ballyvaughan homepage newsletter still 20/09/2026. lisdoonvarna archive is PNG screenshots of 04/10 (PNG not JPEG/PDF). killanninparish.ie + MCN st-annins-church id 443 have no newsletter; seipeal-n-ainnin-2 Nuachtlitir is Paróiste an Chnoic Indreabhán (not this key). ardrahan-kilchreest.com newest media June 2025. oranmore Sunday Leaflets are on Google Drive (no proved public PDF/JPEG). salthillparish.ie HTTP 202 bot wall; MCN christ-the-king-church-salthill id 104 no newsletter JSON. mervueparish.ie no weekly file; churchmedia st-columba is Castlegar. ennistymonparish.ie domain default page / cert mismatch. clarinbridgeparish.ie no newsletter path. Remaining clonfertgalway cards (anspideal, ballinfoyle, ballybane, carron, clarinbridge, craughwell, ennistymon, goodshepherd, gort, kilbeacanty, kilfenora, leitirmoir, liscannor, mervue, oranmore, oughterard, renmore, rosmuc, sacredheartgalway, salthill, shrule, staugustine, stmarycladdagh, stpatrickgalway): no this-week twin proved. No Facebook.
+- **Left skip counts after this pass:** galway skip **29** (including ballinderreen alias) / harvestable **8** (6 already active + 2 this pass). Mega PDF stays on.
+- Next: merge this PR then harvest `galway_diocese` when Frank says go. Do not harvest.
+
 ## 05/10/2026 — Ossory leftover SKIP hunt (cloud)
 
 - Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Ossory already LIVE. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not reopen PR #281 keys (inistioge, rathdowney, stcanices, stjohns, thomastown). Did not hunt Dublin/Meath/Kerry/Limerick/Galway/Kildare this pass.
