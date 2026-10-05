@@ -1,19 +1,33 @@
 {
+  "version": 2,
   "parish_key": "blackrockdublin",
   "display_name": "Blackrock",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.sjb.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://sjb.ie/current-newsletter/",
+  "site_type": "permanent_redirect_document",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.sjb.ie"
+      "action": "download",
+      "url": "https://sjb.ie/current-newsletter/",
+      "use_target_url": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: /current-newsletter/ redirects to this-week PDF (same Pattern F as Naas/Meath).",
+    "Proved GET 200 application/pdf 337847 bytes magic %PDF. Redirect file Newsletter-4th-October-2026.-AutoRecovered.pdf date 04/10/2026.",
+    "Do not pin the dated upload."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "playbook_type": "direct_download"
 }

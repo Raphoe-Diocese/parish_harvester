@@ -1,19 +1,43 @@
 {
+  "version": 2,
   "parish_key": "donnycarney",
   "display_name": "Donnycarney",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.donnycarneyparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.donnycarneyparish.ie/",
+  "site_type": "wp_json_newest_media",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.donnycarneyparish.ie"
+      "url": "https://www.donnycarneyparish.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: weekly PDF in wp-json media. Homepage dated posts do not always expose the .pdf href.",
+    "Proved Newsletter-online-4.10.2026pub.pdf GET 200 application/pdf 1438926 bytes magic %PDF. Date 04/10/2026.",
+    "Skip JPEG previews. Do not pin the dated filename or the dated post slug."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "href_patterns": [
+    ".pdf",
+    "Newsletter"
+  ],
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x",
+    "-1024x",
+    "-150x"
+  ]
 }

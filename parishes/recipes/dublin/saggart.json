@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "saggart",
   "display_name": "Saggart",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.srbnparishes.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://srbnparishes.ie/",
+  "site_type": "http_scrape_newest_pdf",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.srbnparishes.ie"
+      "url": "https://srbnparishes.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: SRBN hub srbnparishes.ie (Saggart, Rathcoole, Brittas, Newcastle). One weekly PDF.",
+    "Proved 2026-10-Oct-04-News-.pdf GET 200 application/pdf 199631 bytes magic %PDF. Filename date 04/10/2026. Trailing hyphen in the live name.",
+    "Harvest once under saggart. Newcastle is alias_of this key. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "href_patterns": [
+    "News",
+    "Oct",
+    ".pdf"
+  ]
 }

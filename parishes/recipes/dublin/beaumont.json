@@ -1,19 +1,35 @@
 {
+  "version": 2,
   "parish_key": "beaumont",
   "display_name": "Beaumont",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://holychildnativity.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://holychildnativity.ie/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://holychildnativity.ie"
+      "url": "https://holychildnativity.ie/newsletters/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: listing /newsletters/ has NewsletterDD.MM.26.pdf.",
+    "Proved Newsletter04.10.26.pdf GET 200 application/pdf 6206708 bytes magic %PDF. Filename date 04/10/2026.",
+    "Homepage also links the same file. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "href_patterns": [
+    "Newsletter",
+    ".pdf"
+  ]
 }

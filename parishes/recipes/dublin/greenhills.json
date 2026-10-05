@@ -1,19 +1,35 @@
 {
+  "version": 2,
   "parish_key": "greenhills",
   "display_name": "Greenhills",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.holyspiritparishgreenhills.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.holyspiritparishgreenhills.ie/newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.holyspiritparishgreenhills.ie"
+      "url": "https://www.holyspiritparishgreenhills.ie/newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: listing /newsletter/.",
+    "Proved Nl041026.pdf GET 200 application/pdf 312247 bytes magic %PDF. Filename date 04/10/2026.",
+    "Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "href_patterns": [
+    "Nl",
+    ".pdf"
+  ]
 }

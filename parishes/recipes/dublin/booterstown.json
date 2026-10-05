@@ -1,19 +1,43 @@
 {
+  "version": 2,
   "parish_key": "booterstown",
   "display_name": "Booterstown",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.booterstownparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://booterstownparish.ie/",
+  "site_type": "wp_json_newest_media",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.booterstownparish.ie"
+      "url": "https://booterstownparish.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: weekly PDF is in wp-json media. Listing /newsletter/ is a webp, not the file.",
+    "Proved Sun-4-October-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1675137 bytes magic %PDF. Date 04/10/2026.",
+    "Skip JPEG previews of the same PDF. Do not pin the dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "href_patterns": [
+    ".pdf",
+    "Newsletter"
+  ],
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x",
+    "-1024x",
+    "-150x"
+  ]
 }

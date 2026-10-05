@@ -71,7 +71,8 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Upload folder is not the Sunday | Balally PDF lives in `/wp-content/uploads/2020/06/` with filename `4th-October-2026-…`. Tuam cathedral PDF lives in `/2026/06/` with filename `Newsletter-October-4th-2026.pdf`. | Score filename date. Do not date-rewrite the folder. Same lesson as Killala ChurchTV `/2021/02/`. |
 | Ossory cards 403 | ossory.ie parish pages often hit SiteGround captcha from cloud IP. | Kitchen-sink `{parish}parish.ie`. Do not pin dated names. Castlecomer listing titles Twenty sixth Sunday but the PDF filename has no date — leave skip until the file itself is dated. |
 | Tuam vocations.ie | Many parish-details cards repeat vocations.ie from the diocese footer. | Ignore. Use the real parish host (castlebarparish.ie, tuamparish.com, athenryparish.ie). |
-| Shared Dublin / Waterford files | Edenmore + Grange Park same stbenedicts-stmonicas PDF. Narraghmore + Moone same listing. St Paul’s + Butlerstown same stpaulsandbutlerstown.ie PDF. | Harvest once. Alias the other key. |
+| Shared Dublin / Waterford files | Edenmore + Grange Park same stbenedicts-stmonicas PDF. Narraghmore + Moone same listing. St Paul’s + Butlerstown same stpaulsandbutlerstown.ie PDF. Portmarnock + Kinsealy same `/newsletters/` PDF. Saggart + Newcastle same `srbnparishes.ie` PDF. | Harvest once. Alias the other key. |
+| Dublin leftover kitchen-sink 05/10/2026 | Skip recipes still had a parish host. Later week: `/newsletters/` dated JPEG (Ardlea), `/current-newsletter/` (Blackrock SJB), wp-json `NL2026-MM-DD.pdf` (Terenure), SRBN hub trailing-hyphen `2026-10-Oct-04-News-.pdf`. Firhouse `Weekly-Notice-Partners.pdf` is the amalgam. | Unskip only GET 200 `%PDF`/JPEG + date. Alias shared files. Do not pin dated names. Squarespace `/s/` (Malahide) and Wix `October.pdf` (Balbriggan) stay skip until listing scrape works. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
