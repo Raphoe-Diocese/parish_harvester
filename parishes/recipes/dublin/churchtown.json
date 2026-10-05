@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "churchtown",
   "display_name": "Churchtown",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.goodshepherdchurchtown.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://churchtownparish.com/newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.goodshepherdchurchtown.ie"
+      "url": "https://churchtownparish.com/newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 Dublin leftover hunt: official card goodshepherdchurchtown.ie redirects to churchtownparish.com.",
+    "Proved Newsletter-Sunday-Message-4th-October-2026.pdf GET 200 application/pdf 1451104 bytes magic %PDF. Date 04/10/2026. Folder /2026/09/ is not the Sunday.",
+    "Score the filename. Do not pin the dated PDF."
+  ],
+  "do_not": [
+    "Do not pin a dated filename or Wix hash.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "href_patterns": [
+    "Newsletter",
+    "October",
+    ".pdf"
+  ]
 }

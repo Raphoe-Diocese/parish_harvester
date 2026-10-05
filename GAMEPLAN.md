@@ -70,6 +70,28 @@
 - Full harvest 37334058753 stitch succeeded (`18cb286c`). Limerick harvest 37344128063 succeeded. Kerry harvest 37346761881 in progress.
 - Next: merge Meath PR #290 then harvest `meath_diocese` after Kerry. Not extra LIVE dioceses until Frank names them.
 
+## 05/10/2026 — Dublin leftover SKIP hunt (cloud)
+
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Dublin only. Did not reopen PR #281 Dublin 25. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not hunt Limerick/Kerry/Galway/Kildare/Kilfenora.
+- **Unskipped 14** after GET 200 + `%PDF`/JPEG + date on the file (aliases stay skip):
+  - ardlea — https://johnvianneydublin.com/newsletters.php — JPEG 208259 bytes — 04/10/2026
+  - beaumont — https://holychildnativity.ie/wp-content/uploads/newsletters/2026/10/Newsletter04.10.26.pdf — 6206708 — 04/10/2026
+  - blackrockdublin — https://sjb.ie/current-newsletter/ — 337847 — 04/10/2026
+  - booterstown — https://booterstownparish.ie/wp-content/uploads/2026/10/Sun-4-October-2026-Booterstown-Weekly-Newsletter.pdf — 1675137 — 04/10/2026
+  - churchtown — https://churchtownparish.com/wp-content/uploads/2026/09/Newsletter-Sunday-Message-4th-October-2026.pdf — 1451104 — 04/10/2026
+  - donnycarney — https://donnycarneyparish.ie/wp-content/uploads/2026/10/Newsletter-online-4.10.2026pub.pdf — 1438926 — 04/10/2026
+  - firhouse — https://firhouseparish.ie/wp-content/uploads/2026/10/2026-10-04-Weekly-Notice.pdf — 378580 — 04/10/2026
+  - foxrock — https://foxrockparish.ie/wp-content/uploads/2026/09/Newsletter-September-27th-2026.pdf — 367076 — 27/09/2026
+  - greenhills — https://www.holyspiritparishgreenhills.ie/wp-content/uploads/2026/10/Nl041026.pdf — 312247 — 04/10/2026
+  - milltowndublin — https://milltownparish.ie/wp-content/uploads/2026/10/Weekly-Bulletin-Sunday-October-4th-2026.pdf — 655698 — 04/10/2026
+  - mourneroad — https://mourneroad.ie/wp-content/uploads/2026/10/20261004.pdf — 1587296 — 04/10/2026
+  - portmarnock — https://www.portmarnockparish.ie/_webedit/uploaded-files/All%20Files/Newsletter%204th%20October%202026.pdf — 327871 — 04/10/2026
+  - saggart — https://srbnparishes.ie/wp-content/uploads/2026/10/2026-10-Oct-04-News-.pdf — 199631 — 04/10/2026
+  - terenure — https://stjosephsterenure.com/wp-content/uploads/2026/09/NL2026-09-27.pdf — 1230623 — 27/09/2026
+- **Left skip on purpose (aliases, not a second harvest):** kinsealy (`alias_of` portmarnock), newcastledublin (`alias_of` saggart). grangepark and moone already shared from PR #281.
+- **Left skip (honest why):** Knocklyon weekly page still August. Malahide Squarespace `/s/` dated PDF — do not pin (same as Tullamore). Balbriggan Wix post titled 4 October but no scrapeable PDF without a hash. Maynooth 27/09 PDF exists on a dated notice slug; `/current-newsletter/` is a March 2026 youth PDF. Ballyroan `Parish-newsletter-2026-03rd-1.pdf` filename has no parseable Sunday. Loughlinstown `Oct-4th.pdf` has no year in the name. Confey only a small dated JPEG poster. Bray CCI 150x150 thumbnails are not parish bulletins. Donaghmede Peoples Mass `26.10.04` is not this week’s bulletin. City Quay / Templeogue / Palmerstown / Lucan / Westland Row leftover hosts had no this-week PDF/JPEG. Remaining official-card-only rows (Bawnogue, Brookfield, vocations/footer) still have no parish weekly file. Facebook stays skip.
+- Dublin skip after this pass: 155 including 4 shared aliases. Mega PDF stays on. Frank should merge later — harvest already queued; do not dispatch another harvest.yml.
+
 ## 05/10/2026 — Kerry / Galway / Kildare LIVE (homepage)
 
 - Frank: turn them on after PR #284 unskipped this-week Kerry/Galway/Killeigh leftovers.
