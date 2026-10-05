@@ -1,10 +1,18 @@
+## 05/10/2026 — Recipe Brain 24/7 hub scan (Frank)
+
+- Frank: hunt 24/7, learn from past wins, tell the brain on the repo.
+- GitHub Actions every 6 hours: `.github/workflows/recipe-brain-hunt.yml` → `scripts/recipe_brain_hub_scan.py --apply`. Not this laptop. Not a full harvest. Mega PDF stays on harvest.yml.
+- Remembered tricks: MCN, churchmedia, mayo.ie, `/current-newsletter/` (Naas), WordPress media / `/newsletters/` (Ashbourne / Askea). A win increments `parishes/site_patterns.json`.
+- Unskip only GET 200 + %PDF/JPEG + date on the file. Facebook, aliases, diocese directory cards stay skip. Kitchen-sink search stays cloud-only.
+- Does not click Harvest. Does not invent dates.
+
 ## 03/10/2026 — Dublin / Ossory / Tuam / Waterford LIVE (homepage)
 
 - Frank: turn them on. PR #281 already merged (37 unskips).
 - Added `dublin`, `ossory`, `tuam`, `waterford-and-lismore` to `LIVE_DIOCESES` + four Wikimedia cathedral heroes (GET 200 JPEG, CC).
 - Regenerated only `docs/index.html` + those four diocese viewers. Homepage now 21 live cards, coming soon (5). Galway / Kerry / Kildare / Kilfenora / Limerick stay coming soon.
 - Stitch fix also on this push (`PYTHONPATH` + repo root in merge script) so the next `all` harvest can stitch.
-- **Not live yet** until push + GitHub Pages. Do not say done on parishpress.ie until the live URL shows the four cards.
+- **Live-proved 05/10/2026** on https://www.parishpress.ie/: Dublin, Ossory, Tuam, Waterford & Lismore cards + coming soon (5). PR #282 merge `e1483013`.
 - Limerick / Kildare / Kerry / Galway still not LIVE unless Frank names them.
 
 ## 03/10/2026 — Dublin / Ossory / Tuam / Waterford hunt START

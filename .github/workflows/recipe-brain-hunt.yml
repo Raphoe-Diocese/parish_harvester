@@ -1,0 +1,43 @@
+name: Recipe Brain hub scan
+
+# Night-and-day skip scan on GitHub, not Frank's laptop.
+# Reuses proved tricks (MCN, churchmedia, mayo.ie, /current-newsletter/, wp-json).
+# Unskips only after GET 200 + %PDF/JPEG + date on the file.
+
+on:
+  schedule:
+    - cron: '20 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recipe-brain-hunt
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Hub scan skipped recipes
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python scripts/recipe_brain_hub_scan.py --limit 25 --apply
+
+      - name: Commit Recipe Brain wins
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add parishes/recipes parishes/site_patterns.json parishes/recipe_brain_cursor.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Recipe Brain: remember proved skip-parish hub wins."
+          git push origin HEAD:main
