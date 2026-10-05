@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "mountrath",
   "display_name": "Mountrath",
   "diocese": "kildare_and_leighlin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/mountrath/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://www.mountrathparish.ie/NewsLetters/Mountrath-NewsLetters",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "Newsletter",
+    "Oct",
+    "Sept",
+    "2026"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/mountrath/"
+      "url": "https://www.mountrathparish.ie/NewsLetters/Mountrath-NewsLetters"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: mountrathparish.ie NewsLetters listing. Proved Mountrath Parish Newsletter 4th Oct. 2026_….pdf GET 200 application/pdf 285268 bytes %PDF. Site header is Mountrath & Ballyfin Parishes — harvest once under mountrath. Filename has a UUID — do not pin it."
+  ],
+  "do_not": [
+    "Do not pin the UUID PDF name.",
+    "Do not harvest ballyfin as a second copy of this file.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

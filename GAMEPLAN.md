@@ -1,3 +1,20 @@
+## 05/10/2026 — Kildare leftover SKIP hunt (cloud)
+
+- Frank: more this-week parish bulletins. Kildare and Leighlin only (`parishes/recipes/kildare_and_leighlin/`, stem `kildare_and_leighlin_diocese`). Already LIVE. Did not add LIVE_DIOCESES. Did not regenerate all docs/. Did not dispatch harvest.yml. Did not download mega PDFs. Did not hunt Dublin/Meath/Kerry/Ossory/Tuam/Waterford/Limerick/Galway this pass.
+- Did not reopen killeigh (PR #284), askea / bennekerry / tinryland, or bagenalstown / borris / mountmellick / edenderry / portarlington.
+- Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Unskip only GET 200 + `%PDF`/JPEG or proved HTML bulletin + date on the file or page.
+- **Unskipped 6** (harvest once). **Alias 4** left skip (plus askea aliases already set):
+  - **kilcockandnewtownparish** — https://www.kilcockandnewtownparish.ie/current-newsletter/ → 27th-Sunday-in-Ordinary-Time-.pdf — 2818821 bytes — 04/10/2026 (liturgical 27th Sunday; `/2026/10/`) — Pattern F.
+  - **kildareparish** — https://kildareparish.ie/wp-content/uploads/2026/10/Kildare-Parish-Newsletter-4th-October-2026.pdf — 1478663 bytes — 04/10/2026 — `/newsletter/` scrape.
+  - **graiguecullenkilleshin** — https://www.graiguecullenkilleshin.com/wp-content/uploads/2026/10/4th-October-Newsletter-2026.pdf — 534581 bytes — 04/10/2026 — homepage scrape (`/newsletter/` archive stale).
+  - **monasterevin** — https://www.monasterevinparish.ie/current-newsletter/ → 3341_001.pdf — 644493 bytes — 04/10/2026 (listing link text 4th October; CreationDate 20261002) — Pattern F; do not pin scanner id.
+  - **killardcloughjohnstown** — https://parishnewsletter.killparish.ie/04-october-2026/ HTML GET 200 — page text 04 October 2026 — click first_match then `print_to_pdf` (PNG on page is not a harvestable JPEG).
+  - **mountrath** — https://www.mountrathparish.ie/…/Mountrath Parish Newsletter 4th Oct. 2026_….pdf — 285268 bytes — 04/10/2026 — NewsLetters listing scrape; do not pin UUID.
+  - **nurneykildangan** stays skip (`alias_of` kildareparish). **ballyfin** stays skip (`alias_of` mountrath). **sallins** + **twomilehouse** stay skip (`alias_of` naas).
+- **Left skip on purpose (known):** abbeyleix — `/current-newsletter/` still June-14th.pdf June 2020. newbridgekandle — newbridgeparish.ie cloud GET 403; prior churchmedia too old unless this-week proved. kilcock was unskipped this pass (newly proved).
+- **Left skip (honest why):** allenparish.ie SSL handshake timeout; caraghparish.ie / clonaslee.com DNS fail; caraghparish.net + prosperousparish.net + svtparish.ie + newbridgeparish.ie HTTP 403; hacketstown current-newsletter HTML with no this-week PDF in media; ballyadams newsletter archive still 2018; ballinakillknockparish.com no PDF; rosenallis.org self-signed tiny park page; rathoens.wordpress.com no this-week file; remaining kandle.ie card-only keys (ballonrathoe, caragh, caraghprosperous, carbury, clonbullogue, clonegal, cooleraghstaplestown, curraghcamp, daingean, doonane, emo, graignamanagh, myshall, paulstown, raheen, rathangankandle, rhode, stmullins, stradbally, suncroft): no this-week twin proved. No Facebook harvest.
+- Left skip count after this pass: **34** (including 6 aliases) / harvestable **24**. Mega PDF stays on in harvest.yml. Irish stays Irish.
+- Next: merge this PR then harvest `kildare_and_leighlin_diocese`. Do not pin Monasterevin `3341_001` or Mountrath UUID names.
 ## 05/10/2026 — Waterford and Lismore leftover SKIP hunt (cloud)
 
 - Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Cloud only. Waterford and Lismore already LIVE. Did not add LIVE_DIOCESES. Did not dispatch harvest.yml. Did not regenerate all docs/. Did not download mega PDFs. Did not reopen PR #281 keys (tramore, stpaulswaterford). Did not hunt Dublin/Meath/Kerry/Ossory/Tuam/Limerick/Galway/Kildare this pass. Mega PDF stays on.
