@@ -1,3 +1,15 @@
+## 05/10/2026 night — Limerick LIVE + Kilfenora honest (cloud)
+
+- Frank named **Limerick** and **Kilfenora**. Earlier ban lifted.
+- **Limerick LIVE:** added `limerick` to `LIVE_DIOCESES` + St John's Cathedral hero (Wikimedia Dieglop CC BY-SA 4.0, GET 200 JPEG). Regenerated only `docs/index.html` + `docs/dioceses/limerick/`. Homepage card **3/60** (status before next harvest). Coming-soon list gone (was 2).
+- **Kilfenora honest:** removed duplicate `Kilfenora-and-Kilmacduagh` from `_CANONICAL_DIOCESES`. Already covered by live Galway card `galway-kilmacduagh-and-kilfenora`. Old stub `docs/dioceses/kilfenora-and-kilmacduagh/` is now a redirect to the Galway viewer. Did not invent a second LIVE diocese.
+- **Unskipped 1** this-week Limerick leftover:
+  - **stjosephs** — https://stjosephsparish.ie/current-newsletter/ → 4th-October.pdf — 372227 bytes — 04/10/2026 — Pattern F. Live twin (not diocese card). Do not pin dated name.
+- Monaleen example_url refreshed to 4th-Oct-26.pdf (already harvestable).
+- **Left skip (honest why):** Cratloe/Sixmilebridge — do **not** use sixmilebridgeparish.ie (Killaloe Sixmilebridge & Kilmurry). Askeaton latest Dec 2025. DKR Dec 2025. Most remaining cards are limerickdiocese.org only / Facebook / dead host guesses. Kilfenora-area galway skips unchanged (ballyvaughan 20/09; lisdoonvarna PNG; clonfertgalway cards).
+- Did not dispatch harvest.yml. Did not regenerate all docs/ diocese pages. Mega PDF stays on. Irish stays Irish.
+- Next: merge this PR → harvest `limerick_diocese` when Frank says go. Then continue Armagh continuous hunt (beragh `/pdf/041026.pdf` + dunleer Pattern F already probed this session).
+
 ## 05/10/2026 night — OLD BULLETINS ON LIVE SITE (NOW)
 
 - Frank screenshot: Ardara OCR week beginning 13/09/2026. Fix PR #302 then Full harvest + OCR. Not live yet. See docs/WEBSITE_OCR_BACKLOG.md NOW item.

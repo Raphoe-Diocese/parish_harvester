@@ -57,6 +57,7 @@ LIVE_DIOCESES = {
     "galway-kilmacduagh-and-kilfenora",
     "kerry",
     "kildare-and-leighlin",
+    "limerick",
 }
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
@@ -486,6 +487,20 @@ HERO_SLIDES: list[HeroSlide] = [
         title="Cathedral of the Assumption, Carlow",
         subtitle="This week's Kildare and Leighlin parish bulletins.",
     ),
+    HeroSlide(
+        diocese_key="limerick",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/"
+            "Limerick_-_St_Johns_Cathedral_-_20240120031001.jpg/"
+            "1280px-Limerick_-_St_Johns_Cathedral_-_20240120031001.jpg"
+        ),
+        credit="Photo: Dieglop / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #1a2430 0%, #3a5068 55%, #a8c0d8 100%)",
+        eyebrow="Limerick Diocese",
+        title="St John's Cathedral, Limerick",
+        subtitle="This week's Limerick parish bulletins.",
+    ),
 ]
 
 
@@ -555,7 +570,6 @@ _CANONICAL_DIOCESES = [
     "Galway Kilmacduagh and Kilfenora",
     "Kerry",
     "Kildare and Leighlin",
-    "Kilfenora-and-Kilmacduagh",
     "Killala",
     "Killaloe",
     "Kilmore",
@@ -1187,6 +1201,15 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     live_cards_html = "".join(_live_card(row) for row in live_rows)
 
     other_rows_html = "".join(_coming_soon_item_html(row) for row in other_rows)
+    # Honest homepage: do not show an empty "coming soon (0)" when every
+    # canonical diocese is already LIVE (Kilfenora is covered by Galway).
+    more_dioceses_html = ""
+    if other_rows:
+        more_dioceses_html = f"""    <details class=\"more-dioceses\">
+      <summary>More dioceses — coming soon ({len(other_rows)})</summary>
+      <p class=\"more-dioceses-note\">These dioceses don't have reliability data yet. Tap a name to see what's available so far.</p>
+      <ul class=\"more-dioceses-grid\">{other_rows_html}</ul>
+    </details>"""
 
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
@@ -1328,11 +1351,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     </div>
     <p class=\"section-title\">Live dioceses</p>
     <section class=\"live-grid\">{live_cards_html}</section>
-    <details class=\"more-dioceses\">
-      <summary>More dioceses — coming soon ({len(other_rows)})</summary>
-      <p class=\"more-dioceses-note\">These dioceses don't have reliability data yet. Tap a name to see what's available so far.</p>
-      <ul class=\"more-dioceses-grid\">{other_rows_html}</ul>
-    </details>
+{more_dioceses_html}
   </main>
   <footer class=\"footer\">
     <p class=\"photo-credit\">{html.escape(_photo_credit_line())}</p>
