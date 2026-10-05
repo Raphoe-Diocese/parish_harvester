@@ -24,13 +24,14 @@ Kitchen-sink search (Google / Bing / Yahoo) stays in [`DIOCESE_HUNT.md`](DIOCESE
 
 ## 24/7
 
-Sunday harvest on GitHub Actions is the repeating job (`harvest.yml` 09:00 UTC). This PC must not run a full harvest or mega PDF.
-
-A night-and-day skip-parish hub scan on Actions is **Next**, not this turn. Do not start it on the laptop.
+1. Sunday harvest on GitHub Actions (`harvest.yml` 09:00 UTC) still downloads this week's PDFs. This PC must not run a full harvest or mega PDF.
+2. **Skip-parish hub scan** runs every 6 hours (`recipe-brain-hunt.yml`). It only retries remembered tricks (MCN, churchmedia, mayo.ie, `/current-newsletter/`, WordPress media / newsletters). Unskip only after GET 200 + `%PDF` or JPEG + a date on the file. Wins are written into `parishes/site_patterns.json`. Facebook and diocese directory cards stay skip. Kitchen-sink Google/Bing stays in cloud hunts, not this scanner.
 
 ## Code
 
 - Hints from a URL: `harvester/recipe_brain.py` `hint_for_url`
+- Remember a win: `harvester/recipe_brain.py` `remember_win` → `parishes/site_patterns.json`
+- 24/7 scan: `scripts/recipe_brain_hub_scan.py` + `.github/workflows/recipe-brain-hunt.yml`
+- Scan cursor (next batch of skips): `parishes/recipe_brain_cursor.json`
 - Trainer catalog: `extension/site_memory.js`
-- Learned patterns: `parishes/site_patterns.json`
-- Hunt command: `docs/DIOCESE_HUNT.md`
+- Hunt command (kitchen-sink, not 24/7): `docs/DIOCESE_HUNT.md`

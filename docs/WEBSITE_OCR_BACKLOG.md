@@ -54,7 +54,7 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **todo** · 2026-10-03 · **Dublin / Ossory / Tuam / Waterford not live yet.** All four in `LIVE_DIOCESES` with cathedral heroes; generated homepage has 21 live cards + coming soon (5). Not on https://www.parishpress.ie/ until push + Pages. · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/dublin|ossory|tuam|waterford-and-lismore/`
+- [x] **done** · 2026-10-05 · **Dublin / Ossory / Tuam / Waterford live** on parishpress.ie. PR #282 merge `e1483013`. Live-proved 05/10: homepage has all four cards + coming soon (5). · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/dublin|ossory|tuam|waterford-and-lismore/`
 
 - [x] **done** · 2026-10-03 · **Meath live** on parishpress.ie: `meath` in `LIVE_DIOCESES` + Mullingar cathedral hero. Live-proved earlier this turn on homepage (Meath Diocese + coming soon (9) before the four-diocese turn-on). · `harvester/site_builder.py`, `docs/index.html`, `docs/dioceses/meath/`
 
