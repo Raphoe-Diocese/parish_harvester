@@ -1,19 +1,45 @@
 {
+  "version": 2,
   "parish_key": "clara",
   "display_name": "Clara",
   "diocese": "meath",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://claraparish.com/wp/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "claraparish.com/wp has HTML newsletter posts (27/09/2026). No this-week PDF proved.",
+  "start_url": "https://claraparish.com/wp/category/newsletter/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "https://claraparish.com/wp/"
+      "url": "https://claraparish.com/wp/category/newsletter/"
+    },
+    {
+      "action": "click",
+      "selector": "article .entry-title a",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "article h2 a",
+        "a:has-text('Parish Newsletter')"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 leftover skip hunt: weekly bulletin is an HTML WP post, not a PDF. Listing /wp/category/newsletter/ newest is Parish Newsletter- 4th October 2026. Proved GET 200. Page text Sunday 4th October Mass intentions Clara and Horseleap. Click first_match then print_to_pdf. Do not pin the dated post slug. WP JSON lives under /wp/wp-json/."
+  ],
+  "do_not": [
+    "Do not pin a dated newsletter slug.",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }

@@ -572,7 +572,8 @@
         "03/10/2026 cloud hunt: diocese cards with no site still had this-week PDFs on mcn.live/Camera/.",
         "GET the camera HTML, read hfChurchId, POST /Website/ProfileDataByJson/{id}, then GET newsletter.newsLetterUrl.",
         "Proved: Portarlington id 354 (04/10/2026, 1303113 bytes), Rathmore id 620 (04/10/2026, 249160 bytes), Galway St Joseph id 342 (04/10/2026, 306650 bytes).",
-        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera."
+        "Two Rathmore cameras served the same bytes. Harvest once. Do not screenshot the camera.",
+        "05/10/2026 Meath leftover: Beauparc id 629 JSON title 4 October 2026, GET 200 150092 bytes %PDF. Kentstown id 628 same bytes. Harvest once under beauparc."
       ],
       "do_not": [
         "Do not pin a CloudFront UUID PDF.",
@@ -587,9 +588,10 @@
       "example_parishes": [
         "portarlington",
         "rathmore",
-        "stjosephgalway"
+        "stjosephgalway",
+        "beauparc"
       ],
-      "success_count": 3
+      "success_count": 4
     },
     "permanent_redirect_document+direct_download": {
       "page_type": "permanent_redirect_document",
@@ -659,6 +661,59 @@
         "strategy": "newest_dated",
         "position": "top"
       }
+    },
+    "kenmareparish_newsletters+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Kenmare parish newsletters listing",
+      "advice": "Kerry leftover: diocese card can stay on June PDFs while kenmareparish.ie/other-information/newsletters/ has this Sunday. Score filename. Do not pin the dated upload. Do not harvest the Kenmare file twice for Glengarriff or Sneem.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: 40-Sunday-4th-October-2026-27th-Sunday-in-Ordinary-Time.pdf GET 200 application/pdf 466594 bytes %PDF. Filename date 04/10/2026."
+      ],
+      "do_not": [
+        "Do not pin the dated PDF filename.",
+        "Do not harvest Facebook.",
+        "Do not harvest the same Kenmare PDF under glengarriff or sneem."
+      ],
+      "html_fingerprint": "kenmareparish_newsletters",
+      "html_markers": [
+        "kenmareparish.ie/other-information/newsletters",
+        "wp-content/uploads",
+        ".pdf"
+      ],
+      "example_parishes": [
+        "kenmare"
+      ],
+      "success_count": 1,
+      "bulletin_layout": {
+        "strategy": "newest_dated",
+        "position": "top"
+      }
+    },
+    "stjohns_tralee+wp_json_newest_media": {
+      "page_type": "wp_json",
+      "recipe_flow": "wp_json_newest_media",
+      "label": "St John's Tralee wp-json newsletter PDFs",
+      "advice": "stjohns.ie HTML /newsletter/ can still show an old 2025 PDF. wp-json/wp/v2/media?search=newsletter has DDMMYY-newsletter-.pdf (trailing hyphen). Keep Irish. Do not pin the dated name.",
+      "operator_notes": [
+        "05/10/2026 leftover skip hunt: 041026-newsletter-.pdf GET 200 application/pdf 551771 bytes %PDF. Filename 041026 is 04/10/2026. Title 27th Sunday in Ordinary Time."
+      ],
+      "do_not": [
+        "Do not pin 041026-newsletter-.pdf.",
+        "Do not harvest the Church of Ireland Ashe Street newsletter.",
+        "Do not harvest Facebook.",
+        "Do not translate as Gaeilge."
+      ],
+      "html_fingerprint": "stjohns_tralee_wp_json",
+      "html_markers": [
+        "stjohns.ie",
+        "wp-json/wp/v2/media",
+        "newsletter"
+      ],
+      "example_parishes": [
+        "stjohnskerry"
+      ],
+      "success_count": 1
     },
     "wp_old_folder_dated_filename+http_scrape_newest_pdf": {
       "page_type": "pdf_link_list",
@@ -740,6 +795,73 @@
       ],
       "example_parishes": [
         "killeigh"
+      ],
+      "success_count": 1
+    },
+    "meath_navan_squarespace_dated_article+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Squarespace dated bulletin article then /s/ PDF",
+      "advice": "If the listing article slug has the Sunday (04-october-2026), follow it with post_slug_patterns then scrape the inner /s/*.pdf. If the slug is a hash (Tullamore), leave skip. Do not pin /s/.",
+      "operator_notes": [
+        "05/10/2026 Meath leftover: Navan /bulletin/ listing has no .pdf href. Inner /s/04-October-2026.pdf GET 200 670480 bytes %PDF-1.7. Filename 04 October 2026.",
+        "Tullamore listing still uses hashed article slugs. Leave skip. Do not pin Bulletin-04-10-2026-k5he.pdf."
+      ],
+      "do_not": [
+        "Do not pin a dated /s/ filename.",
+        "Do not unskip Tullamore hashed /s/ pins."
+      ],
+      "html_fingerprint": "squarespace_dated_bulletin_s_pdf",
+      "html_markers": [
+        "navanparish.ie/bulletin/",
+        "/s/",
+        ".pdf"
+      ],
+      "example_parishes": [
+        "navan"
+      ],
+      "success_count": 1
+    },
+    "meath_curraha_bulletin_listing+http_scrape_newest_pdf": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "http_scrape_newest_pdf",
+      "label": "Curraha /bulletin/ dated Sunday PDFs",
+      "advice": "Scrape /bulletin/ hrefs. Homepage has no .pdf. PDF title can name a second parish — alias that key.",
+      "operator_notes": [
+        "05/10/2026: Sunday-4th-October-2026.pdf GET 200 667553 bytes %PDF-1.5. Title Parishes of Ardcath/Clonalvy and Curraha. Alias ardcath."
+      ],
+      "do_not": [
+        "Do not pin the dated uploads path.",
+        "Do not harvest Ardcath twice."
+      ],
+      "html_markers": [
+        "currahaparish.ie/bulletin/",
+        "Sunday-"
+      ],
+      "example_parishes": [
+        "curraha"
+      ],
+      "success_count": 1
+    },
+    "meath_kingscourt_wp_json_iframe+wp_json_newest_media": {
+      "page_type": "wp_json",
+      "recipe_flow": "direct_download",
+      "label": "WP media bulletin inside a post iframe",
+      "advice": "If the listing has no PDF href but wp-json media has Bulletin-…-4th-October-2026.pdf, use wp_json_newest_media. Do not pin phooriss.",
+      "operator_notes": [
+        "05/10/2026 Kingscourt: GET 200 302517 bytes %PDF-1.7. Skip Gyproc PDFs in the same library."
+      ],
+      "do_not": [
+        "Do not pin the dated phooriss path.",
+        "Do not harvest Facebook."
+      ],
+      "html_markers": [
+        "kingscourtparish.ie",
+        "phooriss",
+        "wp-json/wp/v2/media"
+      ],
+      "example_parishes": [
+        "kingscourt"
       ],
       "success_count": 1
     }
