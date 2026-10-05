@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "ballamayoabbey",
   "display_name": "Balla-Mayo Abbey",
   "diocese": "tuam",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.balla.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.mayo.ie/en-ie/parish-newsletters/balla-belcarra-newsletter",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Balla",
+    "Belcarra",
+    ".pdf",
+    "getmedia"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.balla.ie"
+      "url": "https://www.mayo.ie/en-ie/parish-newsletters/balla-belcarra-newsletter"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 cloud leftover hunt: mayo.ie Balla and Belcarra listing. Proved Balla-and-Belcarra-04-10-2026.pdf GET 200 application/pdf 187084 bytes magic %PDF. Link text October 4th 2026. Harvest this stream under ballamayoabbey. Mayo Abbey and Facefield also has a separate this-week PDF on mayo.ie (153432 bytes) \u2014 same pastoral area, different weekly file; one recipe key so harvest Balla once. Do not pin the getmedia GUID. Official balla.ie is Wix community, not the weekly PDF."
+  ],
+  "do_not": [
+    "Do not pin the getmedia GUID or dated filename.",
+    "Do not harvest the Mayo Abbey Facefield file as a second mega entry under this key.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
