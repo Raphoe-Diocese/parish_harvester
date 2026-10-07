@@ -1,3 +1,16 @@
+## 05/10/2026 night — Armagh continuous hunt pass 1 (cloud)
+
+- Frank: keep going until many more this-week bulletins. Harvest week Sunday 04/10/2026 (also 27/09, 03–05/10). Did not dispatch harvest.yml. Did not regenerate all docs/. Mega PDF stays on.
+- Folder parishes/recipes/armagh/ (61). Started 10 active / 51 skip.
+- **Unskipped 3** after GET 200 + file type + date:
+  - **beragh** — https://beraghparish.com/pdf/041026.pdf — 422496 bytes — 04/10/2026 — predicted_dated_pdf /pdf/DDMMYY.pdf (homepage link text Sunday 4th October 2026).
+  - **dunleer** — http://www.dunleerparish.ie/current-newsletter/ → Twenty_Seventh_Sunday…[2026-10-4].pdf — 429671 bytes — 04/10/2026 — Pattern F.
+  - **cullyhanna** — https://lowercregganparish.com/…/Sunday-4th-October-2026-page-001-scaled.jpg — 890260 bytes — 04/10/2026 — live twin (card was Facebook-only); http_scrape_newest_images.
+- **Left skip (honest why / blockers):** keadyparish.net 403 WAF; ballymascanlon.com 403; cookstownparish.com homepage WAF (parish-news HTML still Sept week); redemptoristsdundalk.ie 403; most remaining Facebook-only / no this-week twin. Do not invent.
+- After this pass: harvestable **13** / skip **48**. Aliases 0.
+- Merged via clean rebase after Limerick #306 (07/10/2026).
+- Next: harvest armagh_diocese (+ limerick_diocese / killaloe_diocese) as single-diocese Jobs — not a serial all-diocese crawl.
+
 ## 05/10/2026 night — Limerick LIVE + Kilfenora honest (cloud)
 
 - Frank named **Limerick** and **Kilfenora**. Earlier ban lifted.
