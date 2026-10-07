@@ -2530,6 +2530,7 @@ async def _try_wp_json_newest_post_images(
     example_post_url: str | None = None,
     weeks_back: int = 3,
     image_count: int = 2,
+    href_patterns: list[str] | None = None,
 ) -> tuple[str, str] | None:
     """Find the newest Sunday bulletin post, then stack its page images.
 
@@ -2639,7 +2640,16 @@ async def _try_wp_json_newest_post_images(
         if "html" not in (post_headers.get("content-type") or "").lower():
             continue
         post_html = post_body.decode("utf-8", errors="ignore")
-        image_urls = _extract_post_page_images(post_html, post_url)[:wanted]
+        image_urls = _extract_post_page_images(post_html, post_url)
+        # Killenaule posts also embed the theme background and lotto ads.
+        # Keep only filenames the recipe named (Sunday- / Newsletter-).
+        if href_patterns:
+            image_urls = [
+                url
+                for url in image_urls
+                if _href_matches_patterns(url, href_patterns)
+            ]
+        image_urls = image_urls[:wanted]
         if len(image_urls) < wanted:
             continue
         image_bytes: list[bytes] = []
@@ -4459,6 +4469,11 @@ async def replay_recipe(
                 except (TypeError, ValueError):
                     pass
                 break
+        image_href_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("href_patterns") or [])
+            if str(p).strip()
+        ]
         found = await _try_wp_json_newest_post_images(
             start_url,
             dest,
@@ -4467,6 +4482,7 @@ async def replay_recipe(
             example_post_url=str(recipe.get("example_post_url") or "").strip() or None,
             weeks_back=int(recipe.get("weeks_back") or 3),
             image_count=image_count,
+            href_patterns=image_href_patterns or None,
         )
         if found:
             return dest, found[1], found[0]
