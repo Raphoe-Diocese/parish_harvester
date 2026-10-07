@@ -45,6 +45,12 @@ _D_M_YYYY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(20\d{2})(?!\d)")
 _D_M_YYYY_DASH_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(20\d{2})(?!\d)")
 _ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")                     # 2025-08-31
 _ISO_NODASH_RE = re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)")  # 20250831
+# Kilmore GoDaddy weekend file 2026100304.pdf means 3–4 October 2026.
+# The 8-digit ISO form refuses a trailing day, so the current file never
+# scored and the scraper kept the previous Sunday.
+_WEEKEND_YYYYMMDDDD_RE = re.compile(
+    r"(?<!\d)(20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(0[1-9]|[12]\d|3[01])(?!\d)"
+)
 _WP_YEAR_MONTH_RE = re.compile(r"/(\d{4})/(\d{2})/")                 # /2026/04/
 
 # Pattern G: WordPress date-based post slug /YYYY/MM/DD/slug/
@@ -292,6 +298,25 @@ def extract_date_from_string(text: str) -> date | None:
                 return candidate
         except ValueError:
             pass
+
+    # Weekend span YYYYMMDDDD (Kilmore 2026100304.pdf = 3–4 October 2026).
+    # Return the later day so the harvest Sunday wins. Only when the two
+    # days are the same month and at most 3 days apart.
+    m = _first_match_outside_hash(_WEEKEND_YYYYMMDDDD_RE, text, spans)
+    if m:
+        year, month = int(m.group(1)), int(m.group(2))
+        span_days: list[date] = []
+        for raw_day in (m.group(3), m.group(4)):
+            try:
+                span_days.append(date(year, month, int(raw_day)))
+            except ValueError:
+                pass
+        if (
+            len(span_days) == 2
+            and 0 <= (span_days[1] - span_days[0]).days <= 3
+            and _is_plausible_bulletin_year(span_days[1].year)
+        ):
+            return span_days[1]
 
     # DDMMYYYY (8 digits)
     m = _first_match_outside_hash(_DDMMYYYY_RE, text, spans)

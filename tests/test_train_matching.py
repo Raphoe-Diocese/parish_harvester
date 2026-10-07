@@ -658,6 +658,22 @@ class UrlDateParsingAndScoringTests(unittest.TestCase):
         self.assertEqual(extract_date_from_string("20260426"), _date(2026, 4, 26))
         self.assertEqual(extract_date_from_string("20260503"), _date(2026, 5, 3))
 
+    def test_extract_date_weekend_yyyymmdddd(self) -> None:
+        # Kilmore GoDaddy: 2026100304.pdf is the weekend of 3–4 October 2026.
+        from harvester.utils import extract_date_from_string
+        from harvester.bulletin_freshness import extract_bulletin_date
+        from datetime import date as _date
+
+        name = "2026100304.pdf"
+        url = (
+            "https://img1.wsimg.com/blobby/go/"
+            "2400e7cd-c228-4722-a1c8-7b93b0d8a8f3/2026100304.pdf"
+        )
+        self.assertEqual(extract_date_from_string(name), _date(2026, 10, 4))
+        self.assertEqual(extract_bulletin_date(url), _date(2026, 10, 4))
+        self.assertEqual(extract_date_from_string("20260426"), _date(2026, 4, 26))
+        self.assertIsNone(extract_date_from_string("20261003041"))
+
     def test_extract_date_ddmmyyyy(self) -> None:
         from harvester.utils import extract_date_from_string
         from datetime import date as _date
