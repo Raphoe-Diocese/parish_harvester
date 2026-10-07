@@ -1,19 +1,38 @@
 {
+  "version": 2,
   "parish_key": "fernsparish",
   "display_name": "Ferns",
   "diocese": "ferns",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://ferns.ie/ferns/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs.",
+  "start_url": "https://fernsparish.ie/parish-newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf",
+    "October",
+    "uploads",
+    "Newsletter"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-07",
+  "example_url": "https://fernsparish.ie/wp-content/uploads/2026/10/October-3rd-October-4th-2026.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://ferns.ie/ferns/"
+      "url": "https://fernsparish.ie/parish-newsletter/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "07/10/2026: ferns.ie/ferns/ Website line is the broken 'http://ferns parish.ie'. Live host is fernsparish.ie. Listing /parish-newsletter/ links the weekly PDF.",
+    "Proved October-3rd-October-4th-2026.pdf GET 200 application/pdf 1157968 bytes magic %PDF. Filename scores 04/10/2026. PDF text says Twenty Seventh Sunday in Ordinary Time October 3rd & October 4th 2026, and also prints Mass intentions for 10–11 October.",
+    "Do not pin the dated filename. Score the listing."
+  ],
+  "do_not": [
+    "Do not pin October-3rd-October-4th-2026.pdf.",
+    "Do not harvest Facebook.",
+    "Do not use the 2013 church photo on ferns.ie."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
