@@ -101,7 +101,7 @@ class LandingPageTests(unittest.TestCase):
             # one-click link to its collated (mega) bulletin and its text
             # bulletin — not a full-size "coming soon" card.
             self.assertIn("Live dioceses", index_html)
-            self.assertEqual(index_html.count("live-card\""), 24)
+            self.assertEqual(index_html.count("live-card\""), 25)
             self.assertIn("Clogher Diocese", index_html)
             self.assertIn("Derry Diocese", index_html)
             self.assertIn("Down &amp; Connor Diocese", index_html)
@@ -127,6 +127,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Galway Kilmacduagh &amp; Kilfenora Diocese", index_html)
             self.assertIn("Kerry Diocese", index_html)
             self.assertIn("Kildare &amp; Leighlin Diocese", index_html)
+            self.assertIn("Limerick Diocese", index_html)
             # Live cards must be A–Z by short name (not discovery order).
             live_headings = re.findall(
                 r'<article class="live-card">.*?<h2[^>]*>(.*?)</h2>',
@@ -180,12 +181,18 @@ class LandingPageTests(unittest.TestCase):
             self.assertNotIn("/subscribe/", index_html)
             self.assertFalse((docs / "subscribe" / "index.html").exists())
 
-            # The other dioceses collapse into one small expandable list.
-            self.assertIn("More dioceses — coming soon (2)", index_html)
+            # Every canonical diocese is LIVE (Kilfenora covered under Galway).
+            # Do not show an empty coming-soon list.
+            self.assertNotIn("More dioceses — coming soon", index_html)
+            self.assertNotIn("kilfenora-and-kilmacduagh", index_html)
+            self.assertIn("Limerick Diocese", index_html)
+            self.assertIn("dioceses/limerick/", index_html)
             self.assertNotIn("Parish of Raphoe", index_html)
 
             links = re.findall(r'href="dioceses/([a-z0-9-]+)/"', index_html)
-            self.assertEqual(len(links), 26)
+            self.assertEqual(len(links), 25)
+            self.assertNotIn("kilfenora-and-kilmacduagh", links)
+            self.assertIn("limerick", links)
             for key in links:
                 self.assertTrue((docs / "dioceses" / key / "index.html").exists(), key)
 
@@ -367,7 +374,7 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertNotIn("Jane Doe", markup)
 
     def test_default_hero_slides_are_real_cathedral_photos_with_cc_credit(self) -> None:
-        self.assertEqual(len(site_builder.HERO_SLIDES), 24)
+        self.assertEqual(len(site_builder.HERO_SLIDES), 25)
         for slide in site_builder.HERO_SLIDES:
             self.assertTrue(slide.image and slide.image.startswith("https://upload.wikimedia.org/"))
             self.assertTrue(slide.credit and "Wikimedia Commons" in slide.credit)
@@ -401,6 +408,7 @@ class HeroSliderRenderTests(unittest.TestCase):
         )
         self.assertIn("St Mary's Cathedral, Killarney", titles)
         self.assertIn("Cathedral of the Assumption, Carlow", titles)
+        self.assertIn("St John's Cathedral, Limerick", titles)
 
         eyebrows = {slide.eyebrow for slide in site_builder.HERO_SLIDES}
         self.assertEqual(
@@ -430,6 +438,7 @@ class HeroSliderRenderTests(unittest.TestCase):
                 "Galway Kilmacduagh and Kilfenora Diocese",
                 "Kerry Diocese",
                 "Kildare and Leighlin Diocese",
+                "Limerick Diocese",
             },
         )
 
