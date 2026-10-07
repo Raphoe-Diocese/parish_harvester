@@ -138,6 +138,18 @@ class PreferEmbeddedTextTests(unittest.TestCase):
             collapse_ocr_spacing("Weekend Mass Times"),
             "Weekend Mass Times",
         )
+        self.assertEqual(collapse_ocr_spacing("A priest"), "A priest")
+        self.assertEqual(collapse_ocr_spacing("I am here"), "I am here")
+        # One gap in a normal word (Ovens / Farran style). Not every letter spaced.
+        self.assertEqual(collapse_ocr_spacing("S ept"), "Sept")
+        self.assertEqual(collapse_ocr_spacing("C ather ine"), "Catherine")
+        self.assertEqual(collapse_ocr_spacing("C urrabeg"), "Currabeg")
+        self.assertEqual(collapse_ocr_spacing("C on Twomey"), "Con Twomey")
+        self.assertEqual(collapse_ocr_spacing("Anniversa ry"), "Anniversary")
+        self.assertEqual(collapse_ocr_spacing("Anyo ne"), "Anyone")
+        self.assertEqual(collapse_ocr_spacing("C onfessions"), "Confessions")
+        self.assertEqual(collapse_ocr_spacing("C elebrated"), "Celebrated")
+        self.assertEqual(collapse_ocr_spacing("C entre"), "Centre")
 
     def test_collapse_ardara_style_bulletin_dump(self) -> None:
         from ocr.convert_bulletin import clean_ocr_line

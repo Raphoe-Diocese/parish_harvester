@@ -798,6 +798,17 @@ def collapse_ocr_spacing(text: str) -> str:
         i += 1
     cleaned = " ".join(out)
 
+    # One gap inside an otherwise normal word: "S ept", "C athy", "Anniversa ry".
+    # Do not join "A priest" or "I am". Do not join real short words (on, in, to).
+    leading_cap = re.compile(r"\b([B-HJ-Z])\s+([a-zà-ÿ]{2,})\b")
+    safe_tail = re.compile(
+        r"\b([A-Za-zÀ-ÿ]{4,})\s+(ry|ne|ly|ng|ine|ing|ers|ion|ted)\b",
+        re.I,
+    )
+    for _ in range(2):
+        cleaned = leading_cap.sub(r"\1\2", cleaned)
+        cleaned = safe_tail.sub(r"\1\2", cleaned)
+
     # Re-run known fragments after joining (Et ern a l → Eternal may need a second pass).
     cleaned = _apply_known_fragments(cleaned)
     # grantuntothem / unto themO leftovers after join
