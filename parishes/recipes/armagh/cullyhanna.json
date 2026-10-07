@@ -1,19 +1,44 @@
 {
+  "version": 2,
   "parish_key": "cullyhanna",
   "display_name": "Cullyhanna (Creggan Lower)",
   "diocese": "armagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://www.armagharchdiocese.org/parishes/parish-details/?page=ddb_parish_details&parishID=24",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official card / search is Facebook-only \u2014 cannot scrape Facebook (checked 29/09/2026).",
+  "start_url": "https://lowercregganparish.com/",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": [
+    "Sunday",
+    "October",
+    "September",
+    ".jpg",
+    "uploads"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-05",
+  "example_url": "https://lowercregganparish.com/wp-content/uploads/sites/6/2026/10/Sunday-4th-October-2026-page-001-scaled.jpg",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.armagharchdiocese.org/parishes/parish-details/?page=ddb_parish_details&parishID=24"
+      "url": "https://lowercregganparish.com/"
+    },
+    {
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "selector": "img[src*='Sunday'][src*='2026']",
+      "min_long_side": 500
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "05/10/2026 continuous hunt: official card Facebook-only. Live twin lowercregganparish.com (Lower Creggan / Cullyhanna). Homepage lists Parish Bulletin 4th October 2026. Proved Sunday-4th-October-2026-page-001-scaled.jpg GET 200 image/jpeg 890260 bytes magic JPEG. One page this week. Do not pin dated name."
+  ],
+  "do_not": [
+    "Do not pin the dated JPEG filename.",
+    "Do not harvest Facebook.",
+    "Do not confuse with Upper Creggan / Crossmaglen."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
