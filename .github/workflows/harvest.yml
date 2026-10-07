@@ -1,10 +1,10 @@
 name: Harvest Parish Bulletins
-run-name: Harvest ${{ inputs.target_parish || 'full' }}
+run-name: Harvest ${{ github.event_name == 'schedule' && 'sunday-all-dioceses' || github.event.inputs.target_parish || github.event.inputs.diocese || 'full' }}
 
 on:
   schedule:
-    # Sunday 09:00 UTC = 10:00 Irish summer time (IST, UTC+1).
-    # A 4-hour full harvest then finishes around 14:00 Irish.
+    # Sunday 09:00 UTC = 10:00 Irish time. Each diocese commits when it
+    # finishes. All 26 should be in well before 16:00 Irish.
     - cron: '0 9 * * 0'
   workflow_dispatch:
     inputs:
@@ -58,15 +58,17 @@ permissions:
   contents: write
   issues: write
 
-# Full harvest and single-parish tests must not share one queue — otherwise
-# "Send & test" waits 30–60+ min behind a running full harvest.
-# S1: Sunday / all-diocese runs use a matrix (one job per diocese, no git
-# push) plus a stitch job that merges report.json + parish_status.json,
-# builds mega PDFs, and commits once. Single-parish Send & test and a
-# one-diocese dispatch still use the harvest job below.
+# Sunday and a manual "all dioceses" share harvest-full-matrix.
+# They queue. They do not cancel each other.
+# One diocese and Send & test use their own groups, so they cannot
+# cancel Sunday or sit in front of it. On 07/10/2026 one shared
+# harvest-full group held the full run for about 34 hours before it
+# even started. The work itself was about one hour.
+# Each matrix diocese commits its own mega as soon as it finishes.
+# Stitch still runs at the end to merge any slice whose push failed.
 concurrency:
-  group: harvest-${{ github.event.inputs.target_parish || 'full' }}
-  cancel-in-progress: ${{ github.event.inputs.target_parish != '' }}
+  group: ${{ github.event_name == 'schedule' && 'harvest-full-matrix' || (github.event.inputs.target_parish != '' && format('harvest-parish-{0}', github.event.inputs.target_parish)) || (github.event.inputs.diocese != 'all' && format('harvest-diocese-{0}', github.event.inputs.diocese)) || 'harvest-full-matrix' }}
+  cancel-in-progress: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_parish != '' }}
 
 jobs:
   harvest:
@@ -486,7 +488,7 @@ jobs:
     timeout-minutes: 180
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 8
       matrix:
         diocese:
           - achonry_diocese
@@ -553,11 +555,32 @@ jobs:
           set -euo pipefail
           xvfb-run -a python main.py --diocese ${{ matrix.diocese }}
         env:
-          HARVEST_MEGA_PDF: "0"
-          HARVEST_SKIP_STATUS: "1"
+          HARVEST_MEGA_PDF: "1"
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit this diocese now
+        if: steps.harvest_run.outcome == 'success'
+        env:
+          HARVEST_DIOCESE: ${{ matrix.diocese }}
+        run: |
+          set -euo pipefail
+          SHORT="${HARVEST_DIOCESE%_diocese}"
+          mkdir -p docs/mega_pdf
+          if [ -f "mega_pdf/${SHORT}_mega_bulletin.pdf" ]; then
+            cp -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f Bulletins/report.json Bulletins/report.txt parishes/parish_status.json parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
+          git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf" 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No changes for ${HARVEST_DIOCESE}"
+            exit 0
+          fi
+          git commit -m "chore: harvest ${HARVEST_DIOCESE} $(date +%Y-%m-%d) [skip ci]"
+          python scripts/push_harvest_results.py --remote origin --branch main --target-parish "" --diocese "${HARVEST_DIOCESE}" --attempts 8
 
       - name: Upload diocese slice
         if: steps.harvest_run.outcome == 'success'
