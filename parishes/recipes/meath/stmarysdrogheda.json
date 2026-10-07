@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "stmarysdrogheda",
   "display_name": "Drogheda (St Mary's)",
   "diocese": "meath",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.dioceseofmeath.ie/map-of-parishes",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week PDF or JPEG proved on 03/10/2026. Do not invent a Facebook PDF.",
+  "start_url": "https://stmarysdrogheda.ie/wp-content/uploads/2026/10/a3-bulletin-04.10.2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 6,
+  "playbook_type": "dated_pdf_bulletin",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-07",
+  "example_url": "https://stmarysdrogheda.ie/wp-content/uploads/2026/10/a3-bulletin-04.10.2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.dioceseofmeath.ie/map-of-parishes"
+      "action": "download",
+      "url": "https://stmarysdrogheda.ie/wp-content/uploads/2026/10/a3-bulletin-04.10.2026.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "07/10/2026: diocese map has no file. Live host stmarysdrogheda.ie. HTML and wp-json return Cloudflare 403. Uploads are open.",
+    "Pattern a3-bulletin-DD.MM.YYYY.pdf under /uploads/YYYY/MM/. Proved a3-bulletin-04.10.2026.pdf GET 200 application/pdf 491126 bytes %PDF-1.7. PDF text: St Mary's Parish, Drogheda, Mass Intentions for Sunday 4th October 2026. Same sheet also has Holy Family Mass Intentions for 3rd-11th October.",
+    "Previous week proved a3-bulletin-27.09.2026.pdf in /2026/09/ (443201 bytes). predicted_dated_pdf rewrites the day and the folder. Do not pin this week's name.",
+    "Harvest once under stmarysdrogheda. holyfamilydrogheda stays skip (alias_of)."
+  ],
+  "do_not": [
+    "Do not pin a3-bulletin-04.10.2026.pdf.",
+    "Do not harvest Holy Family as a second copy of this file.",
+    "Do not harvest Facebook.",
+    "Do not open the Cloudflare HTML listing."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
