@@ -1,3 +1,16 @@
+## 05/10/2026 night — Killaloe continuous hunt pass 1 (cloud)
+
+- Frank continuous hunt. Harvest week Sunday 04/10/2026 (also 27/09, 03–05/10). Did not dispatch harvest.yml. Did not regenerate all docs/. Mega PDF stays on.
+- Folder `parishes/recipes/killaloe/`. Started 20 active / 31 skip / 7 aliases.
+- **Unskipped 3**
+  - **killimer** — Killimer-Parish-Newsletter-3rd-4th-October-2026.pdf — 406927 bytes — 03–04/10/2026 — `wp_json_newest_media` (listing hides .pdf href).
+  - **lorrha** — Newsletter-Sunday-4th-October-2026.pdf — 262136 bytes — 04/10/2026 — `/parish-newsletter/` scrape (was 25/09 on prior pass).
+  - **borrisokane** — 4th-Oct.2026-Newsletter.pdf — 366380 bytes — 04/10/2026 — live twin borrisokaneparish.ie.
+- **Left skip (honest):** doonbeg.info archive newest 20/09; most diocese-card / dead host guesses; silvermines/tulla/portroe/youghalarra/feakle etc. no this-week twin proved.
+- After: harvestable **23** / skip **28** / alias **7**.
+- Related: Limerick LIVE #303; Armagh #304.
+- Next: continue Killaloe leftovers or Cashel & Emly.
+
 ## 05/10/2026 night — OLD BULLETINS ON LIVE SITE (NOW)
 
 - Frank screenshot: Ardara OCR week beginning 13/09/2026. Fix PR #302 then Full harvest + OCR. Not live yet. See docs/WEBSITE_OCR_BACKLOG.md NOW item.
