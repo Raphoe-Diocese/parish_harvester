@@ -36,15 +36,19 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_harvest_run_name_and_single_parish_queue(self) -> None:
         yml = HARVEST_YML.read_text(encoding="utf-8")
-        self.assertIn("run-name: Harvest ${{ inputs.target_parish || 'full' }}", yml)
-        self.assertIn("harvest-${{ github.event.inputs.target_parish || 'full' }}", yml)
+        self.assertIn("sunday-all-dioceses", yml)
+        self.assertIn("harvest-full-matrix", yml)
+        self.assertIn("format('harvest-parish-{0}', github.event.inputs.target_parish)", yml)
+        self.assertIn("format('harvest-diocese-{0}', github.event.inputs.diocese)", yml)
+        self.assertIn("Commit this diocese now", yml)
+        self.assertIn("max-parallel: 8", yml)
+        self.assertNotIn("harvest-${{ github.event.inputs.target_parish || 'full' }}", yml)
+        self.assertNotIn('HARVEST_SKIP_STATUS: "1"', yml)
         self.assertIn(
             "if: github.event_name != 'workflow_dispatch' || github.event.inputs.target_parish == ''",
             yml,
         )
         self.assertIn("Cache Playwright browsers", yml)
-        self.assertIn("max-parallel: 5", yml)
-        self.assertIn("HARVEST_SKIP_STATUS", yml)
         self.assertIn("merge_diocese_harvests.py", yml)
         stitch = yml.split("\n  stitch:", 1)[-1]
         self.assertNotIn("python -m pytest", stitch)
