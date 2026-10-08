@@ -636,7 +636,16 @@ def freshness_verdict_for_ok_result(
     """
     url = (result.url or "").strip()
     pdf_path = result.file_path
-    pdf_exists = pdf_path is not None and Path(pdf_path).exists()
+    candidates: list[Path] = []
+    if pdf_path is not None:
+        candidates.append(Path(pdf_path))
+    # Harvest may have already promoted to Bulletins/<key>.pdf / current/.
+    key = str(getattr(result, "key", "") or "").strip()
+    if key:
+        root = Path(__file__).resolve().parent.parent
+        candidates.append(root / "Bulletins" / f"{key}.pdf")
+        candidates.append(root / "Bulletins" / "current" / f"{key}.pdf")
+    pdf_file = next((path for path in candidates if path.exists()), None)
 
     if report_bulletin_date is not None:
         verdict = verdict_for_extracted_date(report_bulletin_date, target)
@@ -645,8 +654,8 @@ def freshness_verdict_for_ok_result(
     else:
         verdict = FreshnessVerdict(status="unknown", reason="no_date_in_url")
 
-    if pdf_exists:
-        body_stale = pdf_body_stale_verdict(Path(pdf_path), target)
+    if pdf_file is not None:
+        body_stale = pdf_body_stale_verdict(pdf_file, target)
         if body_stale is not None:
             return body_stale
     return verdict

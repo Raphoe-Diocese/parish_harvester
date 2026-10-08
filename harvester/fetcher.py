@@ -2248,13 +2248,26 @@ async def _fetch_entry(
                     recipe_error = blocked
                     print(f"  ↩️  {key}: recipe replay rejected: {blocked}")
                 else:
-                    return FetchResult(
+                    # Must run stale recovery — a this-week slug with an old
+                    # printed body (Ardara) or undated /latest/ with ancient
+                    # years (Attymass) used to return ok here and skip the gate.
+                    ok = FetchResult(
                         key=key,
                         display_name=entry.display_name,
                         status="ok",
                         url=replay_url,
                         file_path=replayed_path,
                         file_type=replay_file_type,
+                    )
+                    guard_dest = dest if dest.exists() else Path(replayed_path)
+                    return await _guard_and_recover_ok_result(
+                        ok,
+                        entry,
+                        target,
+                        guard_dest,
+                        browser,
+                        recipe_meta,
+                        host_profile,
                     )
             else:
                 classified = classify_page_capped_pdf(
