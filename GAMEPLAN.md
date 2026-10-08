@@ -1,4 +1,12 @@
-﻿## 08/10/2026 — referee body beats URL (Raphoe/Achonry)
+﻿## 08/10/2026 — referee body gate used pypdf (missing on CI)
+
+- Root cause: read_pdf_text_head imported pypdf; Actions only has PyPDF2. Empty text → Ardara/Attymass never stale. Fixed to PyPDF2. Re-harvest after merge.
+## 08/10/2026 evening — harvests green but Ardara/Attymass still ok
+
+- #319 + #322 merged. Raphoe run 37798361359 and Achonry 37798367111 success on 54922206.
+- parish_status still: ardara ok 04/10, attymass ok undated. No stale warning for either in logs (ballymote/straide did get stale).
+- Stop after two harvest tries that did not clear these. Need Frank go for third fix (why CI body/ancient gate never fires for these two).
+## 08/10/2026 — referee body beats URL (Raphoe/Achonry)
 
 - Why stale megas: URL/report date won over PDF text (Ardara slug 04/10, body 13/09). Undated /latest/ with only old years (Attymass 2021/2022) stayed unknown=ok. Referee does not wait for OCR — uses embedded PDF text at harvest; OCR is later for the viewer.
 - Fix: pdf_body_stale_verdict — body heading stale or body_years_only_ancient beats URL/report. Tests green. Next: merge + harvest raphoe_diocese and achonry_diocese on GitHub.
@@ -22624,6 +22632,8 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
+
 
 
 

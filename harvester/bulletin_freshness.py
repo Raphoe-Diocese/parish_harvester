@@ -559,9 +559,14 @@ _ANCIENT_BODY_YEAR_GAP = 3
 
 
 def read_pdf_text_head(path: Path, max_pages: int = 4) -> str:
-    """Embedded PDF text from the first pages (same text born-digital OCR sees)."""
+    """Embedded PDF text from the first pages (same text born-digital OCR sees).
+
+    Uses PyPDF2 — that is what CI installs (requirements.txt). Importing
+    ``pypdf`` here failed silently on GitHub Actions, returned empty text,
+    and let Ardara/Attymass skip the body stale gate (08/10/2026).
+    """
     try:
-        from pypdf import PdfReader
+        from PyPDF2 import PdfReader
 
         reader = PdfReader(str(path))
     except Exception:
