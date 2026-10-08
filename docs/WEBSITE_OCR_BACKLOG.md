@@ -1,4 +1,4 @@
-# Website / OCR living backlog
+﻿# Website / OCR living backlog
 
 **Read this file before any website, OCR, diocese viewer, parish page, or mega-PDF viewer work.**
 

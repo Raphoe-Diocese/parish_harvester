@@ -17,15 +17,19 @@ permissions:
 
 jobs:
   generate-ocr-viewers:
-    # Full harvests only (run-name "Harvest full"). Skip single-parish
-    # Send & test runs — those do not upload mega PDFs.
+    # After any successful harvest that is not a single-parish Send & test.
+    # One-diocese runs (Harvest raphoe_diocese) must refresh OCR too — otherwise
+    # parishpress keeps last week's mega text (08/10/2026 Ardara/Attymass).
+    # Artifact check below still skips runs with no mega PDF.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion != 'cancelled' &&
+       github.event.workflow_run.conclusion == 'success' &&
        (github.event.workflow_run.event == 'schedule' ||
-        github.event.workflow_run.display_title == 'Harvest full'))
+        contains(github.event.workflow_run.display_title, '_diocese') ||
+        github.event.workflow_run.display_title == 'Harvest full' ||
+        github.event.workflow_run.display_title == 'Harvest sunday-all-dioceses'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
