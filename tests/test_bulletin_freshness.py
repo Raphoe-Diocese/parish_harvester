@@ -728,6 +728,16 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
 
     TARGET = date(2026, 10, 4)
 
+    def test_read_pdf_text_head_uses_pypdf2_not_pypdf(self) -> None:
+        # CI installs PyPDF2 only. Importing pypdf returned "" and skipped the gate.
+        import inspect
+
+        from harvester import bulletin_freshness as bf
+
+        source = inspect.getsource(bf.read_pdf_text_head)
+        self.assertIn("PyPDF2", source)
+        self.assertNotIn("from pypdf import", source)
+
     def _heading_pdf(self, path: Path, *lines: str) -> None:
         c = canvas.Canvas(str(path))
         y = 700
