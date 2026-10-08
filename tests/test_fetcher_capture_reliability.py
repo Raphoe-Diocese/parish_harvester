@@ -23,6 +23,7 @@ from harvester.fetcher import (
     freshness_after_unknown_url,
     _is_real_pdf,
     _reject_if_oversized,
+    _retry_pdf_still_stale,
     recipe_max_bulletin_pages,
 )
 from harvester.config import MAX_BULLETIN_PAGES, MIN_PDF_BYTES
@@ -313,6 +314,22 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
             self.assertEqual(verdict.status, "stale")
             self.assertEqual(verdict.reason, "body_years_only_ancient")
             self.assertEqual(verdict.extracted_date, date(2022, 12, 31))
+
+    def test_retry_helper_rejects_dated_url_with_september_body(self) -> None:
+        dated = (
+            "https://ardara.ie/notices/"
+            "church-of-the-holy-family-newsletter-sun-4th-october-26/"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "ardara.pdf"
+            self._heading_pdf(
+                pdf,
+                "Twenty-fourth Sunday in Ordinary Time "
+                "Week beginning: 13th September 2026",
+            )
+            self.assertTrue(
+                _retry_pdf_still_stale(dated, pdf, date(2026, 10, 4))
+            )
 
 
 if __name__ == "__main__":
