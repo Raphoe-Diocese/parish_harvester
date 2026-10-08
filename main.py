@@ -27,7 +27,10 @@ from harvester.config import (
     REPORT_TXT,
     target_sunday,
 )
-from harvester.bulletin_freshness import apply_freshness_safety_net
+from harvester.bulletin_freshness import (
+    apply_freshness_safety_net,
+    reclassify_stale_downloaded_in_report,
+)
 from harvester.dashboard_generator import generate_dashboard
 from harvester.email_notifier import send_harvest_notification
 from harvester.fetcher import FetchResult, ParishEntry, fetch_all, parse_evidence_file
@@ -397,6 +400,43 @@ def main() -> int:
     if not target_parish_key:
         print(f"  📄 Report JSON : {REPORT_JSON}")
         print(f"  📄 Report TXT  : {REPORT_TXT}")
+        # Second gate after PDFs are copied to Bulletins/ — catches cases the
+        # in-memory safety net missed (Ardara Sept body under an Oct URL).
+        try:
+            report_payload = json.loads(REPORT_JSON.read_text(encoding="utf-8"))
+            late_rejected = reclassify_stale_downloaded_in_report(
+                report_payload,
+                target,
+                current_dir=CURRENT_DIR,
+            )
+            if late_rejected:
+                REPORT_JSON.write_text(
+                    json.dumps(report_payload, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8",
+                )
+                print("\n── Late stale reclassify ──────────────────────────────────")
+                print(f"  🕐 Removed from downloaded: {len(late_rejected)}")
+                for item in late_rejected:
+                    print(
+                        f"     {item.get('display_name') or item.get('key')}: "
+                        f"{item.get('reason')}"
+                    )
+                # Keep stitch list in sync so mega does not include them.
+                stale_keys = {
+                    str(item.get("key") or "").strip()
+                    for item in late_rejected
+                    if item.get("key")
+                }
+                for result in all_results:
+                    if result.key in stale_keys and result.status == "ok":
+                        result.is_stale = True
+                        result.status = "error"
+                        result.error = (
+                            f"Stale bulletin rejected for mega PDF "
+                            f"({result.key})"
+                        )
+        except Exception as exc:
+            print(f"  ⚠️  Late stale reclassify failed (non-fatal): {exc}")
 
     print("\n── Parish status ───────────────────────────────────────────")
     skip_status = os.environ.get("HARVEST_SKIP_STATUS", "0").strip().lower() in {

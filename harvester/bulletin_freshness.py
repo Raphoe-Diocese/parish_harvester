@@ -312,6 +312,7 @@ def _safe_parse_ddmmyy(day_s: str, month_s: str, year_s: str) -> date | None:
 
 _BULLETIN_HEADING_RE = re.compile(
     r"(?i)\b(?:parish\s+)?(?:bulletin|newsletter|parish\s+news)\b"
+    r"|\bweek\s+beginning\b"
 )
 # Adjacent masthead date only (Raphoe Drive: "Sunday 19 July 2026" then
 # "RAPHOE PARISH NEWSLETTER" on the next line). Long body/memorial lines
@@ -650,7 +651,6 @@ def freshness_verdict_for_ok_result(
         root = Path(__file__).resolve().parent.parent
         candidates.append(root / "Bulletins" / f"{key}.pdf")
         candidates.append(root / "Bulletins" / "current" / f"{key}.pdf")
-    pdf_file = next((path for path in candidates if path.exists()), None)
 
     if report_bulletin_date is not None:
         verdict = verdict_for_extracted_date(report_bulletin_date, target)
@@ -659,8 +659,12 @@ def freshness_verdict_for_ok_result(
     else:
         verdict = FreshnessVerdict(status="unknown", reason="no_date_in_url")
 
-    if pdf_file is not None:
-        body_stale = pdf_body_stale_verdict(pdf_file, target)
+    # Any on-disk PDF that proves stale wins (do not stop at the first path
+    # that exists but has no extractable heading — Ardara 08/10/2026).
+    for path in candidates:
+        if not path.exists():
+            continue
+        body_stale = pdf_body_stale_verdict(path, target)
         if body_stale is not None:
             return body_stale
     return verdict
@@ -699,11 +703,15 @@ def reclassify_stale_downloaded_in_report(
         pdf_path: Path | None = None
         if current_dir is not None:
             file_name = str(item.get("file") or f"{key}.pdf").strip() or f"{key}.pdf"
-            candidate = current_dir / file_name
-            if candidate.exists():
-                pdf_path = candidate
-            elif (current_dir / f"{key}.pdf").exists():
-                pdf_path = current_dir / f"{key}.pdf"
+            for candidate in (
+                current_dir / file_name,
+                current_dir / f"{key}.pdf",
+                current_dir.parent / f"{key}.pdf",
+            ):
+                if candidate.exists():
+                    pdf_path = candidate
+                    break
+
 
         from .fetcher import FetchResult
 
