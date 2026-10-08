@@ -431,8 +431,20 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Partial harvests are normal — always commit OK parishes + parish_status for the extension.
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/index.html docs/dioceses/ 2>/dev/null || true
-          # S2: do not commit PDFs — artifacts + GitHub Release carry the binaries.
           git add -f docs/mega_pdf/*.pages.json 2>/dev/null || true
+          # One-diocese runs must commit that diocese mega PDF into docs/mega_pdf.
+          # Pages prefers committed PDFs over harvest artifacts. Without this,
+          # pages.json updates but the live PDF/OCR stay on last week's mega
+          # (08/10/2026: Ardara/Attymass rejected in status, still on parishpress).
+          # Matrix slice jobs already commit their mega; keep parity here.
+          if [ -z "${TARGET_PARISH}" ] && [ "${HARVEST_DIOCESE}" != "all" ]; then
+            SHORT="${HARVEST_DIOCESE%_diocese}"
+            mkdir -p docs/mega_pdf
+            if [ -f "mega_pdf/${SHORT}_mega_bulletin.pdf" ]; then
+              cp -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+              git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+            fi
+          fi
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."

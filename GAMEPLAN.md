@@ -1,4 +1,11 @@
-﻿## 08/10/2026 night — Ardara Week beginning + late reclassify
+﻿## 08/10/2026 — live megas stale after referee fix (NOW)
+
+- Truth: ardara/attymass stale; Raphoe pages.json has no ardara. Live still shows old mega/OCR because (1) one-diocese harvest did not commit docs/mega_pdf PDF (Pages keeps Oct 7 file) and (2) OCR workflow_run only ran for display_title Harvest full so Harvest raphoe_diocese skipped OCR.
+- Fix branch fix/commit-diocese-mega-and-ocr: commit that diocese mega PDF on one-diocese harvest; OCR also runs after Harvest *_diocese. Then re-harvest raphoe + achonry and wait OCR + Pages. Not live yet until that cycle finishes.
+## 08/10/2026 — Ardara + Attymass stale proved
+
+- Raphoe harvest 37837364501 success on f72cfb51 (#325). parish_status gen 08/10/2026 20:12 UTC: ardara stale 13/09, attymass stale 2022-12-31. Both in stale_rejected. Mega should exclude them after Pages. Next: live check Raphoe/Achonry megas; retrain Ardara for a real this-week PDF when parish posts one.
+## 08/10/2026 night — Ardara Week beginning + late reclassify
 
 - Attymass stale. Ardara still ok with 13/09: Week beginning alone was not a heading; late reclassify after copy not wired. Fix both + check every PDF candidate. Re-harvest Raphoe after merge.
 ## 08/10/2026 — Ardara retry accepted URL without body
@@ -22638,6 +22645,7 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
 
 
 
