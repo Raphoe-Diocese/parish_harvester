@@ -491,6 +491,7 @@ class StaleParishCaptionTests(unittest.TestCase):
                 "</body></html>",
                 encoding="utf-8",
             )
+            (out_dir / "ardara.pdf").write_bytes(b"%PDF-1.4 stale-slice")
             relabelled = parish_pages.relabel_leftover_parish_pages(
                 out_dir,
                 parish_status_path=status_path,
@@ -502,6 +503,7 @@ class StaleParishCaptionTests(unittest.TestCase):
             self.assertIn('class="stale-note"', ardara)
             self.assertNotIn("This week's bulletin", ardara)
             self.assertNotIn("This week&#x27;s bulletin", ardara)
+            self.assertFalse((out_dir / "ardara.pdf").exists())
             keep = (out_dir / "annagryparish.html").read_text(encoding="utf-8")
             self.assertIn("This week&#x27;s bulletin for Annagry", keep)
 

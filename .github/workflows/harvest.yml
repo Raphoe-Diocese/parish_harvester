@@ -443,6 +443,11 @@ jobs:
             if [ -f "mega_pdf/${SHORT}_mega_bulletin.pdf" ]; then
               cp -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
               git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+              # p1.jpg must match new PDF page 1 (08/10/2026: PDF Annagry-first, preview still Ardara).
+              if [ -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" ]; then
+                cp -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg"
+                git add -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg"
+              fi
             fi
           fi
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
@@ -583,10 +588,14 @@ jobs:
           if [ -f "mega_pdf/${SHORT}_mega_bulletin.pdf" ]; then
             cp -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
           fi
+          if [ -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" ]; then
+            cp -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg"
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f Bulletins/report.json Bulletins/report.txt parishes/parish_status.json parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
           git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf" 2>/dev/null || true
+          git add -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg" 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes for ${HARVEST_DIOCESE}"
             exit 0

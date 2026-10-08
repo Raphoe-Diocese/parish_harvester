@@ -1,4 +1,13 @@
-﻿## 08/10/2026 — live megas stale after referee fix (NOW)
+﻿## 09/10/2026 — Ardara still on screen = stale p1.jpg (NOW)
+
+- Frank screenshot: Raphoe mega viewer shows Ardara 13/09, banner 15 pages. Proved: live PDF page 1 text is Annagry (no Week beginning); live raphoe_mega_bulletin_p1.jpg is still Ardara Sept. Viewer shows that preview. One-diocese harvest committed PDF but not p1.jpg. Fix: commit p1.jpg too; delete leftover stale parish PDFs; Jump-to only mega index names. Then re-harvest raphoe.
+## 08/10/2026 — #326 live proved
+
+- Raphoe + Achonry megas + OCR live without Ardara Sept / Attymass 2021 pack. Live Raphoe HTML: no 13th September; Ardara only in stale intro. Achonry mega 919142 B Last-Modified 08/10 22:00; no Michael Durkin / Pilgrim Players. OCR commit 078d9a93; Pages deploy 37850604410. First OCR 37845554547 failed rebase race; second 37846901003 success. Done.
+## 08/10/2026 — #326 live mega path (doing)
+
+- Merged #326. Raphoe harvest 37844841511 + Achonry 37844847383 success. Mega PDFs committed; pages.json: no ardara, no attymass (Achonry 3 parishes). Live Raphoe PDF Last-Modified 08/10 21:16. OCR runs 37845554547 + 37846901003 in progress — OCR text not live yet. Next: wait OCR + Pages, hard-refresh Raphoe OCR / Achonry Open PDF.
+## 08/10/2026 — live megas stale after referee fix (NOW)
 
 - Truth: ardara/attymass stale; Raphoe pages.json has no ardara. Live still shows old mega/OCR because (1) one-diocese harvest did not commit docs/mega_pdf PDF (Pages keeps Oct 7 file) and (2) OCR workflow_run only ran for display_title Harvest full so Harvest raphoe_diocese skipped OCR.
 - Fix branch fix/commit-diocese-mega-and-ocr: commit that diocese mega PDF on one-diocese harvest; OCR also runs after Harvest *_diocese. Then re-harvest raphoe + achonry and wait OCR + Pages. Not live yet until that cycle finishes.
