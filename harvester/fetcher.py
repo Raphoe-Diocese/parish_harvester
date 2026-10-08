@@ -2007,23 +2007,24 @@ def _load_recipe_metadata(recipe_path: Path) -> dict:
 
 
 def freshness_after_unknown_url(url: str, dest: Path, target: date) -> FreshnessVerdict:
-    """URL-first freshness; only a provably old PDF heading flips unknown → stale.
+    """URL freshness with PDF body able to prove stale.
 
-    Undated URLs stay ``unknown`` (accepted) unless the PDF heading date is
-    outside the existing week + grace window. This-week or grace-fresh
-    headings do not invent a new status — the URL verdict stays ``unknown``.
+    A this-week URL or report slug does not win over a provably old PDF
+    heading (Ardara: slug 04/10/2026, body week of 13/09/2026). Undated URLs
+    stay ``unknown`` unless the body heading is stale or the text only
+    mentions ancient years (Attymass ``/latest/newsletter.pdf``). A this-week
+    body heading does not invent ``fresh`` over an unknown URL.
     """
-    verdict = check_bulletin_freshness(url, target)
-    if verdict.status != "unknown":
-        return verdict
+    from .bulletin_freshness import pdf_body_stale_verdict
+
+    verdict = check_bulletin_freshness(url, target) if (url or "").strip() else FreshnessVerdict(
+        status="unknown", reason="no_date_in_url"
+    )
     if not dest.exists():
         return verdict
-    body_date = extract_pdf_bulletin_date(dest)
-    if body_date is None:
-        return verdict
-    body_verdict = verdict_for_extracted_date(body_date, target)
-    if body_verdict.status == "stale":
-        return body_verdict
+    body_stale = pdf_body_stale_verdict(dest, target)
+    if body_stale is not None:
+        return body_stale
     return verdict
 
 

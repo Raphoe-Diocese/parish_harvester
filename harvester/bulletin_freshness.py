@@ -551,6 +551,76 @@ def _parse_iso_date(raw: object) -> date | None:
         return None
 
 
+# Body-year trap for undated /latest/ PDFs whose heading has no week stamp
+# (Attymass 08/10/2026: only 2020–2022 years in the text, still marked ok).
+_BODY_YEAR_RE = re.compile(r"\b(20\d{2})\b")
+# Newest year in the PDF must be at least this many years behind target.
+_ANCIENT_BODY_YEAR_GAP = 3
+
+
+def read_pdf_text_head(path: Path, max_pages: int = 4) -> str:
+    """Embedded PDF text from the first pages (same text born-digital OCR sees)."""
+    try:
+        from pypdf import PdfReader
+
+        reader = PdfReader(str(path))
+    except Exception:
+        return ""
+    chunks: list[str] = []
+    for page in reader.pages[:max_pages]:
+        try:
+            chunks.append(page.extract_text() or "")
+        except Exception:
+            chunks.append("")
+    return "\n".join(chunks)
+
+
+def verdict_from_ancient_body_years(
+    text: str, target: date
+) -> FreshnessVerdict | None:
+    """Stale when the PDF only mentions years far behind the harvest year.
+
+    Does not invent a week stamp from story text. Requires at least two year
+    hits and no year in target.year-1 .. future, so a current bulletin that
+    mentions an old fundraising year plus 2026 stays unknown/fresh elsewhere.
+    """
+    years = [int(match) for match in _BODY_YEAR_RE.findall(text or "")]
+    if len(years) < 2:
+        return None
+    newest = max(years)
+    if newest >= target.year - 1:
+        return None
+    if newest > target.year - _ANCIENT_BODY_YEAR_GAP:
+        return None
+    extracted = date(newest, 12, 31)
+    return FreshnessVerdict(
+        status="stale",
+        extracted_date=extracted,
+        reason="body_years_only_ancient",
+        days_from_target=(extracted - target).days,
+    )
+
+
+def pdf_body_stale_verdict(path: Path, target: date) -> FreshnessVerdict | None:
+    """Return stale when PDF heading or ancient-only years prove the file is old.
+
+    Harvest-time referee uses embedded PDF text here — the same characters a
+    later OCR pass would read on born-digital pages. Vision OCR still runs
+    after the mega for image-only scans; those stay unknown until a heading
+    date appears.
+    """
+    text = read_pdf_text_head(path)
+    if not text.strip():
+        return None
+    body_date = extract_bulletin_date_from_text(text)
+    if body_date is not None:
+        verdict = verdict_for_extracted_date(body_date, target)
+        if verdict.status == "stale":
+            return verdict
+        return None
+    return verdict_from_ancient_body_years(text, target)
+
+
 def freshness_verdict_for_ok_result(
     result: FetchResult,
     target: date,
@@ -559,34 +629,27 @@ def freshness_verdict_for_ok_result(
 ) -> FreshnessVerdict:
     """URL / report date / PDF-body freshness for one ok download.
 
-    Order: report ``bulletin_date`` when present, else URL date, else PDF
-    heading when the URL is undated or missing (H1). A this-week heading does
-    not invent ``fresh`` over an unknown URL.
+    Report ``bulletin_date`` or URL date is the first guess, but a provably
+    old PDF body (heading date or ancient-only years) always wins — otherwise
+    a this-week slug with last month's print slips into the mega (Ardara
+    08/10/2026: URL 04/10, body 13/09).
     """
-    if report_bulletin_date is not None:
-        return verdict_for_extracted_date(report_bulletin_date, target)
-
     url = (result.url or "").strip()
     pdf_path = result.file_path
     pdf_exists = pdf_path is not None and Path(pdf_path).exists()
 
-    if url:
+    if report_bulletin_date is not None:
+        verdict = verdict_for_extracted_date(report_bulletin_date, target)
+    elif url:
         verdict = check_bulletin_freshness(url, target)
-        if verdict.status != "unknown":
-            return verdict
-        if pdf_exists:
-            from .fetcher import freshness_after_unknown_url
-
-            return freshness_after_unknown_url(url, Path(pdf_path), target)
-        return verdict
+    else:
+        verdict = FreshnessVerdict(status="unknown", reason="no_date_in_url")
 
     if pdf_exists:
-        from .fetcher import extract_pdf_bulletin_date
-
-        body_date = extract_pdf_bulletin_date(Path(pdf_path))
-        if body_date is not None:
-            return verdict_for_extracted_date(body_date, target)
-    return FreshnessVerdict(status="unknown", reason="no_date_in_url")
+        body_stale = pdf_body_stale_verdict(Path(pdf_path), target)
+        if body_stale is not None:
+            return body_stale
+    return verdict
 
 
 def reclassify_stale_downloaded_in_report(
@@ -791,9 +854,9 @@ def apply_freshness_safety_net(
     URL that was actually old, empty-URL stitch stubs rebuilt from disk, or
     results rebuilt from cache).
 
-    Undated / missing URLs stay unknown unless a PDF exists and the bulletin
-    heading date is provably old (same rule as H1 ``freshness_after_unknown_url``).
-    A this-week or grace-fresh heading does not invent ``fresh``.
+    Uses ``freshness_verdict_for_ok_result`` so a this-week URL or report date
+    cannot keep a PDF whose body heading (or ancient-only years) is stale.
+    A this-week body heading does not invent ``fresh`` over an unknown URL.
     """
     entries_by_key = entries_by_key or {}
     queue_path = retry_queue_path or _RETRY_QUEUE_PATH

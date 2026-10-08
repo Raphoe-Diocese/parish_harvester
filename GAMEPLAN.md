@@ -1,3 +1,7 @@
+﻿## 08/10/2026 — referee body beats URL (Raphoe/Achonry)
+
+- Why stale megas: URL/report date won over PDF text (Ardara slug 04/10, body 13/09). Undated /latest/ with only old years (Attymass 2021/2022) stayed unknown=ok. Referee does not wait for OCR — uses embedded PDF text at harvest; OCR is later for the viewer.
+- Fix: pdf_body_stale_verdict — body heading stale or body_years_only_ancient beats URL/report. Tests green. Next: merge + harvest raphoe_diocese and achonry_diocese on GitHub.
 ## 05/10/2026 night — Armagh continuous hunt pass 1 (cloud)
 
 - Frank: keep going until many more this-week bulletins. Harvest week Sunday 04/10/2026 (also 27/09, 03–05/10). Did not dispatch harvest.yml. Did not regenerate all docs/. Mega PDF stays on.
@@ -22620,6 +22624,7 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
 
 
 

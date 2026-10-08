@@ -273,6 +273,47 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
             self.assertEqual(verdict.status, "unknown")
             self.assertEqual(verdict.reason, "no_date_in_url")
 
+    def test_dated_url_loses_to_stale_body_heading(self) -> None:
+        # Ardara: slug says 4 Oct, printed PDF still week of 13 Sep.
+        dated = (
+            "https://ardara.ie/notices/"
+            "church-of-the-holy-family-newsletter-sun-4th-october-26/"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "ardara.pdf"
+            self._heading_pdf(
+                pdf,
+                "Twenty-fourth Sunday in Ordinary Time "
+                "Week beginning: 13th September 2026",
+            )
+            verdict = freshness_after_unknown_url(
+                dated, pdf, date(2026, 10, 4)
+            )
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 9, 13))
+
+    def test_undated_latest_url_ancient_years_only_is_stale(self) -> None:
+        # Attymass /latest/newsletter.pdf — no week stamp, only 2021/2022 years.
+        latest = (
+            "http://www.attymassparish.org/newsletter_archive/"
+            "latest/newsletter.pdf"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "attymass.pdf"
+            self._heading_pdf(
+                pdf,
+                "VENUE DATE TIME CELEBRATIONS",
+                "Pilgrim Players 12-14 August 2022",
+                "2021 Mission Sunday collection",
+                "passed away during the coronavirus pandemic",
+            )
+            verdict = freshness_after_unknown_url(
+                latest, pdf, date(2026, 10, 4)
+            )
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.reason, "body_years_only_ancient")
+            self.assertEqual(verdict.extracted_date, date(2022, 12, 31))
+
 
 if __name__ == "__main__":
     unittest.main()
