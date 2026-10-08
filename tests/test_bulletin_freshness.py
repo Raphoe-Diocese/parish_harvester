@@ -12,6 +12,7 @@ from harvester.bulletin_freshness import (
     check_bulletin_freshness,
     extract_bulletin_date,
     extract_bulletin_date_from_text,
+    freshness_verdict_for_ok_result,
     mark_result_stale,
     suggest_retry_strategy,
     verdict_for_extracted_date,
@@ -720,6 +721,78 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
             "https://www.loughshoreparishes.org/app/uploads/2026/09/"
             "23rd-Sunday-in-Ordinary-Time.pdf",
         )
+
+
+class BodyBeatsUrlFreshnessTests(unittest.TestCase):
+    """PDF body stale must beat a this-week URL or report bulletin_date."""
+
+    TARGET = date(2026, 10, 4)
+
+    def _heading_pdf(self, path: Path, *lines: str) -> None:
+        c = canvas.Canvas(str(path))
+        y = 700
+        for line in lines:
+            c.drawString(72, y, line)
+            y -= 18
+        c.save()
+
+    def test_report_date_fresh_body_september_is_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "ardara.pdf"
+            self._heading_pdf(
+                pdf,
+                "Twenty-fourth Sunday in Ordinary Time "
+                "Week beginning: 13th September 2026",
+            )
+            result = FetchResult(
+                key="ardara",
+                display_name="Ardara",
+                status="ok",
+                url=(
+                    "https://ardara.ie/notices/"
+                    "church-of-the-holy-family-newsletter-sun-4th-october-26/"
+                ),
+                file_path=pdf,
+                file_type="print_to_pdf",
+            )
+            verdict = freshness_verdict_for_ok_result(
+                result,
+                self.TARGET,
+                report_bulletin_date=date(2026, 10, 4),
+            )
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 9, 13))
+
+    def test_safety_net_rejects_dated_url_with_ancient_body_years(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "attymass.pdf"
+            self._heading_pdf(
+                pdf,
+                "Pilgrim Players August 2022",
+                "2021 Mission Sunday collection to 15th March",
+            )
+            result = FetchResult(
+                key="attymass",
+                display_name="Attymass",
+                status="ok",
+                url=(
+                    "http://www.attymassparish.org/newsletter_archive/"
+                    "latest/newsletter.pdf"
+                ),
+                file_path=pdf,
+                file_type="pdf",
+            )
+            payload = apply_freshness_safety_net(
+                [result],
+                self.TARGET,
+                retry_queue_path=Path(tmp) / "retry_queue.json",
+            )
+            self.assertTrue(result.is_stale)
+            self.assertEqual(len(payload["rejected_from_mega"]), 1)
+            self.assertEqual(
+                payload["rejected_from_mega"][0]["reason"],
+                "body_years_only_ancient",
+            )
 
 
 if __name__ == "__main__":
