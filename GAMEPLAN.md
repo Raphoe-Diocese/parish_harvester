@@ -1,4 +1,7 @@
-﻿## 08/10/2026 — referee body gate used pypdf (missing on CI)
+﻿## 08/10/2026 — Ardara retry accepted URL without body
+
+- Attymass stale ok after #323. Ardara still ok with 13/09 body: stale recovery retry used URL-only check and took the Oct slug again. Fix: _retry_pdf_still_stale uses body gate. Re-harvest Raphoe after merge.
+## 08/10/2026 — referee body gate used pypdf (missing on CI)
 
 - Root cause: read_pdf_text_head imported pypdf; Actions only has PyPDF2. Empty text → Ardara/Attymass never stale. Fixed to PyPDF2. Re-harvest after merge.
 ## 08/10/2026 evening — harvests green but Ardara/Attymass still ok
@@ -22632,6 +22635,7 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
 
 
 

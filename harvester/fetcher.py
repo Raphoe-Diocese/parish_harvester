@@ -2028,6 +2028,19 @@ def freshness_after_unknown_url(url: str, dest: Path, target: date) -> Freshness
     return verdict
 
 
+def _retry_pdf_still_stale(url: str, dest: Path, target: date) -> bool:
+    """True when a stale-recovery candidate is still not this week's PDF.
+
+    URL-only checks are not enough: Ardara's Oct slug with a Sept print was
+    accepted on retry (08/10/2026) because ``check_bulletin_freshness`` saw
+    fresh while the body was still 13/09.
+    """
+    pdf_path = dest
+    if not pdf_path.exists():
+        return True
+    return freshness_after_unknown_url(url, pdf_path, target).status == "stale"
+
+
 async def _recover_stale_bulletin(
     result: FetchResult,
     entry: ParishEntry,
@@ -2052,7 +2065,13 @@ async def _recover_stale_bulletin(
             error=blocked,
         )
 
-    verdict = freshness_after_unknown_url(result.url, dest, target)
+    # Prefer the on-disk PDF path that actually has bytes (recipe may leave
+    # file_path set while dest was cleared mid-retry).
+    check_dest = dest
+    if not check_dest.exists() and result.file_path and Path(result.file_path).exists():
+        check_dest = Path(result.file_path)
+
+    verdict = freshness_after_unknown_url(result.url, check_dest, target)
     if verdict.status != "stale":
         return result
 
@@ -2086,7 +2105,13 @@ async def _recover_stale_bulletin(
                     host_profile,
                 )
                 if refreshed is not None and refreshed.status == "ok":
-                    if check_bulletin_freshness(refreshed.url or scrape_url, target).status != "stale":
+                    retry_url = refreshed.url or scrape_url
+                    retry_pdf = (
+                        Path(refreshed.file_path)
+                        if refreshed.file_path and Path(refreshed.file_path).exists()
+                        else dest
+                    )
+                    if not _retry_pdf_still_stale(retry_url, retry_pdf, target):
                         print(f"  ✅ {entry.key}: HTML recapture found current-week bulletin")
                         return refreshed
                 continue
@@ -2102,7 +2127,12 @@ async def _recover_stale_bulletin(
             )
             if scraped.status != "ok" or not scraped.url:
                 continue
-            if check_bulletin_freshness(scraped.url, target).status != "stale":
+            retry_pdf = (
+                Path(scraped.file_path)
+                if scraped.file_path and Path(scraped.file_path).exists()
+                else dest
+            )
+            if not _retry_pdf_still_stale(scraped.url, retry_pdf, target):
                 print(f"  ✅ {entry.key}: rescrape found current-week bulletin")
                 return scraped
 
@@ -2119,7 +2149,7 @@ async def _recover_stale_bulletin(
                     timeout_ms=navigation_timeout_ms,
                 )
                 if _is_real_pdf(dest, entry.key, max_pages=recipe_max_bulletin_pages(recipe_meta)):
-                    if check_bulletin_freshness(new_url, target).status != "stale":
+                    if not _retry_pdf_still_stale(new_url, dest, target):
                         print(f"  ✅ {entry.key}: pattern detect found current-week URL")
                         return FetchResult(
                             key=entry.key,
