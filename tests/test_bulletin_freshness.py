@@ -746,6 +746,14 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
             y -= 18
         c.save()
 
+    def test_week_beginning_line_alone_is_a_heading_date(self) -> None:
+        self.assertEqual(
+            extract_bulletin_date_from_text(
+                "Week beginning: 13th September 2026\nWeekend Mass Times"
+            ),
+            date(2026, 9, 13),
+        )
+
     def test_report_date_fresh_body_september_is_stale(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             pdf = Path(tmp) / "ardara.pdf"
