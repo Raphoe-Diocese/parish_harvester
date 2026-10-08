@@ -144,6 +144,24 @@ def relabel_leftover_parish_pages(
         if updated != original:
             _write_text(html_path, updated)
             relabelled.append(key)
+        # Drop leftover parish PDF slices — they keep last week's pages after
+        # the mega no longer includes the parish (08/10/2026 Ardara.pdf).
+        pdf_left = out_root / f"{key}.pdf"
+        if pdf_left.exists():
+            try:
+                pdf_left.unlink()
+            except OSError:
+                pass
+        for sibling in (out_root / f"{key}-ocr.html", out_root / f"{key}-pdf.html"):
+            if not sibling.exists():
+                continue
+            try:
+                body = sibling.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            stamped = apply_stale_caption_to_html(body, meta_line, note)
+            if stamped != body:
+                _write_text(sibling, stamped)
     return relabelled
 
 

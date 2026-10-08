@@ -137,6 +137,29 @@ def _build_ocr_fragment(
     return f'<pre style="white-space:pre-wrap;margin:0;font-family:inherit;">{html.escape(normalized)}</pre>'
 
 
+
+def _az_names_for_mega(
+    tuple_links: list[tuple[str, str]],
+    parish_page_index: dict[str, int] | None,
+) -> list[str]:
+    """Jump-to lists only parishes present in this week's mega page index."""
+    names = [name for name, _url in tuple_links]
+    if not parish_page_index:
+        return names
+    kept: list[str] = []
+    for name in names:
+        n = str(name or "").strip()
+        if not n:
+            continue
+        nl = n.lower()
+        for k in parish_page_index:
+            kl = str(k).strip().lower()
+            if nl == kl:
+                kept.append(n)
+                break
+    return kept
+
+
 def render_diocese_raphoe_page(
     parish_links: list[dict],
     out_path: Path,
@@ -206,7 +229,7 @@ def render_diocese_raphoe_page(
         parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
         parish_links_html=render_parish_link_grid(tuple_links, internal_hrefs=internal_parish_hrefs),
         intro_html=intro_html,
-        az_names=[name for name, _url in tuple_links],
+        az_names=_az_names_for_mega(tuple_links, parish_page_index),
         parish_page_index=parish_page_index,
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
