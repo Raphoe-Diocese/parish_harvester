@@ -1393,7 +1393,7 @@ function _problemsRowsFromStatus(status, retrainedMap) {
       diagnosis,
       outcome: String(item.outcome || ""),
       bulletin_date: _problemsBulletinDateFromStatus(item),
-      advice: _problemsFailureAdvice(errorText, diagnosis),
+      advice: _problemsFailureAdvice(errorText, diagnosis, item),
       category: item.category || _problemsCategory(errorText, { diagnosis }),
       last_seen: _problemsFormatLastSeen(item, status) || defaultLastSeen,
       consecutive_failures: Number(item.consecutive_failures || 0),
@@ -1445,17 +1445,26 @@ function _pdStatusDot(parish) {
   return "⬜";
 }
 
-function _problemsFailureAdvice(errorText, diagnosis) {
+function _problemsFailureAdvice(errorText, diagnosis, statusItem) {
   const text = String(errorText || "");
   const diag = diagnosis && typeof diagnosis === "object" ? diagnosis : {};
+  const item = statusItem && typeof statusItem === "object" ? statusItem : {};
   const harvestNote = String(diag.harvest_note || "").trim();
   if (harvestNote) return harvestNote;
-  if (/Stale bulletin rejected/i.test(text)) {
-    const rawDate = String(diag.bulletin_date || text.match(/bulletin date\s+([^,)]+)/i)?.[1] || "").trim();
+  const outcome = String(item.outcome || "").toLowerCase();
+  const category = String(item.category || "").toLowerCase();
+  if (
+    outcome === "stale"
+    || category.includes("too old")
+    || /Stale bulletin rejected/i.test(text)
+  ) {
+    const rawDate = String(
+      item.bulletin_date || diag.bulletin_date || text.match(/bulletin date\s+([^,)]+)/i)?.[1] || ""
+    ).trim();
     const date = rawDate.replace(/(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${d}/${m}/${y}`);
     return date
-      ? `Your recipe worked — harvest downloaded a ${date} bulletin but this week needs a newer one. Open this Sunday's newsletter and end with print_to_pdf.`
-      : "Your recipe worked but the bulletin was too old for this harvest week.";
+      ? `Recipe worked — site still has ${date}. Find this week's PDF/page (not last week's) and Send & test again. Retraining the same old file will stay stale.`
+      : "Recipe worked but the bulletin is still too old for this week. Open the newest newsletter, then Send & test.";
   }
   if (/Recipe for .* is outdated/i.test(text)) {
     return "Harvest ran your recipe on GitHub but a click selector broke (menu or link moved). Re-record from the parish news page.";

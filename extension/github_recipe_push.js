@@ -291,7 +291,7 @@
     const headers = authHeaders(gh_pat_clean, true);
     const encoded = encodeGithubBase64(JSON.stringify(merged, null, 2));
     const putBody = {
-      message: `chore: update recipe for ${key} [${merged.diocese || "unknown"}]`,
+      message: `chore: update recipe for ${key} [${merged.diocese || "unknown"}] [skip ci]`,
       content: encoded,
       branch: "main",
       ...(existingSha ? { sha: existingSha } : {}),
@@ -347,12 +347,67 @@
     };
   };
 
+
+  const parishKeyInEvidence = async (gh_pat, gh_repo, parishKey, dioceseInput) => {
+    const key = String(parishKey || "").trim().toLowerCase();
+    if (!key) return false;
+    let stem = String(dioceseInput || "").trim().toLowerCase();
+    if (stem === "all" || !stem) return null;
+    if (!stem.endsWith("_diocese")) stem = `${stem}_diocese`;
+    const path = `parishes/${stem}_bulletin_urls.txt`;
+    const headers = authHeaders(gh_pat);
+    const resp = await fetchGithub(
+      `https://api.github.com/repos/${gh_repo}/contents/${path}`,
+      headers,
+      15000
+    );
+    if (resp.status === 404) return false;
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    let text = "";
+    try {
+      text = atob(String(data.content || "").replace(/\n/g, ""));
+    } catch (_e) {
+      return null;
+    }
+    const blocks = text.split(/\n(?=#\s)/);
+    for (const block of blocks) {
+      const headerMatch = block.match(/^#\s*([^\n\u2014\u2013\-]+)/);
+      const header = String(headerMatch?.[1] || "").trim().toLowerCase();
+      const slug = header
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_|_$/g, "");
+      if (slug === key) return true;
+      if (slug.replace(/_parish$/, "") === key.replace(/_parish$/, "")) return true;
+      const esc = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (new RegExp(`\\b${esc}\\b`, "i").test(block)) return true;
+    }
+    return false;
+  };
+
   const dispatchHarvestTest = async ({ gh_pat, gh_repo: storedRepo, parish_key, diocese }) => {
     const gh_pat_clean = String(gh_pat || "").trim();
     if (!gh_pat_clean) return { ok: false, error: "GitHub PAT not configured." };
     const gh_repo = resolveGhRepo(storedRepo);
     const key = String(parish_key || "").trim().toLowerCase();
     const dioceseInput = harvestWorkflowDiocese(diocese);
+    // Harvest only sees parishes listed in the evidence file. Recipe-only
+    // keys (e.g. churchtv 09/10/2026) hard-fail with "not found in diocese"
+    // and look like Send & test was refused.
+    try {
+      const evidenceOk = await parishKeyInEvidence(gh_pat_clean, gh_repo, key, dioceseInput);
+      if (evidenceOk === false) {
+        return {
+          ok: false,
+          error:
+            `Parish "${key}" is not on the harvest list for ${dioceseInput}. ` +
+            "In Problems, Add parish (or pick the real parish key), then Send & test again. " +
+            "Saving the recipe alone is not enough.",
+        };
+      }
+    } catch (_ev) {
+      /* network miss — still try dispatch */
+    }
     const headers = authHeaders(gh_pat_clean, true);
     const resp = await fetchGithub(
       `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/dispatches`,
@@ -909,6 +964,7 @@
     examplePostUrlFromSteps,
     verifyRecipe,
     dispatchHarvestTest,
+    parishKeyInEvidence,
     fetchReportJson,
     fetchLatestFileCommit,
     fetchParishStatusJson,

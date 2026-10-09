@@ -1,4 +1,11 @@
-﻿## 09/10/2026 — Ardara still on screen = stale p1.jpg (NOW)
+﻿## 09/10/2026 — Send & test looked refused (NOW)
+
+- Frank: fixes sent got refused. Proved: (1) recipe commits triggered Run tests with cancel-in-progress so Actions showed cancelled; (2) churchtv recipe saved but key not in Derry evidence — harvest hard-failed not found in diocese. Ballymote recipe DID land; status still stale 01/09.
+- Fix Trainer 1.61.44: recipe/learn commits use [skip ci]; Send & test checks evidence before dispatch; harvest can test recipe-only key; Problems stale advice says do not retrain same old file. Reload extension after merge.
+## 09/10/2026 — Raphoe p1.jpg live proved
+
+- Live https://www.parishpress.ie/mega_pdf/raphoe_mega_bulletin_p1.jpg is Annagry (Anagaire / 27th Sunday / Oct), not Ardara Sept. Size 114097; Last-Modified 09/10/2026. Harvest 37862173704 + #327. Done.
+## 09/10/2026 — Ardara still on screen = stale p1.jpg (NOW)
 
 - Frank screenshot: Raphoe mega viewer shows Ardara 13/09, banner 15 pages. Proved: live PDF page 1 text is Annagry (no Week beginning); live raphoe_mega_bulletin_p1.jpg is still Ardara Sept. Viewer shows that preview. One-diocese harvest committed PDF but not p1.jpg. Fix: commit p1.jpg too; delete leftover stale parish PDFs; Jump-to only mega index names. Then re-harvest raphoe.
 ## 08/10/2026 — #326 live proved

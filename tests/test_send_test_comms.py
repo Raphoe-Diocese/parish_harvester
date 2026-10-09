@@ -23,6 +23,10 @@ class SendTestCommsTests(unittest.TestCase):
         push = PUSH_JS.read_text(encoding="utf-8")
         self.assertIn("GitHub could not start harvest.yml (404)", push)
         self.assertIn("harvest.yml/dispatches", push)
+        self.assertIn("parishKeyInEvidence", push)
+        self.assertIn("not on the harvest list", push)
+        self.assertIn("[skip ci]", push)
+        self.assertIn("update recipe for ${key}", push)
 
     def test_poll_finishes_on_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
@@ -55,7 +59,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.43"', text)
+        self.assertIn('"version": "1.61.44"', text)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("T6: a dated bulletin page is this week's post", content)
         self.assertIn("await _setToolbarHiddenForHost(false);", content)

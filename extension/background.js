@@ -774,7 +774,7 @@ async function _upsertHostProfile(gh_pat, gh_repo, recipe) {
     HOST_PROFILES_PATH,
     profile,
     loaded.sha,
-    `chore: learn host profile for ${host}`
+    `chore: learn host profile for ${host} [skip ci]`
   );
 }
 
@@ -898,7 +898,7 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     SITE_PATTERNS_PATH,
     library,
     loaded.sha,
-    `chore: learn site pattern for ${parishKey} (${combined})`
+    `chore: learn site pattern for ${parishKey} (${combined}) [skip ci]`
   );
 }
 
@@ -1546,7 +1546,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const encoded    = btoa(unescape(encodeURIComponent(recipeJson)));
 
       const body = {
-        message: `chore: update recipe for ${key} [${recipeDiocese || "unknown diocese"}]`,
+        message: `chore: update recipe for ${key} [${recipeDiocese || "unknown diocese"}] [skip ci]`,
         content: encoded,
         branch: "main",
         ...(existingSha ? { sha: existingSha } : {}),
