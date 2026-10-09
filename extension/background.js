@@ -1180,9 +1180,9 @@ function _normalizeRecipeTerminalSteps(recipe) {
 }
 
 function _canonicalDioceseSlug(value) {
-  const raw = String(value || "").trim().toLowerCase();
+  let raw = String(value || "").trim().toLowerCase();
   if (!raw) return "";
-  if (raw === "derry" || raw === "derry_diocese" || raw === "derry diocese") return "derry";
+  if (raw === "all") return "all";
   if (
     raw === "down_and_connor" ||
     raw === "down & connor" ||
@@ -1193,23 +1193,48 @@ function _canonicalDioceseSlug(value) {
   ) {
     return "down_and_connor";
   }
-  if (raw === "raphoe" || raw === "raphoe_diocese" || raw === "raphoe diocese") return "raphoe";
-  if (raw === "clogher" || raw === "clogher_diocese" || raw === "clogher diocese") return "clogher";
-  const normalized = raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-  return normalized;
+  raw = raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  if (raw.endsWith("_diocese")) raw = raw.slice(0, -"_diocese".length);
+  return raw;
 }
+
+const _HARVEST_DIOCESE_NO_SUFFIX = new Set(["cork_and_ross", "down_and_connor"]);
 
 function _harvestWorkflowDiocese(value) {
   const slug = _canonicalDioceseSlug(value);
-  if (!slug) return "all";
-  if (slug === "clogher") return "clogher_diocese";
-  if (slug === "derry") return "derry_diocese";
-  if (slug === "raphoe") return "raphoe_diocese";
-  if (slug === "down_and_connor") return "down_and_connor";
-  return slug;
+  if (!slug || slug === "all" || slug === "unknown") return "all";
+  if (_HARVEST_DIOCESE_NO_SUFFIX.has(slug)) return slug;
+  return `${slug}_diocese`;
 }
 
-const _RECIPE_DIOCESE_FOLDERS = ["achonry", "clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe", "unknown"];
+const _RECIPE_DIOCESE_FOLDERS = [
+  "achonry",
+  "ardagh",
+  "armagh",
+  "cashel_and_emly",
+  "clogher",
+  "cloyne",
+  "cork_and_ross",
+  "derry",
+  "down_and_connor",
+  "dromore",
+  "dublin",
+  "elphin",
+  "ferns",
+  "galway",
+  "kerry",
+  "kildare_and_leighlin",
+  "killala",
+  "killaloe",
+  "kilmore",
+  "limerick",
+  "meath",
+  "ossory",
+  "raphoe",
+  "tuam",
+  "waterford_and_lismore",
+  "unknown",
+];
 
 async function _fetchGithubJson(url, headers, timeoutMs = 45000, init = {}) {
   const controller = new AbortController();

@@ -3,23 +3,61 @@
  * Content calls this directly so pushes survive MV3 service-worker sleep.
  */
 (function initPhGithubRecipePush(global) {
-  const DIOCESE_FOLDERS = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe", "unknown"];
+  // Must match every folder under parishes/recipes/ (except keep "unknown" last).
+  const DIOCESE_FOLDERS = [
+    "achonry",
+    "ardagh",
+    "armagh",
+    "cashel_and_emly",
+    "clogher",
+    "cloyne",
+    "cork_and_ross",
+    "derry",
+    "down_and_connor",
+    "dromore",
+    "dublin",
+    "elphin",
+    "ferns",
+    "galway",
+    "kerry",
+    "kildare_and_leighlin",
+    "killala",
+    "killaloe",
+    "kilmore",
+    "limerick",
+    "meath",
+    "ossory",
+    "raphoe",
+    "tuam",
+    "waterford_and_lismore",
+    "unknown",
+  ];
+
+  // harvest.yml choice values omit "_diocese" only for these two (matches evidence filenames).
+  const HARVEST_DIOCESE_NO_SUFFIX = new Set(["cork_and_ross", "down_and_connor"]);
 
   /** Map recipe/slug names to harvest.yml workflow_dispatch diocese input. */
   const harvestWorkflowDiocese = (value) => {
     const slug = canonicalDioceseSlug(value);
-    if (!slug) return "all";
-    if (slug === "clogher") return "clogher_diocese";
-    if (slug === "derry") return "derry_diocese";
-    if (slug === "raphoe") return "raphoe_diocese";
-    if (slug === "down_and_connor") return "down_and_connor";
-    return slug;
+    if (!slug || slug === "all" || slug === "unknown") return "all";
+    if (HARVEST_DIOCESE_NO_SUFFIX.has(slug)) return slug;
+    return `${slug}_diocese`;
+  };
+
+  /** Evidence bulletin list path for a recipe folder or harvest.yml diocese input. */
+  const evidenceBulletinPath = (value) => {
+    const slug = canonicalDioceseSlug(value);
+    if (!slug || slug === "all" || slug === "unknown") return "";
+    if (HARVEST_DIOCESE_NO_SUFFIX.has(slug)) {
+      return `parishes/${slug}_bulletin_urls.txt`;
+    }
+    return `parishes/${slug}_diocese_bulletin_urls.txt`;
   };
 
   const canonicalDioceseSlug = (value) => {
-    const raw = String(value || "").trim().toLowerCase();
+    let raw = String(value || "").trim().toLowerCase();
     if (!raw) return "";
-    if (raw === "derry" || raw === "derry_diocese" || raw === "derry diocese") return "derry";
+    if (raw === "all") return "all";
     if (
       raw === "down_and_connor" ||
       raw === "down & connor" ||
@@ -30,9 +68,9 @@
     ) {
       return "down_and_connor";
     }
-    if (raw === "raphoe" || raw === "raphoe_diocese" || raw === "raphoe diocese") return "raphoe";
-    if (raw === "clogher" || raw === "clogher_diocese" || raw === "clogher diocese") return "clogher";
-    return raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    raw = raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    if (raw.endsWith("_diocese")) raw = raw.slice(0, -"_diocese".length);
+    return raw;
   };
 
   const resolveGhRepo = (storedRepo) => {
@@ -351,10 +389,8 @@
   const parishKeyInEvidence = async (gh_pat, gh_repo, parishKey, dioceseInput) => {
     const key = String(parishKey || "").trim().toLowerCase();
     if (!key) return false;
-    let stem = String(dioceseInput || "").trim().toLowerCase();
-    if (stem === "all" || !stem) return null;
-    if (!stem.endsWith("_diocese")) stem = `${stem}_diocese`;
-    const path = `parishes/${stem}_bulletin_urls.txt`;
+    const path = evidenceBulletinPath(dioceseInput);
+    if (!path) return null;
     const headers = authHeaders(gh_pat);
     const resp = await fetchGithub(
       `https://api.github.com/repos/${gh_repo}/contents/${path}`,
@@ -954,6 +990,7 @@
   global.phGithubRecipePush = {
     canonicalDioceseSlug,
     harvestWorkflowDiocese,
+    evidenceBulletinPath,
     resolveGhRepo,
     githubRateLimitMessage,
     githubApiError,

@@ -246,12 +246,31 @@ document.getElementById("gh-save").addEventListener("click", () => {
 //   • exclude ☑   → add / remove the parish key from parishes/mega_excludes.json
 
 const PD_EVIDENCE_FILES_FALLBACK = {
-  "Clogher Diocese":       "parishes/clogher_diocese_bulletin_urls.txt",
-  "Derry Diocese":         "parishes/derry_diocese_bulletin_urls.txt",
-  "Down & Connor Diocese": "parishes/down_and_connor_bulletin_urls.txt",
-  "Raphoe Diocese":        "parishes/raphoe_diocese_bulletin_urls.txt",
+  "Achonry Diocese": "parishes/achonry_diocese_bulletin_urls.txt",
+  "Ardagh and Clonmacnoise Diocese": "parishes/ardagh_diocese_bulletin_urls.txt",
+  "Armagh Diocese": "parishes/armagh_diocese_bulletin_urls.txt",
+  "Cashel and Emly Diocese": "parishes/cashel_and_emly_diocese_bulletin_urls.txt",
+  "Clogher Diocese": "parishes/clogher_diocese_bulletin_urls.txt",
+  "Cloyne Diocese": "parishes/cloyne_diocese_bulletin_urls.txt",
   "Cork and Ross Diocese": "parishes/cork_and_ross_bulletin_urls.txt",
-  "Achonry Diocese":       "parishes/achonry_diocese_bulletin_urls.txt",
+  "Derry Diocese": "parishes/derry_diocese_bulletin_urls.txt",
+  "Down & Connor Diocese": "parishes/down_and_connor_bulletin_urls.txt",
+  "Dromore Diocese": "parishes/dromore_diocese_bulletin_urls.txt",
+  "Dublin Archdiocese": "parishes/dublin_diocese_bulletin_urls.txt",
+  "Elphin Diocese": "parishes/elphin_diocese_bulletin_urls.txt",
+  "Ferns Diocese": "parishes/ferns_diocese_bulletin_urls.txt",
+  "Galway Diocese": "parishes/galway_diocese_bulletin_urls.txt",
+  "Kerry Diocese": "parishes/kerry_diocese_bulletin_urls.txt",
+  "Kildare and Leighlin Diocese": "parishes/kildare_and_leighlin_diocese_bulletin_urls.txt",
+  "Killala Diocese": "parishes/killala_diocese_bulletin_urls.txt",
+  "Killaloe Diocese": "parishes/killaloe_diocese_bulletin_urls.txt",
+  "Kilmore Diocese": "parishes/kilmore_diocese_bulletin_urls.txt",
+  "Limerick Diocese": "parishes/limerick_diocese_bulletin_urls.txt",
+  "Meath Diocese": "parishes/meath_diocese_bulletin_urls.txt",
+  "Ossory Diocese": "parishes/ossory_diocese_bulletin_urls.txt",
+  "Raphoe Diocese": "parishes/raphoe_diocese_bulletin_urls.txt",
+  "Tuam Archdiocese": "parishes/tuam_diocese_bulletin_urls.txt",
+  "Waterford and Lismore Diocese": "parishes/waterford_and_lismore_diocese_bulletin_urls.txt",
 };
 let PD_EVIDENCE_FILES = { ...PD_EVIDENCE_FILES_FALLBACK };
 const DIOCESES_JSON_PATH = "parishes/dioceses.json";
