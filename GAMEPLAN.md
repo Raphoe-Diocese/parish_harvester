@@ -1,7 +1,12 @@
-﻿## 09/10/2026 — Send & test looked refused (NOW)
+﻿## 09/10/2026 — Send & test diocese not in choices (NOW)
+
+- Frank Emly/Tubbercurry screenshots: recipe saved, GitHub test refused — `Provided value 'cashel_and_emly'/'achonry' for input 'diocese' not in the list of choices`. Cause: Trainer sent recipe folder slug; harvest.yml wants `*_diocese` (except cork_and_ross / down_and_connor). Harvest-list gate also built wrong evidence path for those two.
+- Fix Trainer 1.61.45: map every recipes/ folder to harvest.yml choice; evidenceBulletinPath for cork/D&C; expand DIOCESE_FOLDERS + dioceses.json + pickers. Test locks harvest.yml options = recipe folders. Not live until merge + Reload.
+
+## 09/10/2026 — Send & test looked refused (DONE)
 
 - Frank: fixes sent got refused. Proved: (1) recipe commits triggered Run tests with cancel-in-progress so Actions showed cancelled; (2) churchtv recipe saved but key not in Derry evidence — harvest hard-failed not found in diocese. Ballymote recipe DID land; status still stale 01/09.
-- Fix Trainer 1.61.44: recipe/learn commits use [skip ci]; Send & test checks evidence before dispatch; harvest can test recipe-only key; Problems stale advice says do not retrain same old file. Reload extension after merge.
+- Fix Trainer 1.61.44 merged PR #328 (`fa77626d`): recipe/learn commits use [skip ci]; Send & test checks evidence before dispatch; harvest can test recipe-only key; Problems stale advice says do not retrain same old file. Frank: Reload at chrome://extensions.
 ## 09/10/2026 — Raphoe p1.jpg live proved
 
 - Live https://www.parishpress.ie/mega_pdf/raphoe_mega_bulletin_p1.jpg is Annagry (Anagaire / 27th Sunday / Oct), not Ardara Sept. Size 114097; Last-Modified 09/10/2026. Harvest 37862173704 + #327. Done.

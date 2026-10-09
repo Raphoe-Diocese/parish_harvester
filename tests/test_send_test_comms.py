@@ -27,6 +27,35 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("not on the harvest list", push)
         self.assertIn("[skip ci]", push)
         self.assertIn("update recipe for ${key}", push)
+        self.assertIn("HARVEST_DIOCESE_NO_SUFFIX", push)
+        self.assertIn("evidenceBulletinPath", push)
+        self.assertIn("cashel_and_emly", push)
+        self.assertIn('return `${slug}_diocese`', push)
+
+    def test_harvest_yml_options_cover_every_recipe_folder(self) -> None:
+        """Send & test fails if harvest.yml choices omit a recipes/ folder."""
+        import re
+
+        yml = HARVEST_YML.read_text(encoding="utf-8")
+        # workflow_dispatch diocese options block (before target_parish)
+        block = yml.split("type: choice", 1)[1].split("target_parish:", 1)[0]
+        options = set(re.findall(r"^\s+-\s+([a-z0-9_]+)\s*$", block, flags=re.M))
+        options.discard("all")
+        no_suffix = {"cork_and_ross", "down_and_connor"}
+        recipe_dirs = sorted(
+            p.name
+            for p in (REPO / "parishes" / "recipes").iterdir()
+            if p.is_dir() and p.name not in {".git", "unknown"}
+        )
+        expected = {d if d in no_suffix else f"{d}_diocese" for d in recipe_dirs}
+        self.assertEqual(options, expected)
+        # Evidence files must exist for the harvest-list gate
+        for d in recipe_dirs:
+            if d in no_suffix:
+                path = REPO / "parishes" / f"{d}_bulletin_urls.txt"
+            else:
+                path = REPO / "parishes" / f"{d}_diocese_bulletin_urls.txt"
+            self.assertTrue(path.is_file(), f"missing evidence list: {path.name}")
 
     def test_poll_finishes_on_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
@@ -59,7 +88,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.44"', text)
+        self.assertIn('"version": "1.61.45"', text)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("T6: a dated bulletin page is this week's post", content)
         self.assertIn("await _setToolbarHiddenForHost(false);", content)

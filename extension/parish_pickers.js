@@ -20,12 +20,31 @@
   ];
 
   const BULLETIN_FILES = [
+    { path: "parishes/achonry_diocese_bulletin_urls.txt", diocese: "achonry" },
+    { path: "parishes/ardagh_diocese_bulletin_urls.txt", diocese: "ardagh" },
+    { path: "parishes/armagh_diocese_bulletin_urls.txt", diocese: "armagh" },
+    { path: "parishes/cashel_and_emly_diocese_bulletin_urls.txt", diocese: "cashel_and_emly" },
     { path: "parishes/clogher_diocese_bulletin_urls.txt", diocese: "clogher" },
+    { path: "parishes/cloyne_diocese_bulletin_urls.txt", diocese: "cloyne" },
+    { path: "parishes/cork_and_ross_bulletin_urls.txt", diocese: "cork_and_ross" },
     { path: "parishes/derry_diocese_bulletin_urls.txt", diocese: "derry" },
     { path: "parishes/down_and_connor_bulletin_urls.txt", diocese: "down_and_connor" },
+    { path: "parishes/dromore_diocese_bulletin_urls.txt", diocese: "dromore" },
+    { path: "parishes/dublin_diocese_bulletin_urls.txt", diocese: "dublin" },
+    { path: "parishes/elphin_diocese_bulletin_urls.txt", diocese: "elphin" },
+    { path: "parishes/ferns_diocese_bulletin_urls.txt", diocese: "ferns" },
+    { path: "parishes/galway_diocese_bulletin_urls.txt", diocese: "galway" },
+    { path: "parishes/kerry_diocese_bulletin_urls.txt", diocese: "kerry" },
+    { path: "parishes/kildare_and_leighlin_diocese_bulletin_urls.txt", diocese: "kildare_and_leighlin" },
+    { path: "parishes/killala_diocese_bulletin_urls.txt", diocese: "killala" },
+    { path: "parishes/killaloe_diocese_bulletin_urls.txt", diocese: "killaloe" },
+    { path: "parishes/kilmore_diocese_bulletin_urls.txt", diocese: "kilmore" },
+    { path: "parishes/limerick_diocese_bulletin_urls.txt", diocese: "limerick" },
+    { path: "parishes/meath_diocese_bulletin_urls.txt", diocese: "meath" },
+    { path: "parishes/ossory_diocese_bulletin_urls.txt", diocese: "ossory" },
     { path: "parishes/raphoe_diocese_bulletin_urls.txt", diocese: "raphoe" },
-    { path: "parishes/cork_and_ross_bulletin_urls.txt", diocese: "cork_and_ross" },
-    { path: "parishes/achonry_diocese_bulletin_urls.txt", diocese: "achonry" },
+    { path: "parishes/tuam_diocese_bulletin_urls.txt", diocese: "tuam" },
+    { path: "parishes/waterford_and_lismore_diocese_bulletin_urls.txt", diocese: "waterford_and_lismore" },
   ];
 
   const registry = {
