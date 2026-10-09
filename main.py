@@ -228,11 +228,46 @@ def main() -> int:
                     if (e.display_name or "").strip().lower() == raw_target_parish
                 ]
             if not matched:
-                print(
-                    f"⚠️  Parish key '{raw_target_parish or target_parish_key}' not found in {diocese}.",
-                    file=sys.stderr,
-                )
-                continue
+                # Send & test can push a recipe before the evidence row exists.
+                # Prefer a recipe-backed entry over a hard fail that looks refused.
+                from harvester.replay import load_recipe, recipe_path_for
+
+                recipe_path = recipe_path_for(target_parish_key, PARISHES_DIR)
+                if recipe_path.exists():
+                    try:
+                        recipe = load_recipe(recipe_path)
+                    except Exception:
+                        recipe = {}
+                    start = str(
+                        (recipe or {}).get("start_url")
+                        or (recipe or {}).get("example_url")
+                        or ""
+                    ).strip()
+                    display = str(
+                        (recipe or {}).get("display_name") or target_parish_key
+                    ).strip()
+                    matched = [
+                        ParishEntry(
+                            key=target_parish_key,
+                            display_name=display,
+                            pattern="F",
+                            content_type="pdf",
+                            example_url=start,
+                            bulletin_page=start,
+                            all_urls=[start] if start else [],
+                        )
+                    ]
+                    print(
+                        f"⚠️  '{target_parish_key}' missing from evidence — "
+                        f"testing recipe at {recipe_path.as_posix()} only.",
+                        file=sys.stderr,
+                    )
+                else:
+                    print(
+                        f"⚠️  Parish key '{raw_target_parish or target_parish_key}' not found in {diocese}.",
+                        file=sys.stderr,
+                    )
+                    continue
             target_parish_key = matched[0].key
             entries = matched
 
