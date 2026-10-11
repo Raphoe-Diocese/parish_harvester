@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Ossory Diocese Text Bulletin — 11/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="ossory-2026-10-11.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">OSSORY Text Bulletin · 11/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-ballyhale" data-parish-name="Ballyhale"><h2 class="ocr-parish-name">Ballyhale</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-ferrybank" data-parish-name="Ferrybank"><h2 class="ocr-parish-name">Ferrybank</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>. Ferrybank/Slieverue Parish Office Tel. <a href="tel:+35351830813" style="color:#1d4ed8;font-weight:600;">051-830813</a> Mon . -Fri. 10am to 1pm Closed on Holy Days &amp; Bank Holidays Ms. Marie Cashin/Ms. Angela O’Brien email <a href="mailto:Slieverue@osory.ie" target="_blank" rel="noopener noreferrer">Slieverue@osory.ie</a>/<a href="mailto:ferrybank@ossory.ie" target="_blank" rel="noopener noreferrer">ferrybank@ossory.ie</a> Website <a href="https://www.ferrybankslieverueparishes.ie" target="_blank" rel="noopener noreferrer">www.ferrybankslieverueparishes.ie</a></p>
+<h3 class="b-head">Mass Schedule</h3>
+<h3 class="b-head">Daily Mass</h3>
+<p>Monday to Thursday 10am Mass from Ferrybank Friday - 10.00am from Slieverue Saturday Vigil 6pm Slieverue and 7pm Ferrybank Sunday 9.30am Ferrybank 10.30am Slieverue 11.30am Ferrybank Eucharistic Adoration Every Wednesday in the Blessed Sacrament Chapel Ferrybank Church from 10.30am to 11.30am Adoration of the Blessed Sacrament Every Tuesday in Slieverue Church from 7.30pm – 8.30pm Every Wednesday in Slieverue Church from 2.30pm – 3.30pm Every Friday in Slieverue Church from 10.30pm – 11.00am FERRYBANK &amp; SLI EVERUE PARISH ES The Church of the Sacred Heart Ferrybank The Church of the Assumption Slieverue Use QR Code to gotoour parish website, facebook page &amp; newsletter online Very Rev. Roderick Whearty P. P. Tel. <a href="tel:+353868133661" style="color:#1d4ed8;font-weight:600;">086 813 3661</a> 11th October 2026 Twenty Eighth Sunday in Ordinary Time PRISONERS’ SUNDAY Remembering all our loved ones who have died</p>
+<h3 class="b-head">Anniversary</h3>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Ferrybank Ministers of the Eucharist 17th &amp; 18th Oct. 2026 Saturday 7.00pm Elaine Searson &amp; Susan Freeman Sunday 9.30am Michael Freyne &amp; Breda Freyne Sunday 11.30am Paul Lyons &amp; Michelle Byrne Ferrybank Ministers of the Word 17th &amp; 18th Oct. 2026 Saturday 7.00pm Bríd Mallon Sunday 9.30am Mary Griffin Sunday 11.30am Mary Walsh Slieverue Ministers of the Eucharist 17th &amp; 18th Oct. 2026 Saturday 6.00pm Alice Irish Sunday 10.30am Maria Condon &amp; Harry Condon Slieverue Ministers of the Word 17th &amp; 18th Oct. 2026 Saturday 6.00pm Keira Doyle Sunday 10.30am Susan O’Neill Church Collections for last weekend Ferrybank Envelopes (04.10.2026.) €744.50 Offertory (04.10.2026.) €509.00 Envelopes (27.09.2026.) €566.00 Offertory (27.09.2026.) €627.50 Total Standing Orders for Sept. ’26. €472.00 Slieverue Envelopes € 642.50 Offertory € 589.55 Ossory Soc. Serv. € 34.00 Missions € 43.00 Lourdes Fund € 20.00 Lenten Alms € 50.00 Total Sept. ‘26 Online &amp; Standing Orders € 298.40 Ferrybank &amp; Slieverue Parishes Newsletter is kindly sponsored by Powers Funeral Directors / Powers Monumental Works Ferrybank <a href="http://www.powersfuneraldirectors.com/" target="_blank" rel="noopener noreferrer">http://www.powersfuneraldirectors.com/</a> Complete &amp; Comprehensive Funeral Services &amp; Monumental Works Phone Martin or Claire on <a href="tel:+353868380033" style="color:#1d4ed8;font-weight:600;">086 8380033</a> / 353 (0)51 832081 Our Parish Safeguarding Representatives Ferrybank - Jerry Hughes &amp; Mary Griffin Slieverue - Mary Kenny &amp; Catherine Manning Ifyou, or anyone you know, has a Safeguarding concern please contact: Diocesan Director of Safeguarding and Designated Liaison Person, DLP, Fintan Fanning at <a href="tel:+353858021633" style="color:#1d4ed8;font-weight:600;">085 802 1633</a> or Email: @ossory.ie An Garda Síochána: 1800 555 222 (or your local Garda Station). TUSLA Waterford <a href="tel:+35351301450" style="color:#1d4ed8;font-weight:600;">051-301450</a> Wexford <a href="tel:+353539198201" style="color:#1d4ed8;font-weight:600;">053-9198201</a>/TUSLA: Kilk enny <a href="tel:+353526177302" style="color:#1d4ed8;font-weight:600;">052 6177302</a> Counselling Services Towards Healing Confidential Helpline: 1800 303 416 <a href="https://www.towardshealing.ie" target="_blank" rel="noopener noreferrer">www.towardshealing.ie</a> Towards Peace Helpline: 01 5053028 <a href="https://www.towardspeace.ie" target="_blank" rel="noopener noreferrer">www.towardspeace.ie</a> Ossory Pilgrimage to Lourdes 2027 The dates for The Ossory pilgrimage to Lourdes in 2027 are Friday May 14th to Wednesday May 19th. inclusive. Details regarding costs will follow shortly. All bookings apart from those travelling as assisted pilgrims aretobe made directly with JWT. Tel. 01-2410800. Anam Cara the organisation that supports bereaved parents, will hold its monthly Support Meeting for bereaved parents on Tuesday 13th October at 7.30pm in the Brandon house Hotel New Ross . This event is free and open to all bereaved parents regardless oftheage your child died, t he circumstances of their death or how recent their death was. Youdonot need to register in advance. We also offer an online support group. The next online meeting is Thursday October 15th at 7.00pm. To find out more call 01 4045378 or email <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> Slieverue &amp; District Active Retirement Association Wednesday 14th October Chairyoga 11.40am at St Mary's parish Hall followed by Bingo at 1.05pm South Kilkenny Historical Society Lecture 100 Years of the (Dreaded) Leaving Cert Friday, October 30th with speaker Eoin Walsh at Mullinavat Parish Hall (opposite St. Beacon's Church) Admission: €5, society members free. Everyone living in Ireland today has heard ofit, ifnotsat, the dreaded Leaving Certificate. It has recently passed a milestone of 100 years of existence. Buthowdidit come about? Andwhydowe still get nightmares about it as adults?! Blood Donation Clinic Waterford There will be a Blood Donation Clinic at The Woodlands Hotel on Tuesday, Wed nesday &amp; Thursday the 13th, 14th &amp; 15th of October from 15.45pm to 20pm. Sunday 18th October 12 to 15.30pm and Monday 19th to Thursday 22nd of October 15.45 to 20pm . Book your appointment at giveblood.ie or ring 1800 222111. Recently Baptised We welcome in to the Christian Community … David Gurgul, Liwia Babol, Leo Barea Souza Ravaiani, Jayde Deegan, Chloe Boldori Costa, Anthony &amp; Ayla Boldori Gomes who were baptised recently in the Church of the Sacred Heart, Ferrybank. Please keep them, their parents and their god-parents in your prayers. October Stations The October Stations for the support of the Priests of the Parish is being take nupat this time. Many thanks toallour parishioners in both Ferrybank &amp; Slieverue parishes who contribute we ekly, monthly &amp; yearly and to those who donate online and by Standing Order.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-inistioge" data-parish-name="Inistioge"><h2 class="ocr-parish-name">Inistioge</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 4</p>
+<p>Twenty Seventh Sunday in Ordinary Time - 4th October 2026 Bereavements . Recently Deceased: Maurice Moore, Melbourne &amp; The Rower (7.30pm); John McCormack, Terrerath, New Ross. Month ’s Mind: Mick Walsh, Ballylogue (7.30pm).</p>
+<h3 class="b-head">Anniversaries</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilmacow" data-parish-name="Kilmacow"><h2 class="ocr-parish-name">Kilmacow</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 5</p>
+<h3 class="b-head">Mass Times</h3>
+<p>Kilmacow- Monday to Friday In Rosedale Monday 6.30 p.m. Tuesday 9.30 a.m. Thursday, Eucharistic Service 9.30 a.m. Friday 9.30 a.m. Sunday 11.15 a.m. Mooncoin Wednesday – Friday 9.30 a.m.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>11.15 a.m. Sr. Noreen Smyth MMM – Month’s Mind John Roche Pat Grant Deceased Members of Grant Family Billy &amp; Mary Atkins Noreen Gaule Denis Buckley Maureen Dwyer Tony O’Neill Safe Guarding Witness Sun 11th Anne O’Keeffe Extraordinary Ministers of Holy Communion Sun 11th Anne O’Keeffe, Ann Kearns, Darina Larrissey Readers Sun 11th Finn O’Neill, Rory Williams Feast Days This Week Monday St. Faustina Kowalska Tuesday St. Bruno, priest Wednesday Our Lady Of The Rosary Friday St. Denis, bishop &amp; Companions Ss John Henry Newman, priest St. John Leonardi, priest Diocese Appointments 2026 Bishop Ger has appointed Fr. Dan Carroll, St. John’s, to be Vicar General of the Diocese and Fr. Seán O’Connor, Ballyhale, to be Episcopal Vicar for Clergy. Ms. Geraldine Campion has been appointed as Clergy Support Person for the Diocese. We congratulate them as they take up their positions and keep them in our prayers as they continue their good work. 30th Anniversary Mass- Beatification Of Blessed Edmund Rice On Monday, October 5th at 7p.m., a special Mass will be celebrated in the Blessed Edmund Rice Chapel, Westcourt, Callan, R95 RX83, to mark the 30th</p>
+<h3 class="b-head">anniversary</h3>
+<p>of the Beatification of Blessed Edmund Rice. On October 6th, 1996, Edmund Rice was beatified in Rome by St. Pope John Paul II. Aswe give thanks for the many blessings and graces received through his intercession, Fr. Willie Dalton, PP Callan, will lead this commemorative Mass. All parishioners of the Diocese of Ossory and friends are welcome to join for this celebration. Refreshments after Mass in the Blessed Edmund Rice Centre Pope’s Monthly Intention – October Let us pray that the mental health ministry be established throughout the Church, helping to overcome the stigma and discrimination of persons with mental illnesses. Kilmacow Parish Priest: Fr. Martin Tobin ADM Weekend Masses : Mobile: <a href="tel:+353862401278" style="color:#1d4ed8;font-weight:600;">086 2401278</a> Kilmacow: Sunday 11.15 a.m. Email priest: <a href="mailto:martintobin@ossory.ie" target="_blank" rel="noopener noreferrer">martintobin@ossory.ie</a> Priests of the Fr. Aaron Tanko Parish Office: <a href="tel:+353874796533" style="color:#1d4ed8;font-weight:600;">087 4796533</a> Pastoral Area: <a href="tel:+353899702189" style="color:#1d4ed8;font-weight:600;">089 9702189</a> Parish Email: kilmacow @ossory.ie Fr. Paschal Moore Parish Website: <a href="https://www.kilmacowparish.com" target="_blank" rel="noopener noreferrer">www.kilmacowparish.com</a> <a href="tel:+353872408078" style="color:#1d4ed8;font-weight:600;">087 2408078</a> Baptisms: Baptisms will be celebrated in Kilmacow on the 4th Sunday of each month at 12 noon and bookings can be made through Kilmacow Parish Office. If a Funeral is taking place on that Sunday, Baptis ms will move to 1 p.m. Funerals: All arrangements for Funerals to be made with Fr. Tobin. In the event of a Funeral, there will be no 9.30 a. m. Mass. Further information is available on the Parish Webs ite <a href="https://www.kilmacowparish.com" target="_blank" rel="noopener noreferrer">www.kilmacowparish.com</a> Weekly newsletter is available on our website. 4th October 2026</p>
+<hr>
+<hr>
+<p class="page-label">Page 6</p>
+<p>Kilmacow Safeguarding Information In the event of concerns about the safeguarding of children or vulnerable adults engaged in church activities c ontact the Designated Liaison Person, Mr. Fintan Fanning <a href="tel:+353858021633" style="color:#1d4ed8;font-weight:600;">085 8021633</a> Ms. Rose Brophy <a href="tel:+353873314330" style="color:#1d4ed8;font-weight:600;">087 3314330</a> Mr. Cathal Cullen <a href="tel:+353567762448" style="color:#1d4ed8;font-weight:600;">056 7762448</a> email: <a href="mailto:dlp@ossory.ie" target="_blank" rel="noopener noreferrer">dlp@ossory.ie</a> TUSLA 059/9115570 <a href="https://www.ossory.ie/safeguarding" target="_blank" rel="noopener noreferrer">www.ossory.ie/safeguarding</a> Parish Safeguarding Representatives: Bernadette Moloney, Anthony Young Mother of Fair Love School 1966-2026 60th Anniversary Mass of Thanksgiving in Mother of Fair Love School, James’s Street, Kilkenny - 9th October at 12 noon. You are invited to join our celebration of 60 years of Education for children and young adults with special needs. Mass will be celebrated by Bishop Ger Nash, Bishop of Ferns and Ossory All welcome. Ossory Diocesan Pilgrimage To Lourdes 2027 The Ossory Pilgrimage to Lourdes in 2027 travels on Friday, 14th May to Wednesday, 19th May inclusive. Details regarding costs will follow shortly. Kilmacow Parish Choir Practice every Wednesday in Kilmacow Church, 6 p.m. to 7.15 p.m. New singers are always welcome. Contact Una <a href="tel:+353872706977" style="color:#1d4ed8;font-weight:600;">087 2706977</a></p>
+<h3 class="b-head">Fundraising</h3>
+<p>Concert A night of songs &amp; stories with Tenor Paul Byrom and special guests, The Cois Nore Choir, in St. Canice's Cathedral, Kilkenny on Saturday 10th October to mark World Mental Health Day. Tickets €30 at <a href="https://fundraise.grow.ie/event/paul-byrom/home" target="_blank" rel="noopener noreferrer">https://fundraise.grow.ie/event/paul-byrom/home</a> Hospice Coffee Morning Kilmacow Hospice Support Group sincerely thanks everyone who supported its recent Coffee Morning. The total amount raised, €786.75, has been transferred to the Hospice Movement based in University Hospital Waterford. Table Quiz - Kilmacow Home Energy Group First table quiz of the monthly series takes place in the Fox’s Den at 8 p.m. this Monday, 5th October. Cost per table of four is €20. All support welcome. Prayer Of St. Francis of Assisi Praised beyou, my Lord, with all your creatures, especially Sir Brother Sun, whoistheday through whom you give us light. Andheis beautiful and radiant with great splendour; and bears the likeness of you, most High. Praised be you, my Lord, through Sister Moon and the stars, in heaven you formed them clear and precious and beautiful. Praised beyou, my Lord, through Brother Wind, and through the air, cloudy and serene, and every kind of weather through whom you give sustenance to your creatures. Praised beyou, my Lord, through Sister Water, who is very useful and humble and precious and chaste. Praised beyou, my Lord, through Brother Fire, through whom you light the night, andheis beautiful and playful and robust and strong. Laudato Si’, 87 Direct Debit Donations These can be made using our Bank details: Kilmacow Parochial Current Account IBAN: IE40 AIBK 93427585444014 BIC: AIBK IE2D Collection Offertory €515 September Envelopes €2,980 Mass Bookings for Anniversary Masses, Baptisms, Weddings etc.canbe made with Aoife at the Parish Office or at <a href="mailto:kilmacow@ossory.ie" target="_blank" rel="noopener noreferrer">kilmacow@ossory.ie</a> Anam Cara The organisation that supports bereaved parents, will hold its monthly Support Evening for bereaved parents on Tuesday, 13th October at 7.30 p.m.inthe Brandon House Hotel, New Ross. Intercessory Prayer Meeting Meetings on Wednesdays from 7.30 p.m. to 8.30 p.m. in Rosedale Day Centre. Tea and refreshments afterwards. The Painted Gospel- Pilgrimage to Rome &amp; Assisi The Adult Faith Development Pilgrimage to Rome and Assisi, Italy will take place in March 2027, ledby Fr Dermot Ryan and Fr Kieran O’Shea. Contact Kieran Troy of Myriam Tours <a href="tel:+353579355050" style="color:#1d4ed8;font-weight:600;">0579355050</a>/ Cake Sale inaidof Kilmacow Hospice on Sunday, 11th October after the 11.15 a.m. Mass in the Parish Office. Please support! Marian Hall, Strangsmills - Weekly Activities Monday Taekwondo (6 p.m. – 8 p.m.) – Audrey <a href="tel:+353863739284" style="color:#1d4ed8;font-weight:600;">086 3739284</a> West African Drumming (8.15 p.m.) – Cathy <a href="tel:+353879684580" style="color:#1d4ed8;font-weight:600;">087 968 4580</a> Tuesday Line Dancing (7-8.30 p.m.) - Suzanne <a href="tel:+353876300336" style="color:#1d4ed8;font-weight:600;">087 6300336</a> Wednesday Yoga (7-8 p.m.) - Laura <a href="tel:+353876802303" style="color:#1d4ed8;font-weight:600;">087 6802303</a> Thursday Children's Dance Class (6.30 p.m.) – Faith <a href="tel:+353872040961" style="color:#1d4ed8;font-weight:600;">087 2040 961</a> Friday Chair Yoga (10-11a.m.) - Lisa <a href="tel:+353876558716" style="color:#1d4ed8;font-weight:600;">087 6558716</a> Hall Enquiries: <a href="tel:+353868921356" style="color:#1d4ed8;font-weight:600;">086 892 1356</a>/ <a href="mailto:mhstrangsmills@gmail.com" target="_blank" rel="noopener noreferrer">mhstrangsmills@gmail.com</a></p>
+<h3 class="b-head">Parish Office</h3>
+<p>Signed Sympathy Cards, Mass Bouquets are available from the Parish Office. The Parish Office opens at the following times - ¥ Tuesday 9.30 a.m. to 2 p.m. ¥ Friday 2 p.m. to 4 p.m. Mass bookings, items for inclusion in the Parish Newsletter etc.canbe emailed to Aoife at <a href="mailto:kilmacow@ossory.ie" target="_blank" rel="noopener noreferrer">kilmacow@ossory.ie</a>, Parish phone <a href="tel:+353874796533" style="color:#1d4ed8;font-weight:600;">087 4796533</a> or dropped into the post boxatthe Parish Office before 12 noon on Friday. Date For The Diary 2026 /2027 Kilmacow Parish Remembrance Mass Sunday, 15th November at 11.15 a.m. Confirmation - Thursday, 15th April, 11 a.m. First Holy Communion - Saturday, 22nd May, 11 a.m</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-mooncoin" data-parish-name="Mooncoin"><h2 class="ocr-parish-name">Mooncoin</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 7</p>
+<p>MASSES THIS WEEKEND IN DURROW PARISH Saturday 10th October 2026 Cullohill 7.30pm: Michael &amp; Esther Fogarty, Newtown, Cullohill Kathleen Kinsella, Portlaoise Sunday 11th October 2026 Durrow 11.00am: Mary Kelly, St Fintan ’s Tce, 1st anniversary Ena Maher, Carrigan St. 1st Anniversary. Masses During this Week Monto Fri: Mass in Durrow at 8.50am.</p>
+<h3 class="b-head">Recent Deaths</h3>
+<p>Patrick (Paddy) Tynan, Dunmore, Durrow Andrew Henderson, The Conoboro Mary Delaney, Ballydavis, Portlaoise</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Billy Kirby, Gurteen Alice &amp; Barry Dunton, Cullohill . MASSES NEXT WEEKEND Saturday 17th October 2026 Cullohill 7.30pm: Kathleen Kenny and all deceased members of the Kenny family, Ballydavin Sunday 18th October 2026 Durrow 11.00am: Ann Parkinson, Seandoire. 1st Anniversary Collections: Weekend 3rd /4th October 2026 Loose Plate € 399 Envelopes € 968 Adoration in Cullohill Church every Thursday morning from 10am to 11am and in Durrow directly after 8.50 am Mass (finishes at 11.30 am) on Mondays and on Fridays from 7-8pm. SAFEGUARDING Designated Liaison Person Fintan Fanning - <a href="tel:+353858021633" style="color:#1d4ed8;font-weight:600;">085 802 1633</a> <a href="mailto:safeguarding@ossory.ie" target="_blank" rel="noopener noreferrer">safeguarding@ossory.ie</a> Gardaí 1800 555 222 / TUSLA Laois/Offaly <a href="tel:+353449353997" style="color:#1d4ed8;font-weight:600;">044 935 3997</a> Towards Healing Helpline: 1800 313 416 <a href="https://www.towardshealing.ie" target="_blank" rel="noopener noreferrer">www.towardshealing.ie</a> Towards Peace Helpline: 01-505 3028 <a href="https://www.towardspeace.ie" target="_blank" rel="noopener noreferrer">www.towardspeace.ie</a> Parish Representatives Rathdowney John Casey &amp; Helen Campion Durrow Michael Killeen &amp; Sarah Brophy MASSES THIS WEEKEND IN RATHDOWNEY PARISH Saturday 10th October 2026 Rathdowney 6pm: Pat Fitzpatrick, Cuan Bhríde, Month ’s Mind Patricia Bergin, Castlegrogan. Peggy &amp; Charlie O ’Reilly, Church Street Sunday 11th October 2026 Errill 9.30am: Jimmy &amp; Lucy Bergin, Knockardgannon Jim &amp; Anna Somers, Churchquarter Masses During this Week in Rathdowney Tuesday: Service of the Word and Distribution of Eucharist Wednesday–Friday: Mass at 10am</p>
+<h3 class="b-head">Recent Deaths</h3>
+<p>Andrew Henderson, The Conoboro Mary Delaney, Ballydavis, Portlaoise Mary Gray, Knockiel.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Jerry Behan, Errill Margaret Nolan, Errill MASSES NEXT WEEKEND Saturday 17th October 2026 Rathdowney 6pm: Ned Stenson &amp; deceased members of the Stenson family, Donaghmore Michael &amp; Mary Ann Creagh, Harristown Sunday 18th October 2026 Errill 9.30am: Colm Tierney, Knockardgannon Fr. Joe Campion, Lisduff Patsy Kelly, Knockardgannon Collections Weekend 3rd/ 4th October 2026 Loose Plate - €219 Envelopes €1,116 Adoration in Rathdowney Church on Thursdays after 10am Mass and in Errill Church on Fridays from 10.30am until 11.30am. Rosary available each evening at 5.30pm on the Webcam Pastoral Council Members Rathdowney Assumpta Casey ; Helen Campion; Tony Holohan; Fran Doyle; Maureen Guilfoyle; Oliver Kennedy, Mary Nolan, Mary O ’Dea, Tadhg Keane; Sr Anita O ’Leary; Fr. Martin Delaney Durrow Martin Lawlor; Mary Lawlor; James Walsh; Vicky Murphy; Margaret Murphy; Liam Kavanagh; Pádraig Kiely; Anne-Marie Kiely Sr. Anita O ’Leary; Fr. Martin Delaney Newsletter for the Parishes of Durrow and Rathdowney 10th / 11th October 2026 28th Sunday in Ordinary Time Tickets €30 available from both of our Parish Ofoces (opening times below) Or through <a href="https://www.michaelenglish.ie" target="_blank" rel="noopener noreferrer">www.michaelenglish.ie</a> Parish Ofoce Opening Hours Rathdowney: Tuesday, Wednesday, Thursday 9.30 - 2pm &amp; Friday 9.30am - 1pm Durrow: Wednesday &amp; Thursday 10am - 2pm &amp; Friday 11am to 2pm Concert in St Andrews On Friday 16th Oct 8pm sharp: Performances by Timahoe Male Voice Choir &amp; The Ballacolla Caocheleles Band. Tickets €20 Available from <a href="tel:+353879031222" style="color:#1d4ed8;font-weight:600;">087 9031222</a> oratthe door. There will be a rafne on the night and light refreshments. Annual Pilgrimage to Medjugorje Will take place April 20th to 27th 2027, 7 nights half board @ Hotel Leone at €899 pp sharing. €100 off if paid in full by the 31st of October 2026, single supplement €210. Travel Insurance, extra. Luggage allowance 10 KG pp or 20KG for €80 return. Pilgrimage ledby Fr. Martin Delaney. For bookings contact Mary O'Dea @ <a href="tel:+353873170084" style="color:#1d4ed8;font-weight:600;">0873170084</a>. Anam Cara , the organisation that supports bereaved parents, will hold its monthly Parent Support Evening on Wednesday 14th October at 7.30pm in the Mullingar Park Hotel. This event is free and open to all bereaved parents regardless oftheage their child died, the circumstances of their death, or how recent their death was. Youdonot need to register in advance. We also offer an online support group meeting. To find out more call 01 4045378 or email <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> Remembrance Masses Our Annual Masses of Remembrance for those who died during the past year will take place in Rathdowney Church on Saturday 31st October at 6.00pm and in Durrow Church on Friday 6th November at 7.00pm. If you wish to have a candle presented at this Mass in memory of your deceased relative please contact the Parish Ofoce on 085 26 25 033 (Durrow) or 0505 46282 (Rathdowney) or email <a href="mailto:durrow@ossory.ie" target="_blank" rel="noopener noreferrer">durrow@ossory.ie</a> or <a href="mailto:rathdowney@ossory.ie" target="_blank" rel="noopener noreferrer">rathdowney@ossory.ie</a> Please let us know who will be there on the night to present the candle Candles will be supplied by the Parish. Major Restoration of the Church Tower In recent times it has become apparent that there some significant structural problems in the tower of Holy Trinity Church Durrow. The wooden Louvres (Slanted beams) on all four sides of the tower are rotting, and each is framed in steel. These present a significant health and safety risk. When the tower was examined earlier in the summer other major difoculties with the pointing of stonework were also identified. The upshot of all this is that some major restora- tion work is necessary andasa matter of urgency. The work is scheduled to begin on Monday 19th of October . The work will take approximately four to six weeks . From after mass this weekend the doors across the front of the church will remain locked and entrance to the church will be through the side aisle doors only. The front of the church and the tower will become a building site and therefore a health and safety risk. I realise this will present an inconvenience, but Iaskfor your consideration and cooperation. I am grateful to the Parish Finance Committee and the diocesan authorities who have worked with me to address this problem. Together with other necessary works to repair the Lightning conductors on the church carried out earlier in the year this major repair job will cost in the region of €90,000. Your ongoing weekly financial support for the parish through the blue envelope collection was never more needed and appreciated. Fr. Martin Rathdowney <a href="https://rathdowneyparish.ie" target="_blank" rel="noopener noreferrer">https://rathdowneyparish.ie</a></p>
+<hr>
+<p class="page-label">Page 8</p>
+<p>Rosbercon Parish Email: <a href="mailto:rosbercon@ossory.ie" target="_blank" rel="noopener noreferrer">rosbercon@ossory.ie</a> Web: <a href="https://www.rosberconparish.ie" target="_blank" rel="noopener noreferrer">www.rosberconparish.ie</a> Phone: <a href="tel:+35351421515" style="color:#1d4ed8;font-weight:600;">051 421515</a> or <a href="tel:+353868180954" style="color:#1d4ed8;font-weight:600;">086 818 0954</a> Pray For Our Deceased Loved Ones</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Bernadette Phelan, Tullogher. Shared with: Bridget Croke, Brownsford and also Michael Croke &amp; deceased family members. Seán Phelan, Curraghlane. Eily Murphy, Ballyreddy (13th Anniv) , John, Alice, Jimmy &amp; Tom Murphy, Ballyreddy. James Power, Glenballyvalley, Mike &amp; Tommy Doolan, Curraghmore. Maura &amp; Mikey Phelan, Tullogher (Sat 7.30pm) Kathleen Doran, Assumption Tce. (7th Anniv) shared with Pat Dooley Garranbehy &amp; deceased family members (Sun 10am).</p>
+<h3 class="b-head">Anniversary</h3>
+<p>Masses Next Weekend: Seamus Mullally, Listerlin (2nd Anniv) (Sat 7.30pm) David ‘Dáithi’ Brindley, Ballybeg &amp; Schoolhouse Rd (10th Anniv) &amp; also remembering hisson Jim RIP March 2021 on his 59th Birthday (Sun 10am). Rosbercon Parish Collection Last Week: Rosbercon €595 Listerlin €288 Thank you very much for your support. Please use your weekly envelopes where possible. Booking Anniversaries, Baptisms Etc. ALL</p>
+<h3 class="b-head">anniversaries</h3>
+<p>, baptism queries, parish queries should be made only to <a href="mailto:rosbercon@ossory.ie" target="_blank" rel="noopener noreferrer">rosbercon@ossory.ie</a> (Anniversaries can also be booked over the phone). St. Canice’s National School is now taking applications for enrolment for Junior Infants 2027. An application form is available by phoning the school at <a href="tel:+35351422813" style="color:#1d4ed8;font-weight:600;">051 422813</a> or by emailing <a href="mailto:secretary@stcanicesns.com" target="_blank" rel="noopener noreferrer">secretary@stcanicesns.com</a> St. Mary’s Cathedral Draw 2026/27: The September Draw took place in the Chapter House on Wednesday 30th September. Please see Noticeboards for full results. Rosbercon &amp; Glenmore Fr Liam Taylor is P. P., both of Rosbercon and Glenmore. Contact: <a href="tel:+353868180954" style="color:#1d4ed8;font-weight:600;">086 818 0954</a> Fr. Liam’s Address: Parish House, Robinstown, Glenmore. Y34 NP08 Date: 4th October 2026 Issue 1/ 10 Regular Mass Times . Monday 10am Glenmore Tuesday 10am Rosbercon Wednesday No Mass Thursday 10am Glenmore Friday 10am Rosbercon Saturday 6pm Glenmore Tullogher 1st Saturday of the month 7.30pm All other Saturday’s, Listerlin 7.30pm Sunday 10am Rosbercon 11.30am Glenmore Confessions : After any Mass or by request Baptisms: Contact the Parish office in Rosbercon, or Fr. Liam to book a baptism. Baptisms are on Saturday’s at 2pm Weddings: At least 6 months’ notice to Church and State. Make sure to check the availability of the church and priest. Ossory Registered Charity No. 20015831 Rosbercon Parish Office: Monday to Thursday, 10.30am to 2.30pm. Secretary: Anne O’Sullivan SAFEGUARDING Designated Liaison Person: Fintan Fanning 085 802 16 33 <a href="mailto:dlp@ossory.ie" target="_blank" rel="noopener noreferrer">dlp@ossory.ie</a> Parish Safeguarding Reps: Rosbercon: Anne O’ Sullivan &amp; Bríd Vereker Glenmore: Anne Marie Harney &amp; Annette Comiskey Free &amp; Confidential Counselling <a href="https://www.towardhealing.ie" target="_blank" rel="noopener noreferrer">www.towardhealing.ie</a> or 1800 303 416 Glenmore Parish Email: <a href="mailto:glenmore@ossory.ie" target="_blank" rel="noopener noreferrer">glenmore@ossory.ie</a> Web: <a href="https://www.glenmoreparish.ie" target="_blank" rel="noopener noreferrer">www.glenmoreparish.ie</a> Phone: <a href="tel:+353868180954" style="color:#1d4ed8;font-weight:600;">086 818 0954</a> Pray For Our Deceased Loved Ones</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Joan Ryan, Gilcough Mór (Sat 6pm) . Paddy McDonald, Gaulstown, Month’s Mind (Sun 11.30)</p>
+<h3 class="b-head">Anniversary</h3>
+<p>Masses Next Weekend : No</p>
+<h3 class="b-head">anniversaries</h3>
+<p>booked Glenmore Parish Collection Last Week: Offertory € 456. Parish Envelopes € 880 Thank you very much for your support. Please use your weekly envelopes where possible. Harvest Supper: Next Friday is the Harvest Supper in Glenmore Community Hall starting at 7.30pm . Enjoy the night if you’re going. October Station . Glenmore. The October collection for the support of the priest is due this month. The envelope is the next green one in your envelope box you received last February. I am grateful toallwho support me through these collections. For further information, take note of the Rosbercon piece opposite. Fr. Liam Chair Exercise: Glenmore Hall Wednesdays, 11am. All welcome. Knitting Classes: Mondays in Glenmore Community Hall 7pm. All welcome. Golden Club: Tuesday 10.30am to 1pm. €5 for chat, games and a light lunch. All welcome Ceili Dancing : Glenmore Community Hall, on Tuesday, 22nd at 8pm. All welcome. The Rise &amp; Shine Trust brings young people with additional needs to Lourdes each Easter for a free week of faith, friendship and fun, supported by dedicated volunteers, nurses and doctors. Local Carlow/Kilkenny Group 174 has almost 40 years’ experience. Applications for Easter 2027 close on 15 October 2026. More details: riseandshine.ie/easter-pilgrimage . First Holy Communion There will be three First Holy Communion dates in our parishes next year: Glenmore, Saturday 8th May 2027 at 11am Listerlin, Saturday 22nd May at 11am Rosbercon &amp; Shanbogh , 29th May at 11am First Confession will be announced at a later date. Confirmation in Rosbercon will be announced at a later date. Rosbercon. October November Christmas Dues Envelopes: These envelopes areforthe support of the priest of the parish. Envelopes are being distributed and thanks toallour distributors who faithfully deliver envelopes for the parish. If you haven’t collected yours yet, they are available after Masses this weekend, and available at the back of the church in Rosbercon from Monday. To make life easier on our distributors, w e are distributing the three remaining priest’s collection envelopes together. Please keep the three safe forusein October, November and Christmas. While I am Parish Priest both of Rosbercon and Glenmore, my salary remains the same with one half taken from Rosbercon and the other from Glenmore. Thanks to everyone who support these collections. I appreciate your generosity. Fr. Liam Mass Cards : Signed Mass cards for the living and deceased are available inallour sacristies. €10 each incl . card. Make sure to leave the name of the person the Mass is offered for. Rosbercon Webcam After a few glitches with the internet, Rosbercon Webcam is back in action. Is there any business willing to sponsor a joint Glenmore &amp; Rosbercon 2027 calendar?</p>
+<h3 class="b-head">Contact</h3>
+<p>Fr. Liam Rosbercon <a href="https://rosberconparish.ie" target="_blank" rel="noopener noreferrer">https://rosberconparish.ie</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-rathdowney" data-parish-name="Rathdowney"><h2 class="ocr-parish-name">Rathdowney</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 9</p>
+<p>ST CANICE’S PARISH Sunday 11th October 2026</p>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Tom Knox, St Francis Tce Majella McCormack, Cypress Court, Loughboy Helen Byrne, Newpark Close</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Sat 7pm Kathleen Murphy (1st Anniv), Rory Brady Sun 10am Edward and Anna Brennan, their daughters Anna, Maryand Patricia and their son Eamonn, Philomena Campion Mon. 9.30am Liturgy of the Word and Communion Tues 9.30am Daniel Phelan Wed 9.30am Maura McArdle and Mary Haide We also remember: Anne Conway , Tom O’Hehir , Ian Jackman, Caroline O’Reilly, Marty Ryan Next weekend Sat 7pm Sun 10am John Rhatigan (1st Anniv) Sun 11.30am Andy Phelan, Margaret Dowling Troyswood (1st Anniv) Sunday Collection Sunday 4th Oct. the collection amounted to € 1216 Thank you for your generosity. We also have the Donate button on the website for those of you who wish to contribute online andwenow have a Tapto Donate machine in the Church. Eucharistic Adoration in St. Canice’s There will be Eucharistic Adoration in St. Canice’s Church on Wed 14th Oct from 2pm – 4pm. Our Special Prayer Intention isforthe forgotten souls in Purgatory All welcome. St. Luke’s General Hospital Annual Remembrance Mass will take place on Wednesday 21st October 2026 October at 7:30pm in St. Canice’s Parish Church, Kilkenny for families and loved ones of patients who have died in our hospital. The Mass, organised by the End-of-Life Care Committee, particularly remembers the patients who have died between 1st September 2025 and 31st August, 2026. The Mass can also be viewed via the following link: <a href="https://www.stcanicesparish.ie/web-cam/" target="_blank" rel="noopener noreferrer">https://www.stcanicesparish.ie/web-cam/</a> All are welcome South Kilkenny Historical Society lecture Friday, October 30th 100 Years of the (Dreaded) Leaving Cert Speaker: Eoin Walsh Time: 8pm Venue: Mullinavat Parish Hall (opposite St. Beacon's Church) Admission: €5, society members free Afternoon Tea Dance at St Canice’s Neighbourhood Hall on Wed 21st October from 2-4pm. Music by Johnny Scully. Rsvp to Jenny on <a href="tel:+35387954636" style="color:#1d4ed8;font-weight:600;">087 954 636</a> 8 email <a href="mailto:jenny.cooke@frmcgrathcentre.ie" target="_blank" rel="noopener noreferrer">jenny.cooke@frmcgrathcentre.ie</a> Afternoon Tea Dances areforthe senior members of the community. A Raffle will be held at each event Parish Retreat: A sincere thank you to everyone who attended our recent parish retreat for those who volunteer and minister within our parish. Itwasa truly blessed and prayerful day. We are very grateful to our Pastoral Council andtothe community at the Blessed Edmund Rice Centre in Callan for helping to create such a welcoming and reflective setting. Our thanks also goto Fr. Joe Kavanagh OP, wholedus throughout thedayand shared his time and wisdom so generously. We look forward to doing it all again in the Spring! We are truly blessed to have so many generous volunteers in our parish who give of their time, gifts and energy, ministering with such generosity and love for our parish community and our Church. Thank youallforthe wonderful contribution you make. Diocesan Pilgrimage to Fatima: We remember in our prayers all our parishioners and diocesan pilgrims who are in Fatima this week. We wish them every blessing as they journey to Our Lady of Fatima, carrying with them our prayers and intentions. World Mission Day – Collection Next Sunday, 18th October 2026 Next weekend we celebrate World Mission Sunday, the Holy Father’s annual appeal to suppor t overseas mission and missionaries. In the poorer and more remote countries o f Africa, Latin America and Asia, itisthe missionaries whoareonthe front line. Our support of our Missionaries will provide them with essential aid to help them to relieve suffering and distress. Please call Missio I reland 01 4972035 orgoto <a href="https://www.missio.ie" target="_blank" rel="noopener noreferrer">www.missio.ie</a> for further information. Thanky ou for your support. Medjugorje Evening of Prayer The Monthly Medjugorje Mass, with Rosary, Adoration and prayer for healing, will take place next Monday the 12th October at 7.30pm in the Oratory of St. Patrick's Parish Centre. All are welcome. Novena in honour of Saint Martin de Porres in the Black Abbey, 28th Oct to Thurs 5th Nov. Mass each day 10.30am &amp; 7.30pm. Mass &amp; Anointing of the Sick on Sunday 1st at 3.00pm. October and November Envelopes The envelopes for the October and November offerings will be available for collection at the Parish Office, by the distributors, from Wed 7th Oct. Thank you for your continued help with this. Fr. Willie Purcell - <a href="tel:+353876286858" style="color:#1d4ed8;font-weight:600;">087 6286858</a>. Parish Centre <a href="tel:+353567721533" style="color:#1d4ed8;font-weight:600;">056 7721533</a> Email - <a href="mailto:stcanices@ossory.ie" target="_blank" rel="noopener noreferrer">stcanices@ossory.ie</a> Website - <a href="https://www.stcanicesparish.ie" target="_blank" rel="noopener noreferrer">www.stcanicesparish.ie</a> Secretary: Caroline Cummins – Sacristan: Ailish Brennan c/o Parish Centre St Canice's <a href="https://stcanicesparish.ie" target="_blank" rel="noopener noreferrer">https://stcanicesparish.ie</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-rosbercon" data-parish-name="Rosbercon"><h2 class="ocr-parish-name">Rosbercon</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 10</p>
+<p>Parish Of Saint John The Evangelist incorporating | St John’s | Dunmore | Johnswell | church areas</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>St John ’s – Saturday: 6.00pm (Vigil); Sunday : 8.00am, 11.30am &amp; 7.00pm. Holy Days: 6.00pm (Vigil); 8.00am, 10.30am &amp; 7.00pm. Weekdays: 8.00am, 10.30am. (Sat. 10.30am only). Adoration: Wednesdays at 11.00am. Johnswell - Sunday 10.00am Dunmore - Sunday 11.00am St. John ’s Parish, St. Mary ’s Parish, St. Patrick ’s Parish, St. Canice ’s Parish together form the Kilkenny City Pastoral Area Address: St John ’s Presbytery, Dublin Road, Kilkenny. R95 ND2W Email: <a href="mailto:stjohns@ossory.ie" target="_blank" rel="noopener noreferrer">stjohns@ossory.ie</a> Website: <a href="https://www.stjohnskilkenny.com" target="_blank" rel="noopener noreferrer">www.stjohnskilkenny.com</a> Office: <a href="tel:+353567721072" style="color:#1d4ed8;font-weight:600;">056 772 1072</a>; Secretary: Áine Butler; Office Hours: Mon-Fri 9.30 a.m. - 2.00 p.m. Newsletter Deadline: Thursdays 12.00 noon SVP Help Line: <a href="tel:+35351350725" style="color:#1d4ed8;font-weight:600;">051 350 725</a> Monsignor Dan Carroll: <a href="tel:+353879077769" style="color:#1d4ed8;font-weight:600;">087 907 7769</a> Fr Tom O ’Toole: <a href="tel:+353872240787" style="color:#1d4ed8;font-weight:600;">087 224 0787</a> Fr. Paul Kasu <a href="tel:+353873905060" style="color:#1d4ed8;font-weight:600;">087 390 5060</a> Monsignor Michael Ryan (Retired) PARISH PASTORAL COUNCIL Mary Brennan; Jo Browne; Alan Burke; Fr Dan Carroll; Claire Coogan; Fr. Paul Kasu; Luke Leydon; Paddy Manning; Iris O ’Flynn; Fr Tom O ’Toole; Karena Phelan. IF YOU HAVE A SAFEGUARDING CONCERN CONTACT The Diocesan Designated Liaison Person, Mr Fintan Fanning, <a href="tel:+353858021633" style="color:#1d4ed8;font-weight:600;">085 802 1633</a> - <a href="mailto:dlp@ossory.ie" target="_blank" rel="noopener noreferrer">dlp@ossory.ie</a> OUR PARISH SAFEGUARDING REPRESENTATIVES ARE: Phil Curran; Marian Eardly; Brenda Whitely. Counselling Services - Towards Healing Confidential Helpline 1800 313 316 - <a href="https://www.towardshealing.ie" target="_blank" rel="noopener noreferrer">www.towardshealing.ie</a> Roman Catholic Diocese and Parishes of Ossory - Registered Charity No. 20015831 Twenty-Seventh Sunday in Ordinary Time - 4th October 2026 . Pray the Rosary in October for Peace Speaking in Lourdes on last Sunday Pope Leo made the following plea. “I would like to make an appeal that is particularly close to my heart, here in this place. It was here that the Immaculate Virgin appeared to Saint Bernadette with the rosary and, asit were, guided her in prayer. For this reason, today I invite all the faithful and all Christian communities to pray the holy rosary throughout the coming monthof October, with the partic- ular intention that wars may cease and that peace may be established among peoples in con- flict. Let us accompany this prayer with concrete acts of penance andmercy, committing our- selves always to fostering dialogue and reconciliation. ” Parishioners gather in St. John ’s Church at 10.10am every morning and at 3.00pm every after- noon to pray the rosary in public. Please feel free to come along and join in this wonderful Marian prayer. May our most holy Mother intercede for us! 30th Anniversary Mass – Beatification of Blessed Edmund Rice On Monday, 5th October at 7.00pm , a special Mass will be celebrated in the Blessed Edmund Rice Chapel, Westcourt, Callan, to mark the 30th anniversary of the Beatification of Blessed Edmund Rice. On 6th October 1996, Edmund Rice was beatified in Rome by St. Pope John Paul II. Aswe give thanks for the many blessings and graces rec eived through his interces- sion, Fr. Willie Dalton, PP Callan, will lead this commemorative Mass. The Christian Brothers Community warmly invites all parishioners of the Diocese of Ossory and friends to join us for this celebration. After Mass, youarewe lcome to gather in the Blessed Edmund Rice Centre for refreshments. The Pope ’s Monthly Intention For mental health ministry – Let us pray that the mental health ministry be established throughout the Church, helping to overcome the stigma and discrimin ation of persons with mental illness. See “Notices ” section of our parish website (<a href="https://www.stjohnskilkenny.com" target="_blank" rel="noopener noreferrer">www.stjohnskilkenny.com</a>) for a video of the Pope praying for this intention. St. Mary ’s Cathedral Draw Thank you to everyone who has supported the St. Mary ’s Cathedral draw this month. We are delighted to announce that wehadatop prize winner. Congratulations toour parishioner who won €2,000. Well done! Tickets cost €10 per draw and are available from t he Parish Office or from Jane in the sacristy. The next draw is on Wednesday, 28th October. Pope Leo Reflects on his Trip to France Speaking to journalists on the plane following his pilgrimage to France, Pope Leo remarked: “The four days were literally filled with many blessings. Almost miracles, I would say, especially the time at Lourdes, walking with, accompanying so many people who ares ick and suffering and seeing how the grace of God's presence manifested in many different wa ys, touches people's hearts, transforms their lives, and, tousean expression that I mention ed there, restores dignity to the sick, the elderly, those who in some parts of society are discarded. ” “So, there were many signs, many expressions, many symbols thro ughout the four days. And personally, I felt very blessed myself to have the privilege to visit Fran ce to encourage especially young people who are obviously searching for something. Itwasso apparent at the stadium, the evening with 80,000 young people gathered together from around Fran ce and their enthusiasm and their joyandthe sense of hope that they offered, but especially I think that they received and will be able to share with others. ” He then went on to speak about the defence of human life. “The defence of life is something that asyouall know the Church teaches, believes very deeply. Andso, ontheone hand obviously knowing that in France thelawwas recently approved, in other countries in Europe as well, as other parts of the world there isalotof debating going on about the qu estions of end-of-life is- sues. But being in a place especially like Lourdes where people are searching for something much deeper and understanding that their lives, even in the midst of sickness or disability or pain of different kinds, that their life has meaning. The Church, because of Jesus Himself, wants to be close to those people and to affirm the values that life itself I think holds forallofus. ” Lourdes – 2027 The dates for the annual Ossory Diocesan Pil- grimage to Lourdes in 2027 are Friday, 14th May to Wednesday, 19th May inclusive. Details regarding costs will follow shortly. All book- ings, apart from those travelling as assisted pil- grims, aretobe made directly with JWT. Tel. 01 241 0800. We encourage parishioners to consider travelling on this pilgrimage. “The Hired Man ” Opening on 6th October at The Watergate Kil- kenny, this year ’s production by Kilkenny Mu- sical Society promises tobean emotional nos- talgic journey. ‘The Hired Man ’ is a captivating musical drama written by Melvyn Bragg and based on the true story of John Tallentire and his wife Emily. <a href="https://www.watergatetheatre.com" target="_blank" rel="noopener noreferrer">www.watergatetheatre.com</a> or <a href="tel:+353567761674" style="color:#1d4ed8;font-weight:600;">056 776 1674</a>. St John's <a href="https://www.stjohnskilkenny.com" target="_blank" rel="noopener noreferrer">https://www.stjohnskilkenny.com</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-st-canice-s" data-parish-name="St Canice&#x27;s"><h2 class="ocr-parish-name">St Canice&#x27;s</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 11</p>
+<p>Remembering Our Loved Ones Who Have Died Recently Deceased : Gerry Ferris, Castlecomer. Requiem Mass at 12.00 noon on Monday in the Church of the Immaculate Conception, Castlecomer. Tom Knox, St. Francis Terrace and late of Clara. Requiem Mass at 11.00am Sund ayin St Mary ’s Cathedral. Murty Brennan, Higginstown Tony Devlin, Cedarwood Drive Mary Traynor, College Road Months Mind : Bill Hennessy (11.00am);</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>John Kelly; Philip Walsh &amp; Margaret Dowling; Joe Cleere; Eamon Morrissey (6.00pm); Liam O ’Gorman (11.30am); Anthony Mahony (7.00pm); Tom Deevy; Dan Butler; Sr. Gregory Ryan; Seánie O ’Brien; Margaret McGuinness. Those we love don’tgo away, they walk beside us every day. Unseen, unheard, but always near. Still loved, still missed and very dear. Ministries for Weekend, 10th &amp; 11th October Mass Readers Ministers of the Eucharist 6.00pm Claire Coogan Ger Daly &amp; Martin O ’Neill 8.00am Mary Elliott Jacinta O ’Connell &amp; Rosario Frances 10.00am Betsy Rice Monica Colgan 11.00am Esther Comerford &amp; Tom Comerford Mary Brennan 11.30am Kathleen Ferguson &amp; Susan Bofin Mary Deegan &amp; Ava Maher 7.00pm Linda O ’Leary Luke Leydon &amp; Clodagh Butler Wesaya sincere thanks toallour Readers and Eucharistic Ministers. Attendance/Collections Last Weekend Envelope Collection: €875.00 Mass Attendance Baskets 6.00pm St. John ’s 146 332.00 8.00am St. John ’s 86 269.00 10.00am Johnswell 37 95.00 11.00am Dunmore 80 122.00 11.30am St. John ’s 142 289.00 7.00pm St. John ’s 97 317.00 588 €1,424.00 Mass Intentions for Week Beginning 5th October 2026 Tuesday: 10.30am: Requiem Helen Byrne Thursday: 10.30am: Seánie O ’Brien Saturday: 10.30am: Tom Deevy Margaret McGuinness 6.00pm: Seamus McGurran John Butler Annette Cummins Sunday: 11.00am: Joe Bergin Frank &amp; Colette Dalton 11.30am: Bridget Breda Byrne 7.00pm: Anthony Mahony Please note we may transfer an anniversary Mass on the occasion ofafun eral. May their souls and the souls ofallthe faithful departed, through the mercy of God, rest in peace. Amen. Pilgrimage to Lourdes for People with Additional Needs Fr. Danis National Chaplain of the Rise &amp; Shine Trust which brings child ren and young people with additional needs on a week-long pilgrimage holiday to Lourdes each Easter. About 400 young people between 13 and 21 with additional needs are invited as guests . There is also a smaller section for people over 21 years. This trip is free for our guests as our volunteers fund- raise for it. Volunteers pay for their own trip. Each of our groups comprise of around 15 volunteer carers and 1 0 guests. Every single group includes a group leader, a nurse, and carers. We are accompanied by a team of volunteer doc- tors who provide additional medical support. The groups share a wonderful fun filled week to- gether that includes playing games in the park, day trips to the mountai ns, the beach, thezoo, or bowling, fancy-dress parties, Masses full of music and colour, the candlelight procession an d visits to the Grotto. Application forms are available from <a href="https://www.riseandshine.ie/easter-pilgrimage" target="_blank" rel="noopener noreferrer">www.riseandshine.ie/easter-pilgrimage</a> or from Fr. Dan who is more than willing to give more information and help with th e application process. The closing date for next Easter ’s pilgrimage is 15th October 2026, soitis important to act immediately. Watch our videos at <a href="https://www.riseandshine.ie/easter-pilgrimage" target="_blank" rel="noopener noreferrer">www.riseandshine.ie/easter-pilgrimage</a> or by scanning the QR code togeta flavour of this unique and life enhancing experience forthose involved. Mother of Fair Love School 1966 - 2026 60th Anniversary Mass of Thanksgiving in Mother of Fair Love School, James ’s Street, Kilken- ny - 9th October 2026 at 12.00 noon. You are invited to join our celebration of 60 years of edu- cation for children and young adults with special needs. Mass will be celebrated by Bishop Ger Nash, Bishop of Ossory and Ferns and Father Dermot Ryan, Chairper sonofthe Board of Man- agement. Past staff, students and members of the community are welcome to join usin celebrat- ing the past and looking with hope to the future. Refreshments will be provided afterwards. October Offering Envelopes We offer a gentle reminder that the envelopes (green in colour) for the October Stations are in- cluded in your contribution packs. We appreciate your continued suppo rt. St. Francis of Assisi This weekend marks the 800th anniversary of the death of St. Francis, inspiring a yearlong series of celebrations across the world. The commemorations aim to renew Fra nciscan values in a world facing conflict and environmental challenges, inviting all to embrace com passion, sim- plicity, and unity in the spirit of the beloved saint. Mass will be celebrated in Kilkenny Capuchin Friary at 12.00 noon on this Sunday. Bishop Ger Nash will be celebrant. All are welcome. National Synodal Assembly With less than three weeks to go before the National Synodal Assembly takes place in Gor- manston, Co Meath, the Church in Ireland is being asked to pray f or those preparing for the gathering andforthe guidance of the Holy Spirit. The Assembly will take place on Saturday, 17th October 2026, bringing together nominated delegates from across the country (including Ossory) to consider the f ruits of five years of prayer, listening and discernment along the Irish Synodal Pathway. The Working Document for the Assembly has now been published and is available at this link: Is not this what God asks of you? . It brings together the proposals developed through the seven national Working Groups and will provide the basis for prayer, conver sation, discernment and deliberation when delegates gather in October. But the invitation in the weeks ahead is not simply to read the documen t. Parishes, communi- ties and individuals are being encouraged to pray with it and reflect on the question which has accompanied the Synodal Pathway since it began in 2021: “What does God want from the Church in Ireland at this time? ” Dates for Your Diary First Holy Communion Johnswell – Sunday, 16th May 2027 at 10.00am St John ’s – Saturday, 22nd May 2027 at 11.00am Parish Confirmations Friday, 28th May 2027 at 11.00am</p>
+<h3 class="b-head">Please pray for</h3>
+<p>the families involved.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-st-john-s" data-parish-name="St John&#x27;s"><h2 class="ocr-parish-name">St John&#x27;s</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 12</p>
+<p>S WEB STREAMING OF MASS CAN BE FOUND AT HTTPS ://<a href="https://www.TEMPLEORUMPARISH" target="_blank" rel="noopener noreferrer">www.TEMPLEORUMPARISH</a> . COM 2 2 N TEMPLEORUM PASTORAL COUNCIL Meeting on Monday evening, 5th October at 7pm in the Community Centre. PAUL BYRON &amp; SPECIAL GUESTS A night of songs &amp; stories with Tenor Paul Byron and special guests The Cois Nore Choir in St. Canice's Cathedral, Kilkenny on Saturday 10th October to mark World Mental Health Day. Tickets €30 andcanbe purchased via <a href="https://fundraise.grow.ie/event/paul-byrom/home" target="_blank" rel="noopener noreferrer">https://fundraise.grow.ie/event/paul-byrom/home</a> 30TH ANNIVERSARY MASS BEATIFICATION OF BLESSED EDMUND RICE On Monday, October 5th at 7pm , a special Mass will be celebrated in the Blessed Edmund Rice Chapel, Westcourt, Callan, R95 RX83, to mark the 30th anniversary of the Beatification of Blessed Edmund Rice. On October 6th, 1996, Edmund Rice was beatified in Rome by St. Pope John Paul II. As we give thanks for the many blessings and graces received through his intercession, Fr. Willie Dalton, PP Callan, will lead this commemorative Mass. The Christian Brothers Community warmly invites all parishioners of the Diocese of Ossory and friends to join us for this celebration. After Mass, you are welcome to gather in the Blessed Edmund Rice Centre for refreshments. SINGING CLASSES ARE HERE! Do you love to sing? Why not come along and explore pop, musical theatre &amp; more! Music Generation Kilkenny is offering small-group singing tuition for ages 8 –18 attwoofour after school hubs: Tuesday: Coláiste Cois Siúire, Mooncoin Thursdays: The Drum Youth Centre, McDonagh Junction Small group tuition ¦ Pop &amp; musical theatre ¦ Ages 8 –18 Interested in registering? Phone: <a href="tel:+353871765493" style="color:#1d4ed8;font-weight:600;">087-1765493</a> <a href="mailto:musicgenerationkilkenny@kectb.ie" target="_blank" rel="noopener noreferrer">musicgenerationkilkenny@kectb.ie</a> Come find your voice and have some fun along the way! #Music Generation Kilkenny #Music Generation #Singing Classes SAVE THE DATE Confirmation 2027 will take place on Friday, 16th April 2027in the Church of the Assumption, Piltown at 11am. MOTHER OF FAIR LOVE SCHOOL 1966-2026 60th Anniversary Mass of Thanksgiving will take place in the Mother of Fair Love School, James’s Street, Kilkenny on 9th October 2026 at 12 noon. You are invited to join our celebration of 60 years of Education for children and young adults with special needs. Mass will be celebrated by Bishop Ger Nash, Bishop of Ferns and Ossory and Father Dermot Ryan, Chairperson of the Board of Management. Past staff, students and members of the community are welcome to join us in celebrating the past and looking forward with hope to the future. Refreshments served afterwards. CARRICK-ON-SUIR LION ’S CLUB CARRICK-ON-SUIR &amp; DISTRICT LIONS CLUB will hold their Annual Church Gate Collection at all masses next weekend 10th and 11th October in aidofthe Christmas Food Appeal 2025 This is always a very busy time of the year for us with huge demands for help and funding andweaskyouto please support as best you can . Thank You! “Noonehas ever become poor by giving” - Helen Keller. LINGAUN VALLEY TOURISM CLG Annual General Meeting will take place on Thursday, October 15th in the Grangemockler Community Centre at 8pm. All are welcome to attend. CARRICK-ON-SUIR ETB COLLEGE National Tour Guiding. Level 6. Commencing in October. Course length is 29 weeks. Full time. Talk to the admissions hub on (067)71001 or email <a href="mailto:admissions@tipperaryetc.ie" target="_blank" rel="noopener noreferrer">admissions@tipperaryetc.ie</a> WE REMEMBER IN OUR PRAYERS AT THIS TIME people of the parish, those who have passed away in our community, our beloved family members &amp; friends and all those who need our prayers at this time. MONTH’S MIND Mary O’Brien, Jamestown</p>
+<h3 class="b-head">ANNIVERSARIES</h3>
+<p>Mary Barnable, Harristown Dick Corcoran and his daughter Jacqueline John Corcoran, Mullinbeg Willie Drennan Alice Lecie Drohan OWNING &amp; TEMPLEORUM SUNDAY 10AM MASS ROSTER 4th October – Templeorum Church 11th October – Owning Church 18th Oct. – Templeorum Church 25th October – Owning Church WEEKLY EXPOSITION OF THE BLESSED SACRAMENT Owning: Tuesdays from 2-3pm Piltown: Thursdays at 10:30am PARISH HALL COMMITTEES We hope tosetupa committee for each of the three Parish Halls in Templeorum, Owning and Piltown. If any parishioners would be interested in serving onanyof these three committees, please submit your name to either Fr. Moore or the Parish Office on <a href="tel:+35351643112" style="color:#1d4ed8;font-weight:600;">051-643112</a>. We would love to see some new parishioners getting involved. TIME WITH JESUS Our ‘Time with Jesus' takes place each Wednesday night at 7:30pm in Piltown Community Centre. All are welcome. Templeorum <a href="https://templeorumparish.ie" target="_blank" rel="noopener noreferrer">https://templeorumparish.ie</a></p>
+<hr>
+<p class="page-label">Page 13</p>
+<p>PILTOWN COMMUNITY CENTRE – ACTIVITIES TIMETABLE Monday - Knitting at 10am, Bowls at 10:30, Chloe 30m, Karate 6-6:45 for beginners and 6-7 for all grades. Tuesday - Irish Dancing @5pm, Inga's keep fit class @7:30p m. Wednesday - Chairobics at 11am, Inga at 7:30pm and Fr Moore's prayer group at 7:30pm in Room 1. Thursday - Bernies' baby massage class at 10am-11:30, Bowls in main hall at 10:30am. Friday - Bowls at 10:30 in main hall. Library opens daily at 10am Snooker hall opens 6pm-10pm daily. THE HIRED MAN Opening on October 6th at The Watergate Kilkenny, this year’s production by Kilkenny Musical Society promi ses to be an emotional nostalgic journey. ‘The Hired Man’isa captivating musical drama written by Melvyn Bragg a nd based on the true story of John Tallentire andhiswife Emily. Setinthe rugged hills of Cumbria from 1898 to 192 0s. A musical brimming with passion, epic storytelling an d spectacular choral music, this is a deeply movings tory of love, betrayal and community resilience. With a cast ofover 30, “The Hired Man”isledby local actor Owen Finnegan in the role of John Tallentine, with Sophie Blaney-Parslow as Emily and David Doyle playing the role of Jackson, a man whose desire threatens to tear the family apart. This is a production you won’t want to miss. Tickets can be booked through <a href="https://www.watergatetheatre.com" target="_blank" rel="noopener noreferrer">www.watergatetheatre.com</a> or by phoning <a href="tel:+353567761674" style="color:#1d4ed8;font-weight:600;">056-7761674</a>. LIE DOWN &amp; LISTEN AT ST. CANICES CATHEDRAL This October, Lie Down &amp; Listen is returning with i ts blissful sound healing and lying down concert experience. You won’t just hear the music - you’ll feel itandits vibrations. This event sold out in days last year, so book early! You're lying down on soft mattresses cushions in Kilkenny's extraordinary Cathedral, absorbing the blissful vibrations of Tibetan bowls and live classical piano music. Dates: 27/28 October &amp; 3/4 November Venue: St. Canice’s Cathedral, Kilkenny Tickets: €55 Includes mattresses, cushions, blankets and the 90mins experience. #liedownandlisten #kilkenny ST. VINCENT DE PAUL Do you need help? Remember youarenot alone. Phone <a href="tel:+353862096341" style="color:#1d4ed8;font-weight:600;">086-2096341</a> (Piltown Conference) Your call canbethe beginning of solutions! IVERK SHOW The next Iverk Show meeting will take place on Monday 12th October in Piltown Community Centre. All are Welcome PARENTING SUPPORT CHAMPIONS Comfort, Connection and Confidence. Supporting your Neurodivergent child. Parenting Support Champions Project. Laura Crowley, Autism consultant. Nano Nagle Commun ity Resource Centre. October 22nd, 2026. 10.30 to 12.30pm Entry is FREE but must be pre booked on <a href="tel:+353876501620" style="color:#1d4ed8;font-weight:600;">087-6501620</a> . PETER WALKER’S PEACE DOVES The Peter Walker’s Peace Doves installation at St Canice’s Cathedral and Round Tower , is now open to visitors. Over recent months, schools and community groups fr om across Kilkenny have taken part in this large-scale partic ipatory artwork by writing their own messages of peace on paper dov es. These individual contributions have now come together to create an installation of almost 10,000 paper doves, filling the Cathedral with a powerful and uplifting message of peace and hope. Come along and explore the installation and reflect on themes of peace, kindness, community and hope. The visit can also provide an opportunity to explore the Cathedral and discove r more about this important heritage site in the heart of Kilken ny. Normal entry fees apply. Peace Doves is on view until 8 November 2026. FOSTERING FIRST IRELAND Could you foster? A child’s tomorrow could start with you. We’re looking for kind, caring people who can open their homes and hearts to children and young people who need a safe, supportive place to belong. You don’t need to have all the answers. We’ll provide full training, ongoing support and guidance every step oftheway. • Make a lasting difference, Local support • Full training provided • Help create brighter futures Interested in fostering? Visit our website for further information at <a href="https://fosteringfirstireland.ie" target="_blank" rel="noopener noreferrer">https://fosteringfirstireland.ie</a> ITEMS FOR PARISH NEWSLETTER Items for inclusion in the Parish Newsletter each w eek must be submitted to <a href="mailto:piltownparishnews@gmail.com" target="_blank" rel="noopener noreferrer">piltownparishnews@gmail.com</a> by 7pm each Wednesday evening in order to be included in that w eek’s issue. Please note that items for the newsletter must be i n typed format – no screenshot picture messages will be accepted for printing.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-templeorum" data-parish-name="Templeorum"><h2 class="ocr-parish-name">Templeorum</h2><p class="ocr-parish-date">11/10/2026</p></header>
+<p class="page-label">Page 14</p>
+<p>TWENTY EIGHTH SUNDAY IN ORDINARY TIME 11th OCTOBER 2026 Saint Luke’s General Hospital Annual Remembrance Mass This Remembrance Mass will take place on Wednesday 21st October 2026 at 7:30pm in St Canice’s Parish Church, Kilkenny, for f amilies and loved ones of patients who have died in our hospital. The Mass, o rganised bythe Endof Life Care Committee, will have particular remembrance of th e patients who have died between 1st September 2025 and 31st August 2026. It can also be viewed via the following link: <a href="https://www.stcanicesparish" target="_blank" rel="noopener noreferrer">https://www.stcanicesparish</a> .ie/web-cam/ All are welcome. Public Rosary There will be a public Rosary in Inistioge Square o n Tuesday, 13th October, at 3.00pm in honour of our Lady of Fatima. We thank our Lady for continued intercession for our families and for World Peace. The church will be used if the weather is bad. Mission Sunday Collection Next Sunday, October 18th is World Mission Sunday and a Church Door collection will be taken upatall Masses. In the D iocese of Ossory it’soneof the six occasions when a church door collection is permitted, apart from the Saint Vincent de Paul Society. “One in Christ, United in Mission” World Mission Sunday (formerly known as Propagation ofthe Faith) is the Holy Father’s annual appeal for spiritual and financials upport so that the life-giving work of overseas mission and missionaries can continue. It always falls on the second last Sunday in October, and its theme for this year is:“Onein Christ, United in Mission”. Right now, missionaries desperately need your help. In many poorer parishes in Africa, Asia, and Latin Ameri ca missionaries are serving on the front line. They already do so much, walking hand-in-hand with marginalised communities, long before and after any em ergency. Thank you in anticipation for showing missionaries your care in s upporting World Mission Sunday. Your prayers and generosity will change liv es. Cois Nore Outreach The scheduled visits that Cois Nore Outreach service visits Thomastown for the month of October are as follows: - 15th October - Thomastown Library 11am to 1pm 22nd October - Thomastown Hall 11am to 1pm 29th October - Thomastown Library 11am to 1pm. All cancer related queries are welcome. Also pick u p information on healthy living tips, signposting and Cois Nore service info rmation. St Colmcille’s Pastoral Area – Thomastown &amp; Inistio ge Parishes THOMASTOWN PARISH Mass Times Inistioge Parish Mass Times Vigil: 6.00pm Vigil: The Rower: 7.30pm Sunday: 10.00am Sunday: Clodiagh: 9.30am St Columba’s: 11.00am Inistioge: 11.00am Wednesday: 9.30am Tuesday: The Rower: 9.30am Friday: 9.30am Thursday: Inistioge: 9.30am webcam: thomastownparish.ie webcam: inistiogeparish.ie BEREAVEMENTS</p>
+<h3 class="b-head">Recently deceased</h3>
+<p>Noelle Walsh, Station Road; Eileen Higginbotham, Castle Ave.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Toddy &amp; Eileen Davis, Dangan; Maura Byrne, Carrickmourne; Kathleen Finan, Kilmurry; Liam Burke, Castle Ave: (6.00pm). Lynn Roche, Jerpoint Church; Josie Beck, Dangan Tce; Margaret Nolan, Friarshill; Kathlee n Denieffe, Newtown: (10.00am).</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Next w/e: Pat Heffernan, Mayo; Elizabeth Walsh, Kilmurry; Margaret (Madge) Grace, Grennan: (6.00pm). Kathleen Stapleton, Legan; Dixie Doyle, Carrickmourne; Geraldine Power, Carrickmourne: (10.00am). Thomastown <a href="https://thomastownparish.ie" target="_blank" rel="noopener noreferrer">https://thomastownparish.ie</a></p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
