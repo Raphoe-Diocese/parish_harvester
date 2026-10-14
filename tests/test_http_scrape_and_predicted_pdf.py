@@ -248,6 +248,19 @@ class HttpScrapeScoreTests(unittest.TestCase):
                 date(2026, 9, 13),
             ),
         )
+        october = predicted_dated_upload_urls(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf",
+            date(2026, 10, 11),
+            weeks_back=1,
+        )
+        this_week = (
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-11th-Oct-26.1.pdf"
+        )
+        last_week = (
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-4th-Oct-26.pdf"
+        )
+        self.assertIn(this_week, october)
+        self.assertLess(october.index(this_week), october.index(last_week))
         self.assertEqual(
             rewrite_date_url(
                 "https://tawnawillyparish.ie/wp-content/uploads/Sunday-13th-Sept-26.pdf",

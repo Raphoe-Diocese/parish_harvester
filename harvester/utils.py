@@ -562,6 +562,9 @@ def month_first_sunday_upload_urls(example_url: str, week: date) -> list[str]:
     for name in month_names:
         cap = name[0].upper() + name[1:]
         names.append(f"Sunday-{day_ord}-{cap}-{yy}.pdf")
+        # WordPress adds .1 when the same name was uploaded twice.
+        # Tawnawilly 11/10/2026 listing href is Sunday-11th-Oct-26.1.pdf.
+        names.append(f"Sunday-{day_ord}-{cap}-{yy}.1.pdf")
         names.append(f"Sunday-{day_ord}-{cap}.pdf")
         names.append(f"Sunday-{day_ord}-{cap}-{week.year}.pdf")
         for day in (day_pad, day_raw):
