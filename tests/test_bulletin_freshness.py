@@ -13,6 +13,8 @@ from harvester.bulletin_freshness import (
     extract_bulletin_date,
     extract_bulletin_date_from_text,
     freshness_verdict_for_ok_result,
+    heading_dates_in_text,
+    issue_date_verdict,
     mark_result_stale,
     suggest_retry_strategy,
     verdict_for_extracted_date,
@@ -724,7 +726,7 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
 
 
 class BodyBeatsUrlFreshnessTests(unittest.TestCase):
-    """PDF body stale must beat a this-week URL or report bulletin_date."""
+    """An older date inside the PDF must not replace a newer date on the link."""
 
     TARGET = date(2026, 10, 4)
 
@@ -778,8 +780,10 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
                 self.TARGET,
                 report_bulletin_date=date(2026, 10, 4),
             )
-            self.assertEqual(verdict.status, "stale")
-            self.assertEqual(verdict.extracted_date, date(2026, 9, 13))
+            # Link says Sunday 4 October. "Week beginning 13 September" inside
+            # the file must not replace that date.
+            self.assertEqual(verdict.status, "fresh")
+            self.assertEqual(verdict.extracted_date, date(2026, 10, 4))
 
     def test_safety_net_rejects_dated_url_with_ancient_body_years(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -811,6 +815,32 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
                 payload["rejected_from_mega"][0]["reason"],
                 "body_years_only_ancient",
             )
+
+
+class IssueDateTests(unittest.TestCase):
+    def test_newest_heading_wins_and_old_inside_date_loses_to_the_link(self) -> None:
+        text = (
+            "Week beginning 27th September 2026\n"
+            "Parish newsletter\n"
+            "Sunday 11th October 2026\n"
+        )
+        dates = heading_dates_in_text(text)
+        self.assertIn(date(2026, 10, 11), dates)
+        self.assertEqual(max(dates), date(2026, 10, 11))
+
+        link = check_bulletin_freshness(
+            "https://www.steunanscathedral.ie/wp-content/uploads/2026/10/"
+            "Newsletter-4th-October-2026.pdf",
+            date(2026, 10, 11),
+        )
+        inside = verdict_for_extracted_date(date(2011, 5, 2), date(2026, 10, 11))
+        picked = issue_date_verdict(link, inside)
+        self.assertEqual(picked.extracted_date, date(2026, 10, 4))
+
+        this_week = verdict_for_extracted_date(date(2026, 10, 11), date(2026, 10, 11))
+        fresh = issue_date_verdict(link, this_week)
+        self.assertEqual(fresh.status, "fresh")
+        self.assertEqual(fresh.extracted_date, date(2026, 10, 11))
 
 
 if __name__ == "__main__":

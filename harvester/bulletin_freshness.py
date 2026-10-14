@@ -404,6 +404,41 @@ def extract_bulletin_date_from_text(text: str) -> date | None:
     return None
 
 
+def heading_dates_in_text(text: str) -> list[date]:
+    """Every bulletin heading date in the text, oldest first is not assumed.
+
+    The first "newsletter" line is often an older notice. The issue date is
+    the newest heading date, not whichever line the scanner hits first.
+    """
+    found: list[date] = []
+    seen: set[date] = set()
+
+    def add(parsed: date | None) -> None:
+        if parsed is not None and parsed not in seen:
+            seen.add(parsed)
+            found.append(parsed)
+
+    lines = _nonempty_text_lines(text)
+    for index, line in enumerate(lines):
+        if _BULLETIN_HEADING_RE.search(line):
+            add(extract_date_from_string(line))
+            for offset in _ADJACENT_DATE_LINE_OFFSETS:
+                neighbour_index = index + offset
+                if 0 <= neighbour_index < len(lines):
+                    add(_parse_short_adjacent_date_line(lines[neighbour_index]))
+        if not _LITURGICAL_MASTHEAD_RE.search(line):
+            continue
+        if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
+            continue
+        if _FULL_YEAR_RE.search(line):
+            add(extract_date_from_string(line))
+        for offset in _ADJACENT_DATE_LINE_OFFSETS:
+            neighbour_index = index + offset
+            if 0 <= neighbour_index < len(lines) and _FULL_YEAR_RE.search(lines[neighbour_index]):
+                add(_parse_short_adjacent_date_line(lines[neighbour_index]))
+    return found
+
+
 def verdict_for_extracted_date(extracted: date, target: date) -> FreshnessVerdict:
     """Compare an already-parsed bulletin date with the harvest Sunday."""
     week_start, week_end = week_window(target)
@@ -607,6 +642,17 @@ def verdict_from_ancient_body_years(
     )
 
 
+def pdf_body_heading_verdict(path: Path, target: date) -> FreshnessVerdict | None:
+    """Newest heading date in the PDF, or an ancient-years stale verdict."""
+    text = read_pdf_text_head(path)
+    if not text.strip():
+        return None
+    dates = heading_dates_in_text(text)
+    if dates:
+        return verdict_for_extracted_date(max(dates), target)
+    return verdict_from_ancient_body_years(text, target)
+
+
 def pdf_body_stale_verdict(path: Path, target: date) -> FreshnessVerdict | None:
     """Return stale when PDF heading or ancient-only years prove the file is old.
 
@@ -615,16 +661,32 @@ def pdf_body_stale_verdict(path: Path, target: date) -> FreshnessVerdict | None:
     after the mega for image-only scans; those stay unknown until a heading
     date appears.
     """
-    text = read_pdf_text_head(path)
-    if not text.strip():
-        return None
-    body_date = extract_bulletin_date_from_text(text)
-    if body_date is not None:
-        verdict = verdict_for_extracted_date(body_date, target)
-        if verdict.status == "stale":
-            return verdict
-        return None
-    return verdict_from_ancient_body_years(text, target)
+    verdict = pdf_body_heading_verdict(path, target)
+    if verdict is not None and verdict.status == "stale":
+        return verdict
+    return None
+
+
+def issue_date_verdict(
+    url_verdict: FreshnessVerdict,
+    body_verdict: FreshnessVerdict | None,
+) -> FreshnessVerdict:
+    """Pick the issue date. An older date inside the PDF does not replace the link.
+
+    Inver's file is named 3–4 October 2026. The PDF text also contains
+    2 May 2011. That inside date must not become the bulletin date.
+    A this-week heading inside the PDF still counts: a later line that says
+    11 October beats an earlier "week beginning 27 September".
+    """
+    if body_verdict is None:
+        return url_verdict
+    if body_verdict.status != "stale":
+        return body_verdict
+    url_date = url_verdict.extracted_date
+    body_date = body_verdict.extracted_date
+    if url_date is not None and body_date is not None and body_date < url_date:
+        return url_verdict
+    return body_verdict
 
 
 def freshness_verdict_for_ok_result(
@@ -635,10 +697,10 @@ def freshness_verdict_for_ok_result(
 ) -> FreshnessVerdict:
     """URL / report date / PDF-body freshness for one ok download.
 
-    Report ``bulletin_date`` or URL date is the first guess, but a provably
-    old PDF body (heading date or ancient-only years) always wins — otherwise
-    a this-week slug with last month's print slips into the mega (Ardara
-    08/10/2026: URL 04/10, body 13/09).
+    Report ``bulletin_date`` or URL date is the first guess. A this-week
+    heading inside the PDF wins. An older date inside the PDF does not
+    replace a newer date written in the link (Inver: file name 4 October
+    2026, text also contains 2 May 2011).
     """
     url = (result.url or "").strip()
     pdf_path = result.file_path
@@ -659,14 +721,14 @@ def freshness_verdict_for_ok_result(
     else:
         verdict = FreshnessVerdict(status="unknown", reason="no_date_in_url")
 
-    # Any on-disk PDF that proves stale wins (do not stop at the first path
-    # that exists but has no extractable heading — Ardara 08/10/2026).
+    # Do not stop at the first path that exists but has no heading date.
     for path in candidates:
         if not path.exists():
             continue
-        body_stale = pdf_body_stale_verdict(path, target)
-        if body_stale is not None:
-            return body_stale
+        body_verdict = pdf_body_heading_verdict(path, target)
+        if body_verdict is None:
+            continue
+        return issue_date_verdict(verdict, body_verdict)
     return verdict
 
 
