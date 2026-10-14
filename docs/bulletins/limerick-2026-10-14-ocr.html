@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Limerick Diocese Text Bulletin — 14/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="limerick-2026-10-14.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">LIMERICK Text Bulletin · 14/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-adare" data-parish-name="Adare"><h2 class="ocr-parish-name">Adare</h2><p class="ocr-parish-date">14/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>Masses this weekend: Saturday 10th October @ 6pm Sinead Rodgers ‘ Month’s Mind’ Tom Kelly (A) Mary Enright ‘ 12th Anniversary’ &amp; Jimmy Cusack (A Sunday 11th October @ 9.30am Maurice Neilan ‘ Ist Anniversary’ Caroline Gordon RIP Margaret McKenna RIP Sunday 11th October @ 11.30am Patsy Griffin ‘5th Anniversary’ and remembering his wife Sheila and their daughter Sheila Fr. Joe Noonan ‘4th Anniversary’ Paul Costello RIP Donal McSweeney RIP Monday 12th October @ 10am The Harnett &amp; O’Sullivan families (A) and remembering Stephanie on her anniversary Tuesday 13th October @ 10am James Corbett (A) Dan O’Connell (A) ‘Happy birthday wishes for Nancy Moore’ For the Intentions of Josephine Murphy Wednesday 14th October @ 10am ‘Adoration from 6pm to 9pm’ Eileen McDonnell RIP Gretta McKenna RIP Thursday 15th October @ 10am Mary O’Sullivan (Ballylongford) RIP Johathan P Ryan (Cork) RIP M J Deely RIP A get well Intention Friday 16th October @ 10am Martin Collins (A) Kathleen Holmes (Feenagh) RIP Moss Hannigan RIP Masses next weekend: Saturday 17th October @ 6pm Diarmuid O’Connor ‘4th Anniversary’ Tony Mackessey RIP Sunday 18th October @ 9.30am ‘World Mission Sunday’ Tony Mackessey RIP ‘Thank you, Patand Madge’ Sunday 18th October @ 11.30am World Mission Sunday’ John O’Brien ‘ 3rd Anniversary and birthday remembrance for John O’Neill, The Thatch, Castleroberts Moss Hannigan RIP Gretta McKenna RIP Mary O’Brien (Tralee) RIP ➢ Baptism: Conall Peter Hennessy, son of Peter and Deirdre, Copay, Adare ➢ Wedding: Michael Ryan, son of Thomas and Maura, Athenry, Co. Galway and Kelly Murphy, daughter of Tomand Mary, Thurles, Co. Tipperary . ❖ Condolences: To the family of Marie McNamara, Ballysheedy/Adare , to her children Suzanne, Caroline, Tom, Patrick, Mary, Elizabeth and John and their spouses and partners, grandchildren, brothers Tony and Conor (Normoyle), sisters-in-law Brenda, Mairead, Phyllis and Mary, nephews, nieces, neighbours and friends. May she rest in peace. ❖ To the family and friends of Bridget Kelly, Embury Close, Adare/Castletroy View, Limerick. May she rest in peace. ▪ Propagation of the Faith (Mission Sunday ): a collection for Mission Sunday will take place at all masses, Saturday 17th October and Sunday 18th October. Envelopes are available at the back of the church. We appreciate your generosity . o Multiple Sclerosis Society Limerick Branch: will hold their Church Gate Collection on Saturday 17th and Sunday 18th October 2026. Please give generously. • Pro-life collection last weekend amounted to €620.00 , thank you for your contribution. Holy Tr inity Abb ey Church Founded 1230 Sund ay 11th Octo ber 2026 Mass Readers: Saturday 17th October 6pm: Catherine Noonan Sunday 18th October 9.30am: Rose Brennan Sunday 18th October 11.30am: Joan Walsh Eucharistic Ministers: Saturday 17th October 6pm: Carmel Scanlon/Mairead Dowling Sunday 18th October 9.30am: Anna O’Donnell/Bobby Reidy Sunday 18th October 11.30am: Anne Keohane/Mary C Ryan The offertory collection amounted to €1,595…Thank you. Monsignor Daniel Neenan, P. P. The Coach House, Main Street, Adare. V94 N6CR <a href="tel:+35361395368" style="color:#1d4ed8;font-weight:600;">061-395368</a> / <a href="tel:+353872208547" style="color:#1d4ed8;font-weight:600;">087-2208547</a>. Email: <a href="mailto:danneenan@outlook.com" target="_blank" rel="noopener noreferrer">danneenan@outlook.com</a> Fr Paul Ikeluka SMMM , The Parochial House, Mainstreet, Adare, V94 YV9K. <a href="tel:+353874256316" style="color:#1d4ed8;font-weight:600;">087-4256316</a> Canon Tony O’Keeffe , P. E. (Retired), The Presbytery, Main Street, Adare . <a href="tel:+353874163401" style="color:#1d4ed8;font-weight:600;">087-4163401</a></p>
+<h3 class="b-head">Parish Office</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-monaleen" data-parish-name="Monaleen"><h2 class="ocr-parish-name">Monaleen</h2><p class="ocr-parish-date">14/10/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>Parish of Donoughmore/ Knockea/Roxboro Fr John Walsh PP <a href="tel:+353874493228" style="color:#1d4ed8;font-weight:600;">087 4493228</a> <a href="mailto:dkrparish@gmail.com" target="_blank" rel="noopener noreferrer">dkrparish@gmail.com</a> Website, dkrparish.ie Facebook: DKR Parish Limerick The Eircode for St. Patrick ’s Church, Donoughmore is V94 V6T3 . Knockea is V94 D938 . Pastoral Unit ‘Sli Padraig ’ Patrick ’s Way ; Donoughmore /Knockea/ Rox- boro, Queen of Peace, Holy Family Feast of St. John XXIII Oct 11th was elected pope in his advanced age on October 28, 1958. He called the Second Vatican Council to discuss certain eccle- siastical issues. He reigned for only four years and seven months and died on June 3, 1963 due to stomach cancer attheage of 81 years and was beatified by Pope John Paul-II on September 3, 2000. He was canonized in April 2014. Feast of St. Carlos Acutis Oct 12th St Carlo Acutis (3 May 1991 – 12 October 2006) was an English-born Italian Catholic teenager known for his devotion to the Eucharist andhisuseof digital media to promote Catholic devo- tion. Born in London and raised in Milan, he developed an early interest in computers and video games, teaching himself programming and web design and assisting his parish and school with digital projects. Active in parish life, he served as a catechist and helped inspire several people to con- vert to Catholicism. He later collected information about Eucharistic miracles and Marian apparitions. He was diagnosed with acute promyelocytic leukae- mia and died attheageof fifteen. Since his death, his relics have been displayed in Assisi, and his exhibitions on Eucharistic miracles have travelled worldwide. Feast of St. Teresa of Avilla Oct 15th She left her house attheageof 15 years on November 2, 1535, to enter the Car- melite Convent of the Incarnation at Avila. Shewasa woman of compassion, prayer and discipline. She spent most of her life in the reformation of herself andthe Car- melites. She always wrote and fought for reform in the monasteries. She founded more than six monas- teries. She died on October 4, 1582 at Salamanca in Spain. She was beatified by Pope Paul-Von April 24, 1614 and canonized by Pope Gregory-XV on March 12, 1622. In 1970 the Church gave her the title of Doctor of the Church. Feast of St. Margaret Mary Alacoque Oct 16th She was born on July 22, 1647 in the Kingdom of France. She was suffering from a rheumatic fever and was bedrid- den for four years, at the very early age and was cured after praying to Mother Mary. After her cure from that illness, she added the name Mary in his name. She took avowto become anunifshe would be cured from the disease. But she forgot about thevowand lived the luxurious life of going to dances etc. Onedayshesawa vision of Jesus Christ with scourged body which reminded her of her forgotten vow. She entered the Order of Visitation Nuns attheageof 24. She was considered as a very simple, humble and a frank nun. Shesawthe vision of Jesus so many times. Jesus asked her to become the apostle for the propagation of the Sacred Heart of Jesus. She died on October 17, 1690 at age 43 years in France. She was beatified by Pope Pius-IX on September 18, 1864 and was canonized by Pope Benedict-XV on May 13, 1920. Coffee Morning in Aidof Milford Hospice A coffee morning will be held on Sunday 11th Oct at 11am atthe Hubin Ballyneety organized by BCDA . Your support would be appreciated for this worthy cause. Congratulations to Ballyneety Men ’s Shed who were one of five Limerick community groups selected to represent Limerick in the 2026 IPB Pride of place competition. Congratulations to South Liberties CLG South Liberties are U14 Division 1 County Hurling Shield Champions after beat- ing Mungret St. Pauls. Notice of Road Closure ! IMPORTANT ADVANCE ROAD CLOSURE NOTICE Full road closure ! At the R512 Kilmallock Road Rounda- bout. The works are required to raise the height of the bridge by 230mm (10 inches). From 10:00hrs Friday 16th October to 05:00hrs Monday 19th October 2026 Please note there will be no pedestrian access dur- ing the road closure also asitisa complex operation. Urgent Appeal for Blood Donations. Call 1800 222111 to book appointments as blood supplies are at critically low levels. Planned Giving and On-Line Donation system. Last week ’s church collections came to €850.00.00 for which weareex- tremely grateful. An alternative fa- cility to allow parishioners make fi- nancial contributions to the church and clergy. Use the camera on your smartphone to scan this QR Code to bring you directly to our payments site or alternatively gotoour parish website dkrparish.ie Weekly Lotto €5,800, No Winner. Winning numbers: 1, 7, 19, 21 Lucky Dips: 1. Stephen Ryan 2. Sharon O ’Connor 3. Donal Fahey 4. Michael J O ’Brien 5. Mary Lynch 6. Nuala Fitzgerald Next Jackpot €5,900. Date Tuesday 13th October 2026 Venue: The Cats Cradle. Remembered In Mass Donoughmore Sat 10th Oct St. Daniel Comboni 7pm Mass Michael &amp; Josephine Sheehan (Anniversaries) Mon 12th Oct St. Carlos Acutis 10 am Mass Parish Intentions Fri 16th Oct St. Gall St. Margaret Mary Alacoque World Food Day 10 am Mass Parish Intention Exposition of the Blessed Sacrament Holy Hour after Mass. Sun 18th Oct St. Luke Evangelist 11am Mass Parish Intentions Knockea Sun 11th Oct St. Canice (Ossory) St. John XXIII, Pope 11am Mass Patrick (Paddy) Shanahan ( 1st Anniversary) Patrick Shanahan Jnr (12th Anniversary) Wed 14th Oct St. Callistus I Pope 10am Mass Parish Intentions Sat 17th Oct St. Ignatius of Antioch 7pm Mass Parish Intentions Booking Anniversary Masses in both our parish churches, please call into the sacristy after Mass or you can also book an anniversary Mass through the parish email at dkr- <a href="mailto:parish@gmail.com" target="_blank" rel="noopener noreferrer">parish@gmail.com</a>. To arrange a home visitation for Holy Communion please</p>
+<h3 class="b-head">contact</h3>
+<header class="ocr-parish-masthead" id="ocr-parish-st-joseph-s" data-parish-name="St Joseph&#x27;s"><h2 class="ocr-parish-name">St Joseph&#x27;s</h2><p class="ocr-parish-date">14/10/2026</p></header>
+<p class="page-label">Page 3</p>
+<p>Shannon West Pastoral Unit comprising of the parishes of Coolcappa/Kilcolman, Shanagolden/Foynes/Robertstown, Loughill/Ballyhahill &amp; Glin Shannon West, Foynes, Co. Limerick. V94 V8N6 Contact Number: <a href="tel:+3536965561" style="color:#1d4ed8;font-weight:600;">069-65561</a> Secretary: Ann Dore E-mail address: <a href="mailto:info@shannonwestchurches.ie" target="_blank" rel="noopener noreferrer">info@shannonwestchurches.ie</a> Pastoral Area Website: shannonwestchurches.ie Office Hours: Wednesday, Thursday, Friday 9-5pm (Lunch 1-2pm) FB : Shannon West Pastoral Area Clergy Details Fr. Francesco Okonkwo <a href="tel:+353877151260" style="color:#1d4ed8;font-weight:600;">087-715 1260</a>. Fr. Liam Enright <a href="tel:+353877415603" style="color:#1d4ed8;font-weight:600;">087-741 5603</a>. Baptisms: Baptism Booking to be done through the Pastoral Office only on <a href="tel:+3536965561" style="color:#1d4ed8;font-weight:600;">069-65561</a> for all churches. Booking to be done 2 months in advance • Glin Church on Sunday’s only after the 11am Mass. • Other Unit churches on Saturday’s only between 2 &amp; 4p 4pm Parents of children to be baptized are required to attend an information evening in Foynes Pastoral Centre. Weddings: Enquiries re weddings to be directed to the office in Foynes. Wednesday /Thursday / Friday. (<a href="tel:+3536965561" style="color:#1d4ed8;font-weight:600;">069-65561</a>). Funerals: Please contact Fr. Enright or Fr. Okonkwo. Funerals in Glin can be recorded on request. Contact Sacristan oroneofour Priests to arrange a recording BEFORE the funeral day. Booking of Masses: If you wish to book a Mass please book it where the Mass istobe celebrated. If you have any notices, you would like included in the weekly newsletter, please email <a href="mailto:info@shannonwestchurches.ie" target="_blank" rel="noopener noreferrer">info@shannonwestchurches.ie</a> before 3pm on Thursdays’. Please limit notices to 3/4 lines as space is very tight andwetrytofitas much info aswecanof interest to our parishioners. Keeping everybody in the loop is very important. If you would like a copy of your donation history, please ring Anninthe office on <a href="tel:+3536965561" style="color:#1d4ed8;font-weight:600;">069-65561</a>. Adoration Times:  Shanagolden Monday 10-11am.  Foynes Tuesday 10-3pm.  Kilcolman Friday 8-9pm  Loughill Thursday 10-10.30am.  Robertstown *Friday 9.30-10am.  Coolcappa Thursday 10-11am.  Glin Friday 5-9pm. Coolcappa/Kilcolman Sacristans Kilcolman Coolcappa Kathleen Sheehy Mary O’Donnell <a href="tel:+353872360726" style="color:#1d4ed8;font-weight:600;">087-236 0726</a> <a href="tel:+353868634539" style="color:#1d4ed8;font-weight:600;">086-863 4539</a> 086-863 4539Loughill/Ballyhahill Sacristans Loughill Ballyhahill Gerard Reidy Mary O’Brien <a href="tel:+353872582963" style="color:#1d4ed8;font-weight:600;">087-258 2963</a> <a href="tel:+353871013871" style="color:#1d4ed8;font-weight:600;">087- 101 3871</a> Glin Sacristan Church of the Immaculate Conception Michael Fennell <a href="tel:+353879828711" style="color:#1d4ed8;font-weight:600;">087-982 8711</a> Sacristans: Shanagolden Foynes Robertstown Anne Moroney Geraldine Toomey Chriss Dundon <a href="tel:+353876826234" style="color:#1d4ed8;font-weight:600;">087-682 6234</a> <a href="tel:+353872033475" style="color:#1d4ed8;font-weight:600;">087-203 3475</a> <a href="tel:+353879908888" style="color:#1d4ed8;font-weight:600;">087-990 8888</a> Ann Ryan <a href="tel:+353863369420" style="color:#1d4ed8;font-weight:600;">086-336 9420</a> Catherine Fennessy <a href="tel:+353879079816" style="color:#1d4ed8;font-weight:600;">087-907 9816</a></p>
+<h3 class="b-head">Mass Schedule</h3>
+<p>Ballyhahill-Church of the Visitation. Sun 11th: Mass for the People. 9.30am. Sun 18th: Mary &amp; Mick O’Connell, A/V. 9.30am. Robert McElligott, A/ V. Paddy &amp; Nell Faley, A/V. Ministries: Oct 18th, 2026 (Ballyhahill Church). Liturgy: Tony O’Shaughnessy Eucharistic: Seán Ó Mocháin Loughill-Church of Our Lady of the Assumption. Thurs 15th: Morning Mass &amp; Adoration 9.30am. Fealy family past &amp; present remembrance Mass formally of Loughill &amp; USA. Going Strong Social: The Going Strong Group will hold their monthly social on Tuesday 13th October from 2-5pm in the Hall in Ballyhahill. All Welcome. Glin 9am Mass Schedule: Church of the Immaculate Conception Sun 11th: Bridie Sheehan, 4th A/V, Turraree &amp; sisters 11am Cathy Scollard &amp; Moira O’Sullivan. AV. Wed 14th: Morning Mass 10am Fri 16th: Morning Mass 10am Sun 18th: Mary Anne O’Brien, A/V. Glenagragra 11am Shane Fitzgerald, 13th A/V, Clonoughter. Eileen Healy, nee McMahon, 6th A/V, late of Ballyguiltenane &amp; Galway. Ministries: Oct 18th, 2026 Reader: Teresa Culhanel Eucharistic: Mary Hogan &amp; Grace Fitzgerald. Local Notes: Please note Glin Library will be closed on Tuesday &amp; Wed 13th &amp; 14th Oct. NO Singing class on Tuesday 13th back 20th Oct. Total Time Out Yoga &amp; Mindfulness with Nicole in Cloverfield every Wednesday at 7 .15 pm. Paygo spaces available. Book Nicole <a href="tel:+353879459971" style="color:#1d4ed8;font-weight:600;">087-9459971</a> Gardening Class in Cloverfield starting Friday 6th Nov running for six weeks. Booking essential with <a href="https://www.fetchcourses.ie" target="_blank" rel="noopener noreferrer">www.fetchcourses.ie</a>. Course 537675. Mass Schedule : Foynes-St. Senan’s Church Sat 10th: Rita Costelloe, 10th A/V. 6pm Christy Moriarty, A/V &amp; remembering his wife Christina. Tues 13th: Morning Mass &amp; Adoration. 9.30am Sat 17th: Michael John Lane, 1st A/V &amp; remembering 6pm his parents Paddy &amp; Mary Lane, brother Denis and sister Margaret. Kathleen Trender, A/V. Seán Culhane, A/V &amp; deceased family members. Seán O’Kane, A/V. Ministries: Oct 17th, 2026, at 6pm (Foynes) Reader: Catherine Mullane EU: Joan &amp; Sean Diffley. Shanagolden: St. Senan’s Church Sun 11th: Paddy Kelly, &amp; deceased family members. 9.30am Liam Dundon. A/V. Jack &amp; Nellie Hayes, A/V &amp; their son Mike A/V. Mon 12th: Morning Mass &amp; Adoration 9.30am Sun 18th: Mass for the People 9.30am Ministries: Oct 18th, 2026, at 9.30am (Shanagolden) Reader: Frances O’Sullivan . EU: Mary Noonan. Robertstown: St. Senan’s Church Fri16th: Adoration 9.30am followed by Mass at 10am. Chair Exercises: Chair Exercises will take place in the Pastoral Centre in Foynes on Monday Mornings at 10am. Commencing Monday 12th October €10 PAYG. Block book 5 classes €50 get 1 class free. Come and enjoy a functional chair exercise class in a friendly atmosphere. To book classes PM Geraldine <a href="tel:+353862532791" style="color:#1d4ed8;font-weight:600;">086-253 2791</a> or Lilian <a href="tel:+353876840993" style="color:#1d4ed8;font-weight:600;">087-684 0993</a>. "Shanagolden &amp; District Community Council are delighted to invite you to attend the Official Opening Ceremony ofournew Astro Training Pitch proudly known as the Roche Group Training Astro and the reopening of the upgraded Walkway at the Capt Tim Madigan Memorial Park, Shanagolden, Co. Limerick on Sunday 11th October at 2pm. We would be delighted if you could join us on thedayto celebrate this special occasion".</p>
+<h3 class="b-head">Mass Schedule</h3>
+<header class="ocr-parish-masthead" id="ocr-parish-st-nicholas" data-parish-name="St Nicholas"><h2 class="ocr-parish-name">St Nicholas</h2><p class="ocr-parish-date">14/10/2026</p></header>
+<p class="page-label">Page 4</p>
+<p>St. Joseph’s Church O’Connell Avenue, Limerick Church Notices, Sunday 11th October 2026 Twenty-Eighth Week in Ordinary Time Mass Times and Intentions Day Time Name Sun. Oct 11th 10.30am Liam Maher (24th A) &amp; Mary Maher (3rd A) Marie Galvin (1st A) Liam O’Doherty (6th A)(his birthday occurred around this time) Michael Manning (8th A) Eileen Cadogan (2nd A) 12.30pm May &amp; Pat Quaid (A) Thomas O’Hagan (A) Rose McCormick (1st A) Brendan Burke (MM) Kathleen Fitzgerald (4th A) Michael Gallaher (3rd A) Mon. Oct 12th 10.30am Mrs O’Callaghan &amp; Selina Curtin Tue. Oct 13th 10.30am Intentions of Clergy Wed. Oct 14th 10:30am Intentions of Clergy Thur. Oct 15th 10.30am Intentions of Clergy Fri. Oct 16th 10:30am Intentions of Clergy Sun. Oct 18th 10.30am Nancy Gaynor (10th A) Fr Gerard O’Meara (6th A) Vera Sinnott (MM) Annette Flood (5th A) 12:30pm Margaret Richardson (late of St Joseph’s Street) (A) Ger Noble (Birthday &amp; 1st A) Diarmuid Lyne (12th A) Rose Healy (5th A) &amp; Michael Healy (36th A) Follow our Parish Facebook page at "St Joseph's Parish Limerick”. 30th Anniversary of Priesthood You are invited to a Mass to celebrate Fr. Derek’s 30th Anniversary of Priesthood . Fr. Derek warmly invites you to join him in celebrating 30 years of priestly min istry and faithful service. Sunday 11th October, 12:30pm in St Joseph’s Church . A special Mass will be celebrated in thanksgiving for this wonderful milestone. Following the Mass , please join usfortea, coffee and refreshments in the Parish Hall. Everyone is warmly invited to join us for this special celebration. Spanish Mass - St. Joseph’s Church The Hispanic Community of Limerick invites everyone to a Spanish Mass on Sunday 18th of October at 3pm in St. Joseph’s Church . If anyone would like to include a special intention in the Mass, please send a direct message with the details and a donation of 10€ which can be arranged with Miriam at <a href="tel:+35389965873" style="color:#1d4ed8;font-weight:600;">089 965873</a> . After the Mass, coffee will be shared and if anyone would like to bring something to share, you are more tha n welcome. Free Concert - Westchester Harmony Chorus The Westchester Harmony Chorus, from the state of New York, present an evening of barbershop classics at St Joseph's Church, Limerick on Monday 12th October at 7pm . Music Director: Keith Harris . Westchester Harmony is an a cappella chorus, singing in four-part close harmony in the style known as "barbershop". Weareacha pter of The Society for Preservation and Encouragement of Barbershop Quartet Singing in Amer ica (SPEBSQSA), otherwise known as the Barbershop Harmony Society. Our mission is to spread thejoyof singing. World Mission Sunday- 18th October 2026 World Mission Sunday is the Holy Father’s annual appeal for spiritual and financial support so that the life-giving work of overseas mission and missionar ies can continue. It always falls on the second last Sunday in October, and like the Good Friday collectio n for the Holy Land and Peter’s Pence, itisoneof three yearly universal Church co llections. World Mission Sunday collections take place in every single parish where the Chu rch is present. This includes not only Ireland and Europe, but also in poorer parish es in developing countries. Itisa moment of universal solidarity when each member of the Church family, regardless of location or background, play their part in s upporting each other. Right now, missionaries desperately need your help. In many poorer parishes in Africa, Asia, and Latin America missionaries are serving on the front line. They alrea dy do so much, walking hand-in-hand with marginalised communities, long before and after any emergency. You can show missionaries you care by supporting World Missio n Sunday. Your prayers and generosity will change lives . Visit: missio.ie for donations Sunday 18th October Readers: 10:30am Mass: Clare O’Mahoney 12:30pm Mass: Gerardine Madden Eucharistic Minister 18th October : 10:30am Mass: Maria Byrne 12:30pm Mass: Carmel Quinn Simply scan with your camera phone and donate to St. Joseph’s Thank You Contact Details: Canon Derek Leonard <a href="tel:+353876261287" style="color:#1d4ed8;font-weight:600;">087-6261287</a> St Joseph’s Church (V94 NR29) ( 061)313401 St Joseph’s Charity number: 20203433 Office Hours: Monday to Friday, 9am to 2pm (Access via Sacristy) Emai l: <a href="mailto:stjosephsparishlk@eircom.net" target="_blank" rel="noopener noreferrer">stjosephsparishlk@eircom.net</a> Website: stjosephsparish.ie Facebook: St Joseph's Parish Limerick Collection: Sunday 4th October: €1039.71 Thank you for your generosity! St Joseph's <a href="https://stjosephsparish.ie/" target="_blank" rel="noopener noreferrer">https://stjosephsparish.ie/</a></p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>NEWSLETTER FOR PASTORAL UNIT 1St Nicholas Parish St Mary’s Parish Mass Time Sunday 10.00am Parish Live Streaming of Masses from St Nicholas Church; log onto <a href="https://www.churchservices.tv/limerickstnicholas" target="_blank" rel="noopener noreferrer">https://www.churchservices.tv/limerickstnicholas</a> or via the parish website; <a href="https://www.saintnicholasparish.ie" target="_blank" rel="noopener noreferrer">www.saintnicholasparish.ie</a> Mass Times Saturday Vigil 5.00pm Sunday 11.30am Monday to Friday Morning Mass 10.00am Parish Live Streaming of Masses from St Mary’s Church; log onto <a href="https://www.churchservices.tv/limerickstmarys" target="_blank" rel="noopener noreferrer">https://www.churchservices.tv/limerickstmarys</a> Saturday 10th &amp; Sunday 11th October 2026 Clergy Contact Fr Richie Da vern <a href="tel:+353872977500" style="color:#1d4ed8;font-weight:600;">0872977500</a> Salesian Sisters <a href="tel:+35361348510" style="color:#1d4ed8;font-weight:600;">061-348510</a> Baptisms are held at 4.00pm in both churches St Mary’s Church on the 1st &amp; 3rd Saturday in the month St Nic holas Church on the last Saturday in the month</p>
+<h3 class="b-head">Contact</h3>
+<hr>
+<p class="page-label">Page 6</p>
+<p>Live Stre aming of ceremonies from St Mary’s Church &amp; from St Nicholas Church. This means your image will be broadcast live during a Mass service when you are near the Sanctuary and in particular ifyousitinthe front rows. Parish Pastoral Cou ncil meet on a monthly basis. If you would like to raise any issues or suggestions at a meeting, please send by email to the relevant PC; St Nicholas Pastoral Council email: <a href="mailto:ppcstnicholas@gmail.com" target="_blank" rel="noopener noreferrer">ppcstnicholas@gmail.com</a> St Mary’s Pastoral Council email; <a href="mailto:stmarysparishlk@outlook.com" target="_blank" rel="noopener noreferrer">stmarysparishlk@outlook.com</a> The collec tion for last week end, 3rd &amp; 4th October, amounted to €1482.30 in St Mary’s Church and € 969 in St Nicholas Church Wearevery thankful for your continued generosity, and grateful for your loyalty and support. ST VINCENT DE PAUL collection is held after Mass on the first weekend each month Making a donation to the church by bank transfer St Mary’s Chu rch Account IBAN: IE11 AIBK 9352 4794 4621 73 BIC: AIBKIE2D St Nic holas Church Account IBAN: IE84 BOFI 9045 9525 8744 17 BIC: BOFIIE2D ST. NICHO LAS PARISH MEDITATION GROUP We invite you to join us every Tues day for 20 minutes of silent meditation in St. Nic holas Prayer Chapel from 10;45am - 11;15am. “Be still and you will know……” ADORATION OF THE BLESSED SACRAMENT St Mary’s Church Wednesday 10.30am-11.30am (after Mass) We are delighted to begin our Children's Liturgy in St. Mary’s Church this weekend and plan to hold it every second Sunday of the month going forward (8th November, 13th December etc.) If any primary school children would like to join, parents can complete the registration form available in the church or speak to Fr. Richie. Speak to your local Priest and Moderator to seek their support and endorsement. Attend an information session on 21st of October, Limerick Diocesan Centre (V94 925C), 7.30 pm. Tickets also available from St Mary’s Credit Union</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
