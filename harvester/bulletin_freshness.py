@@ -681,7 +681,11 @@ def issue_date_verdict(
     if body_verdict is None:
         return url_verdict
     if body_verdict.status != "stale":
-        return body_verdict
+        # A this-week heading beats an older date on the link.
+        # An undated link stays unknown — do not invent "fresh".
+        if url_verdict.extracted_date is not None:
+            return body_verdict
+        return url_verdict
     url_date = url_verdict.extracted_date
     body_date = body_verdict.extracted_date
     if url_date is not None and body_date is not None and body_date < url_date:
