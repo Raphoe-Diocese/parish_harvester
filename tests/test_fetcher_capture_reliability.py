@@ -274,8 +274,9 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
             self.assertEqual(verdict.status, "unknown")
             self.assertEqual(verdict.reason, "no_date_in_url")
 
-    def test_dated_url_loses_to_stale_body_heading(self) -> None:
-        # Ardara: slug says 4 Oct, printed PDF still week of 13 Sep.
+    def test_dated_url_keeps_newer_link_over_older_body_heading(self) -> None:
+        # Link says Sunday 4 October. A "week beginning 13 September" line
+        # inside the file must not replace that date.
         dated = (
             "https://ardara.ie/notices/"
             "church-of-the-holy-family-newsletter-sun-4th-october-26/"
@@ -290,8 +291,8 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
             verdict = freshness_after_unknown_url(
                 dated, pdf, date(2026, 10, 4)
             )
-            self.assertEqual(verdict.status, "stale")
-            self.assertEqual(verdict.extracted_date, date(2026, 9, 13))
+            self.assertEqual(verdict.status, "fresh")
+            self.assertEqual(verdict.extracted_date, date(2026, 10, 4))
 
     def test_undated_latest_url_ancient_years_only_is_stale(self) -> None:
         # Attymass /latest/newsletter.pdf — no week stamp, only 2021/2022 years.
@@ -315,7 +316,7 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
             self.assertEqual(verdict.reason, "body_years_only_ancient")
             self.assertEqual(verdict.extracted_date, date(2022, 12, 31))
 
-    def test_retry_helper_rejects_dated_url_with_september_body(self) -> None:
+    def test_retry_helper_keeps_newer_link_over_september_body(self) -> None:
         dated = (
             "https://ardara.ie/notices/"
             "church-of-the-holy-family-newsletter-sun-4th-october-26/"
@@ -327,7 +328,7 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
                 "Twenty-fourth Sunday in Ordinary Time "
                 "Week beginning: 13th September 2026",
             )
-            self.assertTrue(
+            self.assertFalse(
                 _retry_pdf_still_stale(dated, pdf, date(2026, 10, 4))
             )
 
