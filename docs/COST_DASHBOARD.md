@@ -1,6 +1,6 @@
 # 💷 Cost Dashboard
 
-_Auto-generated at 2026-10-14T16:22:35Z UTC._
+_Auto-generated at 2026-10-14T18:00:02Z UTC._
 
 _This file is rewritten on every harvest and OCR run. Do not edit manually._
 
@@ -40,7 +40,7 @@ _Providers can change free tiers. Read the OCR table above for this month’s pa
 
 ## 🟢 Repository storage
 
-**Used:** 0.426 GB / 5.0 GB hard cap
+**Used:** 0.427 GB / 5.0 GB hard cap
 **Progress:** [█░░░░░░░░░░░░░░░░░░░] 8.5%
 
 Plenty of space. No action needed.
