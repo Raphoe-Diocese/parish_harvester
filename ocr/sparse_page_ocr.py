@@ -20,6 +20,7 @@ from ocr.text_extract import (
     extract_all_page_lines,
     page_is_sparse,
     page_text_char_count,
+    page_text_is_garbage,
 )
 
 _PAGE_MARK_RE = re.compile(
@@ -158,6 +159,8 @@ def page_ocr_needs_image_repair(
     Dunfanaghy-style image PDFs often embed *lots* of junk characters, so they
     are not ``page_is_sparse`` — still send them for vision/column repair.
     """
+    if embedded_lines and page_text_is_garbage(embedded_lines):
+        return True
     if embedded_lines and ocr_lines_look_smashed(embedded_lines):
         return True
     if embedded_lines and not page_is_sparse(embedded_lines):
@@ -654,13 +657,18 @@ def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int
     if not pages:
         return None
     sparse = [i for i, lines in enumerate(pages) if page_is_sparse(lines)]
+    garbage = [
+        i
+        for i, lines in enumerate(pages)
+        if i not in sparse and page_text_is_garbage(lines)
+    ]
     smashed = [
         i
         for i, lines in enumerate(pages)
-        if i not in sparse and ocr_lines_look_smashed(lines)
+        if i not in sparse and i not in set(garbage) and ocr_lines_look_smashed(lines)
     ]
     smashed.sort(key=lambda i: column_smash_score(pages[i]), reverse=True)
-    need = sparse + smashed
+    need = sparse + garbage + smashed
     if not need:
         return []
     if len(need) == len(pages) and len(pages) <= MAX_VISION_PAGES_PER_PDF:
@@ -668,8 +676,8 @@ def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int
     if len(need) > MAX_VISION_PAGES_PER_PDF:
         need = need[:MAX_VISION_PAGES_PER_PDF]
         print(
-            f"  Vision page cap: sending {len(need)}/{len(sparse) + len(smashed)} "
-            f"worst pages (sparse first, then smash score)."
+            f"  Vision page cap: sending {len(need)}/{len(sparse) + len(garbage) + len(smashed)} "
+            f"worst pages (sparse first, then photo junk, then smash score)."
         )
     return need
 

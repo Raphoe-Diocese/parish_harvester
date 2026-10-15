@@ -50,6 +50,13 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIsNone(
             split_heading_prefix("Please pray for all those taking part in the Assembly")[0]
         )
+        self.assertIsNone(
+            split_heading_prefix("Anniversary Sunday 11th 10.00am Una McMullin")[0]
+        )
+        self.assertIsNone(
+            split_heading_prefix("contact the Parish Office on 9131135")[0]
+        )
+        self.assertEqual(classify_heading_line("Anniversaries"), "Anniversaries")
 
     def test_smashed_paragraph_splits_at_a_real_heading(self) -> None:
         chunks = split_readable_chunks(
