@@ -38,6 +38,19 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertEqual(head.lower(), "mass times")
         self.assertIn("Saturday", rest)
 
+    def test_contact_inside_a_sentence_is_not_a_heading(self) -> None:
+        plain = (
+            "Annagry Parish Pastoral contact any of the following: "
+            "Safeguarding Children Office"
+        )
+        chunks = split_readable_chunks(plain)
+        self.assertEqual(len(chunks), 1)
+        head, _rest = split_heading_prefix(plain)
+        self.assertIsNone(head)
+        self.assertIsNone(
+            split_heading_prefix("Please pray for all those taking part in the Assembly")[0]
+        )
+
     def test_smashed_paragraph_splits_at_a_real_heading(self) -> None:
         chunks = split_readable_chunks(
             "Please read the notices. Anniversaries are listed for this week. "

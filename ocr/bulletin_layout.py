@@ -183,6 +183,29 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         return None, text
     if _REST_IS_BODY_WORD.match(rest):
         return None, text
+    # "contact any of the following" and "Anniversary Mass" are sentences.
+    # A real "Anniversaries" or "Contact" title has nothing after it, or a
+    # day/date list. Do not invent a section from a word in the middle.
+    if re.fullmatch(
+        r"contacts?(?:\s+us)?|anniversar(?:y|ies)|bingo(?:\s+night)?|notices?",
+        head,
+        re.IGNORECASE,
+    ):
+        if rest and re.match(
+            r"^(?:any|the|a|an|are|is|was|were|mass|of|us|me)\b",
+            rest,
+            re.IGNORECASE,
+        ):
+            return None, text
+        if rest and rest[:1].islower() and not _BODY_AFTER_HEADING.match(rest):
+            return None, text
+    if re.fullmatch(r"please\s+pray\s+for", head, re.IGNORECASE):
+        if rest and not re.match(
+            r"^(?:the\s+)?(?:dead|deceased|faithful\s+departed)\b",
+            rest,
+            re.IGNORECASE,
+        ):
+            return None, text
     # "MASS TIMES ANNIVERSARIES /INTENTIONS" — whole line is the title.
     if _HEADING_CONTINUATION.match(rest) and len(text) <= _MAX_HEADING_CHARS:
         return text.rstrip(".:;"), ""
@@ -205,6 +228,13 @@ _EMBEDDED_HEADING = re.compile(
     r"(?<![A-Za-zÀ-ÿ])" + _HEADING_START.pattern[1:],
     _HEADING_START.flags,
 )
+# A one-word label is a heading only on its own line, or after a full stop.
+# "Pastoral contact any" and "Shiels Anniversary Mass" are not titles.
+_SHORT_EMBEDDED_TITLE = re.compile(
+    r"^(?:contacts?(?:\s+us)?|anniversar(?:y|ies)|bingo(?:\s+night)?|"
+    r"notices?|parochial\s+house|please\s+pray\s+for|sunday\s+mass(?:es)?)$",
+    re.IGNORECASE,
+)
 _WEEKDAY_LINE = re.compile(
     r"\s+(?=(?:Mon(?:day)?|Tue(?:s(?:day)?)?|Wed(?:nesday)?|"
     r"Thu(?:rs(?:day)?)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s+\d{1,2}\b)",
@@ -224,6 +254,12 @@ def split_readable_chunks(plain: str) -> list[str]:
     prev_end = 0
     for match in _EMBEDDED_HEADING.finditer(text):
         if match.start() <= 0:
+            prev_end = match.end()
+            continue
+        head = match.group(0).strip()
+        before = text[: match.start()].rstrip()
+        after_stop = bool(before) and before[-1] in ".!?:;"
+        if (_SHORT_EMBEDDED_TITLE.match(head) or len(head) < 18) and not after_stop:
             prev_end = match.end()
             continue
         gap = text[prev_end:match.start()]
