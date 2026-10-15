@@ -7,6 +7,7 @@ from ocr.bulletin_layout import (
     classify_heading_line,
     render_parish_masthead,
     split_heading_prefix,
+    split_readable_chunks,
     structure_ocr_html,
 )
 from ocr.generate_bulletin_pages import prepare_ocr_fragment
@@ -29,6 +30,21 @@ class BulletinLayoutTests(unittest.TestCase):
         head, rest = split_heading_prefix("Mass times Saturday 15th August 10:00am")
         self.assertEqual(head.lower(), "mass times")
         self.assertIn("Saturday", rest)
+
+    def test_long_line_still_gets_its_heading(self) -> None:
+        plain = "Mass times " + ("Saturday 10:00am " * 12)
+        self.assertGreater(len(plain), 120)
+        head, rest = split_heading_prefix(plain)
+        self.assertEqual(head.lower(), "mass times")
+        self.assertIn("Saturday", rest)
+
+    def test_smashed_paragraph_splits_at_a_real_heading(self) -> None:
+        chunks = split_readable_chunks(
+            "Please read the notices. Anniversaries are listed for this week. "
+            "Sunday 11th 10.00am in the parish church."
+        )
+        self.assertTrue(any(chunk.lower().startswith("anniversaries") for chunk in chunks))
+        self.assertTrue(any(chunk.lower().startswith("please read") for chunk in chunks))
 
     def test_keeps_irish_prayer_intact(self) -> None:
         html_out = structure_ocr_html(

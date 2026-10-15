@@ -8,7 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from harvester.bulletin_freshness import check_bulletin_freshness
+from harvester.bulletin_freshness import (
+    check_bulletin_freshness,
+    issue_date_verdict,
+    verdict_for_extracted_date,
+)
 from harvester.replay import (
     _best_scored_link_index,
     _recipe_fresh_recorded_file_urls,
@@ -43,8 +47,10 @@ from harvester.utils import (
     extract_mcn_church_id,
     looks_like_permanent_bulletin_url,
     parishpress_weekly_upload_url,
+    mcn_newsletter_stated_date,
     mcn_newsletter_url_from_profile,
     mcn_profile_data_url,
+    url_with_stated_issue_date,
     predicted_dated_upload_urls,
     predicted_wordpress_dated_post_urls,
     quote_http_url,
@@ -581,6 +587,29 @@ class McnNewsletterHelperTests(unittest.TestCase):
             str(mcn_newsletter_url_from_profile(payload)).endswith(".pdf")
         )
         self.assertIsNone(mcn_newsletter_url_from_profile({"newsletter": {}}))
+
+    def test_killybegs_card_date_beats_an_older_line_inside_the_pdf(self) -> None:
+        payload = {
+            "newsletter": {
+                "newsLetterTitle": "11th October 2026",
+                "newsLetterName": "Sunday 11th October 2026 .pdf",
+                "newsLetterUrl": (
+                    "https://d3gxiup807zlof.cloudfront.net/live/Uploads/115/"
+                    "NewsLetter/2d9ce7cb-9f6b-4f27-9057-b08f47b69914.pdf"
+                ),
+            }
+        }
+        stated = mcn_newsletter_stated_date(payload)
+        self.assertEqual(stated, date(2026, 10, 11))
+        labelled = url_with_stated_issue_date(
+            mcn_newsletter_url_from_profile(payload), stated
+        )
+        target = date(2026, 10, 11)
+        url_verdict = check_bulletin_freshness(labelled, target)
+        body_verdict = verdict_for_extracted_date(date(2026, 9, 7), target)
+        kept = issue_date_verdict(url_verdict, body_verdict)
+        self.assertEqual(kept.status, "fresh")
+        self.assertEqual(kept.extracted_date, date(2026, 10, 11))
 
 
 class ChurchmediaNewsletterHelperTests(unittest.TestCase):

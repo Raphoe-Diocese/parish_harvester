@@ -121,6 +121,22 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertEqual(clean_ocr_line("Sunday 11th August"), "Sunday 11th August")
         self.assertEqual(clean_ocr_line("the 1717th of the month"), "the 17th of the month")
 
+    def test_collapse_keeps_real_short_words(self) -> None:
+        from ocr.convert_bulletin import collapse_ocr_spacing
+
+        self.assertEqual(
+            collapse_ocr_spacing("You can now make a donation"),
+            "You can now make a donation",
+        )
+        self.assertEqual(
+            collapse_ocr_spacing("any of the following"),
+            "any of the following",
+        )
+        self.assertEqual(
+            collapse_ocr_spacing("más fiú aon ní an sólás"),
+            "más fiú aon ní an sólás",
+        )
+
     def test_collapse_ocr_spacing_fixes_letter_spaced_titles(self) -> None:
         from ocr.convert_bulletin import collapse_ocr_spacing, clean_ocr_line
 

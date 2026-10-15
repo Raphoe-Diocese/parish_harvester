@@ -1,4 +1,4 @@
-"""Turn mega-OCR dumps into a readable parish bulletin.
+﻿"""Turn mega-OCR dumps into a readable parish bulletin.
 
 Promote topic lines that already exist in the text to real headings, and
 insert a visible parish masthead so the reader knows whose bulletin this is.
@@ -151,16 +151,26 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
     text = collapse_ocr_spacing(_SPACE_RE.sub(" ", (plain or "").strip()))
     if not text:
         return None, ""
-    if len(text) > 120:
-        # Long glued schedules / OCR dumps are never section titles.
-        return None, text
     if _IRISH_RIP_HEADING.match(text) and len(text) <= 56:
         return text, ""
     match = _HEADING_START.match(text)
     if not match:
         return None, text
     head = match.group(0).strip()
-    rest = text[match.end() :].lstrip(" \t:/|–—-")
+    rest = text[match.end() :].lstrip(" \t")
+    # Keep "Cuimhneacháin báis & bás le gairid" as one heading.
+    paired = re.match(
+        r"^(?:[&/|]\s*)+"
+        r"(b[aá]s\s+le\s+gairid|cuimhneach[aá]in\s+b[aá]is|anniversar\w*)"
+        r"(.*)$",
+        rest,
+        re.IGNORECASE,
+    )
+    if paired:
+        head = f"{head} & {paired.group(1)}".strip()
+        rest = paired.group(2).lstrip(" \t:/|–—-&")
+    else:
+        rest = rest.lstrip(":/|–—-")
     if not rest or re.fullmatch(r"[.:;]*", rest):
         return text.rstrip(".:;"), ""
     # Contact / office / bingo lines that continue with a phone or sentence
@@ -184,10 +194,57 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
     letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", rest)
     if letters and letters.isupper() and len(rest) > 12:
         return None, text
-    # "Recently Deceased: Kathleen Martin" → heading + name body.
-    if len(head) <= _MAX_HEADING_CHARS and len(rest) <= 80:
+    # "Recently Deceased: Kathleen Martin" → heading + the names, even when
+    # the name list runs on. A long rest used to hide the heading entirely.
+    if len(head) <= _MAX_HEADING_CHARS:
         return head.rstrip(".:;"), rest
     return None, text
+
+
+_EMBEDDED_HEADING = re.compile(
+    r"(?<![A-Za-zÀ-ÿ])" + _HEADING_START.pattern[1:],
+    _HEADING_START.flags,
+)
+_WEEKDAY_LINE = re.compile(
+    r"\s+(?=(?:Mon(?:day)?|Tue(?:s(?:day)?)?|Wed(?:nesday)?|"
+    r"Thu(?:rs(?:day)?)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s+\d{1,2}\b)",
+    re.IGNORECASE,
+)
+
+
+def split_readable_chunks(plain: str) -> list[str]:
+    """Break one smashed paragraph at a real heading or a Mass day line.
+
+    Does not invent a heading. Only splits where those words are already there.
+    """
+    text = (plain or "").strip()
+    if len(text) < 90:
+        return [text] if text else []
+    cuts = [0]
+    prev_end = 0
+    for match in _EMBEDDED_HEADING.finditer(text):
+        if match.start() <= 0:
+            prev_end = match.end()
+            continue
+        gap = text[prev_end:match.start()]
+        # "Cuimhneachain bais & bas le gairid" is one title, not two.
+        if prev_end and re.fullmatch(r"[\s&/|–—-]*", gap or ""):
+            prev_end = match.end()
+            continue
+        cuts.append(match.start())
+        prev_end = match.end()
+    cuts.append(len(text))
+    pieces: list[str] = []
+    for start, end in zip(cuts, cuts[1:]):
+        chunk = text[start:end].strip(" \t-–—")
+        if not chunk:
+            continue
+        if len(chunk) > 140:
+            bits = [bit.strip() for bit in _WEEKDAY_LINE.split(chunk) if bit.strip()]
+            pieces.extend(bits or [chunk])
+        else:
+            pieces.append(chunk)
+    return pieces or [text]
 
 
 def classify_heading_line(plain: str) -> str | None:
@@ -443,10 +500,19 @@ def structure_ocr_html(
                 out.append(chunk)
             body = []
 
-        for idx, raw in enumerate(raw_lines):
+        expanded: list[tuple[str, str]] = []
+        for raw in raw_lines:
             from ocr.convert_bulletin import collapse_ocr_spacing
 
-            plain = collapse_ocr_spacing(_plain(raw))
+            plain0 = collapse_ocr_spacing(_plain(raw))
+            chunks = split_readable_chunks(plain0) or ([plain0] if plain0 else [])
+            keep_markup = len(chunks) == 1 and bool(
+                re.search(r"<(?:a|strong|em)\b", raw, re.I)
+            )
+            for chunk in chunks:
+                expanded.append((chunk, raw if keep_markup else chunk))
+
+        for idx, (plain, raw) in enumerate(expanded):
             if not plain:
                 flush()
                 continue
@@ -459,7 +525,7 @@ def structure_ocr_html(
                     add_masthead(owner)
                 out.append(f'<p class="page-label">{html.escape(plain)}</p>')
                 continue
-            nxt = _plain(raw_lines[idx + 1]) if idx + 1 < len(raw_lines) else ""
+            nxt = expanded[idx + 1][0] if idx + 1 < len(expanded) else ""
             if allow_parish and packed:
                 hit = _looks_like_parish_name(plain, packed, nxt)
                 if hit and _name_belongs_on_page(hit[1], current_page, spans):

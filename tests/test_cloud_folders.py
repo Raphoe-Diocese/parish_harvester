@@ -6,10 +6,13 @@ from datetime import date
 from harvester.cloud_folders import (
     cloud_folder_date_tokens,
     detect_cloud_date_format,
+    drive_year_folder_id,
     format_cloud_folder_label,
     is_cloud_folder_url,
     listing_looks_like_year_folders,
+    newest_drive_pdf_on_or_before,
     newest_yy_mm_dd_label,
+    parse_drive_embedded_entries,
     parse_yy_mm_dd,
     recipe_uses_cloud_folder,
     rewrite_cloud_folder_click_step,
@@ -203,6 +206,41 @@ class CloudFolderTests(unittest.TestCase):
                 ["26.08.16.pdf", "26.09.06.pdf", "README"]
             )
         )
+
+
+class DriveEmbeddedFolderTests(unittest.TestCase):
+    PARENT = """
+    <div id="entry-YEAR2026ID" class="flip-entry">
+      <a href="https://drive.google.com/drive/folders/YEAR2026ID"></a>
+      <div class="flip-entry-title">2026</div>
+    </div>
+    <div id="entry-YEAR2027ID" class="flip-entry">
+      <a href="https://drive.google.com/drive/folders/YEAR2027ID"></a>
+      <div class="flip-entry-title">2027</div>
+    </div>
+    """
+    YEAR = """
+    <div id="entry-OLDFILE" class="flip-entry">
+      <div class="flip-entry-title">26.10.04.pdf</div>
+    </div>
+    <div id="entry-NEWFILE" class="flip-entry">
+      <div class="flip-entry-title">26.10.11.pdf</div>
+    </div>
+    <div id="entry-LATER" class="flip-entry">
+      <div class="flip-entry-title">26.10.18.pdf</div>
+    </div>
+    """
+
+    def test_year_folder_follows_the_harvest_year(self) -> None:
+        entries = parse_drive_embedded_entries(self.PARENT)
+        self.assertEqual(drive_year_folder_id(entries, 2026), "YEAR2026ID")
+        self.assertEqual(drive_year_folder_id(entries, 2027), "YEAR2027ID")
+        self.assertIsNone(drive_year_folder_id(entries, 2028))
+
+    def test_newest_pdf_is_this_sunday_not_next_week(self) -> None:
+        entries = parse_drive_embedded_entries(self.YEAR)
+        picked = newest_drive_pdf_on_or_before(entries, date(2026, 10, 11))
+        self.assertEqual(picked, (date(2026, 10, 11), "NEWFILE"))
 
 
 if __name__ == "__main__":

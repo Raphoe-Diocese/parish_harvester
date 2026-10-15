@@ -27,13 +27,17 @@ from playwright.async_api import (
 )
 from PyPDF2 import PdfReader
 
-from .bulletin_freshness import check_bulletin_freshness
+from .bulletin_freshness import check_bulletin_freshness, extract_bulletin_date
 from .cloud_folders import (
+    drive_folder_id_from_url,
+    drive_year_folder_id,
     is_cloud_folder_click_step,
     is_cloud_folder_url,
     is_year_folder_click_step,
     listing_looks_like_year_folders,
+    newest_drive_pdf_on_or_before,
     newest_yy_mm_dd_label,
+    parse_drive_embedded_entries,
     rewrite_cloud_folder_click_step,
     rewrite_year_folder_click_step,
     recipe_uses_cloud_folder,
@@ -62,8 +66,10 @@ from .utils import (
     looks_like_image_bytes,
     looks_like_permanent_bulletin_url,
     parishpress_weekly_upload_url,
+    mcn_newsletter_stated_date,
     mcn_newsletter_url_from_profile,
     mcn_profile_data_url,
+    url_with_stated_issue_date,
     oneweb_newsletter_download_urls,
     parish_uploader_bulletin_candidates,
     predict_dropfiles_bulletin_urls,
@@ -1268,8 +1274,11 @@ async def _save_dropfiles_bytes_to_pdf(
     raise RecipeReplayError(f"Unrecognized Dropfiles file content for {url}")
 
 
-def _mcn_fetch_newsletter_url(camera_url: str) -> str | None:
-    """Plain-HTTP: camera page church id → ProfileDataByJson → newsLetterUrl."""
+def _mcn_fetch_newsletter_url(camera_url: str) -> tuple[str, date | None] | None:
+    """Plain-HTTP: camera page church id → ProfileDataByJson → newsLetterUrl.
+
+    Also returns the date on the newsletter card. The PDF address has none.
+    """
     html_hit = _fetch_bytes_with_retries(
         camera_url,
         max_attempts=2,
@@ -1297,7 +1306,12 @@ def _mcn_fetch_newsletter_url(camera_url: str) -> str | None:
             payload = json.loads(response.read().decode("utf-8", "ignore") or "{}")
     except Exception:
         return None
-    return mcn_newsletter_url_from_profile(payload if isinstance(payload, dict) else None)
+    if not isinstance(payload, dict):
+        return None
+    newsletter_url = mcn_newsletter_url_from_profile(payload)
+    if not newsletter_url:
+        return None
+    return newsletter_url, mcn_newsletter_stated_date(payload)
 
 
 async def _try_http_document_url(url: str, dest: Path) -> tuple[str, str] | None:
@@ -1321,10 +1335,88 @@ async def _try_http_document_url(url: str, dest: Path) -> tuple[str, str] | None
 
 
 async def _try_mcn_live_newsletter(start_url: str, dest: Path) -> tuple[str, str] | None:
-    newsletter_url = await asyncio.to_thread(_mcn_fetch_newsletter_url, start_url)
-    if not newsletter_url:
+    fetched = await asyncio.to_thread(_mcn_fetch_newsletter_url, start_url)
+    if not fetched:
         return None
-    return await _try_http_document_url(newsletter_url, dest)
+    newsletter_url, stated = fetched
+    downloaded = await _try_http_document_url(newsletter_url, dest)
+    if not downloaded:
+        return None
+    saved_url, kind = downloaded
+    # The cloudfront id has no date. Keep the card date so an older line
+    # inside the PDF cannot mark this week's file as last month.
+    if stated is not None and extract_bulletin_date(saved_url) is None:
+        saved_url = url_with_stated_issue_date(saved_url, stated)
+    return saved_url, kind
+
+
+async def _try_drive_year_folder_pdf(
+    start_url: str,
+    dest: Path,
+    target: date,
+) -> tuple[str, str] | None:
+    """Open the parent Drive folder, then the year folder, then the newest PDF.
+
+    The year name comes from the harvest Sunday (2026, 2027, …). The year
+    folder id is not stored on the recipe, because next year's folder is new.
+    Download is plain HTTP. A browser goto of the Drive download link aborts.
+    """
+    parent_id = drive_folder_id_from_url(start_url)
+    if not parent_id:
+        return None
+
+    def _list(folder_id: str) -> str | None:
+        hit = _fetch_bytes_with_retries(
+            f"https://drive.google.com/embeddedfolderview?id={folder_id}",
+            max_attempts=2,
+            per_attempt_timeout_s=20,
+            total_budget_s=35,
+        )
+        if not hit:
+            return None
+        return hit[0].decode("utf-8", "replace")
+
+    parent_html = await asyncio.to_thread(_list, parent_id)
+    if not parent_html:
+        return None
+    year_id = drive_year_folder_id(
+        parse_drive_embedded_entries(parent_html), target.year
+    )
+    if not year_id:
+        return None
+    year_html = await asyncio.to_thread(_list, year_id)
+    if not year_html:
+        return None
+    picked = newest_drive_pdf_on_or_before(
+        parse_drive_embedded_entries(year_html), target
+    )
+    if not picked:
+        return None
+    _found, file_id = picked
+    download_url = (
+        "https://drive.usercontent.google.com/download"
+        f"?id={file_id}&export=download"
+    )
+    saved = await _try_http_document_url(download_url, dest)
+    if saved:
+        return saved
+    hit = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        download_url,
+        max_attempts=2,
+        per_attempt_timeout_s=20,
+        total_budget_s=35,
+    )
+    if not hit:
+        return None
+    html = hit[0].decode("utf-8", "replace")
+    confirm = gdrive_confirm_token(html)
+    if not confirm:
+        return None
+    confirmed = gdrive_download_url_with_confirm(
+        download_url, confirm, gdrive_confirm_uuid(html)
+    )
+    return await _try_http_document_url(confirmed, dest)
 
 
 def _churchmedia_fetch_newsletter_url(listing_url: str, slug: str = "") -> str | None:
@@ -4250,6 +4342,17 @@ async def replay_recipe(
                 f"Permanent bulletin URL {download_url} did not return a PDF/DOCX "
                 "(listing page was not opened)"
             )
+
+    # Drive year folders (Bruckless): parent folder, then the folder named
+    # for this harvest year, then the newest YY.MM.DD.pdf. Next year is a
+    # new folder. Do not open the download link in the browser.
+    if target_date is not None and (
+        site_type == "cloud_folder"
+        or str(recipe.get("playbook_type") or "").strip().lower() == "cloud_folder"
+    ):
+        found = await _try_drive_year_folder_pdf(start_url, dest, target_date)
+        if found:
+            return dest, found[1], found[0]
 
     # MCN.live camera pages expose the weekly newsletter via JSON, not the
     # webcam. HTTP-first so Send & test does not need Playwright for Glenfin.
