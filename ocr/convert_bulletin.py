@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # Requires: pip install openai pdf2image Pillow mistralai
 import os
 import base64
@@ -717,6 +717,122 @@ def _apply_known_fragments(text: str) -> str:
     return cleaned
 
 
+# Real words the letter-spacing joiner must never glue together.
+# "any of the" / "You can now" / "más fiú aon ní an" were being smashed.
+_REAL_SHORT_WORDS = frozenset({
+    "a", "i", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
+    "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we",
+    "the", "and", "for", "you", "can", "now", "all", "who", "our", "are", "was",
+    "not", "but", "his", "her", "has", "had", "any", "its", "out", "may", "let",
+    "one", "two", "per", "via", "new", "old", "day", "god", "see", "ask",
+    "na", "ar", "ag", "le", "mo", "sa", "ón", "gan", "mar", "sé", "sí", "ní",
+    "má", "más", "fiú", "aon", "go", "is",
+})
+
+_URL_PARK = re.compile(r"https?://[^\s<>\"']+|www\.[^\s<>\"']+", re.IGNORECASE)
+
+
+def _pull_spaced_urls(text: str) -> str:
+    """Put spaces back out of a web address. Leave the words after it alone."""
+    out: list[str] = []
+    i = 0
+    lower = text.lower()
+    while i < len(text):
+        if lower.startswith("http://", i) or lower.startswith("https://", i):
+            start = i
+            while i < len(text) and not text[i].isspace():
+                i += 1
+            while True:
+                j = i
+                while j < len(text) and text[j].isspace():
+                    j += 1
+                if j == i or j >= len(text):
+                    break
+                k = j
+                while k < len(text) and not text[k].isspace():
+                    k += 1
+                piece = text[j:k]
+                if not re.fullmatch(r"[A-Za-z0-9_\-./?=&%#]+", piece):
+                    break
+                plain = piece.lower().strip("/")
+                # Stop at a real word ("and", "please"). Keep id scraps like "Lrsysm".
+                if plain in _REAL_SHORT_WORDS or plain in {
+                    "please", "come", "then", "this", "that", "with", "from",
+                    "your", "have", "will", "mass", "parish", "church", "after",
+                    "before", "email", "phone", "words", "sunday", "saturday",
+                }:
+                    break
+                i = k
+            out.append(re.sub(r"\s+", "", text[start:i]))
+            continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
+def _park_urls(text: str) -> tuple[str, list[str]]:
+    found: list[str] = []
+
+    def repl(match: re.Match[str]) -> str:
+        found.append(match.group(0))
+        return f"URLPARK{len(found) - 1}END"
+
+    return _URL_PARK.sub(repl, text), found
+
+
+def _unpark_urls(text: str, found: list[str]) -> str:
+    def repl(match: re.Match[str]) -> str:
+        return found[int(match.group(1))]
+
+    return re.sub(r"URLPARK(\d+)END", repl, text)
+
+
+def _counts_as_spaced_letter(token: str) -> bool:
+    """A lone letter from 'S e p t', not the word 'a' or 'I'."""
+    if _joinable_alpha_len(token) != 1:
+        return False
+    return token.lower() not in {"a", "i", "á", "í"}
+
+
+def _run_is_letter_spaced(run: list[str]) -> bool:
+    """True for 'PA R O C H' / 'Sa tur da y'. False for 'any of the'."""
+    if len(run) < 3:
+        return False
+    if any(not (1 <= _joinable_alpha_len(w) <= 3) for w in run):
+        return False
+    if any(_counts_as_spaced_letter(w) for w in run):
+        return True
+    return all(w.lower() not in _REAL_SHORT_WORDS for w in run)
+
+
+def _join_letter_spaced_runs(words: list[str]) -> list[str]:
+    out: list[str] = []
+    i = 0
+    while i < len(words):
+        j = i
+        while j < len(words) and 1 <= _joinable_alpha_len(words[j]) <= 3:
+            j += 1
+        run = words[i:j]
+        if _run_is_letter_spaced(run):
+            out.append("".join(run))
+            i = j
+            continue
+        # "aw ay" is a split word. "of the" is not.
+        if (
+            i + 1 < len(words)
+            and 2 <= _joinable_alpha_len(words[i]) <= 3
+            and 2 <= _joinable_alpha_len(words[i + 1]) <= 3
+            and words[i].lower() not in _REAL_SHORT_WORDS
+            and words[i + 1].lower() not in _REAL_SHORT_WORDS
+        ):
+            out.append(words[i] + words[i + 1])
+            i += 2
+            continue
+        out.append(words[i])
+        i += 1
+    return out
+
+
 def collapse_ocr_spacing(text: str) -> str:
     """Fix letter-spaced / mid-split OCR and known PDF glyph maps.
 
@@ -725,7 +841,9 @@ def collapse_ocr_spacing(text: str) -> str:
     """
     if not text:
         return text
-    cleaned = _normalize_ocr_glyphs(str(text))
+    cleaned = _pull_spaced_urls(str(text))
+    cleaned, parked_urls = _park_urls(cleaned)
+    cleaned = _normalize_ocr_glyphs(cleaned)
     cleaned = _apply_known_fragments(cleaned)
     # Twenty -fourth → Twenty-fourth (space before hyphen only)
     cleaned = re.sub(r"(?<=\w)\s+-(?=\w)", "-", cleaned)
@@ -771,38 +889,17 @@ def collapse_ocr_spacing(text: str) -> str:
 
     words = cleaned.split()
     if not words:
-        return cleaned
+        return _unpark_urls(cleaned, parked_urls)
 
-    # Heavily fragmented lines: join runs of short alpha tokens (len <= 3).
-    # Never join tokens that contain digits (17th, 6.00pm, etc.).
-    alpha = [w for w in words if _joinable_alpha_len(w) > 0]
-    short_ratio = (
-        (sum(1 for w in alpha if _joinable_alpha_len(w) <= 3) / len(alpha))
-        if alpha
-        else 0.0
-    )
-    max_join = 3 if short_ratio >= 0.4 else 2
-    min_run = 3 if short_ratio >= 0.4 else 4
-
-    out: list[str] = []
-    i = 0
-    while i < len(words):
-        j = i
-        while j < len(words) and 1 <= _joinable_alpha_len(words[j]) <= max_join:
-            j += 1
-        if j - i >= min_run:
-            out.append("".join(words[i:j]))
-            i = j
-            continue
-        out.append(words[i])
-        i += 1
-    cleaned = " ".join(out)
+    # Letter-spaced scraps only ("S e p t", "PA R O C H"). Never glue real
+    # short words ("any of the", "You can now", "más fiú aon ní an").
+    cleaned = " ".join(_join_letter_spaced_runs(words))
 
     # One gap inside an otherwise normal word: "S ept", "C athy", "Anniversa ry".
     # Do not join "A priest" or "I am". Do not join real short words (on, in, to).
     leading_cap = re.compile(r"\b([B-HJ-Z])\s+([a-zà-ÿ]{2,})\b")
     safe_tail = re.compile(
-        r"\b([A-Za-zÀ-ÿ]{4,})\s+(ry|ne|ly|ng|ine|ing|ers|ion|ted)\b",
+        r"\b([A-Za-zÀ-ÿ]{4,})\s+(ry|ne|ly|ng|ine|ing|ers|ion|ted|ully|ged)\b",
         re.I,
     )
     for _ in range(2):
@@ -854,9 +951,12 @@ def collapse_ocr_spacing(text: str) -> str:
     cleaned = re.sub(r"\bFor\s+ever\s+and\s+ever\b", "For ever and ever", cleaned)
     # Second glyph/mid-word pass after short-token joins
     cleaned = _normalize_ocr_glyphs(cleaned)
+    # 11t h → 11th. Eunan 's / won ’t → Eunan's / won’t.
+    cleaned = re.sub(r"\b(\d{1,2})t\s+h\b", r"\1th", cleaned, flags=re.I)
+    cleaned = re.sub(r"([A-Za-zÀ-ÿ])\s+([’'])", r"\1\2", cleaned)
 
     cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
-    return cleaned
+    return _unpark_urls(cleaned, parked_urls)
 
 
 def clean_ocr_line(text: str) -> str:

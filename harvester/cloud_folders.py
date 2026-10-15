@@ -229,6 +229,52 @@ def newest_yy_mm_dd_label(texts: list[str]) -> str | None:
     return best_label
 
 
+def drive_folder_id_from_url(url: str) -> str | None:
+    """Google Drive folder id from a ``/folders/ID`` link."""
+    match = re.search(r"/folders/([A-Za-z0-9_-]+)", url or "")
+    return match.group(1) if match else None
+
+
+_DRIVE_ENTRY_ID_RE = re.compile(r'id="entry-([A-Za-z0-9_-]+)"', re.IGNORECASE)
+_DRIVE_TITLE_RE = re.compile(r'class="flip-entry-title">([^<]+)', re.IGNORECASE)
+
+
+def parse_drive_embedded_entries(html: str) -> list[tuple[str, str]]:
+    """Pair Drive embedded-folder ids with the visible row titles."""
+    ids = _DRIVE_ENTRY_ID_RE.findall(html or "")
+    titles = [title.strip() for title in _DRIVE_TITLE_RE.findall(html or "")]
+    count = min(len(ids), len(titles))
+    return list(zip(ids[:count], titles[:count]))
+
+
+def drive_year_folder_id(entries: list[tuple[str, str]], year: int) -> str | None:
+    """Folder id whose title is exactly ``2026``, ``2027``, and so on."""
+    label = str(year)
+    for entry_id, title in entries:
+        if title == label:
+            return entry_id
+    return None
+
+
+def newest_drive_pdf_on_or_before(
+    entries: list[tuple[str, str]],
+    target: date,
+) -> tuple[date, str] | None:
+    """Newest ``YY.MM.DD.pdf`` that is not after the harvest Sunday."""
+    best: date | None = None
+    best_id: str | None = None
+    for entry_id, title in entries:
+        found = parse_yy_mm_dd(title)
+        if found is None or found > target:
+            continue
+        if best is None or found > best:
+            best = found
+            best_id = entry_id
+    if best is None or not best_id:
+        return None
+    return best, best_id
+
+
 def recipe_uses_cloud_folder(steps: list) -> bool:
     """True when recipe navigates a dated cloud folder listing."""
     for step in steps:

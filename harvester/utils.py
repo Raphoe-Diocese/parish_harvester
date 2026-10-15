@@ -8,7 +8,7 @@ import re
 import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from urllib.parse import quote, unquote, urlparse, urlunparse
+from urllib.parse import parse_qsl, quote, unquote, urlencode, urlparse, urlunparse
 
 
 def format_uk_date(iso_date: str | date | None) -> str:
@@ -2061,6 +2061,39 @@ def mcn_newsletter_url_from_profile(payload: dict | None) -> str | None:
     if url.lower().startswith(("http://", "https://")):
         return url
     return None
+
+
+def mcn_newsletter_stated_date(payload: dict | None) -> date | None:
+    """Date written on the MCN newsletter card.
+
+    The PDF address is a cloudfront id with no date. The card title
+    (``11th October 2026``) is the issue date. Title wins over the file name.
+    """
+    if not isinstance(payload, dict):
+        return None
+    newsletter = payload.get("newsletter")
+    if not isinstance(newsletter, dict):
+        return None
+    for key in ("newsLetterTitle", "newsLetterName"):
+        found = extract_date_from_string(str(newsletter.get(key) or ""))
+        if found is not None:
+            return found
+    return None
+
+
+def url_with_stated_issue_date(url: str, stated: date | None) -> str:
+    """Add ``bulletin_date=YYYY-MM-DD`` when the caller knows the issue date."""
+    if stated is None:
+        return url
+    raw = (url or "").strip()
+    if not raw:
+        return raw
+    parsed = urlparse(raw)
+    pairs = parse_qsl(parsed.query, keep_blank_values=True)
+    if any(key == "bulletin_date" for key, _value in pairs):
+        return raw
+    pairs.append(("bulletin_date", stated.isoformat()))
+    return urlunparse(parsed._replace(query=urlencode(pairs)))
 
 
 _CHURCHMEDIA_RESERVED_PATHS = {
