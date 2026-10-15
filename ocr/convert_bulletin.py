@@ -659,6 +659,8 @@ _MIDWORD_SPLITS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bSUNDAYCO\s+LLECTION\b", re.I), "SUNDAY COLLECTION"),
     (re.compile(r"\bSUN\s+DAY\s+CO\s+LLECTION\b"), "SUNDAY COLLECTION"),
     (re.compile(r"\bCO\s+LLECTION\b"), "COLLECTION"),
+    (re.compile(r"\bDEE\s+PEST\b"), "DEEPEST"),
+    (re.compile(r"\bInisk\s+eel\b"), "Iniskeel"),
     (re.compile(r"\bNE\s+WSLE\s+TTER\b", re.I), "NEWSLETTER"),
     (re.compile(r"\bP\s+ADRE\b"), "PADRE"),
     (re.compile(r"\bwor\s+king\b", re.I), "working"),
@@ -759,10 +761,14 @@ def _strip_pdf_symbol_junk(text: str) -> str:
             kept.append(token)
             continue
         if re.search(r"\d", token):
-            if re.search(r"[A-Za-zÀ-ÿ]", token) or re.fullmatch(
-                r"[€£$]?\d[\d,.:]*", token
-            ):
-                kept.append(token)
+            # Keep every number, including a phone written as 074 95 41135.
+            # Drop only a one-digit symbol scrap such as <3.
+            if re.fullmatch(r"\W*\d\W*", token) and re.search(r"[{}|<>\\^%@]", token):
+                continue
+            kept.append(token)
+            continue
+        if re.fullmatch(r"[€£$]+|[,;:!?()\[\]'\"“”‘’….\-–—]+", token):
+            kept.append(token)
             continue
         if not re.search(r"[A-Za-zÀ-ÿ]", token):
             continue
@@ -912,6 +918,47 @@ def _join_letter_spaced_runs(words: list[str]) -> list[str]:
     return out
 
 
+def _join_broken_word_head(text: str) -> str:
+    """Join 'E ighth', 'N olan' and 'Co llectors'. Leave 'Fr John' and 'to this'."""
+
+    def repl(match: re.Match[str]) -> str:
+        head, tail = match.group(1), match.group(2)
+        if re.search(r"[áéíóúÁÉÍÓÚ]", head + tail):
+            return match.group(0)
+        if head.lower() in _REAL_SHORT_WORDS or tail.lower() in _REAL_SHORT_WORDS:
+            return match.group(0)
+        if head.lower() in {"fr", "st", "pp", "mr", "ms", "dr", "sr"}:
+            return match.group(0)
+        return head + tail
+
+    return re.sub(r"\b([A-ZÀ-Ÿ][a-zà-ÿ]?)\s+([a-zà-ÿ]{2,})\b", repl, text)
+
+
+# Second half of a word split at a line break: "Satur- day", "anniver- sary".
+# Not "Prize- fund" or "department- of".
+_HYPHEN_TAILS = frozenset({
+    "day", "days", "ber", "sary", "saries", "hood", "tion", "tions",
+    "ty", "cess", "ning", "nity", "ples", "gance", "selling",
+    "lenge", "aged", "tinue", "cation", "tation", "mation", "cate",
+})
+
+
+def _join_line_break_hyphens(text: str) -> str:
+    """Join a word split with a hyphen at the line end. Leave real hyphens."""
+
+    def repl(match: re.Match[str]) -> str:
+        head, tail = match.group(1), match.group(2)
+        if re.search(r"[áéíóúÁÉÍÓÚ]", head + tail):
+            return match.group(0)
+        if tail.lower() not in _HYPHEN_TAILS:
+            return match.group(0)
+        if head.lower() in _REAL_SHORT_WORDS:
+            return match.group(0)
+        return head + tail
+
+    return re.sub(r"\b([A-Za-zÀ-ÿ]{3,})-\s+([a-zà-ÿ]{2,})\b", repl, text)
+
+
 def collapse_ocr_spacing(text: str) -> str:
     """Fix letter-spaced / mid-split OCR and known PDF glyph maps.
 
@@ -951,12 +998,11 @@ def collapse_ocr_spacing(text: str) -> str:
     # like parish.website / stmarysonthehill.online (Frank harvest gate 29/09).
     cleaned = re.sub(r"\.([A-ZÀ-Ÿ])", r". \1", cleaned)
     # Trailing letter of a broken word: burie d / Kilcloone y / Sunda y / classe s.
-    # Only join common *suffix* letters. Never join w/a/i/o/u (start of who/was/and/…).
+    # Lowercase suffix only. A capital E is the start of "E ighth", not a suffix.
     cleaned = re.sub(
         r"\b([A-Za-zÀ-ÿ]{3,})\s+([dysge])\b",
         r"\1\2",
         cleaned,
-        flags=re.I,
     )
     # Do NOT join "A bhráithre" / "I am" — that breaks Irish and English.
     # Mc names still spaced: M c Gill → McGill
@@ -980,12 +1026,13 @@ def collapse_ocr_spacing(text: str) -> str:
     # Do not join "A priest" or "I am". Do not join real short words (on, in, to).
     leading_cap = re.compile(r"\b([B-HJ-Z])\s+([a-zà-ÿ]{2,})\b")
     safe_tail = re.compile(
-        r"\b([A-Za-zÀ-ÿ]{4,})\s+(ry|ne|ly|ng|ine|ing|ers|ion|ted|ully|ged)\b",
+        r"\b([A-Za-zÀ-ÿ]{4,})\s+(ry|ne|ly|ng|ine|ing|ers|ion|ted|ully|ged|tter|sh|rday)\b",
         re.I,
     )
     for _ in range(2):
         cleaned = leading_cap.sub(r"\1\2", cleaned)
         cleaned = safe_tail.sub(r"\1\2", cleaned)
+    cleaned = _join_broken_word_head(cleaned)
 
     # Re-run known fragments after joining (Et ern a l → Eternal may need a second pass).
     cleaned = _apply_known_fragments(cleaned)
@@ -1036,6 +1083,19 @@ def collapse_ocr_spacing(text: str) -> str:
     cleaned = re.sub(r"\b(\d{1,2})t\s+h\b", r"\1th", cleaned, flags=re.I)
     cleaned = re.sub(r"([A-Za-zÀ-ÿ])\s+([’'])", r"\1\2", cleaned)
 
+    cleaned = re.sub(r"(\d)a\s+m\b", r"\1am", cleaned, flags=re.I)
+    cleaned = re.sub(r"(\d)p\s+m\b", r"\1pm", cleaned, flags=re.I)
+    cleaned = _join_broken_word_head(cleaned)
+    cleaned = _join_line_break_hyphens(cleaned)
+    cleaned = re.sub(r"\bSuaim-\s+hneas\b", "Suaimhneas", cleaned)
+    cleaned = re.sub(r"\bt\s+heme\b", "theme", cleaned)
+    cleaned = re.sub(r"\bp\s+rayers\b", "prayers", cleaned)
+    cleaned = re.sub(r"\bp\s+rayer\b", "prayer", cleaned)
+    cleaned = re.sub(r"\bacti\s+on\b", "action", cleaned)
+    cleaned = re.sub(r"\ban\s+d\b", "and", cleaned)
+    cleaned = re.sub(r"\bInthe\b", "In the", cleaned)
+    cleaned = re.sub(r"\binthe\b", "in the", cleaned)
+    cleaned = re.sub(r"(\d)([ap]\.m\.?)", r"\1 \2", cleaned, flags=re.I)
     cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
     return _unpark_urls(cleaned, parked_urls)
 

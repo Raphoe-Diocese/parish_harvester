@@ -147,6 +147,137 @@ def all_pages_have_embedded_text(pages: list[list[str]] | None) -> bool:
     return all(not page_is_sparse(lines) for lines in pages)
 
 
+# Words that are real in a bulletin. A photo page is mostly other scraps.
+_KEEP_WORDS = frozenset({
+    "a", "i", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
+    "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we",
+    "the", "and", "for", "you", "can", "now", "all", "who", "our", "are", "was",
+    "not", "but", "his", "her", "has", "had", "any", "its", "out", "may", "let",
+    "one", "two", "per", "new", "old", "day", "god", "see", "ask", "na", "ar",
+    "ag", "le", "mo", "sa", "gan", "mar", "se", "si", "ni", "ma", "mas", "fiu",
+    "aon", "don", "den", "seo", "sin", "agus", "ach",
+    "mass", "masses", "sunday", "monday", "tuesday", "wednesday", "thursday",
+    "friday", "saturday", "parish", "church", "priest", "office", "email",
+    "phone", "vigil", "funeral", "anniversary", "anniversaries", "intention",
+    "intentions", "collection", "newsletter", "bulletin", "rosary", "adoration",
+    "baptism", "confession", "confessions", "novena", "sympathy", "family",
+    "families", "please", "welcome", "thank", "thanks", "holy", "time", "times",
+    "ordinary", "week", "morning", "evening", "night", "this", "that", "with",
+    "from", "your", "have", "will", "been", "were", "they", "them", "their",
+    "there", "here", "when", "what", "which", "after", "before", "about",
+    "into", "over", "also", "only", "more", "some", "than", "then", "every",
+    "each", "other", "people", "lord", "jesus", "mary", "saint", "rest",
+    "peace", "soul", "souls", "dead", "deceased", "recently", "month", "mind",
+    "pray", "prayer", "prayers", "notice", "notices", "news", "community",
+    "bingo", "contact", "website", "online", "donation", "donations",
+    "safeguarding", "children", "child", "october", "september", "november",
+    "december", "january", "february", "march", "april", "june", "july",
+    "august", "may", "sides", "story", "candle", "remembrance", "cross",
+    "coming", "memory", "two", "are", "there", "every", "both", "such",
+    "would", "could", "should", "today", "open", "closed", "special",
+    "private", "public", "reading", "gospel", "fr", "pp", "st", "cc", "rip",
+    "am", "pm", "rev",
+})
+_ACCENTED = re.compile(r"[áéíóúÁÉÍÓÚ]")
+_VOWEL = re.compile(r"[aeiouáéíóú]", re.I)
+_CONSONANT_RUN = re.compile(r"[bcdfghjklmnpqrstvwxyz]{3}", re.I)
+
+
+_SHORT_OK = frozenset({
+    "a", "i", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
+    "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we",
+    "na", "ar", "ag", "le", "mo", "sa",
+})
+_ABBREV_OK = frozenset({"fr", "pp", "st", "cc", "am", "pm", "rev"})
+
+
+def _letters_of(token: str) -> str:
+    return re.sub(r"[^A-Za-zÀ-ÿ]", "", token or "")
+
+
+def _token_is_scrap(token: str) -> bool:
+    """A one-to-three letter leftover, not a real short word or Fr/PP/St."""
+    if re.search(r"\d", token or ""):
+        return False
+    if re.fullmatch(r"[&/|~–—.+]+", token or ""):
+        return False
+    if _ACCENTED.search(token or ""):
+        return False
+    letters = _letters_of(token)
+    if not letters or len(letters) > 3:
+        return False
+    low = letters.lower()
+    if low in _ABBREV_OK or low in _KEEP_WORDS or low in _SHORT_OK:
+        return False
+    return True
+
+
+def _token_is_photo_junk(token: str) -> bool:
+    """A scrap from a photographed page, not a word, name, phone or Irish."""
+    if re.fullmatch(r"[&/|~–—.+]+", token or ""):
+        return False
+    low_all = (token or "").lower()
+    if "@" in token or "http" in low_all or low_all.startswith("www."):
+        return False
+    if _ACCENTED.search(token or ""):
+        return False
+    if re.search(r"\d", token or ""):
+        return False
+    if re.search(r"[{}|\\^]", token or ""):
+        return True
+    if _token_is_scrap(token):
+        return True
+    letters = _letters_of(token)
+    if not letters:
+        return True
+    low = letters.lower()
+    if low in _KEEP_WORDS:
+        return False
+    if token[:1].isupper() and len(letters) >= 3 and _VOWEL.search(low):
+        return False
+    # On a photo line only: short unknown leftovers, not real words like programme.
+    if token[:1].islower() and (
+        len(letters) <= 7 or not _VOWEL.search(low) or _CONSONANT_RUN.search(low)
+    ):
+        return True
+    return False
+
+
+def drop_photo_junk_tokens(text: str) -> str:
+    """On a photographed line, keep the real words and drop the scraps.
+
+    A normal sentence is left as it is. Irish with fadas is left as it is.
+    A line is only treated as a photo when it has several short scraps.
+    """
+    tokens = (text or "").split()
+    if len(tokens) < 4:
+        return text or ""
+    if sum(1 for tok in tokens if _ACCENTED.search(tok)) >= 2:
+        return text
+    scraps = sum(1 for tok in tokens if _token_is_scrap(tok))
+    # Three scraps in a long parish notice is normal. A photo line is
+    # mostly scraps (about one in six tokens, or more).
+    if scraps < 3 or scraps / len(tokens) < 0.15:
+        return text
+    kept = [tok for tok in tokens if not _token_is_photo_junk(tok)]
+    return " ".join(kept)
+
+
+def page_text_is_garbage(lines: list[str] | None) -> bool:
+    """True when a page is mostly photo scraps, not a readable bulletin."""
+    tokens = " ".join(lines or []).split()
+    if len(tokens) < 12:
+        return False
+    if sum(1 for tok in tokens if _ACCENTED.search(tok)) >= 4:
+        return False
+    scraps = sum(
+        1
+        for tok in tokens
+        if _token_is_scrap(tok) or re.search(r"[{}|\\^]|ffi!", tok)
+    )
+    return scraps / len(tokens) >= 0.18
+
+
 def prefer_embedded_page_text(
     pdf_path: str | Path,
     pages_text: list[list[str]] | None,
@@ -159,8 +290,10 @@ def prefer_embedded_page_text(
     for i in range(n):
         nat = native[i] if i < len(native) else []
         vis = vision[i] if i < len(vision) else []
-        if nat and not page_is_sparse(nat):
+        if nat and not page_is_sparse(nat) and not page_text_is_garbage(nat):
             out.append(nat)
-        else:
+        elif vis:
             out.append(vis)
+        else:
+            out.append(nat)
     return out

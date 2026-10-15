@@ -149,6 +149,48 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertIn("12 Oct", collapse_ocr_spacing("Mon 12'Oct No Mass"))
         self.assertIn("10.00am", collapse_ocr_spacing("Thurs 15 Oct 10.00am_ Joseph"))
         self.assertNotIn("10.00am_", collapse_ocr_spacing("Thurs 15 Oct 10.00am_ Joseph"))
+        phone = collapse_ocr_spacing(
+            "ffi!fl 28th Sunday Wm h Ordinary %@ <3 Time Parish Office: 074-9548902"
+        )
+        self.assertIn("074-9548902", phone)
+        self.assertIn("Sunday in Ordinary Time", phone)
+        self.assertNotIn("ffi!fl", phone)
+        photo = collapse_ocr_spacing(
+            "ge SE Va a egdirae gacn scedi There are two sides "
+            "The Candle of Remembrance yii every story"
+        )
+        self.assertIn("Candle of Remembrance", photo)
+        # Photo scraps stay. Deleting them also deleted real names and phones.
+        self.assertIn("egdirae", photo)
+        self.assertEqual(
+            collapse_ocr_spacing("Week Twenty E ighth Week"),
+            "Week Twenty Eighth Week",
+        )
+        self.assertIn("theme", collapse_ocr_spacing("The t heme for this year"))
+        self.assertIn("prayer", collapse_ocr_spacing("Your p rayer and your support"))
+        self.assertIn("Newsletter", collapse_ocr_spacing("Parish Newsle tter"))
+        self.assertIn("Parish", collapse_ocr_spacing("Pari sh Office"))
+        self.assertIn("Saturday", collapse_ocr_spacing("Satur- day 6pm"))
+        self.assertIn("Saturday", collapse_ocr_spacing("Satu rday Vigil"))
+        self.assertIn("anniversary", collapse_ocr_spacing("an anniver- sary Mass"))
+        self.assertIn("In the", collapse_ocr_spacing("Inthe Lord's own house"))
+        self.assertIn("and Farley", collapse_ocr_spacing("Hackett an d Farley"))
+        self.assertIn("s annual", collapse_ocr_spacing("This year s annual collection"))
+        self.assertIn("12.00 a.m", collapse_ocr_spacing("Glencastle 12.00a.m Alan"))
+        self.assertIn(
+            "071 9855042 , 086-1705423",
+            collapse_ocr_spacing("Fr. John Gilhooly: 071 9855042 , 086-1705423"),
+        )
+        self.assertIn(
+            "Pam",
+            collapse_ocr_spacing("12 noon Pam & Patrick Farrell and son Ciaran"),
+        )
+        self.assertIn(
+            "087-4758009",
+            collapse_ocr_spacing(
+                "eta 2 eae jeboi 4x} 087-4758009 Parish of Ardara"
+            ),
+        )
 
     def test_collapse_ocr_spacing_fixes_letter_spaced_titles(self) -> None:
         from ocr.convert_bulletin import collapse_ocr_spacing, clean_ocr_line

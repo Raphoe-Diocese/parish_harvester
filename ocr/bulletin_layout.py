@@ -183,22 +183,15 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         return None, text
     if _REST_IS_BODY_WORD.match(rest):
         return None, text
-    # "contact any of the following" and "Anniversary Mass" are sentences.
-    # A real "Anniversaries" or "Contact" title has nothing after it, or a
-    # day/date list. Do not invent a section from a word in the middle.
-    if re.fullmatch(
+    # "Anniversary", "contact" and "bingo" are headings only when that
+    # word is the whole line. "Anniversary Sunday 11th" and "contact the
+    # parish office" are sentences, not new sections.
+    if rest and re.fullmatch(
         r"contacts?(?:\s+us)?|anniversar(?:y|ies)|bingo(?:\s+night)?|notices?",
         head,
         re.IGNORECASE,
     ):
-        if rest and re.match(
-            r"^(?:any|the|a|an|are|is|was|were|mass|of|us|me)\b",
-            rest,
-            re.IGNORECASE,
-        ):
-            return None, text
-        if rest and rest[:1].islower() and not _BODY_AFTER_HEADING.match(rest):
-            return None, text
+        return None, text
     if re.fullmatch(r"please\s+pray\s+for", head, re.IGNORECASE):
         if rest and not re.match(
             r"^(?:the\s+)?(?:dead|deceased|faithful\s+departed)\b",
@@ -275,7 +268,7 @@ def split_readable_chunks(plain: str) -> list[str]:
         chunk = text[start:end].strip(" \t-–—")
         if not chunk:
             continue
-        if len(chunk) > 140:
+        if len(chunk) > 90:
             bits = [bit.strip() for bit in _WEEKDAY_LINE.split(chunk) if bit.strip()]
             pieces.extend(bits or [chunk])
         else:
