@@ -136,6 +136,19 @@ class PreferEmbeddedTextTests(unittest.TestCase):
             collapse_ocr_spacing("más fiú aon ní an sólás"),
             "más fiú aon ní an sólás",
         )
+        annagry = collapse_ocr_spacing(
+            "ffi!fl 28th Sunday Wm h Ordinary %@ <3 Time Parish Office"
+        )
+        self.assertIn("28th Sunday in Ordinary Time", annagry)
+        self.assertNotIn("ffi!fl", annagry.lower())
+        self.assertNotIn("%@", annagry)
+        self.assertEqual(
+            collapse_ocr_spacing("SUN DAY CO LLECTION ~ 4th October"),
+            "SUNDAY COLLECTION ~ 4th October",
+        )
+        self.assertIn("12 Oct", collapse_ocr_spacing("Mon 12'Oct No Mass"))
+        self.assertIn("10.00am", collapse_ocr_spacing("Thurs 15 Oct 10.00am_ Joseph"))
+        self.assertNotIn("10.00am_", collapse_ocr_spacing("Thurs 15 Oct 10.00am_ Joseph"))
 
     def test_collapse_ocr_spacing_fixes_letter_spaced_titles(self) -> None:
         from ocr.convert_bulletin import collapse_ocr_spacing, clean_ocr_line

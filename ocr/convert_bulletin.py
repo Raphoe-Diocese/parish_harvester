@@ -657,6 +657,8 @@ _MIDWORD_SPLITS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bEGISTRAT\s+ION\b", re.I), "REGISTRATION"),
     (re.compile(r"\bEXP\s+ENDITURE\b", re.I), "EXPENDITURE"),
     (re.compile(r"\bSUNDAYCO\s+LLECTION\b", re.I), "SUNDAY COLLECTION"),
+    (re.compile(r"\bSUN\s+DAY\s+CO\s+LLECTION\b"), "SUNDAY COLLECTION"),
+    (re.compile(r"\bCO\s+LLECTION\b"), "COLLECTION"),
     (re.compile(r"\bNE\s+WSLE\s+TTER\b", re.I), "NEWSLETTER"),
     (re.compile(r"\bP\s+ADRE\b"), "PADRE"),
     (re.compile(r"\bwor\s+king\b", re.I), "working"),
@@ -692,6 +694,83 @@ _MIDWORD_SPLITS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bTiny\.\s+cc\b", re.I), "tiny.cc"),
     (re.compile(r"\btiny\.\s+cc\b", re.I), "tiny.cc"),
 )
+
+
+def _token_is_bridge_junk(token: str) -> bool:
+    """A broken glyph between real words, not a date or a real short word."""
+    if re.search(r"\d", token):
+        return False
+    if token.lower() in {"in", "of", "the", "on", "a"}:
+        return False
+    letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", token)
+    if not letters:
+        return True
+    if len(letters) <= 2:
+        return True
+    if len(letters) <= 3 and len(letters) < len(token):
+        return True
+    return token.lower() in {"wm", "ffi", "ffl", "fl"}
+
+
+def _repair_ordinary_time(text: str) -> str:
+    """'Sunday <junk> Ordinary <junk> Time' is the line already on the page.
+
+    Drops the broken glyphs. Does not add a Mass time.
+    """
+    words = text.split()
+    out: list[str] = []
+    i = 0
+    while i < len(words):
+        if words[i].lower() == "sunday":
+            j = i + 1
+            while j < len(words) and _token_is_bridge_junk(words[j]):
+                j += 1
+            if j < len(words) and words[j].lower() == "ordinary":
+                k = j + 1
+                while k < len(words) and _token_is_bridge_junk(words[k]):
+                    k += 1
+                if k < len(words) and words[k].lower() == "time" and (j > i + 1 or k > j + 1):
+                    out.extend(["Sunday", "in", "Ordinary", "Time"])
+                    i = k + 1
+                    continue
+        out.append(words[i])
+        i += 1
+    return " ".join(out)
+
+
+def _strip_pdf_symbol_junk(text: str) -> str:
+    """Drop glyph scraps such as ffi!fl, %@ and a trailing underscore on a time."""
+    cleaned = re.sub(r"\bffi!+fl\b", " ", text, flags=re.I)
+    cleaned = re.sub(
+        r"(?<=\d)['\"Q]\s*(?=(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b)",
+        " ",
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r"(\d(?::\d{2})?\s*(?:am|pm))_+\b",
+        r"\1",
+        cleaned,
+        flags=re.I,
+    )
+    kept: list[str] = []
+    for token in cleaned.split():
+        if re.fullmatch(r"[&/|~–—.+]+", token):
+            kept.append(token)
+            continue
+        if re.search(r"\d", token):
+            if re.search(r"[A-Za-zÀ-ÿ]", token) or re.fullmatch(
+                r"[€£$]?\d[\d,.:]*", token
+            ):
+                kept.append(token)
+            continue
+        if not re.search(r"[A-Za-zÀ-ÿ]", token):
+            continue
+        letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", token)
+        if letters and (len(token) - len(letters)) > len(letters) and len(letters) <= 3:
+            continue
+        kept.append(token)
+    return " ".join(kept)
 
 
 def _normalize_ocr_glyphs(text: str) -> str:
@@ -844,6 +923,8 @@ def collapse_ocr_spacing(text: str) -> str:
     cleaned = _pull_spaced_urls(str(text))
     cleaned, parked_urls = _park_urls(cleaned)
     cleaned = _normalize_ocr_glyphs(cleaned)
+    cleaned = _strip_pdf_symbol_junk(cleaned)
+    cleaned = _repair_ordinary_time(cleaned)
     cleaned = _apply_known_fragments(cleaned)
     # Twenty -fourth → Twenty-fourth (space before hyphen only)
     cleaned = re.sub(r"(?<=\w)\s+-(?=\w)", "-", cleaned)
