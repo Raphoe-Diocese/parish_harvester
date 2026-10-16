@@ -149,7 +149,7 @@ def all_pages_have_embedded_text(pages: list[list[str]] | None) -> bool:
 
 # Words that are real in a bulletin. A photo page is mostly other scraps.
 _KEEP_WORDS = frozenset({
-    "a", "i", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
+    "a", "i", "o", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
     "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we",
     "the", "and", "for", "you", "can", "now", "all", "who", "our", "are", "was",
     "not", "but", "his", "her", "has", "had", "any", "its", "out", "may", "let",
@@ -176,7 +176,7 @@ _KEEP_WORDS = frozenset({
     "coming", "memory", "two", "are", "there", "every", "both", "such",
     "would", "could", "should", "today", "open", "closed", "special",
     "private", "public", "reading", "gospel", "fr", "pp", "st", "cc", "rip",
-    "am", "pm", "rev",
+    "am", "pm", "rev", "lit", "tel",
 })
 _ACCENTED = re.compile(r"[áéíóúÁÉÍÓÚ]")
 _VOWEL = re.compile(r"[aeiouáéíóú]", re.I)
@@ -184,11 +184,33 @@ _CONSONANT_RUN = re.compile(r"[bcdfghjklmnpqrstvwxyz]{3}", re.I)
 
 
 _SHORT_OK = frozenset({
-    "a", "i", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
+    "a", "i", "o", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in",
     "is", "it", "me", "my", "no", "of", "on", "or", "so", "to", "up", "us", "we",
     "na", "ar", "ag", "le", "mo", "sa",
 })
-_ABBREV_OK = frozenset({"fr", "pp", "st", "cc", "am", "pm", "rev"})
+_ABBREV_OK = frozenset({
+    "fr", "pp", "st", "cc", "am", "pm", "rev",
+    "gal", "ps", "lk", "jn", "mt", "mk",
+})
+# A short word with none of these is not ordinary English. Used only to
+# spot photo leftovers such as jeboi. Real words are still kept unless
+# they sit in a run of leftovers.
+_COMMON_TRIGRAM = frozenset({
+    "the", "and", "ing", "ion", "ent", "tio", "for", "her", "ter", "ate",
+    "ver", "all", "wit", "thi", "tha", "hat", "his", "ere", "rea", "com",
+    "ome", "man", "any", "ive", "pro", "res", "est", "ati", "str", "tre",
+    "day", "sun", "mas", "ass", "par", "ari", "ris", "ish", "chu", "hur",
+    "rch", "tim", "ime", "wee", "eek", "ord", "pri", "rie", "not", "ice",
+    "ple", "lea", "eas", "ase", "wil", "ill", "hav", "ave", "bee", "een",
+    "fro", "rom", "whi", "hic", "ich", "out", "int", "nto", "ove", "als",
+    "onl", "nly", "mor", "som", "eve", "sid", "ide", "des", "lov", "vin",
+    "hol", "oly", "cro", "ros", "mem", "ory", "can", "dle", "sto", "tor",
+    "who", "ear", "yea", "ann", "way", "she", "ash",
+})
+_GOOD_ENDING = re.compile(
+    r"(?:ed|es|er|ly|ing|ion|day|ous|ent|ant|est|ist|ity|ate|ful|ness|ment|ments|ship|th|mas)$",
+    re.I,
+)
 
 
 def _letters_of(token: str) -> str:
@@ -212,55 +234,115 @@ def _token_is_scrap(token: str) -> bool:
     return True
 
 
-def _token_is_photo_junk(token: str) -> bool:
-    """A scrap from a photographed page, not a word, name, phone or Irish."""
+# "gd" inside kingdom is a real word. egdirae has gd that is not after n.
+_BAD_BIGRAM = re.compile(
+    r"(?<!n)gd|gk|gq|gx|jx|qx|vx|zx|bq|cx|fq|hx|kx|pq|qj|qk|qy|qz|xj",
+    re.I,
+)
+
+
+def _junk_kind(token: str) -> str:
+    """'hard' photo scrap, 'soft' odd token, or '' for a real word.
+
+    Soft tokens are removed only when they sit beside a hard scrap.
+    Two ordinary words that merely look odd are left alone.
+    """
     if re.fullmatch(r"[&/|~–—.+]+", token or ""):
-        return False
+        return ""
     low_all = (token or "").lower()
-    if "@" in token or "http" in low_all or low_all.startswith("www."):
-        return False
+    if "@" in (token or "") or "http" in low_all or low_all.startswith("www"):
+        return ""
     if _ACCENTED.search(token or ""):
-        return False
+        return ""
+    if re.search(r"[{}|\\^<>]", token or ""):
+        return "hard"
     if re.search(r"\d", token or ""):
-        return False
-    if re.search(r"[{}|\\^]", token or ""):
-        return True
-    if _token_is_scrap(token):
+        return ""
+    letters = _letters_of(token)
+    if not letters:
+        return ""
+    low = letters.lower()
+    if low in _KEEP_WORDS or low in _ABBREV_OK or low in _SHORT_OK:
+        return ""
+    if token[:1].isupper() and len(letters) >= 3 and _VOWEL.search(low):
+        return ""
+    if not re.search(r"[bcdfghjklmnpqrstvwxyz]", low):
+        return "hard"
+    if _BAD_BIGRAM.search(low):
+        return "hard"
+    if len(letters) <= 2:
+        return "hard"
+    if token[:1].isupper() or len(letters) > 8 or _GOOD_ENDING.search(low):
+        return ""
+    grams = {low[i:i + 3] for i in range(max(0, len(low) - 2))}
+    if len(letters) >= 4 and grams and not grams & _COMMON_TRIGRAM:
+        return "soft"
+    if len(letters) == 3:
+        return "soft"
+    return ""
+
+
+def _cluster_transparent(token: str) -> bool:
+    """A single digit, a mark, or a two-letter capital between scraps.
+
+    It stays. Real words such as the, of, and new split the run, so a
+    sentence is not pulled into the scrap beside it.
+    """
+    if re.fullmatch(r"\d", token or ""):
         return True
     letters = _letters_of(token)
     if not letters:
         return True
-    low = letters.lower()
-    if low in _KEEP_WORDS:
-        return False
-    if token[:1].isupper() and len(letters) >= 3 and _VOWEL.search(low):
-        return False
-    # On a photo line only: short unknown leftovers, not real words like programme.
-    if token[:1].islower() and (
-        len(letters) <= 7 or not _VOWEL.search(low) or _CONSONANT_RUN.search(low)
-    ):
-        return True
-    return False
+    return letters.isupper() and len(letters) <= 2
 
 
 def drop_photo_junk_tokens(text: str) -> str:
-    """On a photographed line, keep the real words and drop the scraps.
+    """Drop a photo leftover only when it sits beside another leftover.
 
-    A normal sentence is left as it is. Irish with fadas is left as it is.
-    A line is only treated as a photo when it has several short scraps.
+    One odd token in a real sentence stays. Irish with fadas stays.
+    Phones, emails and capital names stay.
     """
     tokens = (text or "").split()
     if len(tokens) < 4:
         return text or ""
-    if sum(1 for tok in tokens if _ACCENTED.search(tok)) >= 2:
+    kinds = [_junk_kind(tok) for tok in tokens]
+    drop = [False] * len(tokens)
+    i = 0
+    while i < len(tokens):
+        if not kinds[i] and not _cluster_transparent(tokens[i]):
+            i += 1
+            continue
+        j = i
+        while j < len(tokens) and (kinds[j] or _cluster_transparent(tokens[j])):
+            j += 1
+        run = [k for k in range(i, j) if kinds[k]]
+        hard = [k for k in run if kinds[k] == "hard"]
+        strong = [
+            k for k in hard
+            if re.search(r"[{}|\\^<>]", tokens[k])
+            or _BAD_BIGRAM.search(_letters_of(tokens[k]))
+            or (
+                _letters_of(tokens[k])
+                and not re.search(
+                    r"[bcdfghjklmnpqrstvwxyz]", _letters_of(tokens[k]), re.I
+                )
+            )
+        ]
+        # A symbol, a nonsense bigram, or a vowel-only scrap can take the
+        # odd tokens beside it. A stray "n" or "HT" must not.
+        if strong and len(run) >= 2:
+            for k in run:
+                drop[k] = True
+        elif len(hard) >= 2:
+            for k in hard:
+                drop[k] = True
+        else:
+            for k in strong:
+                drop[k] = True
+        i = j
+    if not any(drop):
         return text
-    scraps = sum(1 for tok in tokens if _token_is_scrap(tok))
-    # Three scraps in a long parish notice is normal. A photo line is
-    # mostly scraps (about one in six tokens, or more).
-    if scraps < 3 or scraps / len(tokens) < 0.15:
-        return text
-    kept = [tok for tok in tokens if not _token_is_photo_junk(tok)]
-    return " ".join(kept)
+    return " ".join(tok for tok, gone in zip(tokens, drop) if not gone)
 
 
 def page_text_is_garbage(lines: list[str] | None) -> bool:

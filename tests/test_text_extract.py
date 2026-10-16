@@ -160,8 +160,25 @@ class PreferEmbeddedTextTests(unittest.TestCase):
             "The Candle of Remembrance yii every story"
         )
         self.assertIn("Candle of Remembrance", photo)
-        # Photo scraps stay. Deleting them also deleted real names and phones.
-        self.assertIn("egdirae", photo)
+        self.assertIn("two sides", photo)
+        self.assertNotIn("egdirae", photo)
+        self.assertNotIn("gacn", photo)
+        streamed = collapse_ocr_spacing(
+            "All Masses are streamed live and can be viewed from home"
+        )
+        self.assertIn("streamed live", streamed)
+        self.assertIn("viewed", streamed)
+        ardara = collapse_ocr_spacing(
+            "eta 2 eae ardara@raphoediocese.ie jeboi 4x} 087-4758009 Parish of Ardara"
+        )
+        self.assertIn("087-4758009", ardara)
+        self.assertIn("ardara@raphoediocese.ie", ardara)
+        self.assertIn("Parish of Ardara", ardara)
+        self.assertNotIn("jeboi", ardara)
+        self.assertNotIn("eae", ardara)
+        self.assertIn("In the", collapse_ocr_spacing("ZInthe Lord's own house"))
+        self.assertIn("out into", collapse_ocr_spacing("walked outinto the dark"))
+        self.assertIn("11th", collapse_ocr_spacing("Week beginning: 11tl Weekend"))
         self.assertEqual(
             collapse_ocr_spacing("Week Twenty E ighth Week"),
             "Week Twenty Eighth Week",

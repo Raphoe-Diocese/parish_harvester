@@ -574,6 +574,7 @@ def prefer_embedded_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> st
         if (
             native_lines
             and not page_is_sparse(native_lines)
+            and not page_text_is_garbage(native_lines)
             and not ocr_lines_look_smashed(native_lines)
         ):
             rendered = "\n".join(render_markdown_lines(native_lines))
