@@ -87,6 +87,19 @@ class BulletinLayoutTests(unittest.TestCase):
             classify_heading_line("Sunday Mass KILLYGARVAN & TULLYFERN PARISH")
         )
 
+    def test_plain_email_and_web_address_become_links(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Email drumholmparish@gmail.com and see www.giveblood.ie today.</p>"
+            "<p>Book at https://donegalcollegeopenweek.eventbrite.ieTAKINGACTION now.</p>"
+            '<p>Phone: <a href="tel:+353749721026">074 97 21026</a></p>'
+        )
+        self.assertIn('href="mailto:drumholmparish@gmail.com"', html_out)
+        self.assertIn('href="https://www.giveblood.ie"', html_out)
+        self.assertIn("eventbrite.ie</a>", html_out)
+        self.assertIn("TAKINGACTION", html_out)
+        self.assertNotIn("eventbrite.ieTAKING", html_out)
+        self.assertEqual(html_out.count('href="tel:+353749721026"'), 1)
+
     def test_splits_recently_deceased_name_onto_body(self) -> None:
         head, rest = split_heading_prefix("Recently Deceased: Kathleen Martin, Fanad,")
         self.assertEqual(head, "Recently Deceased")

@@ -645,7 +645,11 @@ def structure_ocr_html(
         gap = source[pos:].strip()
         if gap:
             out.append(gap)
-    return "\n".join(part for part in _drop_empty_directory_mastheads(out) if part)
+    from ocr.convert_bulletin import linkify_html
+
+    return linkify_html(
+        "\n".join(part for part in _drop_empty_directory_mastheads(out) if part)
+    )
 
 
 def _drop_empty_directory_mastheads(parts: list[str]) -> list[str]:
