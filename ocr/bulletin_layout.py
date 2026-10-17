@@ -171,6 +171,16 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         rest = paired.group(2).lstrip(" \t:/|–—-&")
     else:
         rest = rest.lstrip(":/|–—-")
+    # "Parochial House, Upper Main St." is one address, not a section.
+    if rest.startswith(","):
+        return None, text
+    # "souls of the faithful departed rest in peace" is the prayer, not a title.
+    if re.fullmatch(r"faithful\s+departed", head, re.I) and re.match(
+        r"rest\s+in\s+peace\b",
+        rest,
+        re.I,
+    ):
+        return None, text
     if not rest or re.fullmatch(r"[.:;]*", rest):
         return text.rstrip(".:;"), ""
     # Contact / office / bingo lines that continue with a phone or sentence
@@ -569,8 +579,11 @@ def structure_ocr_html(
                 continue
             head, rest = split_heading_prefix(plain)
             if head and not rest:
+                piece = _heading_html(head)
+                if out and out[-1] == piece:
+                    continue
                 flush()
-                out.append(_heading_html(head))
+                out.append(piece)
                 continue
             if head and rest:
                 flush()
@@ -645,7 +658,37 @@ def structure_ocr_html(
         gap = source[pos:].strip()
         if gap:
             out.append(gap)
-    return "\n".join(part for part in _drop_empty_directory_mastheads(out) if part)
+    return "\n".join(
+        part for part in _drop_empty_directory_mastheads(_stick_comma_after_heading(out)) if part
+    )
+
+
+def _stick_comma_after_heading(parts: list[str]) -> list[str]:
+    """Keep "Parochial House, Upper Main St." as one sentence.
+
+    The address comma often lands in the next paragraph. A heading there is wrong.
+    Phone links in that paragraph stay.
+    """
+    joined: list[str] = []
+    i = 0
+    while i < len(parts):
+        part = parts[i]
+        nxt = parts[i + 1] if i + 1 < len(parts) else ""
+        if (
+            part.startswith('<h3 class="b-head">')
+            and nxt.startswith("<p>")
+            and _plain(nxt).startswith(",")
+        ):
+            title = _plain(part)
+            inner = nxt[len("<p>") :]
+            if inner.endswith("</p>"):
+                inner = inner[: -len("</p>")]
+            joined.append(f"<p>{html.escape(title)}{inner}</p>")
+            i += 2
+            continue
+        joined.append(part)
+        i += 1
+    return joined
 
 
 def _drop_empty_directory_mastheads(parts: list[str]) -> list[str]:
