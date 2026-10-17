@@ -243,7 +243,8 @@ _SHORT_EMBEDDED_TITLE = re.compile(
 )
 _WEEKDAY_LINE = re.compile(
     r"\s+(?=(?:Mon(?:day)?|Tue(?:s(?:day)?)?|Wed(?:nesday)?|"
-    r"Thu(?:rs(?:day)?)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s+\d{1,2}\b)",
+    r"Thu(?:rs(?:day)?)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)"
+    r"\s+\d{1,2}(?:st|nd|rd|th)?\b)",
     re.IGNORECASE,
 )
 # Fr. Gerard and 6.30pm stay. "church. The next" becomes two sentences.
@@ -318,14 +319,12 @@ def _split_long_piece(text: str) -> list[str]:
         chunk = text[start:end].strip(" \t-–—")
         if not chunk:
             continue
-        if len(chunk) > 90:
-            bits = [bit.strip() for bit in _WEEKDAY_LINE.split(chunk) if bit.strip()]
-            sentences: list[str] = []
-            for bit in bits or [chunk]:
-                sentences.extend(split_sentences(bit))
-            pieces.extend(sentences or [chunk])
-        else:
-            pieces.append(chunk)
+        bits = [bit.strip() for bit in _WEEKDAY_LINE.split(chunk) if bit.strip()]
+        for bit in bits or [chunk]:
+            if len(bit) > 90:
+                pieces.extend(split_sentences(bit) or [bit])
+            else:
+                pieces.append(bit)
     return pieces or [text]
 
 
@@ -643,6 +642,10 @@ def structure_ocr_html(
                 out.append(_subhead_html(label[0]))
                 if label[1]:
                     body.append(html.escape(label[1]))
+                continue
+            if re.fullmatch(r"date\s+time\s+intention", plain, re.IGNORECASE):
+                flush()
+                out.append(_subhead_html(plain))
                 continue
             # Each block is its own paragraph so the gap between them shows.
             # A phone link used to freeze the raw line, so the stray Ardara 2 stayed.
