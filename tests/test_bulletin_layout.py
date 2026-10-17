@@ -100,6 +100,17 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn("eventbrite.ieTAKING", html_out)
         self.assertEqual(html_out.count('href="tel:+353749721026"'), 1)
 
+    def test_ardara_stray_two_goes_even_when_the_phone_is_already_a_link(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>2 ardara@raphoediocese "
+            '<a href="tel:+353874758009">087-4758009</a> Parish of Ardara</p>'
+            "<p>2 parishes meet today</p>"
+        )
+        self.assertNotIn(">2 ardara@", html_out)
+        self.assertIn("ardara@raphoediocese", html_out)
+        self.assertIn('href="tel:+353874758009"', html_out)
+        self.assertIn("2 parishes meet today", html_out)
+
     def test_prayer_and_address_are_not_headings(self) -> None:
         html_out = structure_ocr_html(
             "<p>May their souls and the souls of the</p>"
