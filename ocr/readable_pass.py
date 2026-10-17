@@ -13,6 +13,8 @@ _DOUBLED_PAIRS = re.compile(r"^(([A-Za-z])\2){2,}$")
 # lsdkjflas: six consonants in a row. strengths stops at five.
 _CONSONANT_MASH = re.compile(r"[bcdfghjklmnpqrstvwxyz]{6}", re.I)
 _FADA = re.compile(r"[áéíóúÁÉÍÓÚ]")
+# Proved photo leftovers on the live Raphoe page. Not real bulletin words.
+_PHOTO_TOKEN = frozenset({"scedi", "yii", "iito"})
 
 
 def _drop_token(token: str) -> bool:
@@ -25,6 +27,8 @@ def _drop_token(token: str) -> bool:
     letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", token)
     if not letters:
         return False
+    if letters.lower() in _PHOTO_TOKEN:
+        return True
     if _DOUBLED_PAIRS.match(letters):
         return True
     return bool(_CONSONANT_MASH.search(letters))
@@ -46,6 +50,9 @@ def readable_pass(text: str) -> str:
     cleaned = re.sub(r"\bNEW\s+SLETT\s+ER\b", "NEWSLETTER", cleaned)
     cleaned = re.sub(r"\bWebsi\s+te\b", "Website", cleaned, flags=re.I)
     cleaned = re.sub(r"\bHfyou\b", "If you", cleaned)
+    cleaned = re.sub(r"\bIfyou\b", "If you", cleaned)
+    cleaned = re.sub(r"\bSires\s+[‘'’]?Prisoner", "Prisoner", cleaned)
+    cleaned = re.sub(r"\bDarfil\b", "", cleaned)
     kept = [tok for tok in cleaned.split() if not _drop_token(tok)]
     cleaned = " ".join(kept)
     return re.sub(r"[ \t]{2,}", " ", cleaned).strip()

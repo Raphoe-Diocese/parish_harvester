@@ -198,6 +198,21 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertIn("KILLARNEY", collapse_ocr_spacing("KILL ARNEY PARISH NEW SLETT ER"))
         self.assertIn("NEWSLETTER", collapse_ocr_spacing("KILL ARNEY PARISH NEW SLETT ER"))
         self.assertIn("If you", collapse_ocr_spacing("Hfyou, O Lord, should mark iniquities"))
+        self.assertIn("If you", collapse_ocr_spacing("If you, O Lord, should mark iniquities"))
+        self.assertIn("If you", collapse_ocr_spacing("Ifyou, O Lord, should mark iniquities"))
+        self.assertNotIn("Ifyou", collapse_ocr_spacing("If you, O Lord, should mark iniquities"))
+        dun = collapse_ocr_spacing(
+            "SE a aon scedi There are two sides The Candle of Remembrance yii"
+        )
+        self.assertNotIn("scedi", dun)
+        self.assertNotIn("yii", dun)
+        self.assertIn("There are two sides", dun)
+        self.assertIn("Candle of Remembrance", dun)
+        self.assertIn(
+            "Prisoner's Sunday",
+            collapse_ocr_spacing("Sires Prisoner's Sunday St. Patrick's Church"),
+        )
+        self.assertNotIn("Sires", collapse_ocr_spacing("Sires Prisoner's Sunday"))
         self.assertNotIn("lsdkjflas", collapse_ocr_spacing("ohe Ire lsdkjflas Ossor 29th"))
         self.assertIn("parishioners", collapse_ocr_spacing(
             "parishioners we offer our ssii iinn nncc recently"
