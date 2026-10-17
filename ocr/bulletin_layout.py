@@ -54,6 +54,7 @@ _HEADING_START = re.compile(
     r"|parish\s+news(?!letter\b)"
     r"|community\s+news"
     r"|fundraising"
+    r"|sunday\s+collection"
     r"|parish\s+events?"
     r"|upcoming\s+events?"
     r"|bingo(?:\s+night)?"
@@ -157,7 +158,11 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
     if not match:
         return None, text
     head = match.group(0).strip()
-    rest = text[match.end() :].lstrip(" \t")
+    rest_raw = text[match.end() :]
+    # "PARISH NOTICES: St Vincent … Tel 086" is a real section. The phone
+    # stays in the body. "Parish Office: 074…" is still a contact line.
+    labelled = rest_raw.lstrip().startswith(":")
+    rest = rest_raw.lstrip(" \t")
     # Keep "Cuimhneacháin báis & bás le gairid" as one heading.
     paired = re.match(
         r"^(?:[&/|]\s*)+"
@@ -170,7 +175,7 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         head = f"{head} & {paired.group(1)}".strip()
         rest = paired.group(2).lstrip(" \t:/|–—-&")
     else:
-        rest = rest.lstrip(":/|–—-")
+        rest = rest.lstrip(":/|–—-").lstrip()
     # "Parochial House, Upper Main St." is one address, not a section.
     if rest.startswith(","):
         return None, text
@@ -214,7 +219,9 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         return text.rstrip(".:;"), ""
     if _BODY_AFTER_HEADING.match(rest):
         return head, rest
-    if re.search(r"\d", rest) or re.search(r"\bwill\b|\bevery\b|\bplease\b", rest, re.I):
+    if re.search(r"\bwill\b|\bevery\b|\bplease\b", rest, re.I):
+        return None, text
+    if re.search(r"\d", rest) and not labelled:
         return None, text
     # ALL-CAPS parish banner after "Sunday Mass …" stays body, not a heading.
     letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", rest)
@@ -236,6 +243,17 @@ _EMBEDDED_HEADING = re.compile(
 _SHORT_EMBEDDED_TITLE = re.compile(
     r"^(?:contacts?(?:\s+us)?|anniversar(?:y|ies)|bingo(?:\s+night)?|"
     r"notices?|parochial\s+house|please\s+pray\s+for|sunday\s+mass(?:es)?)$",
+    re.IGNORECASE,
+)
+# Printed labels that already end with a colon. Split them out of a
+# smashed paragraph. Do not invent a label that is not in this list.
+_COLON_LABEL = re.compile(
+    r"\s+(?=(?:"
+    r"parish\s+office|web|e-?mail|facebook|instagram|telephone|webpage|"
+    r"mass\s+bookings|parish\s+newsletter|parish\s+notices|community\s+notices|"
+    r"sunday\s+collection|mass\s+times|recently\s+deceased|useful\s+numbers|"
+    r"month'?s?\s+mind"
+    r")\s*:)",
     re.IGNORECASE,
 )
 _WEEKDAY_LINE = re.compile(
@@ -276,8 +294,22 @@ def split_readable_chunks(plain: str) -> list[str]:
     """Break one smashed paragraph at a real heading or a Mass day line.
 
     Does not invent a heading. Only splits where those words are already there.
+    A printed label that already ends with a colon, such as Parish Office:
+    or PARISH NOTICES:, is split out even when no full stop comes before it.
     """
     text = (plain or "").strip()
+    if not text:
+        return []
+    labelled = [part.strip() for part in _COLON_LABEL.split(text) if part.strip()]
+    if len(labelled) > 1:
+        pieces: list[str] = []
+        for part in labelled:
+            pieces.extend(_split_long_piece(part))
+        return pieces or [text]
+    return _split_long_piece(text)
+
+
+def _split_long_piece(text: str) -> list[str]:
     if len(text) < 90:
         return [text] if text else []
     cuts = [0]

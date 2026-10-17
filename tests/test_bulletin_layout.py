@@ -66,6 +66,30 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertTrue(any(chunk.lower().startswith("anniversaries") for chunk in chunks))
         self.assertTrue(any(chunk.lower().startswith("please read") for chunk in chunks))
 
+    def test_printed_colon_labels_leave_the_smashed_line(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>28th Sunday in Ordinary Time Parish Office: 074-9548902 "
+            "Web: www.annagryparish.ie Email: pp.annagry@gmail.com</p>"
+            "<p>A Thirty Third Sunday in Ordinary time PARISH NOTICES: "
+            "St Vincent de Paul Local Branch Tel: 086 038 9322 "
+            "SUNDAY COLLECTION: €3080. Thank you!</p>"
+        )
+        self.assertIn("28th Sunday in Ordinary Time", html_out)
+        self.assertIn("Parish Office:", html_out)
+        self.assertIn('href="tel:+353749548902"', html_out)
+        self.assertNotIn('b-head">Parish Office', html_out)
+        self.assertIn("Web:", html_out)
+        self.assertIn('href="https://www.annagryparish.ie"', html_out)
+        self.assertIn('href="mailto:pp.annagry@gmail.com"', html_out)
+        self.assertIn('class="b-head">PARISH NOTICES</h3>', html_out)
+        self.assertIn("086 038 9322", html_out)
+        self.assertIn('class="b-head">SUNDAY COLLECTION</h3>', html_out)
+        self.assertIn("€3080", html_out)
+        self.assertIn("Thirty Third Sunday", html_out)
+        self.assertIsNone(
+            classify_heading_line("Parish Office : 028 9066 5409")
+        )
+
     def test_long_notice_becomes_sentences(self) -> None:
         plain = (
             "The rosary will be recited from Monday to Friday at the grotto. "
