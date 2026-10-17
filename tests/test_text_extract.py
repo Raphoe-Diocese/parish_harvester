@@ -190,6 +190,25 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         ))
         self.assertIn("out into", collapse_ocr_spacing("walked outinto the dark"))
         self.assertIn("11th", collapse_ocr_spacing("Week beginning: 11tl Weekend"))
+        self.assertIn(
+            "11 OCTOBER 2026",
+            collapse_ocr_spacing("PARISHES 11_OCTOBER_2026 No. 50"),
+        )
+        self.assertIn("PP Tel", collapse_ocr_spacing("Sean McCartan PPTel: 028 8075 8206"))
+        self.assertIn("KILLARNEY", collapse_ocr_spacing("KILL ARNEY PARISH NEW SLETT ER"))
+        self.assertIn("NEWSLETTER", collapse_ocr_spacing("KILL ARNEY PARISH NEW SLETT ER"))
+        self.assertIn("If you", collapse_ocr_spacing("Hfyou, O Lord, should mark iniquities"))
+        self.assertNotIn("lsdkjflas", collapse_ocr_spacing("ohe Ire lsdkjflas Ossor 29th"))
+        self.assertIn("parishioners", collapse_ocr_spacing(
+            "parishioners we offer our ssii iinn nncc recently"
+        ))
+        self.assertNotIn("ssii", collapse_ocr_spacing(
+            "parishioners we offer our ssii iinn nncc recently"
+        ))
+        self.assertIn(
+            "LARRY & ELLEN MACKEY",
+            collapse_ocr_spacing("ST. PAUL'S LARRY & ELLEN MACKEY CHRISTOPHER"),
+        )
         self.assertEqual(
             collapse_ocr_spacing("Week Twenty E ighth Week"),
             "Week Twenty Eighth Week",
