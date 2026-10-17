@@ -591,8 +591,10 @@ def structure_ocr_html(
                 body.append(html.escape(rest))
                 continue
             # Prefer cleaned plain text, but keep existing inline links/markup.
+            # A phone link used to freeze the raw line, so the stray Ardara 2 stayed.
             if re.search(r"<(?:a|strong|em)\b", raw, re.I):
-                body.append(raw.strip())
+                kept = re.sub(r"\b2\s+(?=ardara@)", "", raw.strip())
+                body.append(kept)
             else:
                 body.append(html.escape(plain))
         flush()
