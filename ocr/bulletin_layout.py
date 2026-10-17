@@ -11,6 +11,7 @@ import html
 import re
 from typing import Iterable
 
+from ocr.reader_pass import parse_printed_label, split_reader_blocks
 from ocr.parish_splitter import (
     _cleaned_title,
     _line_matches_banner,
@@ -47,6 +48,7 @@ _HEADING_START = re.compile(
     r"|we\s+pray\s+for\s+(?:the\s+)?(?:dead|deceased|faithful\s+departed)"
     r"|please\s+pray\s+for(?:\s+the\s+(?:dead|deceased|faithful\s+departed))?"
     r"|in\s+memoriam"
+    r"|parish\s+child\s+safeguarding(?:\s+liaisons)?"
     r"|parish\s+notices?"
     r"|community\s+notices?"
     r"|this\s+week(?:'s)?\s+notices?"
@@ -54,6 +56,7 @@ _HEADING_START = re.compile(
     r"|parish\s+news(?!letter\b)"
     r"|community\s+news"
     r"|fundraising"
+    r"|sunday\s+collection"
     r"|parish\s+events?"
     r"|upcoming\s+events?"
     r"|bingo(?:\s+night)?"
@@ -170,7 +173,7 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         head = f"{head} & {paired.group(1)}".strip()
         rest = paired.group(2).lstrip(" \t:/|–—-&")
     else:
-        rest = rest.lstrip(":/|–—-")
+        rest = rest.lstrip(":/|–—-").lstrip()
     # "Parochial House, Upper Main St." is one address, not a section.
     if rest.startswith(","):
         return None, text
@@ -214,7 +217,7 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         return text.rstrip(".:;"), ""
     if _BODY_AFTER_HEADING.match(rest):
         return head, rest
-    if re.search(r"\d", rest) or re.search(r"\bwill\b|\bevery\b|\bplease\b", rest, re.I):
+    if re.search(r"\bwill\b|\bevery\b|\bplease\b", rest, re.I):
         return None, text
     # ALL-CAPS parish banner after "Sunday Mass …" stays body, not a heading.
     letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", rest)
@@ -244,7 +247,8 @@ _WEEKDAY_LINE = re.compile(
     re.IGNORECASE,
 )
 # Fr. Gerard and 6.30pm stay. "church. The next" becomes two sentences.
-_SENTENCE_BREAK = re.compile(r"(?<=[a-z])[.!?][\"'’)]?\s+(?=[A-ZÁÉÍÓÚ])")
+# "church. The next" and "11am). Adoration" both start a new sentence.
+_SENTENCE_BREAK = re.compile(r"(?<=[a-z)\]])[.!?][\"'’)]?\s+(?=[A-ZÁÉÍÓÚ])")
 _ABBREV_END = re.compile(
     r"(?:fr|rev|st|dr|sr|mr|mrs|ms|no|tel|pp|co|vol|dept|am|pm)\.$",
     re.IGNORECASE,
@@ -273,11 +277,20 @@ def split_sentences(text: str) -> list[str]:
 
 
 def split_readable_chunks(plain: str) -> list[str]:
-    """Break one smashed paragraph at a real heading or a Mass day line.
+    """Break one smashed paragraph at a printed label, a heading, or a Mass day.
 
-    Does not invent a heading. Only splits where those words are already there.
+    The same rules run for every parish. Nothing is invented.
     """
     text = (plain or "").strip()
+    if not text:
+        return []
+    pieces: list[str] = []
+    for block in split_reader_blocks(text):
+        pieces.extend(_split_long_piece(block))
+    return pieces or [text]
+
+
+def _split_long_piece(text: str) -> list[str]:
     if len(text) < 90:
         return [text] if text else []
     cuts = [0]
@@ -465,6 +478,10 @@ def _heading_html(text: str) -> str:
     return f'<h3 class="b-head">{html.escape(text)}</h3>'
 
 
+def _subhead_html(text: str) -> str:
+    return f'<h4 class="b-sub">{html.escape(text)}</h4>'
+
+
 def _should_keep_existing_heading(inner: str) -> bool:
     """Keep short real section titles; demote OCR dumps and spaced banners."""
     from ocr.convert_bulletin import collapse_ocr_spacing
@@ -620,8 +637,16 @@ def structure_ocr_html(
                 out.append(_heading_html(head))
                 body.append(html.escape(rest))
                 continue
-            # Prefer cleaned plain text, but keep existing inline links/markup.
+            label = parse_printed_label(plain)
+            if label:
+                flush()
+                out.append(_subhead_html(label[0]))
+                if label[1]:
+                    body.append(html.escape(label[1]))
+                continue
+            # Each block is its own paragraph so the gap between them shows.
             # A phone link used to freeze the raw line, so the stray Ardara 2 stayed.
+            flush()
             if re.search(r"<(?:a|strong|em)\b", raw, re.I):
                 kept = re.sub(r"\b2\s+(?=ardara@)", "", raw.strip())
                 body.append(kept)
@@ -665,6 +690,14 @@ def structure_ocr_html(
                     add_masthead(parish_hit[1], parish_hit[0])
                 elif "ocr-parish-name" in (hm.group(2) or ""):
                     out.append(token)
+                elif hm.group(1) == "4":
+                    from ocr.convert_bulletin import collapse_ocr_spacing
+
+                    title = collapse_ocr_spacing(inner)
+                    if title and len(title) <= 60:
+                        out.append(_subhead_html(title))
+                    else:
+                        out.append(f"<p>{html.escape(title)}</p>")
                 elif classify_heading_line(inner) or _should_keep_existing_heading(inner):
                     # Re-emit as a clean b-head so spacing cleanup applies.
                     title = classify_heading_line(inner) or _plain(inner)
