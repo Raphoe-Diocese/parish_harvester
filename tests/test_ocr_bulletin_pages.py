@@ -1174,11 +1174,12 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("parish-head", result)
         self.assertIn("Page 1", result)
         self.assertIn("Ardara Parish", result)
-        self.assertIn("Mass times this week", result)
+        self.assertIn('class="b-head">Mass times</h3>', result)
+        self.assertIn("this week: Saturday 6pm, Sunday 11am.", result)
         self.assertIn("Bangor Parish", result)
         # Original page order is preserved (Ardara's content appears before
         # Bangor's, exactly as extracted — not re-sorted A-Z into sections).
-        self.assertLess(result.index("Mass times this week"), result.index("Confessions"))
+        self.assertLess(result.index("Mass times"), result.index("Confessions"))
 
     def test_prepare_ocr_fragment_flattens_legacy_accordion_markup(self) -> None:
         """Pages regenerated from already-published HTML (which may still
@@ -1206,7 +1207,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("parish-head", result)
         self.assertNotIn("summary", result)
         self.assertIn("Ardara Parish", result)
-        self.assertIn("Mass times this week", result)
+        self.assertIn('class="b-head">Mass times</h3>', result)
+        self.assertIn("this week: Saturday 6pm.", result)
 
     def test_prepare_ocr_fragment_keeps_failed_banner_when_no_parish_markers(self) -> None:
         parish_links = [
@@ -1238,7 +1240,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         # Bangor genuinely has no content this week — its own empty row
         # must be preserved (item 4: don't touch short/empty real notices).
         self.assertIn("No searchable text available this week.", html_output)
-        self.assertIn("Mass times this week", html_output)
+        self.assertIn('class="b-head">Mass times</h3>', html_output)
+        self.assertIn("this week: Saturday 6pm, Sunday 11am.", html_output)
 
 
 if __name__ == "__main__":
