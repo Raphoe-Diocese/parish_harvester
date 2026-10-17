@@ -1,7 +1,7 @@
 """One reader layout for every parish bulletin.
 
 Runs on the text of every diocese. It does not look up a parish name
-and it does not invent words. A printed label becomes its own block.
+and it does not invent words. Only a known bulletin label is split out.
 A phone number ends a line. The next name or sentence starts the next line.
 """
 
@@ -9,28 +9,61 @@ from __future__ import annotations
 
 import re
 
-# One-word labels bulletins print before a colon: Web: Email: Tel:
-_ONE_WORD_LABEL = r"Web|E-?mail|Facebook|Instagram|Tel|Telephone|Webpage|Twitter|YouTube"
-# Two to six words, each already starting with a capital, then a colon.
-_TITLE_LABEL = r"[A-ZÁÉÍÓÚ][\w'’.-]*(?:\s+[A-ZÁÉÍÓÚ][\w'’.-]*){1,5}"
-# PARISH NOTICES: and SUNDAY COLLECTION:
-_CAPS_LABEL = r"[A-ZÁÉÍÓÚ]{2,}(?:\s+[A-ZÁÉÍÓÚ]{2,}){1,5}"
-_LABEL = rf"(?:{_ONE_WORD_LABEL}|{_TITLE_LABEL}|{_CAPS_LABEL})"
-
-_COLON_LABEL = re.compile(rf"\s+(?=(?:{_LABEL})\s*:)")
+# Longer phrases first so "Parish Office" wins over a shorter word.
+_KNOWN_LABELS = (
+    "Parish Child Safeguarding Liaisons",
+    "Community Notices",
+    "Recently Deceased",
+    "Parish Newsletter",
+    "Sunday Collection",
+    "Parish Notices",
+    "Useful numbers",
+    "Mass Bookings",
+    "Parish Office",
+    "Month's Mind",
+    "Months Mind",
+    "Mass times",
+    "Instagram",
+    "Telephone",
+    "Facebook",
+    "Webpage",
+    "YouTube",
+    "Twitter",
+    "E-mail",
+    "Email",
+    "Web",
+    "Tel",
+)
+# "Annagry Parish Pastoral Council:" keeps the words already in front of it.
+_PASTORAL = r"(?:[A-ZÁÉÍÓÚ][\w'’.-]+\s+){0,3}Pastoral\s+Council"
+_LABEL = "|".join(re.escape(label) for label in _KNOWN_LABELS) + "|" + _PASTORAL
+# Split only where the known label itself is followed by a colon.
+_COLON_LABEL = re.compile(rf"(?<![A-Za-zÁÉÍÓÚáéíóú])(?:{_LABEL})\s*:", re.IGNORECASE)
 _BARE_LABEL = re.compile(
-    r"\s+(?=(?:Charity\s+No\.|Parish\s+Child\s+Safeguarding(?:\s+Liaisons)?)\b)",
+    r"(?<![A-Za-zÁÉÍÓÚáéíóú])(?:Charity\s+No\.|Parish\s+Child\s+Safeguarding(?:\s+Liaisons)?)\b",
     re.IGNORECASE,
 )
-_LABEL_LINE = re.compile(rf"^({_LABEL})\s*:\s*(.*)$", re.DOTALL)
+_LABEL_LINE = re.compile(rf"^({_LABEL})\s*:\s*(.*)$", re.IGNORECASE | re.DOTALL)
 # 074-9532445 Mary → the next person or sentence is a new line.
 _PHONE_NEXT = re.compile(
     r"(?:\+353|\+44|0\d)[\d\s().-]{6,16}\d(?=\s+[A-ZÁÉÍÓÚ])"
 )
 
 
-def _parts(pattern: re.Pattern[str], text: str) -> list[str]:
-    parts = [part.strip() for part in pattern.split(text) if part.strip()]
+def _split_at(pattern: re.Pattern[str], text: str) -> list[str]:
+    """Split before each match. The match stays with the text that follows it."""
+    parts: list[str] = []
+    start = 0
+    for match in pattern.finditer(text):
+        if match.start() < start:
+            continue
+        left = text[start : match.start()].strip(" \t")
+        if left:
+            parts.append(left)
+        start = match.start()
+    rest = text[start:].strip(" \t")
+    if rest:
+        parts.append(rest)
     return parts or ([text.strip()] if text.strip() else [])
 
 
@@ -54,8 +87,8 @@ def split_reader_blocks(text: str) -> list[str]:
     if not raw:
         return []
     blocks: list[str] = []
-    for part in _parts(_COLON_LABEL, raw):
-        for bit in _parts(_BARE_LABEL, part):
+    for part in _split_at(_COLON_LABEL, raw):
+        for bit in _split_at(_BARE_LABEL, part):
             blocks.extend(_split_at_phone(bit))
     return blocks or [raw]
 
