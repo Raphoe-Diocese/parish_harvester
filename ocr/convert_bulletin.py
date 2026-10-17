@@ -881,15 +881,25 @@ def _counts_as_spaced_letter(token: str) -> bool:
     return token.lower() not in {"a", "i", "á", "í"}
 
 
+def _word_key(token: str) -> str:
+    return re.sub(r"^[^A-Za-zÀ-ÿ]+|[^A-Za-zÀ-ÿ]+$", "", token or "").lower()
+
+
 def _run_is_letter_spaced(run: list[str]) -> bool:
     """True for 'PA R O C H' / 'Sa tur da y'. False for 'any of the'."""
     if len(run) < 3:
         return False
     if any(not (1 <= _joinable_alpha_len(w) <= 3) for w in run):
         return False
+    # "If you, O" is real words plus a capital O. Do not glue them.
+    if any(
+        _word_key(w) in _REAL_SHORT_WORDS and _joinable_alpha_len(w) > 1
+        for w in run
+    ):
+        return False
     if any(_counts_as_spaced_letter(w) for w in run):
         return True
-    return all(w.lower() not in _REAL_SHORT_WORDS for w in run)
+    return all(_word_key(w) not in _REAL_SHORT_WORDS for w in run)
 
 
 def _join_letter_spaced_runs(words: list[str]) -> list[str]:
