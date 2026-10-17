@@ -84,6 +84,9 @@ class BulletinLayoutTests(unittest.TestCase):
             "SUNDAY COLLECTION: €3080. Thank you!</p>"
             "<p>Sunday 11th October 11:00am Bill &amp; Mary Shiels Anniversary Mass</p>"
         )
+        self.assertIn("28th Sunday in Ordinary Time", html_out)
+        self.assertNotIn("<p>Ordinary</p>", html_out)
+        self.assertNotIn("<p>Time</p>", html_out)
         self.assertNotIn("Ordinary Time Parish Office", html_out)
         self.assertIn('class="b-sub">Parish Office</h4>', html_out)
         self.assertIn('class="b-sub">Web</h4>', html_out)
@@ -95,14 +98,22 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn('class="b-sub">Parish Newsletter</h4>', html_out)
         self.assertIn("074-9548902", html_out)
         self.assertIn('class="b-head">PARISH NOTICES</h3>', html_out)
+        self.assertIn("St Vincent de Paul Local Branch", html_out)
+        self.assertNotIn("<p>Paul</p>", html_out)
         self.assertIn('class="b-head">SUNDAY COLLECTION</h3>', html_out)
         self.assertIn("€3080", html_out)
         self.assertIn('href="tel:+353860389322"', html_out)
         self.assertIn("Bill &amp; Mary Shiels Anniversary Mass", html_out)
         self.assertNotIn('b-head">Anniversary', html_out)
         self.assertIsNone(classify_heading_line("Parish Office : 028 9066 5409"))
+        plain_notice = structure_ocr_html(
+            "<p>We Welcome: the children of the parish. Road Seller: Mary Byrne.</p>"
+        )
+        self.assertNotIn("b-sub", plain_notice)
+        self.assertIn("We Welcome:", plain_notice)
         again = structure_ocr_html(html_out)
         self.assertIn('class="b-sub">Parish Office</h4>', again)
+        self.assertIn("28th Sunday in Ordinary Time", again)
 
     def test_long_notice_becomes_sentences(self) -> None:
         plain = (
