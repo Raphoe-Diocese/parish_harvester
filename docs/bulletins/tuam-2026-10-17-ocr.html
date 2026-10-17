@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Tuam Archdiocese Text Bulletin — 17/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="tuam-2026-10-17.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">TUAM ARCHDIOCESE Text Bulletin · 17/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-annaghdown-corrandulla" data-parish-name="Annaghdown/Corrandulla"><h2 class="ocr-parish-name">Annaghdown/Corrandulla</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<header class="ocr-parish-masthead" id="ocr-parish-athenry" data-parish-name="Athenry"><h2 class="ocr-parish-name">Athenry</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>Briathar Dé An Chéad Léacht Sliocht as Leabhar Ísáia fáidh -- 25:6-10 Réiteoidh Tiarna na Slua féasta mór ar an sliabh seo le haghaidh na gciníocha go léir, beidh scoth na beatha ann agus togha an fhíona, beatha shaibhir agus bhlasta, fíon nach bhfuil a bhualadh le fáil. Tógfaidh sé leis den sliabh seo an lionndubh atá mar bheadh clóca ar an domhan go léir agus an taiséadach atá timpeall na náisiún go léir, cuirfidh sé an Bás ar ceal. Glanfaidh Dia na deora de chuile éadan, ní fhágfaidh sé a phobal faoi náire in aon áit ar fud an domhain, mar sé an Tiar na a dúirt. Déarfar an lásin, breathnaígí, séárn Diaé, a raibh muid ag súil le slánú uaidh; sé an Tiarna é ar chuir muid ár muinín as. Tá gliondar agus lúcháir orainn gur shlánaigh sé muid; mar tá lámh an Tiarna ag lonnú ar an sliabh. Briathar an Tiarna. Freagra: Buíochas le Dia Salm le Freagra: I dteach an Tiarna a mhairfidh mé, go brách na breithe. ‘Sé’n Tiarna m’aoire, ní bheidh aon uireasa orm. Cuireann sé i mo luímé i móinéar féarghlas. Seolann sé ar imeall an uisce mé, mar a bhfaighim suaimhneas. Fr Cuireann sé ar bhealach mo leasa mé, tá sé dílis dá fhocal. Fiú dá siúlfainn i ngleann an dorchadais níor bhaol dom an t-olc agus tú ansin le do shlat is do bhachall, le sólás a thabhairt dom. Fr Réitigh tú féasta dom, i bhfianaise mo naimhde, Chuir túola ar mo cheann; tá mo chupán ag cur thar maoil. Fr Leanfaidh cineáltas is fabhar mé, chuile láde mo shaol. I dteach an Tiarna a mhairfidh mé, go brách na breithe. Fr An Dara Léacht Sliocht as Litir N. Pól chuig na Filipigh -- 4:12-14, 19-20 A chairde, is minic mé ar an gcaolchuid agus is minic fuílleach agam. Tá seanchleachtadh agam ar chuile shórt: ar mo dhóthain mhór, agus ar an ocras, ar an bhflúirse agus ar an ngannchuid. Támé in ann chuile shórt a dhéanamh le cabhair an Téúd a thugann neart dom. Mar sin féin ba mhaith an mhaise daoibhse tíocht i gcabhair orm nuair a bhímé i gcruachás. Agus ní fhágfaidh mo Dhia easpa oraibhse as a fhlúirse féin trí Íosa Críost. Moladh godeole Dia, árn A thair. Áiméan. Briathar an Tiarna. Freagra: Buíochas le Dia</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-balla-mayo-abbey" data-parish-name="Balla-Mayo Abbey"><h2 class="ocr-parish-name">Balla-Mayo Abbey</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 3</p>
+<p>Alleluia, alleluia! Is spiorad agus is beatha iadd’fhocla, a Thiarna; is agatsa atá briathra na beatha síoraí. Alleluia!<br>
+An Soiscéal Sliocht as an Soiscéal naofa de réir N. Maitiú -- 22:1-14 San am sin, thosaigh Íosa ag labhairt i bparabail leis na príomhshagairt agus le seanóirí an phobail; “Tá ríocht na bhflaitheas,” ar seisean, “cosúil le rí a rinne bainis dá mhac. Chuir sé a shearbhóntaí amach ag glaoch orthu siúd a fuair cuireadh bainise, ach níor mhian leo a thíocht. Ansin chuir sé searbhóntaí eile amach agus dúirt sé leo a ráleo siúd a fuair cuireadh: “Breathnaigh, tá an féasta ullamh, mo chuid mart agus mo chuid beithíoch beaite maraithe, agus chuile rud réitithe: tagaigí chun na baini se.”Achba chuma leoach imeacht, ag obair ar an bhfeilm, duine eile ag ceannacht rudaí, agus an chuid ar a chuid searbhóntaí, thugadar spídiúlacht dóibh agus mharaíodar iad. Tháinig fearg ar an rí, chuir sé a chuid saighdiúirí amach gur chuireadar na scriostóirí chun báis agus gur loisceadar a gcathair. Ansin dúirt sé leis na searbhóntaí: “Tá an bhainis réidh ach an dream a fuair an cuireadh, níorbh bhfiú iadé. Marsin téigíse amach ar na sráideanna agus tugaigí cuireadh chun na bainse do chuile dhuine a chasfar oraibh.” Chuaigh na searbhóntaí amach ar na bóithre agus bhailigh siad ar casadh orthu, olc agus maith, go raibh láthair na bainise lán le cuideachta. Chuaigh an rí isteach ag breathnú ar an gcuideachta, agus chonaic sé fear ann nach raibh aon éadach bainise air. Agus dúirt sé leis: “Céard a thug isteach anseo thú agus gan aon éadach bainise ort?”Ach níor fhreagair sé. Agus dúirt an rí leis an lucht freastail: “Ceanglaítear a chosa agus a lámha agus caitear amach sa dor chadas é: is ansin a bheidh caoineadh agus gíoscán fiacal.” Mar glaoitear ar go leor ach ní thoghtar ach beagán.” Soiscéal an Tiarna. Freagra: Moladh leis an Tiarna Íosa Críost S. Rúndiamhair an chreidimh A Shlanaitheoir an domhain, slánaigh sinn, tusa a shaor sinn trí do chros agus tríd’aiséirí. Scrioptúir Dé Domhnaigh seo chugainn Leabhar Ísáia fáidh -- 45:1, 4-6 Salm 95 Céad Litir N. Pól chuig na Teasalónaigh 1:1-5 N. Maitiú -- 22:15-21 Tugaigí onóir agus glóir don Tiarna</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-ballindine-kilvine" data-parish-name="Ballindine (Kilvine)"><h2 class="ocr-parish-name">Ballindine (Kilvine)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 4</p>
+<p>Iséan Domhnach seo chugainn 18ú Deireadh Fómhair Domhnach na Misiúin. Tá clúdach sna boscaí don bhailiúchán seo. Duine ar bith nach bhfuil boscaí acutá clúdaí fágtha ar an mbord ag deireadh an t Séipéil, is féidir leat ceann a thabhairt abhaile leat agus é a fhágáil ar aissna ciseáin an tseachtain seo chugann más maith leat síntiús a thabhairt. Míle buíochas. Tá cuireadh seolta ag muintir gach duine a d’imigh uainn arshlína Fírinne le bliain anuas chuig Aifrinn speisialta i Séipéal Mhic Dara ar an Máirt 3ú Samhain 7.30 i.n. agus Séipéal Mhuire Gan Smál, arang Céadaoin 11ú Samhain 7.30i.n. Má tá duine ar bith gur mhaith leo Léacht nó Guí an Phobal a léamh glaoigh ar <a href="tel:+35391595452" style="color:#1d4ed8;font-weight:600;">091 595452</a>. Tá an Parósite buíoch don Ghrúpa Bethany a eagraíonn na h Aifrinn seo. AN PHAIDRÍN PHÁIRTEACH - mí Deireadh Fómhair 2026 7.00i.n. Séipéal Naomh Ainnín <a href="https://www.mcn.live/Camera/seipeal-n-ainnin" target="_blank" rel="noopener noreferrer">www.mcn.live/Camera/seipeal-n-ainnin</a> . Beidh tú in ann a bheith páirteach sa Nóibhéine agus an Paidrín ó do theach féin, nó is féidir leat a bheith i láthair i Séipéal Naomh Ainnín ar an Cnoc 7.00i.n. Fáil te roimh chách. Beidh billeog fágtha ar an mbord sna Séipéil. Tá sé i gceist ag Pobal Rua taispeántas pictiúirí a bheith ar siúl le linn Fhéile Rua i mí na Samhna. Beidh Seán Ó Mainnín ag glacadh pictiúir de dhaoine atáos cionn 75 bliaind'aois le bheith mar chuid den taispeántas. Ba bhreá linn cloisteáil ó dhaoine ar mhaith leo a bpictiúr a bheith annnóó dhaoine ar mhait hleoa muintir a bheith páirteach. Cuir glaoch ar Rhona ar <a href="tel:+353872563317" style="color:#1d4ed8;font-weight:600;">0872563317</a> Bíonn Adhradh na Naomh Shacraiminte ar siúl i Séipéal Mhic Dara gach tráthnóna Dé h Aoine idir 7.00i.n.- 8.00i.n. agus i Séipéal Thír an Fhia ar an Domhnach idir 6.00-7.00i.n. Fáilte Romhaibh. Ministreacht D. Fómhair An Cheathrú Rua D. Fómhair 2026 Leitir Mealláin 18ú D. Fómhair Léitheoirí Mali Uí Chlochartaigh Caitlín Seoighe (Páid) Ministéirí Comaoineach Mali Uí Chlochartiagh Marion Uí Cheallaigh Áine Uí Chonghaile Cuntóir Sacraistí Tina Uí Fhlatharta 18/10 Áine Uí Chonghaile Tuismitheoirí Freastalaithe Andrea Breathnach Caitlín Seoighe Freastalaithe 18/10/-24/10/26 Ciara Ní Ghríofa Ava Ní Shúilleabháin Seóna Seoighe Anna Seoighe Cóireamh an Bhailiúcháin Máirtín Ó Conghaile Beartlaí Ó Ráighne Cóilín MacDonnacha Mícheál Breathnach</p>
+<hr>
+<p class="page-label">Page 5</p>
+<header class="ocr-parish-masthead" id="ocr-parish-ballyhaunis-annagh" data-parish-name="Ballyhaunis (Annagh)"><h2 class="ocr-parish-name">Ballyhaunis (Annagh)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 6</p>
+<p>Briathar Dé An Chéad Léacht Sliocht as Leabhar Ísáia fáidh -- 25:6-10 Réiteoidh Tiarna na Slua féasta mór ar an sliabh seo le haghaidh na gciníocha go léir, beidh scoth na beatha ann agus togha an fhíona, beatha shaibhir agus bhlasta, fíon nach bhfuil a bhualadh le fáil. Tógfaidh sé leis den sliabh seo an lionndubh atá mar bheadh clóca ar an domhan go léir agus an taiséadach atá timpeall na náisiún go léir, cuirfidh sé an Bás ar ceal. Glanfaidh Dia na deora de chuile éadan, ní fhágfaidh sé a phobal faoi náire in aon áit ar fud an domhain, mar sé an Tiarna a dúirt. Déarfar an lásin, breathnaígí, séárn Diaé, a raibh muid ag súil le slánú uaidh; sé an Tiarna é ar chuir muid ár muinín as. Tá gliondar agus lúcháir orainn gur shlánaigh sé muid; mar tá lámh an Tiarna ag lonnú ar an sliabh. Sin é Briathar Dé. Freagra: Buíochas le Dia Salm le Freagra : Freagra: I dteach an Tiarna a mhairfidh mé, go brách na breithe. 1. ‘Sé’n Tiarna m’a oire, ní bheidh aon uireasa orm. Cuireann sé i mo luímé i móinéar féarghlas. Seolann sé ar imeall an uisce mé, mar a bhfaighim suaimhneas. Fr 2. Cuireann sé ar bhealach mo leasa mé, tá sé dílis dá fhocal. Fiú dá siúlfainn i ngleann an dorchadais níor bhaol dom an t-olc agus tú ansin le do shlat is do bhachall, le sólás a thabhairt dom. Fr 3. Réitigh tú féasta dom, i bhfianaise mo naimhde, Chuir túola ar mo cheann; tá mo chupán ag cur thar maoil. Fr 4. Leanfaidh cineáltas is fabhar mé, chuile láde mo shaol. I dteach an Tiarna a mhairfidh mé, go brách na breithe. Fr</p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>An Dara Léacht Sliocht as Litir N. Pól chuig na Filipigh -- 4:12-14, 19-20 A chairde, is minic mé ar an gcaolchuid agus is minic fuílleach agam. Tá seanchleachtadh agam ar chuile shórt: ar mo dhóthain mhór, agus ar an ocras, ar an bhflúirse agus ar an ngannchuid. Támé in ann chuile shórt a dhéanamh le cabhair an Téúd a thugann neart dom. Mar sin féin ba mhaith an mhaise daoibhse tíocht i gcabhair orm nuair a bhímé i gcruachás. Agus ní fhágfaidh mo Dhia aon easpa oraibhse as a fhlúirse féin trí Íosa Críost. Moladh godeole Dia, árn Athair. Áiméan. Sin é Briathar Dé. Freagra: Buíochas le Dia Alleluia, alleluia! Is spiorad agus is beatha iadd’fhocla, a Thiarna; is agatsa atá briathra na beatha síoraí. Alleluia!<br>
+An Soiscéal Sliocht as an Soiscéal naofa de réir N. Maitiú -- 22:1-14 San am sin, thosaigh Íosa ag labhairt i bparabail leis na príomhshagairt agus le seanóirí an phobail; “Tá ríocht na bhflaitheas,” ar seisean, “cosúil le rí a rinne bainis dá mhac. Chuir sé a shearbhóntaí amach ag glaoch orthu siúd a fuair cuireadh bainise, ach níor mhian leo a thíocht. Ansin chuir sé searbhóntaí eile amach agus dúirt sé leo a ráleo siúd a fuair cuireadh: “Breathnaigh, tá an féasta ullamh, mo chuid mart agus mo chuid beithíoch beaite maraithe, agus chuile rud réitithe: tagaigí chun na bainise.” Achbachumaleoach imeacht, ag obair ar an bhfeilm, duine eile ag ceannacht rudaí, agus an chuid ar a chuid searbhóntaí, thugadar spídiúlacht dóibh agus mharaíodar iad. Tháinig fearg ar an rí, chuir sé a chuid saighdiúirí amach gur chuireadar na scriostóir í chun báis agus gur loisceadar a gcathair. Ansin dúirt sé leis na searbhóntaí: “Tá an bhainis réidh ach an dream a fuair an cuireadh, níorbh bhfiú iadé. Marsin téigíse amach ar na sráideanna agus tugaigí cuireadh chun na bainse do chuile dhuine a chasfar oraibh.” Chuaigh na searbhóntaí amach ar na bóithre agus bhailigh siad ar casadh orthu, olc agus maith, go raibh láthair na bainise lán le cuideachta. Chuai gh an rí isteach ag breathnú ar an gcuideachta, agus chonaic sé fear ann nach raibh aon éadach bainise air. Agus dúirt sé leis: “Céard a thug isteach anseo thú agus gan aon éadach bainise ort?”Ach níor fhreagair sé. Agus dúirt an rí leis an lucht freastail: “Ceanglaítear a chosa agus a lámha agus caitear amach sa dorchadas é: is ansin a bheidh caoineadh agus gíoscán fiacal.” Mar glaoitear ar go leor ach ní thoghtar ach beagán .” Sin é Soiscéal Dé. Freagra: Moladh leis an Tiarna Íosa Críost S. Rúndiamhair an chreidimh P. A Shlánaitheoir an domhain, slánaigh sinn, tusa a shaor sinn trí do chros agus tríd’aiséirí.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-castlebar-aglish" data-parish-name="Castlebar (Aglish)"><h2 class="ocr-parish-name">Castlebar (Aglish)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 8</p>
+<p>Scrioptúir Dé Sathairn/Domhnaigh seo chugainn: Leabhar Ísáia fáidh -- 45:1, 4-6 Salm 95 N. Pól chuig na Teasalónaigh -- 1:1-5 N. Maitiú -- 22:15-21 ‘Tugaigí onóir agus glóir don Tiarna. ’ Fógraí: AN PHAIDRÍN PHÁIRTEACH - mí Deireadh Fómhair 2026 @7i.n. Séipéal Naomh Ainnín - <a href="https://www.mcn.live/Camera/seipeal-n-ainnin-2" target="_blank" rel="noopener noreferrer">www.mcn.live/Camera/seipeal-n-ainnin-2</a> - Raidió go háitiúil ar 105.5fm Le Nóibhéine do Mhuire Máthair na Síor Cabhrach a chomhlíonadh, beidh Paidir an Nóibhéine mar chuid den searmanas don chéad naoi lá. Beidh Lá Domhanda a n Paidrín á chéiliúradh le chéile arang Céadaoin 7ú Deireadh Fómhair 7i.n. Beidh tú in ann a bheith páirteach sa Nóibhéine agus an Paidrín ó do theach fhéin, nó is féidir leat a bheith i láthair i Séipéal Naomh Ainnín, ar an Cnoc @7i.n. Fáilte roimh chách. Scéim Aisíoc Cánach Chuireamar meabhrúcháin le déanaí maidir leis an Scéim Aisíoc Cánach faoi Acht na g Carthannachtaí agus Foirmeacha CHY3. Tá muid thar a bheith buíoch dóibh siúd a chuir na foirmeacha ar ais. Le bhur dtoil, cuir ar ais an fhoirm CHY3 más íocóir cánach tú féin nó duine ar bith sa gclann. Cuir in iúl dúinn mura bhfuil tú féin nó aon duine sa gclann incháilithe don scéim seo agus beidh muid in annd'ainm a bhaint don liosta. Glao igh ar <a href="tel:+35391593122" style="color:#1d4ed8;font-weight:600;">091-593122</a> nó seol an fhoirm ar ais sa clúdach iniata. Míle buíochas. An t Seachtain seo beidh Cuireadh ag dul amach chuig muintir na daoine a d’fhág muid slán acu le bliain anuas sa b Paróiste, chuig Aifreann speisialta i Séipeal Naomh Ainnín ar an Déardaoin 5ú Samhain 2026 7.30i.n. Iséan Domhnach seo chugainn 18ú Deireadh Fómhair Domhnach na Misiúin. Tá clúdach sna boscaí don bhailiúchán seo. Duine ar bith nach bhfuil boscaí a cutá clúdaí fágtha ar an mbord ag deireadh an t Séipéil, is féidir leat ceann a thabhairt abhaile leat agus é a fhágáil ar aissna ciseáin an tseachtain seo chugann más maith leat síntiús a thabhairt. Míle buíochas.</p>
+<h3 class="b-head">AR DHEIS DÉ</h3>
+<p>John Comerford, Cornarón. Idirchaidrimh an Pharóiste atá ainmnithe ag an Deoise: Caitríona Uí Bhéarra <a href="tel:+353872118838" style="color:#1d4ed8;font-weight:600;">087.2118838</a></p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>St. Brendan’s Church by the Lake Annaghdown Fr. Tom Gallagher PPTel: 791125 E-Mail address for notices - <a href="mailto:brendanannaghdown@gmail.com" target="_blank" rel="noopener noreferrer">brendanannaghdown@gmail.com</a> <a href="https://www.annaghdownchurch.com" target="_blank" rel="noopener noreferrer">www.annaghdownchurch.com</a> Webcam : Churchtv.ie/Annaghdown Mass Intentions from: 11th – 18th October 2026 Sun 11th 10am Stephen, Mary &amp; Martin Flaherty,</p>
+<h3 class="b-head">Anniversary</h3>
+<p>Eileen Scully , Woodpark. Sun 18th 10am Fr Ollie McNamara . 1st Anniversary. Mick Farragher , Shankill &amp; all deceased of the Farragher family. All masses must now be booked through the Parish Office. Phone: <a href="tel:+35391791125" style="color:#1d4ed8;font-weight:600;">091- 791125</a>. Office Hours: Monday, Tuesday &amp; Thursday 9am – 3.30pm.</p>
+<h3 class="b-head">Parish Office</h3>
+<p>Email address: <a href="mailto:corrandullachurch@gmail.com" target="_blank" rel="noopener noreferrer">corrandullachurch@gmail.com</a></p>
+<h3 class="b-head">Parish Finances</h3>
+<p>Parish account details; Weekly Collection : Annaghdown: Church Account. IBAN: IE15 AIBK 93745200022000 BIC: AIBKIE2D. Please include your name as a narrative to appear on our bank statement. Annaghdown Parish Priests Revenue Account: IBAN: IE85 AIBK 93745219069018 BIC: AIBKIE2D Baptisms: Are celebrated in Annaghdown Church on the 2nd Saturday of the month.<br>
+Contact the parish office, 091- 791125 . Minimum of 2 weeks’ notice required. Annaghdown Pastoral Council : Meeting will now take place on Monday 19th October at 8pm. If you have any questions, please feel free to contact any member. Fr. Ollie’ s 1st Anniversary : After Mass next Sunday the re will be tea &amp; coffee in the school. You are all welcome to attend. Date Reader Eucharist Child Safeguarding Sun 11th Myles Meehan Aine Farragher Myles Meehan Sun 18th Mary Hoade Maura Kavanagh Mary Hoade Sun 25th Olivia Divilly Marguerite Fitzpatrick Olivia Divilly First Holy Communion 2027: Saturday, 8th May, 11.00am - Annaghdown National School Saturday, 15th May, 11.00am - Corrandulla NS Saturday, 15th May , 2.00pm - Corrandrum / Castlehackett Sacrament of Confirmation : Will be celebrated in the parish on Friday, 16th April 2027. Annaghdown NS 11.00am, Corrandulla / Castlehackett NS 2.00pm. Epilepsy Ireland : The annual church gate collection in aid of Epilepsy Ireland will take place this Sunday 11th October. Epilepsy Ireland provides vital support services, education, and advocacy for individuals and families affected by epilepsy. Your generous support is greatly appreciated. Thank you. Mission Sunday Collection : The Mission Sunday Collection will be taken up next Sunday,18th October. Additional envelopes are available at the church doors. Please support this important collection. Thank you for your generosity Annaghdown Heritage Society : Will hold its Annual General Meeting on Wednesday, Oct 21st, 2026 at 8 pm in the Heritage Room, Old Girls&#x27; School, Corrandulla. All members are invited to attend and new members are always welcome. The evening will conclude with tea and a chat. Hospice Coffee morning : A huge thank you to everyone who supported our Hospice Coffee Morning in Regan’s. We are so grateful to everyone who baked at home, helped out on the day, and contributed in any way to making this very special event such a success. A special thank you to the Active Retirement Group , who always come along and support us for this very special occasion. Your continued support means so much. We are delighted to announce that a fantastic €3,370.00 was raised on the day! Thank you all so much for your generosity, kindness and support. Annaghdown Lotto results : (05/10/26) : 1 - 4 - 25 – 26. No jackpot winner. 0 match 3&#x27;s. 5 Lucky dips: Ronan Keenan, online, Loretta Duggan online, Ronnie Forde, Anagh West, Michael Forde Lisanoran &amp; Kathleen Geraghty Carraghy. Promoters prize: Mike Melia. . Annaghdown/Corrandulla https://www.annaghdownchurch.com/newsletters/</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-islandeady-glenisland" data-parish-name="Islandeady-Glenisland"><h2 class="ocr-parish-name">Islandeady-Glenisland</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 10</p>
+<p>11 jjjjjj Davitts GAA – Presto result: Numbers drawn: 24, 28, 29, 34. Jackpot not won. €50 winners were: Noel Reapy, John Joyce, Jill Wright, Lorna Bourke. Jackpot of €13,800 this weekend, draw will be held in the Clubhouse on Monday night. Fixtures: Mon Aug 3rd, U-14 D C’ship: Davitts v Bonniconlon in Ballindine at 7pm Tues Aug 4th, Minor B C’ship: Gaeil Na Daibheidí v Tourmakeady in Mayo Abbey, 7pm Wed Aug 5th, U-12 Summer League: Davitts v Ballyhaunis in Ballindine at 7pm Hugh congratulations to Fenton Kelly, Colm Boyle, Ronan Kirrane, Paul Cunnane and all involved in Mayo’s All-Ireland final victory last Sunday. Community Family Quiz night - on Friday 16th October in Davitts GAA clubhouse from 7- 9pm. €40 per table of 4 adults, €30 less than 4. proceeds to Ballindine NS. Born Identity ABBA tribute band - returns to Milltown Community Centre on October 16th at 8 pm. Tickets €25 available in all businesses in Milltown and Quinn’s shop Tuam or by contacting 086 8054160 . All proceeds going towards the continuing works on Milltown Church. Shrule &amp; District Vintage Club - are holding their harvest social in Craddock&#x27;s Bar in Shrule on October 24th at 9.30pm, music is by Matt Keane. Raffle for a tractor, tickets on sale until Oct 22nd from www.shrulevintage.ie Ballindine/Irishtown/Milltown Active Retirement - meeting in Davitt’s GAA Clubhouse on Tuesday, October 13th at 11:30am. Vivaldi Recomposed - Join the RTE Concert Orchestra and renowned Norwegian violinist Mari Samuelsen for an unforgettable evening in Knock Basilica on Saturday, November 7th. See www.knockshrine.ie for booking details. Jive &amp; Line Dancing - 4-week Course in Bourke’s of Irishtown starting Thursday 15th of October 8pm. Cost: €40. To book text 087 7077074 . Sacred Heart Magazine - subscription of €30 now due. Magazines available to subscribers in Ballindine Church porch. Western Care Association - are holding a staff recruitment open day on 20th October 10.30 – 3pm in Cúram, Claremorris. Meet the team, management &amp; the people we support. Everyone welcome. Look Beyond the Behaviour - Cúram Family Centre hosts Child &amp; Adolescent Creative Psychotherapist Lyndsey Gill for an evening exploring children’s behaviour, feelings, emotional reactions and connection. It takes place on Thursday 22nd October, 7–9pm at Cúram. Places limited; m.cribbin@curamclaremorris.ie or 087 911 9714 . Dementia Dance Memory Group - if you are caring for someone with Dementia come to our weekly club in Cúram, Claremorris every<br>
+Wednesday 11.30am-1.00pm. Call Irene on 087 1080650 for information. Film screening of Triumph of the Heart - taking place in St John&#x27;s Rest and Care Centre, Knock Shrine on Thursday 22nd October at 7pm. The film focuses on the life and final days of St Maximilian Kolbe. YOUNG MEN OF ST JOSEPH (YMOSJ) - is a new monthly youth group for secondary level students (13-17) who want to build real friendships, understand life, and find the courage to stand up for what matters. With St Joseph as our guide, we’ll explore what it means to live with strength, purpose and responsibility. All enquiries to: frmarkquinn@tuamparish.com For reflection – “Quality means doing it right when no one is looking ” - Henry Ford Ballindine - Parish of Kilvine - Irishtown Fr. Seán Flynn Kilvine &amp; Crossboyne 094 9364423 Email: kilvineparish@gmail.com www.kilvineparish.ie / www.ballindineschool.ie / www.irishtownns.scoilnet.ie Parish Office Hours: Tuesday, Wednesday, Thursday 9am to 1pm (emergencies anytime) Kilvine Parish Mission Statement Kilvine Parish is a Catholic Christian community rooted in Christ’s love, we lcoming all with compassion, dignity and respect. Guided by faith, we strive to foster inclusion, kindness and tolerance in keeping with the teachings of Jesus Christ. 10th October 2026 - 18th October 2026 +++++++++++++++++++++++++++++++++++++++++++++++++++++ Davitts GAA Presto result: Numbers drawn were: 7, 9, 26, 36. Jackpot not won. €50 winners were: Michael Sullivan, Olive Wallace, Jenny McGale, Niamh McMahon. Jackpot of €10,800 this weekend, draw will be held Bourke’s Bar on Sunday night. The Working Document for the Irish National Synodal Assembly - taking place in on 17 October, brings together the fruits of five years of prayer, listening and discernment and will guide delegates as they consider and vote on suggested actions to be presented to the bishops of Ireland. The Synodal Pathway is now moving towards a new phase of implementation. Everyone is invited to read, pray with, and reflect on the Working Document and the question: “What does God want from the Church in Ireland at this time?” Please pray for all those taking part in the Assembly and for the guidance of the Holy Spirit, and scan the QR code to access the Working Document, and see www.synod.ie Jesus compares God’s kingdom to a king inviting guests to a wedding feast, people must choose to accept the invitation. They must also be ready by living according to His ways. “For many are called, but few are chosen.” The Lord is my shepherd; there is nothing I shall not want. Fresh and green are the pastures where he gives me repose. Near restful waters he leads me; to revive my drooping spirit. – Psalm 23 Ballindine (Kilvine) https://www.mayo.ie/en-ie/parish-newsletters/kilvine-parish-newsletter</p>
+<hr>
+<p class="page-label">Page 11</p>
+<p>+ + Easter Day of the Lord’s Resurrection + Eucharistic Ministers Readers Servers Collectors Irishtown Sat 17th Oct 8pm G. McDermott /Ag. Clarke Breda Raftery Gp3 A. Clarke, H. Ronayne Ballindine Sun 18th Oct 10am P. Kirrane Conroy Orla Duggan Gp3 M. Clarke, M. Dooley Prayers of the Faithful Irishtown Sat 17th Oct: Emma &amp; Grace Ballindine Sun 18th Oct: Caoimhín &amp; Paul Marian House Sun 18th Oct: Margaret Corless</p>
+<hr>
+<p>Mass Intentions 10th October - 18th October 2026 Irishtown Sat 10th Oct 8pm Thomas, Mary, Margaret &amp; Luke Roche, Jimmy, Mary &amp; James Rattigan, Martin &amp; Patricia Gibbons &amp; deceased of Jord an &amp; Gibbon families, Edward &amp; Teresa McLoughlin, Delia &amp; Julia McLoughlin Ballindine Sun 11th Oct 10am Bill Gannon, Bernie Fallon Healy (5th Anniv) brother James Fallon &amp; parents Mary &amp; Jmmy, Fr. Des Fahey PP, Mary Fitzpatrick, Leface (2nd Anniversary), Thomas &amp; Bridget Canavan &amp; deceased of family. Ballindine Thurs 15th Oct 7pm Anne &amp; Tighe &amp; deceased family members. Irishtown Fri 16th Oct 10am People of the Parish. Irishtown Sat 17th Oct 8pm Paddy Somers (20th Anniversary), Deceased of the Mullarkey &amp; Lynch families, Deceased of the Tierney family, John &amp; Mary Ellen Ruane, Tom &amp; Mary Shaughnessy, Mary Devine (Anniv) &amp; Joe &amp; Delia Devine. Ballindine Sun 18th Oct 10am Patrick Paddy Cummins (Months mind), Mary Joyce (4th Anniversary) &amp; Jack &amp; Mary Joyce, Kathleen &amp; Johnny Flanagan &amp; daughter Martina , Matt &amp; Bridget Kenny, Martin Kenny &amp; deceased family members, Pake Lyons &amp; deceased of family, Pat, Jane &amp; Martin McManus, Michael Conway.</p>
+<h3 class="b-head">Anniversaries -</h3>
+<p>John Kirrane, Val O’ Connor, Tom Nyland, John Cullina, Nora Kilgannon, Michael Mawn, Pat Connell, Tom McHugh, Fr O’Malley, Tom Cunningham, Frank Hynes, William Dunne, Brigid Boyle. Twenty-Eighth Sunday in Ordinary Time Prisoners’ Sunday In life and in death they belong to the Lord - T HE FÉILEACÁIN WAVE OF LIGHT - takes place worldwide on Thursday October 15th at 7pm. You are invited to light up your house or business on that evening to remember all babies who have died during pregnancy or infancy. See Kilvine parish facebook page for details. Thank you.“One in Christ, united in mission ” - is the theme of World Mission Sunday 2026 which takes place on Sunday, October 18th. “Following the Jubilee Year, [2025] I wish to encourage the whole Church to continue its missionary journey with joy and zeal in the Holy Spirit. Mission belongs to the entire Church. Every baptized person is called to share God’s love through prayer, ge nerosity, and witness. Inspired by the dedication of missionaries, we continue working together so that the message of Christ may reach every community” (Pope Leo XIV). Missio Ireland envelopes are available in both churches if you wish to take one and return it on October 18th. Thank you. Priest’s Autumn Collection sincere thank you to all who contributed so generously to this collection, which is in support of the priests who serve your parish. Whisper of God Silent Day Retreat - takes place in the Prayer Centre at Knock Shrine on Saturday, October 17th from 10am to 5pm. See <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> for more details. Email <a href="mailto:prayerguidance@knockshrine.ie" target="_blank" rel="noopener noreferrer">prayerguidance@knockshrine.ie</a> The Waters of Baptism: Kilvine Parish Community welcomes Arlo Peter Jones and congratulates his parents Rosaleen &amp; Gearóid, Dublin . Be United in Mind and Purpose - An evening for parish councils with David Wells takes place in the Prayer Centre at Knock on Wednesday, October 14th from 7.30pm to 9.30pm. for details. See <a href="mailto:faithrenewal@knockshrine.ie" target="_blank" rel="noopener noreferrer">faithrenewal@knockshrine.ie</a> Catholic Marriage Encounter Weekend - St. Marys, Knock, Co. Mayo. Friday 9th to Sunday 11th April 2027. This residential Weekend starts at 7.30pm on Friday and finishes at 4.30pm on Sunday, and is open to all married couples. Online booking only at <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> Children’s Choir - will resume on Sunday 18th October at 10am Mass in Ballindine Church. Rehearsal this Monday 12th from 7-8pm. Prisoners’ Sunday - on Oct 11th is an opportunity to think about howwe, as individuals, as a Church, and as communities, serve our brothers and sisters affected by imprisonment.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-louisburgh-kilgeever" data-parish-name="Louisburgh (Kilgeever)"><h2 class="ocr-parish-name">Louisburgh (Kilgeever)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 12</p>
+<p>CASTLEBAR PARISH NEWS LETT ER Websi te: <a href="https://www.castlebarparish.ie" target="_blank" rel="noopener noreferrer">www.castlebarparish.ie</a> email: <a href="mailto:castlebarparish@gmail.com" target="_blank" rel="noopener noreferrer">castlebarparish@gmail.com</a></p>
+<h3 class="b-head">Sunday Mass</h3>
+<p>Times Parish Churc h: 6pm (Sat), 9am, 11am Ballyheane Churc h: 7.30pm (Sat.) Breaffy Churc h: 10am Priests: Fr. Conal Eustace PP, Fr. Shane Costello CC, Fr. George Kappen CC. Tel. <a href="tel:+353949021844" style="color:#1d4ed8;font-weight:600;">094 9021844</a> Diocesan Child Safeguarding: More information available at <a href="https://www.tuamarchdiocese.org" target="_blank" rel="noopener noreferrer">www.tuamarchdiocese.org</a> Anyone with issues or concerns around the safety of children should tel. <a href="tel:+353879315823" style="color:#1d4ed8;font-weight:600;">087 9315823</a> or <a href="tel:+353874070206" style="color:#1d4ed8;font-weight:600;">087 4070206</a>. PARISH CHURCH view online at churchtv.ie/castlebar Parish Radio 105. 3fm Monday 12th October: 10.00am - Ann Maughan, Ballina. 7.00pm - Craig Evans, Castlebar &amp; Chicago. Jimmy, Bridie &amp; Frank Foy, McHale Road. John Naughton &amp; Joan Walsh, Ballinacorriga. Tuesday 13th October: 10.00am - Dec. Kilcourse family, Rocklands. Wednesday 14th October: 10.00am - Michael Burke, London &amp; late of Boradruma. Thursday 15th October: 10.00am - Private Intention. Friday 16th October: 10.00am - Private Intention. Saturday 17th October: 10.00am - Brendan Munnelly, Rathbawn Drive. Tony &amp; Mary Monaghan, Ballymacragh. Michael McNeela, Riverdale Court &amp; Bohola. Johnny O’Grady, Riverdale Court. Thomas O’ Hora, Lakeshore Drive. Mary &amp; James Conway, Raheenbar &amp; dec. O’Malley family. Seán Tobin, Church View Villas. 6.00pm - Mary Jordan, Knockthomas. (1st Anv.) BALLYHEANE CHURCH view online at churchtv.ie/ballyheane Saturday 17th October: 7.30pm - Seán Cannon, Frenchill. Joe Geraghty, Pontoon Road. BREAFFY CHURCH view online at churchtv.ie/breaffy Sunday 18th October: 10.00am - Teresa Prendergast, Lightford. Tom &amp; Madeline Tuffy, Lightford. Katie Walsh, Kilkenny Cross. Mary &amp; Fintan Hayes, Fortfield.</p>
+<h3 class="b-head">Rest in Peace</h3>
+<p>Daniel Gerard Fitzgerald, Liscromwell. Michael Burke, London &amp; late of Boradruma. Castlebar (Aglish) <a href="http://www.castlebar.ie/parish" target="_blank" rel="noopener noreferrer">http://www.castlebar.ie/parish</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-newport-burrishoole" data-parish-name="Newport (Burrishoole)"><h2 class="ocr-parish-name">Newport (Burrishoole)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 13</p>
+<p>Twenty-Eighth Sunday in Ordinary Time The landowner had prepared for a large crowd. When he sent his servants out to personally remind the guests to come, some of the servants were mistreated, beaten and even killed by his prospe ctive guests! Quite naturally, the king was outraged. What does this Sunday’s Gospel say to us? I doubt that we have had the experience this story speaks of. However, we all have been disappointed and upset at various times in our lives. We may have been deeply hurt by someone or betrayed by another. Our natural human response is to be angry, hurt and disappointed – and rightly so. Hopefully, we haven’t decided to kill anyone because of that! In these situations, we need to take time to calm down and deal with the hurt, anger and disappointment. We need to acknowledge and feel the emotions. If we repress them, most likely the emotions will come back with a vengeance . But we can’t stop there. We also need to honestly acknowledge what we are experiencing but then with time to gradually ‘let these feelings go’ and forgive. Most often this is the last thing that we want to do! It will take time but it is an important step to take. If we nurse our anger and hurt, we are not hurting the individuals who disappointed us, but we are hurting ourselves and those we love! If we are not able to forgive, we simply need to ask God to help us. May we have the grace to ask God to heal the anger and hurt – and to free us! Intercom: Sr Kristine Anne Harpenau OSB ferdinandbenedictines.blogspot.com 125th Anniversary of the Dedication of the Church of the Holy Rosary We give thanks for our faith community over those years and may God guide and bless our parish into the future. October is World Mission Month World Mission Sunday is the Holy Father’s annual appeal for spiritual and fina ncial support so that the life-giving work of overseas mission and missionaries can continue. This year it will be celebrated over the weekend of Sunday 18th October. The theme for this year’s celebration of Mission Sunday is:“One in Christ, United in Mission ”. Please tel. Missio Ireland on 01 497 2035 or go to <a href="https://www.missio.ie" target="_blank" rel="noopener noreferrer">www.missio.ie</a> for further information. Parish Church Guided Holy Hour : Sunday from 7pm to 8pm. Holy Face Devotion: Tuesday at 3.30pm. Adoration: Monday 11am-12noon, Tuesday 7pm-8pm, Thursday, Friday 11am-8pm. Rosary, Divine Mercy Chaplet: Daily at 3pm. Confessions: Saturday 12pm – 1pm. Anointing Fire Catholic Ministry (AFCM) – Afternoon of Healing Sunday 18th October, 1.15pm to 4pm in the Church of the Holy Rosary. Service led by Roisin Doherty, Derry. Rosary, Praise and Worship, Talks, Eucharistic Adoration and One to One Praye r. Allare welcome. Rosary in the Parish Church As October is the month dedicated to the Holy Rosary, the children of the Junior Legion of Mary will be praying the Rosary in the Parish Church every Tuesday in October at 6.30pm. Allare welcome to come along and join them in prayer. Anam Cara Bereavement Information Evening - Thursday 15th October at 7pm The evening will centre around the fundamentals of parental grief and'what helps.' This online event is open to all parents whose child or children have died, regardless of thei rageand circumstances of their death, or time since bereavement. Register at: <a href="https://bit.ly/OctBIEWhisper" target="_blank" rel="noopener noreferrer">https://bit.ly/OctBIEWhisper</a> of God, Silent Day Retreat in the Prayer Centre, Knock Shrine Saturday, October 17th from 10am to 5pm. See <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> for more details or email <a href="mailto:prayerguidance@knockshrine.ie" target="_blank" rel="noopener noreferrer">prayerguidance@knockshrine.ie</a></p>
+<hr>
+<p class="page-label">Page 14</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-tuam-cathedral-parish" data-parish-name="Tuam (Cathedral Parish)"><h2 class="ocr-parish-name">Tuam (Cathedral Parish)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<p class="page-label">Page 15</p>
+<h3 class="b-head">Daily Mass</h3>
+<p>Please note that there will be no weekday Masses this week as Fr Tod will be attending the annual Priests Inservice which is being held in Mulranny. Senior Ladies County final Best of luck to joint captains Clodagh McManamon and Jenny Cawley and our Burrishoole Senior Ladies who play in the County Final this Sunday at 3pm in McHale Park. C’mon the parish! Climate Action Event Join Mulranny Community Futures on Weds Oct 14th in Mulranny Arts. Starting at 5pm with a Planet Champion Workshop before breaking for food at 6pm, followed by a Climate Cafe where we will explore what we can do together to make our community more prepared and resilient when the next storm comes. This is a FREE event but registration is essential. See Eventbrite at https://bit.ly/4hvIpy1 or Mulranny Community Futures Facebook Page. Peatland Restoration Event Learn about community led nature restoration happening in North Mayo, includes a visit to a rewetted bog. All welcome, particularly farmers and landowners managing designated land. Refreshments provided. Sat 17th Oct, 10.30am to 1.30pm, Bangor Erris Parish Hall. Free event, booking required, contact Amanda 089 4831224 . Be United in Mind and Purpose An evening for parish councils with David Wells takes place in the Prayer Centre at Knock Shrine on Wednesday, October 14th from 7.30pm to 9.30pm. See www.knockshrine.ie Day Retreat at Knock The Whisper of God Silent Day Retreat takes place in the Prayer Centre at Knock Shrine on Saturday, October 17th from 10am to 5pm. See www.knockshrine.ie for more details. Mulranny Bridge Lessons are about to start in Mulranny and there are a few places left. Anyone interested please phone 087 912 0166 for further details. Mulranny ICA At the next meeting Rachael Abbott will give a presentation on skin care for mature skin with a facial treatment demonstration . All are welcome to attend at 8pm on Tuesday, October 13 in the Amenity Centre, Mulranny. GAA Health Awareness Event As part of their Healthy Club initiative Burrishoole GAA is sponsoring a Breast Health Education &amp; Awareness event for Men and Women at 7pm in Hotel Newport on Tues, Oct 13. Presented by Breast Cancer Ireland this event is open to all Sunflower Children’s Hospice Bank of Ireland is inviting people to pop into their local branch on Fri, 16 Oct for a cup of tea, coffee and treats to support the Sunflower Children’s Hospice. To make a donation, visit sunflowerchildrenshospice.ie .<br>
+Weekday Masses (Fahy- Fri 7pm) No Daily Masses due to Priests’ Inservice Weekend Masses Saturday Oct 10th Tiernaur at 7pm Michael John Keane, Letterkenny and Rosturk Sunday Oct 11th Newport at 10am Valerie McNally (nee Collins), Months Mind. Oliver Murray, Skirdagh. Eileen Merritt, Oak Park. Mary and Paddy Clancy, Quay Rd. Keith Donnellan, Shramore. Lil Tobin and Mons. Michael Tobin, Newport, Dublin and Mountbellew. Michael Kearns, Quay Rd. and the deceased members of the Kearns, McLoughlin and Connolly families. Sunday Oct 11th Mulranny at 11.30am Rosie McCorry Williams, Mulranny. Maggie and Mick McLoughlin and Seanie McLoughlin. Saturday Oct 17th Tiernaur at 7pm Mary and Hughie Kilbane, Knockbreaga. John and Bridget McGuire, Newport Mill. Jack Moran, Newport and Roskeen, his wife Mary and daughter Christine. John Guilfoyle, Shanvalleyhue and deceased family members. Sunday Oct 18th Newport at 10am Teresa Hoban, Georges St. (1st Ann). Anne and Peadar Kilroy, Carrabawn and deceased members of the Kilroy and Cox families. Michael O Malley, Main St, and his brother Tommy, Cornanool. Francis and Hilda Chambers Fauleens. Tony and Annie Leneghan, Skirdagh Sunday Oct 18th Mulranny at 11.30am Nora and Michael Kilcoyne, Murrivagh, daughter Bridgie and Al Malfeo Chicago. James Gorman, Australia and parents Betty and Pat, Murrivagh</p>
+<hr>
+<p class="page-label">Page 16</p>
+<p>Church Collection 4th October 2026 Partry €359 Tourmakeady €765 . Thank you. Readers Partry: Sunday 18th October 10.00am Teresa Horan. Sunday 25th October 10.00 am Brendan Duignan. Readers Tourmakeady: Friday 16th October 7.30pm Jen- nifer Sheridan. Sunday 18th October 11.30am Tomás Ó hÉa- nacháin Eucharistic Ministers Partry: Sunday 18th October 10.00am Teresa Horan. Sunday 25th October 10.00am Deirdre Walsh Eucharistic Ministers Tourmakeady: . Friday 16th October 7.30pm Áine Uí Loideain Sunday 18th October 11.30am Ann Uí Éanacháin Church Care Team. Tourmakeady: Donal &amp; James. Church Care Team. Partry: week 24th October Ann Burke , Mary Staunton &amp; Eleanor Mannion Adora tion will be held in Partry Church on<br>
+Monday 5.30pm-9.00pm and on Fridays in Tourmakeady Church at 6.30pm-7.30pm with Mass. Defibrillator in Partry There is defibrillator at the back of the Community Centre. Events in Partry Community Centre Bingo every Monday at 20:30. Breast Canc er Awareness Month 2026 takes place Thur sday, Oct 1st, 2026 – Saturday, Oct 31st, 2026. For more information, please vis- it breastcancerresearch.ie or www.breastcanceri reland.com. Tourmakeady Wood Parkrun runs every Saturday meeting in the carpark of the Wood at 9.30am. ! Its open to walkers, joggers, runners, families and dogwalkers as long as the dog is on a short leash! Mayo Cance r Supp ort Assoc at Rock Rose House, will be holding their annu- al Church Gate Collec tion on the weekend of 10th &amp; 11th October, 2026 in your church area We would appreciate your continued sup- port for this local charity that tional support to people affected by cancer and their families. See www.mayocancersupport.ie for more. If any- one can volunteer to assist with the collections, please call Rose 083 489 0754 Medjugorje Weekend Retreat led by Fr Jason Lewis (Medjugorje Chaplain) in St John&#x27;s Day Care Centre, Knock Shrine, from<br>
+Friday 23 Oc- tober to Sunday 25th October, Booking is es- sential, for more info contact Nicola 087 9622800 . Open Evening – Coláiste Muire, Tourmakeady (F12 H766) Join us on Tuesday, 13th October, from 6:30pm –8:30pm to explore our school and meet members of our school community. Prospective students and their parents/ guardians are warmly welcome. Unable to at- tend?<br>
+Contact us at eolas@colaistemuire.eu to arrange an alternative appointment. Shrule &amp; District Vintage Club are h olding our harvest social in Cradd ock&#x27;s Bar in Shru le on October 24th. The social starts at 9:30pm , mu-sic is by Matt Keane . We will be doing the raf-fle just after 11pm , tickets for the tractor etc can still be bought up until Oct 22nd from www.shrulevintage.ie . Partry Women&#x27;s Circle will host another Felting evening on Thurs October 22nd 8pm with crafter Sue Stanley. Sue will supply all materials needed so just bring yourself and a smile . All ladies (over 18) welcome, not just Partry ladies. €8 entry (to cover tutor/materials/hall rent) and refreshments after. Mons Horan Community Centre Partry. Ceol agus Craic with m usic and song in the Sciobal, Ballintubber on Thursday Oct 15th, 8.3pm- 10.30pm Tom Lyons will provide adult mu-sic lessons in the Sciobol, Ballin- tubber on 15th Oct starting at 8pm. Tuar Mhic Éadaigh Community Christmas Tree Project: The Knitting Circle and Coiste an Halla are currently working on a special community project for Christmas this year. The group is busy crocheting colourful squares which will be used to decorate a Christmas tree that will be erected in the village during the festive sea-son. As the Christmas tree will be located out- doors and exposed to the elements, a strong and durable frame made from galvanised steel is required. The Knitting Circle would love to in- volve the whole community in this project and is asking for your support. If you would like to make a donation towards the Christmas lights for the tree or decorations around the tree, your generosity would be greatly appreciated. Donations can be left into the Halla or given to any member of the Knitting Group. community can make a contribution. Every donation, no matter how small, will help us create something col- ourful, festive and special for everyone to enjoy this Christmas. Launch of Plan: Launch of Biodiversity Plan and Information Evening on Home Energy Grants, Servicing of Heat Pumps and Beekeeping will take place in Halla Tuar Mhic Éadaigh on Thursday 15th October. This event starts 7.30pm and is free of charge. Refreshments served. Fur- ther information from 094-9544295 or las@tourmakeady.com . Imeachtaí/Weekly Events in Halla Tuar Mhic Éadaigh: Monday: Knitting Circle 7.30-9.30pm. Tuesday: Parent and Tod dler Group 10.30- 12.30pm. Yoga 6.30-7.30pm Wednesday: Concertina Classes with Ríona @4.15pm-7.45pm Thursday: Social Club every</p>
+<header class="ocr-parish-masthead" id="ocr-parish-partry-ballyovey" data-parish-name="Partry (Ballyovey)"><h2 class="ocr-parish-name">Partry (Ballyovey)</h2><p class="ocr-parish-date">17/10/2026</p></header>
+<hr>
+<p class="page-label">Page 17</p>
+<p>OUR LADY &amp; JARLATH , LAVALLY CATHEDRAL OF THE ASSUMPTION ST. PATRICK’S CHURCH , CORTOON SUNDAY , OCTOBER 11TH 2026 - TWENTY-EIGHT SUNDAY IN ORDINARY TIME “Tuam Parish is a Catholic Christian community inspired by the teachings of Jesus Christ. We want to celebrate God’s love for everyone through our words and actions.” Priests: Fr. Pat Farragher Adm., Fr. Mark Quinn Phone: 093-24250 Email: info@tuamparish.com Local Safeguarding Representative: Dáithí Quinn. NEWSLETTER DEADLINE -<br>
+Wednesday 3.00 p.m. Website: www.tuamparish.com Webcam : www.tuamparish.com/web-cam Weekend Masses Cathedral: Saturday (Vigil) 6.00 p.m. Sunday: 8.30 10.30 a.m. &amp; 12.30 p.m. Our Lady &amp; St. Jarlath, Lavally:<br>
+Saturday 8.00 p.m. St. Patrick’s Cortoon:<br>
+Sunday 11.00 a.m.<br>
+Weekday Masses Cathedral : Monday –Saturday: 10.00 a.m. Holydays: As announced. Confessions: Cathedral -<br>
+Saturday 12 noon –1.00 p.m. or by appointment. Baptisms: Cathedral – Sundays 11.15 a.m. Book at Parish Office – Minimum of two weeks’ notice . Baptisms: Cortoon – Sundays after 11.00 a.m. Mass. Lavally: Book at Parish Office.<br>
+Parish Office Opening Hours: Mon-Thurs 9 a.m. –5 p.m. (Lunch 1 p.m.-2<br>
+Friday 9 a.m. –1 p.m. Blessed Sacrament Chapel Opening Hours: Monday –Saturday 10.30 a.m. –6<br>
+Sunday 2 –6 p.m. Masses Commencing Monday October 12th, 2026 Monday 12th 10.00 a.m. Mel Whyatt, Wolverhampton, (1st Anniversary) Lizzie, Seamus, James, George, Patsy &amp; Thomas Mannion, St. Enda’s Avenue. John Ward, St. Joseph’s Park. Private Intention. Tuesday 13th 10.00 a.m. Michael &amp; Mary Mongans Enistymon. Edward Canney, The Square. Deceased of the Raftery family, Stripe &amp; Bermingham Road. Michael Monaghan, Barnaderg. Wednesday 14th 10.00 a.m. Ellie &amp; Edward McDonagh, Weir Road. Kate, Joseph, Michael, Helen, Geraldine &amp; Mark Gilmore, late of Tubberjarlath. Tom &amp; Kitty O’Rourke, Fairgreen. Gary McHugh, Athenry Road. Thursday 15th 10.00 a.m. Florence McKenna, Marino, Dublin &amp; St. Enda’s Avenue &amp; Padraig Butler, Finglas, Dublin. James Lee Barrett &amp; his parents Jimmy &amp; Mary &amp; Kathleen Ward, 13 Tirboy. Friday 16th 10.00 a.m. Martin McDonnell, Bishop Street. (1st Anniversary) Chrissie &amp; Paddy Feeney, Weir Road. Martin Coen, Dublin Road. Saturday 17th 10.00 a.m. Thomas Henderson, Tubberjarlath. (1st Anniversary) Evelyn O’Connor, Parkmore. Tom Burke, Kilcloghans &amp; deceased of the Burke &amp; Healy families. Eileen Cahill, Churchview. Jim &amp; Peggy Nestor, Bel Air Drive. Ann Holian, Tubberjarlath &amp; deceased of the Reynolds family, Bishop Street. Michael (Mick) &amp; Meta Kelly, Aughlora &amp; The Glebe &amp; their sons Jim &amp; Tom. +++++++++++++++++++++++++++++++++++ October Rosary – During the month of October, the Rosary will be recited each evening at 6.00 pm at the Grotto in Cloonthue. The intention each evening will be world peace. Organised by the Legion of Mary. Everyone is welcome. Cortoon Community Creche Annual General Meeting Monday October 12th at 8.00 p.m.<br>
+Daily Mass Readers 12th – 17th October Mon Msl: 1196 Noreen Doherty Tues Msl: 1198 Sr. Agnes Curley Wed Msl: 1200 Mary Neenan Thur. Msl: 1201 Marian Daniels Fri Msl: 1204 Jim Byrne Sat Msl: 1205 Kathleen Flaherty Sunday Mass Readers for 18th October Msl: 394 6.00pm Teresa Mills 8.30am John B. McLoughlin 10.30am Sr. Agnes Curley 12.30pm Claire Mannion Cathedral Collection - Sunday October 4th €4,305 YOUNG MEN OF ST JOSEPH - Faith. Courage. Brotherhood. - What kind of man do you want to become? YMOSJ is a new monthly youth group for secondary level students (13-17) who want to build real friendships, understand life, and find the courage to stand up for what matters. With St Joseph as our guide, we’ll explore what it means to live with strength, purpose and responsibility. Pizza and plenty of craic on the night. Come along. Bring a friend. Discover what you’re made for. Friday 16th Oct 8-9pm Tuam Parish centre . To register and to obtain parental consent forms, please contact. frmarkquinn@tuamparish.com Ministers Lavally 17th Cortoon 18th Oct Reader: Genny Melia Ann Moloney Eucharistic: Ita Ryan Mary Neenan &amp; Nally families, St. Enda’s Avenue &amp; Mayo Abbey. Gerry O’Brien, Rusheens. Edward &amp; Bridget Ward, 4St. Patrick’s Please Pray for Liam Mannion, Cappadavock, Lavally. Teresa Boyle, Curragh View, Dublin Road . Dermot Finnegan, Abbeytrinity. Josephine Sweeney , Limerick &amp; Tubberjaralth Road. Autumn Offerings for the Archbishop &amp; Priests Thank you to all who contributed to the autumn Collection for the Archbishop and priests of the parish. Anyone who has not returned your envelope may place it in the Offertory Collection. Thank you . World Mission Sunday - is the Holy Father’s annual appeal for spiritual and financial support so that the life-giving work of overseas mission and missionaries can continue. It always falls on the second last Sunday in October, meaning this year it will be celebrated over the weekend of Sunday 18th October. World Mission Sunday collections take place in every single parish where the Church is present. This includes not only Ireland and Europe, but also in poorer parishes in developing countries. It is a moment of universal solidarity when each member of the Church family, regardless of location or background, play their part in supporting each other. This is what makes it such a special celebration. The theme for this year’s celebration of Mission Sunday is:“One in Christ, United in Mission.” The offertory collection at all Masses next weekend will go to Misso Ireland , the Irish branch of the Pontifical Missionary Society. Be United in Mind and Purpose. An evening for parish councils with David Wells takes place in the Prayer Centre at Knock Shrine on Wednesday, October 14th from 7.30pm to 9.30pm. See www.knockshrine.ie for details. Email: faithrenewal@knockshrine.ie Presentation Sisters Mission Development Fund - raiser – Afternoon tea served with home made delights, Bake sale, Bric-A --Brac in Old Gardenfield in partnership with “Friends of Nano” – Sunday 18th October 2.00 – 4.00 p.m. All proceeds will go towards funding a small pre school. Cairde Nano Nagle Group - Meeting on Thursday October 15th at 8.00pm in the Presentation Convent. Cortoon &amp; Lavally Intentions . +++++++++++++++++++++++++++++++++++ Saturday, 10th October - 8.00 p.m. Lavally +++++++++++++++++++++++++++++++++++ Sunday, 11th October - 11.00 a.m. Cortoon Frank Heverin, Brockagh, Cortoon. (Months Mind) Margaret Healy, Drumbulcan, Cortoon. (Months Mind) Tom Forde &amp; deceased of the Forde family, Knockaloura. +++++++++++++++++++++++++++++++++++ Saturday, 17th October - 8.00 p.m. Lavally +++++++++++++++++++++++++++++++++++ Sunday, 18th October - 11.00 a.m. Cortoon Celia, Joe, Jack &amp; Margaret Cullinane, Knockaloura. Simon Lowry, Mahanagh &amp; deceased of the Lowry family. Ned &amp; Julia Donohue, Brockagh &amp; their sons Joe &amp; Donal &amp; daughter-in-law Helen &amp; deceased of the Donohue &amp; Fleming families.</p>
+<h3 class="b-head">Months Mind</h3>
+<p>Mass Satur day October 10th 6.0 0 p.m. Michael Roche, Tubberjar lath &amp; his wife Mary. High Cross College Tuam (H54 V260) Open Evening Thursday October 15th 2026 for 6th Class students, together with accompanying adults. Registration at 5.15 p.m. and 7.00 p.m. followed by Principal’s address and school tours. Carers support group - Western Alzheimer’s Carer Support Group takes place on Tuesday 11th October in the Ard Ri House Hotel Tuam 8.00pm until 9.00pm and the 2nd Tuesday of the month thereafter . Our support meetings help carers connect with each other and feel supported as they navigate the journey with a loved one’s Dementia Diagnosis. Walk-ins welcome. For further information please contact <a href="tel:+353949364900" style="color:#1d4ed8;font-weight:600;">094 9364900</a> Retreat for Men - Iron Sharpens Iron is a two-day retreat for men of all ages taking place on Saturday October 24th and Saturday November 21st near Abbeyknockmoy, Co. Galway. Through gripping lectures, workshops, prayer and discussions, this retreat seeks to enable Catholic men to become free and noble actors, leaders, protectors and builders of Irish society. For more detailed information and to register please visit <a href="https://www.theirishforge.com" target="_blank" rel="noopener noreferrer">www.theirishforge.com</a> The MS Ireland National Conference 2026 - is taking place on Saturday, 17 October at the Clayton Hotel Galway from 9 am to 4.45 p.m. Whether you are living with Multiple Sclerosis yourself, supporting a loved one or simply interested in learning more all are welcome and encouraged to attend. For more information call <a href="tel:+353872748092" style="color:#1d4ed8;font-weight:600;">087 2748092</a>. Cathedral Accounts 2025 – A copy of the Cathedral’s 2025 Income &amp; Expenditure Account is available to view on the noticeboard in the Cathedral porch. Copies may also be collected from the Parish Office. The new boxes of offertory envelopes are currently being distributed, and we are grateful to our distributors for their assistance. Any parishioner who wishes to register with the parish and receive a box of offertory envelopes may contact the Parish Office <a href="tel:+3539324250" style="color:#1d4ed8;font-weight:600;">093 24250</a>. Offertory contributions may also be made directly to the Cathedral account using 59BOFI90397187600921. Please include your envelope number or name with any online donation. We extend our thanks to the ushers who assist with the offertory collection in the Cathedral and to the counters who count the collection each week. Above all, we sincerely thank our parishioners for their generous support of the offertory collection each weekend. Tuam (Cathedral Parish) <a href="http://www.tuamparish.com" target="_blank" rel="noopener noreferrer">http://www.tuamparish.com</a></p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
