@@ -11,6 +11,7 @@ import html
 import re
 from typing import Iterable
 
+from ocr.reader_pass import parse_printed_label, split_reader_blocks
 from ocr.parish_splitter import (
     _cleaned_title,
     _line_matches_banner,
@@ -47,6 +48,7 @@ _HEADING_START = re.compile(
     r"|we\s+pray\s+for\s+(?:the\s+)?(?:dead|deceased|faithful\s+departed)"
     r"|please\s+pray\s+for(?:\s+the\s+(?:dead|deceased|faithful\s+departed))?"
     r"|in\s+memoriam"
+    r"|parish\s+child\s+safeguarding(?:\s+liaisons)?"
     r"|parish\s+notices?"
     r"|community\s+notices?"
     r"|this\s+week(?:'s)?\s+notices?"
@@ -158,11 +160,7 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
     if not match:
         return None, text
     head = match.group(0).strip()
-    rest_raw = text[match.end() :]
-    # "PARISH NOTICES: St Vincent … Tel 086" is a real section. The phone
-    # stays in the body. "Parish Office: 074…" is still a contact line.
-    labelled = rest_raw.lstrip().startswith(":")
-    rest = rest_raw.lstrip(" \t")
+    rest = text[match.end() :].lstrip(" \t")
     # Keep "Cuimhneacháin báis & bás le gairid" as one heading.
     paired = re.match(
         r"^(?:[&/|]\s*)+"
@@ -221,8 +219,6 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         return head, rest
     if re.search(r"\bwill\b|\bevery\b|\bplease\b", rest, re.I):
         return None, text
-    if re.search(r"\d", rest) and not labelled:
-        return None, text
     # ALL-CAPS parish banner after "Sunday Mass …" stays body, not a heading.
     letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", rest)
     if letters and letters.isupper() and len(rest) > 12:
@@ -245,24 +241,14 @@ _SHORT_EMBEDDED_TITLE = re.compile(
     r"notices?|parochial\s+house|please\s+pray\s+for|sunday\s+mass(?:es)?)$",
     re.IGNORECASE,
 )
-# Printed labels that already end with a colon. Split them out of a
-# smashed paragraph. Do not invent a label that is not in this list.
-_COLON_LABEL = re.compile(
-    r"\s+(?=(?:"
-    r"parish\s+office|web|e-?mail|facebook|instagram|telephone|webpage|"
-    r"mass\s+bookings|parish\s+newsletter|parish\s+notices|community\s+notices|"
-    r"sunday\s+collection|mass\s+times|recently\s+deceased|useful\s+numbers|"
-    r"month'?s?\s+mind"
-    r")\s*:)",
-    re.IGNORECASE,
-)
 _WEEKDAY_LINE = re.compile(
     r"\s+(?=(?:Mon(?:day)?|Tue(?:s(?:day)?)?|Wed(?:nesday)?|"
     r"Thu(?:rs(?:day)?)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s+\d{1,2}\b)",
     re.IGNORECASE,
 )
 # Fr. Gerard and 6.30pm stay. "church. The next" becomes two sentences.
-_SENTENCE_BREAK = re.compile(r"(?<=[a-z])[.!?][\"'’)]?\s+(?=[A-ZÁÉÍÓÚ])")
+# "church. The next" and "11am). Adoration" both start a new sentence.
+_SENTENCE_BREAK = re.compile(r"(?<=[a-z)\]])[.!?][\"'’)]?\s+(?=[A-ZÁÉÍÓÚ])")
 _ABBREV_END = re.compile(
     r"(?:fr|rev|st|dr|sr|mr|mrs|ms|no|tel|pp|co|vol|dept|am|pm)\.$",
     re.IGNORECASE,
@@ -291,22 +277,17 @@ def split_sentences(text: str) -> list[str]:
 
 
 def split_readable_chunks(plain: str) -> list[str]:
-    """Break one smashed paragraph at a real heading or a Mass day line.
+    """Break one smashed paragraph at a printed label, a heading, or a Mass day.
 
-    Does not invent a heading. Only splits where those words are already there.
-    A printed label that already ends with a colon, such as Parish Office:
-    or PARISH NOTICES:, is split out even when no full stop comes before it.
+    The same rules run for every parish. Nothing is invented.
     """
     text = (plain or "").strip()
     if not text:
         return []
-    labelled = [part.strip() for part in _COLON_LABEL.split(text) if part.strip()]
-    if len(labelled) > 1:
-        pieces: list[str] = []
-        for part in labelled:
-            pieces.extend(_split_long_piece(part))
-        return pieces or [text]
-    return _split_long_piece(text)
+    pieces: list[str] = []
+    for block in split_reader_blocks(text):
+        pieces.extend(_split_long_piece(block))
+    return pieces or [text]
 
 
 def _split_long_piece(text: str) -> list[str]:
@@ -497,6 +478,10 @@ def _heading_html(text: str) -> str:
     return f'<h3 class="b-head">{html.escape(text)}</h3>'
 
 
+def _subhead_html(text: str) -> str:
+    return f'<h4 class="b-sub">{html.escape(text)}</h4>'
+
+
 def _should_keep_existing_heading(inner: str) -> bool:
     """Keep short real section titles; demote OCR dumps and spaced banners."""
     from ocr.convert_bulletin import collapse_ocr_spacing
@@ -652,8 +637,16 @@ def structure_ocr_html(
                 out.append(_heading_html(head))
                 body.append(html.escape(rest))
                 continue
-            # Prefer cleaned plain text, but keep existing inline links/markup.
+            label = parse_printed_label(plain)
+            if label:
+                flush()
+                out.append(_subhead_html(label[0]))
+                if label[1]:
+                    body.append(html.escape(label[1]))
+                continue
+            # Each block is its own paragraph so the gap between them shows.
             # A phone link used to freeze the raw line, so the stray Ardara 2 stayed.
+            flush()
             if re.search(r"<(?:a|strong|em)\b", raw, re.I):
                 kept = re.sub(r"\b2\s+(?=ardara@)", "", raw.strip())
                 body.append(kept)
@@ -697,6 +690,14 @@ def structure_ocr_html(
                     add_masthead(parish_hit[1], parish_hit[0])
                 elif "ocr-parish-name" in (hm.group(2) or ""):
                     out.append(token)
+                elif hm.group(1) == "4":
+                    from ocr.convert_bulletin import collapse_ocr_spacing
+
+                    title = collapse_ocr_spacing(inner)
+                    if title and len(title) <= 60:
+                        out.append(_subhead_html(title))
+                    else:
+                        out.append(f"<p>{html.escape(title)}</p>")
                 elif classify_heading_line(inner) or _should_keep_existing_heading(inner):
                     # Re-emit as a clean b-head so spacing cleanup applies.
                     title = classify_heading_line(inner) or _plain(inner)

@@ -69,26 +69,40 @@ class BulletinLayoutTests(unittest.TestCase):
     def test_printed_colon_labels_leave_the_smashed_line(self) -> None:
         html_out = structure_ocr_html(
             "<p>28th Sunday in Ordinary Time Parish Office: 074-9548902 "
-            "Web: www.annagryparish.ie Email: pp.annagry@gmail.com</p>"
+            "Web: www.annagryparish.ie Email: pp.annagry@gmail.com "
+            "Facebook: @annagryparish Instagram: #annagry_parish "
+            "Annagry Parish Pastoral Council: Email: annagryppc@gmail.com "
+            "Charity No. CHY7373 Parish Child Safeguarding Liaisons "
+            "Dr Tony Delap 074-9532445 Mary Logue 087-4164426 "
+            "Brid Rodgers 087-6218327 Your Sunday gift to God and His Church "
+            "last week was €1,655 Mile buiochas Mass Bookings: Anyone wishing "
+            "to book a Mass or Christening, can do so by calling 074-9548902 "
+            "Parish Newsletter: Please submit parish related items for inclusion "
+            "in the newsletter before 6pm on Thursday to:</p>"
             "<p>A Thirty Third Sunday in Ordinary time PARISH NOTICES: "
             "St Vincent de Paul Local Branch Tel: 086 038 9322 "
             "SUNDAY COLLECTION: €3080. Thank you!</p>"
+            "<p>Sunday 11th October 11:00am Bill &amp; Mary Shiels Anniversary Mass</p>"
         )
-        self.assertIn("28th Sunday in Ordinary Time", html_out)
-        self.assertIn("Parish Office:", html_out)
+        self.assertNotIn("Ordinary Time Parish Office", html_out)
+        self.assertIn('class="b-sub">Parish Office</h4>', html_out)
+        self.assertIn('class="b-sub">Web</h4>', html_out)
+        self.assertIn('class="b-sub">Email</h4>', html_out)
         self.assertIn('href="tel:+353749548902"', html_out)
-        self.assertNotIn('b-head">Parish Office', html_out)
-        self.assertIn("Web:", html_out)
-        self.assertIn('href="https://www.annagryparish.ie"', html_out)
-        self.assertIn('href="mailto:pp.annagry@gmail.com"', html_out)
+        self.assertNotIn("6218327 Your Sunday", html_out)
+        self.assertIn("Mile buiochas", html_out)
+        self.assertIn('class="b-sub">Mass Bookings</h4>', html_out)
+        self.assertIn('class="b-sub">Parish Newsletter</h4>', html_out)
+        self.assertIn("074-9548902", html_out)
         self.assertIn('class="b-head">PARISH NOTICES</h3>', html_out)
-        self.assertIn("086 038 9322", html_out)
         self.assertIn('class="b-head">SUNDAY COLLECTION</h3>', html_out)
         self.assertIn("€3080", html_out)
-        self.assertIn("Thirty Third Sunday", html_out)
-        self.assertIsNone(
-            classify_heading_line("Parish Office : 028 9066 5409")
-        )
+        self.assertIn('href="tel:+353860389322"', html_out)
+        self.assertIn("Bill &amp; Mary Shiels Anniversary Mass", html_out)
+        self.assertNotIn('b-head">Anniversary', html_out)
+        self.assertIsNone(classify_heading_line("Parish Office : 028 9066 5409"))
+        again = structure_ocr_html(html_out)
+        self.assertIn('class="b-sub">Parish Office</h4>', again)
 
     def test_long_notice_becomes_sentences(self) -> None:
         plain = (
@@ -300,8 +314,9 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn("<details", result)
         self.assertIn("ocr-parish-masthead", result)
         self.assertIn("Ardara Parish", result)
-        self.assertIn("Mass times this week", result)
-        self.assertLess(result.index("Mass times this week"), result.index("Confessions"))
+        self.assertIn('class="b-head">Mass times</h3>', result)
+        self.assertIn("this week: Saturday 6pm, Sunday 11am.", result)
+        self.assertLess(result.index("Mass times"), result.index("Confessions"))
 
     def test_preserves_page_label_class(self) -> None:
         html_out = structure_ocr_html(
