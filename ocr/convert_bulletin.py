@@ -9,6 +9,7 @@ import sys
 
 from ocr.bulletin_layout import split_heading_prefix
 from ocr.sparse_page_ocr import choose_vision_page_indexes, merge_vision_into_pages
+from ocr.readable_pass import readable_pass
 from ocr.text_extract import (
     drop_photo_junk_tokens,
     extract_all_page_lines,
@@ -1100,6 +1101,7 @@ def collapse_ocr_spacing(text: str) -> str:
     cleaned = re.sub(r"\boutinto\b", "out into", cleaned)
     cleaned = re.sub(r"\b(\d{1,2})tl\b", r"\1th", cleaned)
     cleaned = re.sub(r"(\d)([ap]\.m\.?)", r"\1 \2", cleaned, flags=re.I)
+    cleaned = readable_pass(cleaned)
     cleaned = drop_photo_junk_tokens(cleaned)
     cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
     return _unpark_urls(cleaned, parked_urls)
