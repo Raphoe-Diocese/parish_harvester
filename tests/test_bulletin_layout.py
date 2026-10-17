@@ -100,6 +100,28 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn("eventbrite.ieTAKING", html_out)
         self.assertEqual(html_out.count('href="tel:+353749721026"'), 1)
 
+    def test_prayer_and_address_are_not_headings(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>May their souls and the souls of the</p>"
+            "<p>faithful departed rest in peace. The 6.00pm Mass is offered.</p>"
+            "<p>Anniversaries</p>"
+            "<p>Anniversaries</p>"
+            "<p>11:30am Gavin Hanna</p>"
+            "<p>Parochial House</p>"
+            "<p>, Upper Main St., Donegal Town Phone: "
+            '<a href="tel:+353749721026">074 97 21026</a></p>'
+            "<p>Anniversary</p>"
+            "<p>Eileen Scully, Woodpark.</p>"
+        )
+        self.assertNotIn('b-head">faithful departed', html_out)
+        self.assertIn("faithful departed rest in peace", html_out)
+        self.assertNotIn('b-head">Parochial House', html_out)
+        self.assertIn("Parochial House, Upper Main St.", html_out)
+        self.assertIn('href="tel:+353749721026"', html_out)
+        self.assertEqual(html_out.count('b-head">Anniversaries'), 1)
+        self.assertIn('b-head">Anniversary</h3>', html_out)
+        self.assertIn("Eileen Scully", html_out)
+
     def test_splits_recently_deceased_name_onto_body(self) -> None:
         head, rest = split_heading_prefix("Recently Deceased: Kathleen Martin, Fanad,")
         self.assertEqual(head, "Recently Deceased")
