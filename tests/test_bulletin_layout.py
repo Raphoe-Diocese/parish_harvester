@@ -115,6 +115,21 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn('class="b-sub">Parish Office</h4>', again)
         self.assertIn("28th Sunday in Ordinary Time", again)
 
+    def test_each_mass_day_is_its_own_line(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Date Time Intention Saturday 10th October 6:00pm Vigil Mass – "
+            "Priest's Intention Sunday 11th October 11:00am Bill &amp; Mary Shiels "
+            "Anniversary Mass Thursday 15th October 9:30am Priest's Intention "
+            "Friday 16th October 9:30am Priest's Intention</p>"
+        )
+        self.assertIn('class="b-sub">Date Time Intention</h4>', html_out)
+        self.assertIn("<p>Saturday 10th October 6:00pm Vigil Mass", html_out)
+        self.assertIn("Bill &amp; Mary Shiels Anniversary Mass</p>", html_out)
+        self.assertNotIn("Intention Sunday", html_out)
+        self.assertNotIn('b-head">Anniversary', html_out)
+        self.assertIn("<p>Thursday 15th October 9:30am", html_out)
+        self.assertIn("<p>Friday 16th October 9:30am", html_out)
+
     def test_long_notice_becomes_sentences(self) -> None:
         plain = (
             "The rosary will be recited from Monday to Friday at the grotto. "
