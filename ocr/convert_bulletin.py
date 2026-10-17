@@ -207,6 +207,11 @@ OCR_PROMPT = (
 MARKDOWN_FENCE_PATTERN = re.compile(r"^\s*```(?:[A-Za-z0-9_-]+)?\s*$")
 EMAIL_PATTERN = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 URL_PATTERN = re.compile(r"(?<!@)\b(?:https?://|www\.)[^\s<>\"]+", re.IGNORECASE)
+# eventbrite.ieTAKINGACTION — the address is stuck to the next word.
+_TLD_GLUE = re.compile(
+    r"((?:https?://|www\.)[^\s<>\"']*?\.(?:ie|com|org|net|tv|uk))(?=[A-Z])",
+    re.IGNORECASE,
+)
 DIGITS_ONLY_PATTERN = re.compile(r"\D")
 # Irish + NI/UK phone formats commonly seen on parish bulletins.
 PHONE_PATTERN = re.compile(
@@ -1152,6 +1157,9 @@ def clean_ocr_line(text: str) -> str:
 
 def linkify(text):
     """Convert escaped text emails, URLs, and phone numbers into HTML links."""
+    if not text:
+        return text or ""
+    text = _TLD_GLUE.sub(r"\1 ", text)
     placeholders = []
 
     def stash(replacement):
@@ -1211,6 +1219,40 @@ def linkify(text):
     for i, replacement in enumerate(placeholders):
         linked = linked.replace(f"__LINKIFY_{i}__", replacement)
     return linked
+
+
+_ANCHOR_RE = re.compile(r"(<a\b[^>]*>.*?</a>)", re.IGNORECASE | re.DOTALL)
+_HTML_TAG_RE = re.compile(r"(<[^>]+>)")
+_SKIP_BLOCK_RE = re.compile(
+    r"(<(?:script|style)\b[^>]*>.*?</(?:script|style)>)",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def linkify_html(fragment: str) -> str:
+    """Link emails and web addresses in text. Leave a link that is already there."""
+    if not fragment:
+        return fragment or ""
+
+    def link_outside_anchors(chunk: str) -> str:
+        pieces = _ANCHOR_RE.split(chunk)
+        out: list[str] = []
+        for piece in pieces:
+            if piece.lower().startswith("<a"):
+                out.append(piece)
+                continue
+            for bit in _HTML_TAG_RE.split(piece):
+                if bit.startswith("<"):
+                    out.append(bit)
+                else:
+                    out.append(linkify(bit))
+        return "".join(out)
+
+    blocks = _SKIP_BLOCK_RE.split(fragment)
+    return "".join(
+        block if block.lower().startswith(("<script", "<style")) else link_outside_anchors(block)
+        for block in blocks
+    )
 
 
 def _escape_html(value):

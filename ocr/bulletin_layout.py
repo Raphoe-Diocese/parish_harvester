@@ -658,8 +658,12 @@ def structure_ocr_html(
         gap = source[pos:].strip()
         if gap:
             out.append(gap)
-    return "\n".join(
-        part for part in _drop_empty_directory_mastheads(_stick_comma_after_heading(out)) if part
+    from ocr.convert_bulletin import linkify_html
+
+    return linkify_html(
+        "\n".join(
+            part for part in _drop_empty_directory_mastheads(_stick_comma_after_heading(out)) if part
+        )
     )
 
 
