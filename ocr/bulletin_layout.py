@@ -243,6 +243,33 @@ _WEEKDAY_LINE = re.compile(
     r"Thu(?:rs(?:day)?)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)\s+\d{1,2}\b)",
     re.IGNORECASE,
 )
+# Fr. Gerard and 6.30pm stay. "church. The next" becomes two sentences.
+_SENTENCE_BREAK = re.compile(r"(?<=[a-z])[.!?][\"'’)]?\s+(?=[A-ZÁÉÍÓÚ])")
+_ABBREV_END = re.compile(
+    r"(?:fr|rev|st|dr|sr|mr|mrs|ms|no|tel|pp|co|vol|dept|am|pm)\.$",
+    re.IGNORECASE,
+)
+
+
+def split_sentences(text: str) -> list[str]:
+    """Break a long notice into sentences. Do not invent words or headings."""
+    if len(text) < 160:
+        return [text] if text else []
+    parts: list[str] = []
+    start = 0
+    for match in _SENTENCE_BREAK.finditer(text):
+        word = text[max(0, match.start() - 8) : match.start() + 1]
+        if _ABBREV_END.search(word.strip()) or re.search(r"[ir]\.n\.$", word, re.I):
+            continue
+        sentence = text[start : match.start() + 1].strip()
+        if len(sentence) < 40:
+            continue
+        parts.append(sentence)
+        start = match.end()
+    rest = text[start:].strip()
+    if rest:
+        parts.append(rest)
+    return parts or [text]
 
 
 def split_readable_chunks(plain: str) -> list[str]:
@@ -280,7 +307,10 @@ def split_readable_chunks(plain: str) -> list[str]:
             continue
         if len(chunk) > 90:
             bits = [bit.strip() for bit in _WEEKDAY_LINE.split(chunk) if bit.strip()]
-            pieces.extend(bits or [chunk])
+            sentences: list[str] = []
+            for bit in bits or [chunk]:
+                sentences.extend(split_sentences(bit))
+            pieces.extend(sentences or [chunk])
         else:
             pieces.append(chunk)
     return pieces or [text]
