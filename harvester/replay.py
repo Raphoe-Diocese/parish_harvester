@@ -4125,22 +4125,14 @@ async def _open_selected_drive_row(page: Page, timeout_ms: int) -> None:
     anywhere and no download fires. Pressing Enter/double-clicking to "open"
     the file inside Drive's own viewer is slow and flaky to automate, but
     the row's ``<tr data-id="...">`` attribute already exposes the file's
-    Drive ID directly in the DOM — construct the direct-download URL from it
-    and navigate straight there. That either fires a native browser
-    "download" event (picked up by the following ``download`` step's
-    ``downloads.pop(0)``) or gets abandoned as ERR_ABORTED once Chromium
-    hands the response to its download manager, which is expected and
-    ignored (see Bruckless: previously the click step "succeeded" but the
-    following download step had nothing to find, "did not find a matching
-    document URL").
+    Drive ID. Do not open that download link in the browser: Chromium
+    aborts it with net::ERR_ABORTED. The year-folder HTTP download is the
+    path that saves the PDF.
     """
     file_id = await _selected_drive_row_id(page)
     if file_id:
-        download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-        try:
-            await page.goto(download_url, timeout=min(timeout_ms, 30_000))
-        except Exception:
-            pass
+        # Do not page.goto the Drive download link. Chromium aborts it
+        # (net::ERR_ABORTED) and that error fails the parish.
         return
     try:
         await page.keyboard.press("Enter")
@@ -4166,11 +4158,8 @@ async def _click_newest_cloud_pdf_row(page: Page, timeout_ms: int) -> bool:
             if file_id:
                 break
     if file_id:
-        download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
-        try:
-            await page.goto(download_url, timeout=min(timeout_ms, 30_000))
-        except Exception:
-            pass
+        # Do not page.goto the Drive download link. Chromium aborts it
+        # (net::ERR_ABORTED) and that error fails the parish.
         return True
     try:
         escaped = label.replace("'", "\\'")
@@ -4353,6 +4342,10 @@ async def replay_recipe(
         found = await _try_drive_year_folder_pdf(start_url, dest, target_date)
         if found:
             return dest, found[1], found[0]
+        raise RecipeReplayError(
+            "Google Drive year folder did not return a PDF. "
+            "The download link is not opened in the browser."
+        )
 
     # MCN.live camera pages expose the weekly newsletter via JSON, not the
     # webcam. HTTP-first so Send & test does not need Playwright for Glenfin.

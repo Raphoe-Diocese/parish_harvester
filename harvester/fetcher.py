@@ -529,6 +529,14 @@ def _rewrite_gdrive_url(url: str) -> str:
     return normalize_document_url(url)
 
 
+def _is_direct_drive_download_url(url: str) -> bool:
+    """True for a Drive file download. Opening it in the browser aborts."""
+    lower = unquote((url or "").strip()).lower()
+    if "drive.usercontent.google.com/download" in lower:
+        return True
+    return "drive.google.com/uc" in lower and "export=download" in lower
+
+
 def _is_pdf_content(data: bytes) -> bool:
     """Return True if *data* starts with the PDF magic bytes ``%PDF``."""
     return data[:4] == b"%PDF"
@@ -1347,6 +1355,14 @@ async def _scrape_and_download(
     allow_html_render: bool = True,
 ) -> FetchResult:
     """Scrape a page for bulletin document links and download the best match."""
+    if _is_direct_drive_download_url(scrape_url):
+        return FetchResult(
+            key=entry.key,
+            display_name=entry.display_name,
+            status="error",
+            url=scrape_url,
+            error="Drive download links are not opened in the browser",
+        )
     context = await new_harvester_context(browser)
     page = await context.new_page()
     key = entry.key
@@ -2075,6 +2091,16 @@ async def _recover_stale_bulletin(
         f"  ⚠️  {entry.key}: stale bulletin ({verdict.extracted_date}) "
         f"— retry via {strategy}"
     )
+
+    # The Drive link is already the PDF. A browser open aborts with
+    # net::ERR_ABORTED and the harvest reports a recipe failure. Bruckless
+    # on 15/10/2026 saved 26.10.04.pdf, then this retry threw that error.
+    if _is_direct_drive_download_url(result.url or ""):
+        print(
+            f"  ↩️  {entry.key}: Drive file already saved — "
+            "not opening the download link in the browser"
+        )
+        return mark_result_stale(result, verdict, entry=entry)
 
     host_profile = host_profile or {}
     navigation_timeout_ms = int(
