@@ -206,8 +206,53 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         )
         self.assertNotIn("scedi", dun)
         self.assertNotIn("yii", dun)
+        self.assertNotIn("aon", dun)
         self.assertIn("There are two sides", dun)
         self.assertIn("Candle of Remembrance", dun)
+        self.assertIn("aon", collapse_ocr_spacing("Beidh aon Aifreann ann"))
+        opening = collapse_ocr_spacing(
+            'SE a aon i. , " m There are two sides The Candle of Remembrance '
+            'I I to every story. for the coming week will be a ! Sy)"IN lit '
+            "in loving memory of i SEFr. Martin Doohan 074-91-36163 "
+            '28" Sunday 11" October'
+        )
+        self.assertTrue(opening.startswith("There are two sides"))
+        self.assertIn("Remembrance to every story", opening)
+        self.assertIn("lit in loving memory", opening)
+        self.assertIn("Fr. Martin Doohan", opening)
+        self.assertIn("074-91-36163", opening)
+        self.assertIn("28th Sunday", opening)
+        self.assertIn("11th October", opening)
+        self.assertNotIn("SEFr", opening)
+        self.assertNotIn("Sy)", opening)
+        cloyne = collapse_ocr_spacing(
+            "DARKNE To t Next CLOYNE 085 7102945 Wednesday 1.00m. - 4.00pm"
+        )
+        self.assertNotIn("DARKNE", cloyne)
+        self.assertIn("CLOYNE", cloyne)
+        self.assertIn("085 7102945", cloyne)
+        self.assertIn("1.00pm", cloyne)
+        ardara_two = collapse_ocr_spacing("2 ardara@raphoediocese 087-4758009")
+        self.assertFalse(ardara_two.startswith("2 "))
+        self.assertIn("ardara@raphoediocese", ardara_two)
+        self.assertIn("087-4758009", ardara_two)
+        self.assertIn("2", collapse_ocr_spacing("2 parishes meet today"))
+        dromore = collapse_ocr_spacing(
+            "AAAAs parishioners we offer ours parishioners we offer our recentlyrecently"
+        )
+        self.assertNotIn("AAAAs", dromore)
+        self.assertEqual(dromore.count("parishioners"), 1)
+        self.assertIn("recently", dromore)
+        self.assertNotIn("recentlyrecently", dromore)
+        gloria = collapse_ocr_spacing(
+            "forgiveness, 0 God of Israel. seated al the right hand. "
+            "Glory te Ged in the highest"
+        )
+        self.assertIn("O God of Israel", gloria)
+        self.assertIn("seated at the right", gloria)
+        self.assertIn("Glory to God in the highest", gloria)
+        self.assertIn("O'Brien", collapse_ocr_spacing("Fr. O'Brien and Mary's parish"))
+        self.assertIn("Mary's", collapse_ocr_spacing("Fr. O'Brien and Mary's parish"))
         self.assertIn(
             "Prisoner's Sunday",
             collapse_ocr_spacing("Sires Prisoner's Sunday St. Patrick's Church"),
