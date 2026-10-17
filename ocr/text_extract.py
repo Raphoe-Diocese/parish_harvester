@@ -239,6 +239,8 @@ _BAD_BIGRAM = re.compile(
     r"(?<!n)gd|gk|gq|gx|jx|qx|vx|zx|bq|cx|fq|hx|kx|pq|qj|qk|qy|qz|xj",
     re.I,
 )
+# ala, ece: a scrap shaped like a vowel, a consonant, the same vowel.
+_ABA_SCRAP = re.compile(r"^[aeiou][bcdfghjklmnpqrstvwxyz][aeiou]$", re.I)
 
 
 def _junk_kind(token: str) -> str:
@@ -269,6 +271,8 @@ def _junk_kind(token: str) -> str:
     if not re.search(r"[bcdfghjklmnpqrstvwxyz]", low):
         return "hard"
     if _BAD_BIGRAM.search(low):
+        return "hard"
+    if _ABA_SCRAP.fullmatch(low):
         return "hard"
     if len(letters) <= 2:
         return "hard"
@@ -321,6 +325,7 @@ def drop_photo_junk_tokens(text: str) -> str:
             k for k in hard
             if re.search(r"[{}|\\^<>]", tokens[k])
             or _BAD_BIGRAM.search(_letters_of(tokens[k]))
+            or _ABA_SCRAP.fullmatch(_letters_of(tokens[k]) or "")
             or (
                 _letters_of(tokens[k])
                 and not re.search(
@@ -338,8 +343,17 @@ def drop_photo_junk_tokens(text: str) -> str:
                 drop[k] = True
         else:
             for k in strong:
+                # A lone "eve" is a word. "ala" beside racy is a photo scrap.
+                if _ABA_SCRAP.fullmatch(_letters_of(tokens[k]) or ""):
+                    continue
                 drop[k] = True
         i = j
+    for k, gone in enumerate(drop):
+        if not gone or k == 0 or drop[k - 1]:
+            continue
+        letters = _letters_of(tokens[k - 1])
+        if letters.isupper() and 3 <= len(letters) <= 6:
+            drop[k - 1] = True
     if not any(drop):
         return text
     return " ".join(tok for tok, gone in zip(tokens, drop) if not gone)

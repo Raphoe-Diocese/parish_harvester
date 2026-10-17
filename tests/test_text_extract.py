@@ -177,6 +177,17 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertNotIn("jeboi", ardara)
         self.assertNotIn("eae", ardara)
         self.assertIn("In the", collapse_ocr_spacing("ZInthe Lord's own house"))
+        kilbarron = collapse_ocr_spacing(
+            "TIME ala, racy' Sires Prisoner's Sunday 11.10.2026 "
+            "St. Patrick's Church Ballyshannon Saturday 10th"
+        )
+        self.assertNotIn("TIME ala", kilbarron)
+        self.assertNotIn("racy", kilbarron)
+        self.assertIn("Prisoner's Sunday", kilbarron)
+        self.assertIn("Patrick's Church Ballyshannon", kilbarron)
+        self.assertIn("says", collapse_ocr_spacing(
+            "The manager comes over and says, I am sorry, gents"
+        ))
         self.assertIn("out into", collapse_ocr_spacing("walked outinto the dark"))
         self.assertIn("11th", collapse_ocr_spacing("Week beginning: 11tl Weekend"))
         self.assertEqual(
