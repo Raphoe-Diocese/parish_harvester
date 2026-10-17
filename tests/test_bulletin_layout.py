@@ -66,6 +66,22 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertTrue(any(chunk.lower().startswith("anniversaries") for chunk in chunks))
         self.assertTrue(any(chunk.lower().startswith("please read") for chunk in chunks))
 
+    def test_long_notice_becomes_sentences(self) -> None:
+        plain = (
+            "The rosary will be recited from Monday to Friday at the grotto. "
+            "Everyone is welcome to come along and pray. "
+            "Fr. Gerard will visit the sick and housebound on Tuesday. "
+            "The Sunday collection was €1,370. Thank you for your support."
+        )
+        chunks = split_readable_chunks(plain)
+        self.assertGreaterEqual(len(chunks), 3)
+        self.assertTrue(any(chunk.startswith("The rosary") for chunk in chunks))
+        self.assertTrue(any("Fr. Gerard will visit" in chunk for chunk in chunks))
+        self.assertFalse(any(chunk.strip() == "Gerard will visit the sick and housebound on Tuesday." for chunk in chunks))
+        joined = " ".join(chunks)
+        self.assertIn("€1,370", joined)
+        self.assertIn("Thank you", joined)
+
     def test_keeps_irish_prayer_intact(self) -> None:
         html_out = structure_ocr_html(
             "<p>Ar dheis Dé go raibh a anam dílis.</p>",
