@@ -328,11 +328,53 @@ class MemoryTests(unittest.TestCase):
         self.assertEqual(DIOCESE_ORDER[-1], "waterford_and_lismore")
         self.assertEqual(next_diocese([]), "achonry")
         self.assertEqual(next_diocese(["achonry"]), "ardagh")
-        self.assertEqual(len(LEARNED), 27)
+        self.assertEqual(len(LEARNED), 28)
         drive = next(item for item in LEARNED if item["id"] == "cloud_folder_newest")
         self.assertIn("2027", drive["how"])
         self.assertIn("1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK", drive["how"])
         self.assertNotIn("start_url", drive["how"])
+
+    def test_this_sunday_upload_names_are_guessed(self) -> None:
+        sunday = date(2026, 10, 18)
+        shapes = filename_shapes(sunday)
+        self.assertIn(
+            "Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf",
+            shapes,
+        )
+        self.assertIn("2026-10-18-Newsletter.pdf", shapes)
+        self.assertIn("Sunday-October-18th-1-scaled.jpg", shapes)
+        found = invent_candidates("", "https://cloyneparish.com/", sunday)
+        from harvester.newsletter_brain import weekend_files
+
+        ordered = [item.url for item in weekend_files(found, sunday)]
+        self.assertIn("wp-content/uploads", ordered[0])
+        self.assertTrue(
+            any("Newsletter-18th-October-2026" in url for url in ordered[:4])
+        )
+        self.assertTrue(any(url.endswith("2026-10-18-Newsletter.pdf") for url in ordered[:4]))
+        self.assertEqual(
+            check_bulletin_freshness(
+                "Sunday-October-18th-1-scaled.jpg", sunday
+            ).extracted_date,
+            sunday,
+        )
+        from harvester.utils import naomhfionan_bulletin_urls, sunday_month_day_image_urls
+
+        falcarragh = naomhfionan_bulletin_urls(sunday)
+        self.assertIn(
+            "https://naomhfionan.com/wp-content/uploads/2026/10/"
+            "Parish-Newsletter-42-Sun-A-18102026.pdf",
+            falcarragh,
+        )
+        pages = sunday_month_day_image_urls(
+            "https://wexfordparish.com/wp-content/uploads/2026/10/"
+            "Sunday-October-4th-1-scaled.jpg",
+            sunday,
+            count=4,
+        )
+        self.assertEqual(len(pages), 4)
+        self.assertTrue(pages[0].endswith("Sunday-October-18th-1-scaled.jpg"))
+        self.assertTrue(pages[3].endswith("Sunday-October-18th-4-scaled.jpg"))
 
     def test_crumlin_homepage_points_at_the_newsletter_page(self) -> None:
         html = (
