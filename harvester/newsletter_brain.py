@@ -108,7 +108,7 @@ LEARNED = (
     {
         "id": "cloud_folder_newest",
         "label": "Google Drive or OneDrive folder",
-        "how": "Open the parent folder, then the year folder. Take the newest YY.MM.DD.pdf that is not after this Sunday. Bruckless 26.10.18.pdf is 18/10/2026. The Drive file id has no date, so keep the name date. An older date inside the PDF must not replace it. Do not pin a year folder or a /file/d/ link.",
+        "how": "Bruckless starts on the parent folder 1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK, then opens the folder named for the harvest year. In 2027 that year folder is new. Do not save the 2026 folder id 1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC. Take the newest YY.MM.DD.pdf that is not after this Sunday. 26.10.18.pdf is 18/10/2026. The Drive file id has no date, so keep the name date. An older date inside the PDF must not replace it. Do not pin a /file/d/ link.",
     },
     {
         "id": "google_drive_static",

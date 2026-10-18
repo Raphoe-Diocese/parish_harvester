@@ -329,6 +329,10 @@ class MemoryTests(unittest.TestCase):
         self.assertEqual(next_diocese([]), "achonry")
         self.assertEqual(next_diocese(["achonry"]), "ardagh")
         self.assertEqual(len(LEARNED), 26)
+        drive = next(item for item in LEARNED if item["id"] == "cloud_folder_newest")
+        self.assertIn("2027", drive["how"])
+        self.assertIn("1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK", drive["how"])
+        self.assertNotIn("start_url", drive["how"])
 
     def test_crumlin_homepage_points_at_the_newsletter_page(self) -> None:
         html = (
