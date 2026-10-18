@@ -242,6 +242,31 @@ class DriveEmbeddedFolderTests(unittest.TestCase):
         picked = newest_drive_pdf_on_or_before(entries, date(2026, 10, 11))
         self.assertEqual(picked, (date(2026, 10, 11), "NEWFILE"))
 
+    def test_bruckless_row_date_survives_the_file_id_link(self) -> None:
+        from harvester.bulletin_freshness import (
+            check_bulletin_freshness,
+            issue_date_verdict,
+            verdict_for_extracted_date,
+        )
+        from harvester.replay import (
+            _remember_page_issue_date,
+            _with_remembered_issue_date,
+        )
+
+        page = object()
+        _remember_page_issue_date(page, date(2026, 10, 18))
+        bare = (
+            "https://drive.usercontent.google.com/download"
+            "?id=159sVW5D-sRUFzE24HDCVR1Vykf245M44&export=download"
+        )
+        stamped = _with_remembered_issue_date(page, bare)
+        kept = issue_date_verdict(
+            check_bulletin_freshness(stamped, date(2026, 10, 18)),
+            verdict_for_extracted_date(date(2026, 9, 13), date(2026, 10, 18)),
+        )
+        self.assertEqual(kept.status, "fresh")
+        self.assertEqual(kept.extracted_date, date(2026, 10, 18))
+
     def test_bruckless_18_october_name_is_this_sunday(self) -> None:
         from harvester.bulletin_freshness import check_bulletin_freshness
         from harvester.utils import url_with_stated_issue_date

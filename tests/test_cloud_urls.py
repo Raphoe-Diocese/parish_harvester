@@ -98,6 +98,16 @@ class CloudUrlTests(unittest.TestCase):
         self.assertIn("id=ABC123xyz", out)
         self.assertIn("resourcekey=0-someKey", out)
 
+    def test_gdrive_rewrite_keeps_bruckless_name_date(self) -> None:
+        url = (
+            "https://drive.google.com/uc?export=download"
+            "&id=159sVW5D-sRUFzE24HDCVR1Vykf245M44"
+            "&bulletin_date=2026-10-18"
+        )
+        out = rewrite_gdrive_download_url(url)
+        self.assertIn("id=159sVW5D-sRUFzE24HDCVR1Vykf245M44", out)
+        self.assertIn("bulletin_date=2026-10-18", out)
+
     def test_gdrive_workspace_style_file_url_id_extracted(self) -> None:
         url = "https://drive.google.com/a/parish.org/file/d/WORKSPACE_ID/view"
         out = rewrite_gdrive_download_url(url)
