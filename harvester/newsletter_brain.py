@@ -108,7 +108,7 @@ LEARNED = (
     {
         "id": "cloud_folder_newest",
         "label": "Google Drive or OneDrive folder",
-        "how": "Open the parent folder and take the newest YY.MM.DD file. Do not pin a year folder.",
+        "how": "Open the parent folder, then the year folder. Take the newest YY.MM.DD.pdf that is not after this Sunday. Bruckless 26.10.18.pdf is 18/10/2026. The Drive file id has no date, so keep the name date. An older date inside the PDF must not replace it. Do not pin a year folder or a /file/d/ link.",
     },
     {
         "id": "google_drive_static",

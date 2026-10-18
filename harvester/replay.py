@@ -1392,14 +1392,17 @@ async def _try_drive_year_folder_pdf(
     )
     if not picked:
         return None
-    _found, file_id = picked
-    download_url = (
+    found_date, file_id = picked
+    # The file id has no date. Bruckless names the Sunday in the row
+    # (26.10.18.pdf). An older line inside the PDF must not replace it.
+    download_url = url_with_stated_issue_date(
         "https://drive.usercontent.google.com/download"
-        f"?id={file_id}&export=download"
+        f"?id={file_id}&export=download",
+        found_date,
     )
     saved = await _try_http_document_url(download_url, dest)
     if saved:
-        return saved
+        return url_with_stated_issue_date(saved[0], found_date), saved[1]
     hit = await asyncio.to_thread(
         _fetch_bytes_with_retries,
         download_url,
@@ -1416,7 +1419,10 @@ async def _try_drive_year_folder_pdf(
     confirmed = gdrive_download_url_with_confirm(
         download_url, confirm, gdrive_confirm_uuid(html)
     )
-    return await _try_http_document_url(confirmed, dest)
+    saved = await _try_http_document_url(confirmed, dest)
+    if not saved:
+        return None
+    return url_with_stated_issue_date(saved[0], found_date), saved[1]
 
 
 def _churchmedia_fetch_newsletter_url(listing_url: str, slug: str = "") -> str | None:
