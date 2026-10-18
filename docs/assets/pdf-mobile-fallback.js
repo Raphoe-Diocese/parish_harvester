@@ -5,7 +5,7 @@
 (function () {
   if (window.__parishPressPdfInpage) return;
   var s = document.createElement("script");
-  s.src = "/assets/pdf-inpage-viewer.js?v=20260912a";
+  s.src = "/assets/pdf-inpage-viewer.js?v=20261018a";
   s.defer = true;
   document.head.appendChild(s);
 })();
