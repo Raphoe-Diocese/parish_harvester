@@ -58,7 +58,7 @@ LEARNED = (
     {
         "id": "http_scrape_newest_pdf",
         "label": "Dated PDF link on the listing page",
-        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Do not keep a guessed Twenty-Sixth file.",
+        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Milford and Rathmullan list Parish-Newsletter-Sunday-18th-October.pdf on https://milfordrathmullanparishes.ie/bulletins/. That name is 18/10/2026. A later notice date inside the file does not replace it. Do not keep a guessed Twenty-Sixth file.",
     },
     {
         "id": "wp_json_newest_media",
@@ -113,7 +113,7 @@ LEARNED = (
     {
         "id": "google_drive_static",
         "label": "One Drive file replaced each week",
-        "how": "Train on the /file/d/ preview, not the instant download link.",
+        "how": "Irish Martyrs replaces one Drive file each week: /file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR. The title Newsletter 18th October 2026 is this Sunday. A later notice date is not the issue date. Train on the /file/d/ preview, not the instant download link.",
     },
     {
         "id": "mcn_bulletin_date",
@@ -184,6 +184,11 @@ LEARNED = (
         "id": "dated_bulletin_post",
         "label": "WordPress post whose address contains the Sunday date",
         "how": "Open /parish-bulletin-18th-october-2026/ from the homepage. The picture is an img src on that post, not a link on the homepage. A category page with no PDF can still link emly-parish-bulletin-18th-october-2026. Open that post and take the Word file.",
+    },
+    {
+        "id": "permanent_bulletin_pdf",
+        "label": "Same bulletin.pdf address every week",
+        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page.",
     },
 )
 
