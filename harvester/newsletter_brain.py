@@ -1,0 +1,764 @@
+"""How the harvester looks for a parish newsletter.
+
+Learned tricks are the ones already proved on a real parish. Invented tricks
+are new URL shapes the brain builds from the harvest Sunday. A trick is
+remembered only when a probe brings back a real file and the freshness
+referee accepts the date. An undated guess is not called fresh.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import asdict, dataclass
+from datetime import date
+from pathlib import Path
+from urllib.parse import unquote, urljoin, urlparse, urlunparse
+
+from .bulletin_freshness import (
+    FreshnessVerdict,
+    check_bulletin_freshness,
+    extract_bulletin_date_from_text,
+    verdict_for_extracted_date,
+)
+from .liturgical import get_liturgical_name
+
+MEMORY_PATH = Path(__file__).resolve().parent.parent / "parishes" / "newsletter_brain.json"
+
+DIOCESE_ORDER = (
+    "achonry",
+    "ardagh",
+    "armagh",
+    "cashel_and_emly",
+    "clogher",
+    "cloyne",
+    "cork_and_ross",
+    "derry",
+    "down_and_connor",
+    "dromore",
+    "dublin",
+    "elphin",
+    "ferns",
+    "galway",
+    "kerry",
+    "kildare_and_leighlin",
+    "killala",
+    "killaloe",
+    "kilmore",
+    "limerick",
+    "meath",
+    "ossory",
+    "raphoe",
+    "tuam",
+    "waterford_and_lismore",
+)
+
+# Ways already proved. The id is what a recipe site_type should use.
+LEARNED = (
+    {
+        "id": "http_scrape_newest_pdf",
+        "label": "Dated PDF link on the listing page",
+        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Do not keep a guessed Twenty-Sixth file.",
+    },
+    {
+        "id": "wp_json_newest_media",
+        "label": "WordPress media library",
+        "how": "Read /wp-json/wp/v2/media and take a newsletter source_url.",
+    },
+    {
+        "id": "predicted_dated_pdf",
+        "label": "Guess /pdf/DDMMYY.pdf",
+        "how": "Listing HTML can be empty because the links are JavaScript.",
+    },
+    {
+        "id": "print_html_newsletter",
+        "label": "Print the live HTML page",
+        "how": "The page is overwritten each week. Do not pin a 109.228 article id.",
+    },
+    {
+        "id": "wix_link_text_date",
+        "label": "Wix hash with the date in the link text",
+        "how": "Never save the /_files/ugd/ hash. Click the newest dated row.",
+    },
+    {
+        "id": "onewebmedia_pdf",
+        "label": "One.com onewebmedia PDF",
+        "how": "Ignore an expired certificate and do not pin the hash.",
+    },
+    {
+        "id": "dated_dotted_filename",
+        "label": "DD.MM.YYYY or YY.MM.DD in the filename",
+        "how": "Read the 4-digit year before a 2-digit year.",
+    },
+    {
+        "id": "rtf_newsletter",
+        "label": "Weekly RTF converted to PDF",
+        "how": "Take the newest .rtf. Do not invent a PDF name.",
+    },
+    {
+        "id": "image_stack",
+        "label": "Sunday image, including an old upload folder",
+        "how": "Stack the visible page images, including an img src. NextGEN gallery is not /uploads/.",
+    },
+    {
+        "id": "jetpack_image",
+        "label": "Jetpack i0.wp.com scan",
+        "how": "Keep the i0.wp.com URL. Do not rewrite it back to the parish host.",
+    },
+    {
+        "id": "cloud_folder_newest",
+        "label": "Google Drive or OneDrive folder",
+        "how": "Open the parent folder and take the newest YY.MM.DD file. Do not pin a year folder.",
+    },
+    {
+        "id": "google_drive_static",
+        "label": "One Drive file replaced each week",
+        "how": "Train on the /file/d/ preview, not the instant download link.",
+    },
+    {
+        "id": "mcn_bulletin_date",
+        "label": "Parish page that takes ?bulletin_date=",
+        "how": "Add the harvest Sunday only when the URL itself has no date.",
+    },
+    {
+        "id": "mdocs_table",
+        "label": "mDocs PDF table",
+        "how": "Click Download on the newest row. Use http when the certificate is dead.",
+    },
+    {
+        "id": "joomla_dropfiles",
+        "label": "Joomla Dropfiles docx",
+        "how": "Click the parish cloud icon. Skip diocese GDPR files.",
+    },
+    {
+        "id": "oneweb_docx",
+        "label": "One.com Word file",
+        "how": "Download the docx. Ignore slow Google preview iframes. view.officeapps.live.com?src= is the same Word file. A misspelled month such as Octaber still counts when the day and year are in the name.",
+    },
+    {
+        "id": "sequential_bulletin_number",
+        "label": "Numbered /Weekly-Bulletins/ folder",
+        "how": "Advance the number by the weeks since the example.",
+    },
+    {
+        "id": "parish_messenger",
+        "label": "Parish Messenger widget",
+        "how": "Newest View Newsletter row. Skip Gift Aid and Data Entry.",
+    },
+    {
+        "id": "wp_block_file",
+        "label": "Permanent bulletin page, changing PDF name",
+        "how": "Match *bulletin*.pdf. Never pin one week's filename.",
+    },
+    {
+        "id": "shared_bulletin",
+        "label": "Two parishes, one file",
+        "how": "Download once. The other parish stays a labelled link.",
+    },
+    {
+        "id": "dead_hostname_twin",
+        "label": "Official hostname is dead",
+        "how": "Try the live .ie .com or .co.uk twin. Skip Anglican twins.",
+    },
+    {
+        "id": "facebook_link_only",
+        "label": "Facebook or Instagram only",
+        "how": "Leave a clickable link. Do not scrape the post.",
+    },
+    {
+        "id": "mayo_ie_getmedia",
+        "label": "Mayo County Council parish newsletter list",
+        "how": "Open /en-ie/parish-newsletters/{name}-parish-newsletter or the plural. Take the newest /getmedia/ PDF. A diocese profile page is not the bulletin.",
+    },
+    {
+        "id": "connect_news_article",
+        "label": "Parish site NEWS.aspx article",
+        "how": "Read ArticleDetail.aspx links titled Parish Newsletter. The date is in the link text. Print that article. Do not save the diocese /parishes/ page.",
+    },
+    {
+        "id": "http_pdf_after_browser_abort",
+        "label": "Plain HTTP download when the browser aborts a PDF",
+        "how": "ERR_ABORTED on a PDF is not a missing file. Read the listing and take sunday-newsletter-DD-MM-YYYY for this Sunday. Prefer the parish file over thought-for-the-week. Download it with plain HTTP.",
+    },
+    {
+        "id": "dated_bulletin_post",
+        "label": "WordPress post whose address contains the Sunday date",
+        "how": "Open /parish-bulletin-18th-october-2026/ from the homepage. The picture is an img src on that post, not a link on the homepage. A category page with no PDF can still link emly-parish-bulletin-18th-october-2026. Open that post and take the Word file.",
+    },
+)
+
+_HREF_RE = re.compile(r"""href\s*=\s*['"]([^'"]+)['"]""", re.I)
+_MEDIA_RE = re.compile(
+    r"""(?:href|src|data-src)\s*=\s*['"]([^'"]+)['"]""",
+    re.I,
+)
+_DATED_POST_RE = re.compile(
+    r"""href\s*=\s*['"]([^'"]*(?:bulletin|newsletter)[^'"]*)['"]""",
+    re.I,
+)
+_OFFICE_SRC_RE = re.compile(
+    r"officeapps\.live\.com/op/embed\.aspx\?src=([^\"'\s&]+)",
+    re.I,
+)
+_SKIP_RE = re.compile(
+    r"gdpr|gift[\s-]?aid|privacy|financial|data[\s-]?entry|new[\s-]?parishioner|"
+    r"safeguarding|rota|vocation|anglican",
+    re.I,
+)
+_FACEBOOK_RE = re.compile(r"facebook\.com|instagram\.com|fb\.com", re.I)
+_POINTER_RE = re.compile(r"churchservices\.tv", re.I)
+_FILE_RE = re.compile(r"\.(?:pdf|docx|doc|rtf|jpe?g|png)(?:$|\?)", re.I)
+_ARTICLE_RE = re.compile(
+    r'href="(ArticleDetail\.aspx\?articleid=\d+)"[^>]*>\s*(Parish\s+Newsletter[^<]{0,80})',
+    re.I,
+)
+_GETMEDIA_RE = re.compile(
+    r'href="(/getmedia/[^"]+\.pdf)"[^>]*>\s*([^<]+)',
+    re.I,
+)
+_SIDE_PDF_RE = re.compile(r"thought-for-the-week|pastoral-letter", re.I)
+_BULLETIN_WORD_RE = re.compile(r"newsletter|bulletin|parish[\s-]?news", re.I)
+_DRIVE_NAME_RE = re.compile(r"\b(\d{2}\.\d{2}\.\d{2}\.pdf)\b", re.I)
+_UPLOADS_RE = re.compile(r"/uploads/(20\d{2})/(0?\d{1,2})/", re.I)
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
+@dataclass
+class Candidate:
+    strategy_id: str
+    url: str
+    kind: str
+    why: str
+    label: str = ""
+
+
+@dataclass
+class Win:
+    strategy_id: str
+    url: str
+    parish_key: str
+    verdict: str
+    bulletin_date: str
+    file_kind: str
+
+
+def diocese_order() -> tuple[str, ...]:
+    return DIOCESE_ORDER
+
+
+def next_diocese(done: set[str] | list[str]) -> str | None:
+    finished = {str(item).strip().lower() for item in done}
+    for key in DIOCESE_ORDER:
+        if key not in finished:
+            return key
+    return None
+
+
+def referee(url: str, body_text: str, target: date) -> FreshnessVerdict:
+    """Date check. A newer link date beats an older date in the file.
+
+    An undated link stays unknown. A stale heading in the file then wins.
+    Do not call an undated link fresh because the file mentions a date.
+    """
+    link = check_bulletin_freshness(url or "", target)
+    body_date = extract_bulletin_date_from_text(body_text or "")
+    body = verdict_for_extracted_date(body_date, target) if body_date else None
+
+    if link.extracted_date and body and body.extracted_date:
+        if link.extracted_date > body.extracted_date and link.status == "fresh":
+            return FreshnessVerdict(
+                status="fresh",
+                extracted_date=link.extracted_date,
+                reason="link_date_beats_older_body",
+                days_from_target=link.days_from_target,
+            )
+        return link
+
+    if link.status == "unknown" and body and body.status == "stale":
+        return FreshnessVerdict(
+            status="stale",
+            extracted_date=body.extracted_date,
+            reason="undated_url_stale_body",
+            days_from_target=body.days_from_target,
+        )
+    if link.status == "unknown":
+        return FreshnessVerdict(status="unknown", reason="no_date_in_url")
+    return link
+
+
+def _origin(page_url: str) -> str:
+    parsed = urlparse(page_url)
+    if not parsed.scheme or not parsed.netloc:
+        return ""
+    return urlunparse((parsed.scheme, parsed.netloc, "", "", "", ""))
+
+
+def _ordinal(day: int) -> str:
+    if 10 <= day % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+    return f"{day}{suffix}"
+
+
+def _rejected(url: str) -> bool:
+    if _FACEBOOK_RE.search(url) or _POINTER_RE.search(url):
+        return True
+    if _SKIP_RE.search(url):
+        return True
+    if "/_files/ugd/" in url.lower():
+        return True
+    return False
+
+
+def _abs(page_url: str, href: str) -> str:
+    return urljoin(page_url, href.strip())
+
+
+def filename_shapes(target: date) -> list[str]:
+    """New filename guesses for one Sunday. Each one carries a real date."""
+    day, month, year = target.day, target.month, target.year
+    names = [
+        f"{day:02d}{month:02d}{year % 100:02d}.pdf",
+        f"{day:02d}{month:02d}{year}.pdf",
+        f"{year}-{month:02d}-{day:02d}.pdf",
+        f"{day:02d}.{month:02d}.{year}.pdf",
+        f"{year % 100:02d}.{month:02d}.{day:02d}.pdf",
+        f"Sunday-{_ordinal(day)}-{_MONTHS[month - 1]}-{year % 100:02d}.pdf",
+    ]
+    liturgical = get_liturgical_name(target)
+    if liturgical:
+        names.append(liturgical.replace("_", "-") + ".pdf")
+    return names
+
+
+def predicted_urls(page_url: str, target: date) -> list[Candidate]:
+    origin = _origin(page_url)
+    if not origin:
+        return []
+    folders = (
+        "/pdf/",
+        f"/wp-content/uploads/{target.year}/{target.month:02d}/",
+    )
+    found: list[Candidate] = []
+    for folder in folders:
+        for name in filename_shapes(target):
+            found.append(
+                Candidate(
+                    strategy_id="predicted_dated_pdf",
+                    url=origin + folder + name,
+                    kind="invented",
+                    why="Sunday filename on a usual bulletin folder",
+                )
+            )
+    found.append(
+        Candidate(
+            strategy_id="wp_json_newest_media",
+            url=origin + "/wp-json/wp/v2/media?search=newsletter&per_page=10",
+            kind="invented",
+            why="WordPress media search for newsletter",
+        )
+    )
+    if "bulletin_date=" not in page_url:
+        found.append(
+            Candidate(
+                strategy_id="mcn_bulletin_date",
+                url=page_url.split("?")[0] + f"?bulletin_date={target.isoformat()}",
+                kind="invented",
+                why="Ask the parish page for the harvest Sunday",
+            )
+        )
+    return found
+
+
+def is_diocese_profile(url: str) -> bool:
+    """A diocese /parishes/ card is the parish's address, not its newsletter."""
+    parsed = urlparse(url or "")
+    host = parsed.netloc.lower()
+    return "/parishes/" in parsed.path.lower() and "diocese" in host
+
+
+def parish_slug_from_profile(url: str) -> str:
+    part = urlparse(url or "").path.rstrip("/").split("/")[-1]
+    return re.sub(r"-\d+$", "", part).strip().lower()
+
+
+def profile_probes(url: str) -> list[Candidate]:
+    """Where to look after a diocese profile was saved instead of a newsletter."""
+    slug = parish_slug_from_profile(url)
+    if not slug:
+        return []
+    found: list[Candidate] = []
+    base = "https://www.mayo.ie/en-ie/parish-newsletters/"
+    for path in (f"{slug}-parish-newsletters", f"{slug}-parish-newsletter"):
+        found.append(
+            Candidate(
+                strategy_id="mayo_ie_listing",
+                url=base + path,
+                kind="invented",
+                why="Mayo council list for this parish name",
+            )
+        )
+    compact = slug.replace("-", "")
+    found.append(
+        Candidate(
+            strategy_id="connect_news_list",
+            url=f"https://www.{compact}.com/NEWS.aspx",
+            kind="invented",
+            why="Parish news list on the parish's own site",
+        )
+    )
+    return found
+
+
+def parse_connect_news(html: str, page_url: str) -> list[Candidate]:
+    """Article links whose text is Parish Newsletter plus a date."""
+    found: list[Candidate] = []
+    for href, title in _ARTICLE_RE.findall(html or ""):
+        label = " ".join(title.split())
+        found.append(
+            Candidate(
+                strategy_id="connect_news_article",
+                url=_abs(page_url, href),
+                kind="learned",
+                why="Parish Newsletter article on the parish site",
+                label=label,
+            )
+        )
+    return found
+
+
+def parse_mayo_listing(html: str, page_url: str) -> list[Candidate]:
+    """Newest-looking PDFs on a Mayo.ie parish newsletter page."""
+    found: list[Candidate] = []
+    for href, title in _GETMEDIA_RE.findall(html or ""):
+        label = " ".join(title.split())
+        if not _BULLETIN_WORD_RE.search(label):
+            continue
+        found.append(
+            Candidate(
+                strategy_id="mayo_ie_getmedia",
+                url=_abs(page_url, href),
+                kind="learned",
+                why="PDF linked from the Mayo council newsletter list",
+                label=label,
+            )
+        )
+    return found
+
+
+def neighbour_month_urls(url: str) -> list[Candidate]:
+    match = _UPLOADS_RE.search(url or "")
+    if not match:
+        return []
+    year = int(match.group(1))
+    month = int(match.group(2))
+    found: list[Candidate] = []
+    for shift in (-1, 1):
+        moved = month + shift
+        moved_year = year
+        if moved < 1:
+            moved = 12
+            moved_year -= 1
+        elif moved > 12:
+            moved = 1
+            moved_year += 1
+        new_url = _UPLOADS_RE.sub(
+            f"/uploads/{moved_year}/{moved:02d}/",
+            url,
+            count=1,
+        )
+        found.append(
+            Candidate(
+                strategy_id="neighbour_month_folder",
+                url=new_url,
+                kind="invented",
+                why="Same filename in the month beside the upload folder",
+            )
+        )
+    return found
+
+
+def pick_from_wp_json(items: list[dict], target: date) -> Candidate | None:
+    best: Candidate | None = None
+    for item in items:
+        source = str(item.get("source_url") or "")
+        if not source or _rejected(source):
+            continue
+        verdict = check_bulletin_freshness(source, target)
+        if verdict.status != "fresh":
+            continue
+        title = str(item.get("title") or "")
+        if title and _SKIP_RE.search(title):
+            continue
+        best = Candidate(
+            strategy_id="wp_json_newest_media",
+            url=source,
+            kind="invented",
+            why="Media library file dated in this harvest week",
+        )
+        break
+    return best
+
+
+def links_on_page(html: str, page_url: str) -> list[Candidate]:
+    if not html:
+        return []
+    found: list[Candidate] = []
+    seen: set[str] = set()
+    has_file = False
+    for match in _MEDIA_RE.finditer(html):
+        href = match.group(1).strip()
+        if not href or href.startswith("#"):
+            continue
+        url = _abs(page_url, href)
+        if url in seen or _rejected(url):
+            continue
+        if not _FILE_RE.search(url):
+            continue
+        seen.add(url)
+        has_file = True
+        strategy = "http_scrape_newest_pdf"
+        if "i0.wp.com" in url.lower():
+            strategy = "jetpack_image"
+        elif url.lower().endswith(".rtf") or ".rtf?" in url.lower():
+            strategy = "rtf_newsletter"
+        elif re.search(r"\.(jpe?g|png)(?:$|\?)", url, re.I):
+            strategy = "image_stack"
+        found.append(
+            Candidate(
+                strategy_id=strategy,
+                url=url,
+                kind="learned",
+                why="File link already on the page",
+            )
+        )
+    for name in _DRIVE_NAME_RE.findall(html):
+        if name.lower() in seen:
+            continue
+        seen.add(name.lower())
+        found.append(
+            Candidate(
+                strategy_id="cloud_folder_newest",
+                url=name,
+                kind="learned",
+                why="Drive row named YY.MM.DD.pdf",
+            )
+        )
+    for match in _DATED_POST_RE.finditer(html):
+        url = _abs(page_url, match.group(1).strip())
+        if url in seen or _rejected(url) or _FILE_RE.search(url):
+            continue
+        if check_bulletin_freshness(url, date(2026, 1, 1)).extracted_date is None:
+            continue
+        seen.add(url)
+        found.append(
+            Candidate(
+                strategy_id="dated_bulletin_post",
+                url=url,
+                kind="learned",
+                why="Bulletin post address contains a Sunday date",
+            )
+        )
+    if not has_file and _BULLETIN_WORD_RE.search(html):
+        found.append(
+            Candidate(
+                strategy_id="print_html_newsletter",
+                url=page_url,
+                kind="learned",
+                why="Newsletter words on the page and no file to download",
+            )
+        )
+    return found
+
+
+_SECTION_RE = re.compile(
+    r"/(?:newsletters?|nuachtlitir|parish-bulletin|weekly-bulletins|bulletins)/?$",
+    re.I,
+)
+
+
+def section_links(html: str, page_url: str) -> list[str]:
+    """Undated newsletter index on the same site. Crumlin hides the PDF there."""
+    if not html:
+        return []
+    host = (urlparse(page_url).netloc or "").lower()
+    found: list[str] = []
+    seen: set[str] = set()
+    for match in _MEDIA_RE.finditer(html):
+        href = match.group(1).strip()
+        if not href or href.startswith("#"):
+            continue
+        url = _abs(page_url, href)
+        parsed = urlparse(url)
+        if host and parsed.netloc.lower() != host:
+            continue
+        if not _SECTION_RE.search(parsed.path or ""):
+            continue
+        if url in seen or _rejected(url):
+            continue
+        seen.add(url)
+        found.append(url)
+    return found
+
+
+def parse_office_embed(html: str) -> list[Candidate]:
+    """The Word file is hidden in a Microsoft Office preview address."""
+    found: list[Candidate] = []
+    seen: set[str] = set()
+    for match in _OFFICE_SRC_RE.finditer(html or ""):
+        url = unquote(match.group(1))
+        if url in seen or _rejected(url) or not _FILE_RE.search(url):
+            continue
+        seen.add(url)
+        kind = "oneweb_docx" if re.search(r"\.docx(?:$|\?)", url, re.I) else "http_scrape_newest_pdf"
+        found.append(
+            Candidate(
+                strategy_id=kind,
+                url=url,
+                kind="learned",
+                why="Office embed src is the parish file",
+            )
+        )
+    return found
+
+
+def invent_candidates(html: str, page_url: str, target: date) -> list[Candidate]:
+    """Page links first, then new guesses. Facebook is never a guess."""
+    page = links_on_page(html, page_url)
+    page.extend(parse_connect_news(html, page_url))
+    page.extend(parse_mayo_listing(html, page_url))
+    page.extend(parse_office_embed(html))
+    file_urls = [item.url for item in page if _FILE_RE.search(item.url)]
+    # A listing PDF is enough. Do not also open a /bulletin/ path.
+    if file_urls:
+        page = [item for item in page if "/bulletin/" not in item.url.lower() or _FILE_RE.search(item.url)]
+    if is_diocese_profile(page_url):
+        guessed = profile_probes(page_url)
+    else:
+        guessed = predicted_urls(page_url, target)
+    for item in page:
+        guessed.extend(neighbour_month_urls(item.url))
+    combined = page + guessed
+    unique: list[Candidate] = []
+    seen: set[str] = set()
+    for item in combined:
+        if item.url in seen or _rejected(item.url):
+            continue
+        seen.add(item.url)
+        unique.append(item)
+    return unique
+
+
+_PROBE_STRATEGIES = {
+    "wp_json_newest_media",
+    "print_html_newsletter",
+    "mcn_bulletin_date",
+    "mayo_ie_listing",
+    "connect_news_list",
+}
+
+
+def candidate_verdict(
+    item: Candidate, target: date, body_text: str = ""
+) -> FreshnessVerdict:
+    """Date the file. A Parish Newsletter title counts when the URL has no date."""
+    url_verdict = check_bulletin_freshness(item.url, target)
+    if url_verdict.status != "unknown":
+        return referee(item.url, body_text, target)
+    label = (item.label or "").strip()
+    if label and _BULLETIN_WORD_RE.search(label):
+        labelled = check_bulletin_freshness(label, target)
+        if labelled.status != "unknown":
+            return labelled
+    return referee(item.url, body_text, target)
+
+
+def choose(candidates: list[Candidate], target: date, body_text: str = "") -> Candidate | None:
+    """First fresh file. A stale file is kept only if nothing this week exists."""
+    fresh: list[tuple[Candidate, FreshnessVerdict]] = []
+    stale: list[tuple[Candidate, FreshnessVerdict]] = []
+    for item in candidates:
+        if item.strategy_id in _PROBE_STRATEGIES:
+            continue
+        verdict = candidate_verdict(item, target, body_text)
+        if verdict.status == "fresh":
+            fresh.append((item, verdict))
+        elif verdict.status == "stale":
+            stale.append((item, verdict))
+    def _closest(pairs: list[tuple[Candidate, FreshnessVerdict]]) -> Candidate:
+        pairs.sort(
+            key=lambda pair: (
+                2 if _SIDE_PDF_RE.search(pair[0].url) else 1 if pair[0].strategy_id == "dated_bulletin_post" else 0,
+                abs(pair[1].days_from_target or 99),
+            )
+        )
+        return pairs[0][0]
+
+    learned_fresh = [pair for pair in fresh if pair[0].kind == "learned"]
+    learned_stale = [pair for pair in stale if pair[0].kind == "learned"]
+    if learned_fresh:
+        return _closest(learned_fresh)
+    if learned_stale:
+        return _closest(learned_stale)
+    if fresh:
+        return _closest(fresh)
+    if stale:
+        return _closest(stale)
+    for item in candidates:
+        if item.strategy_id == "print_html_newsletter":
+            return item
+    return None
+
+
+def proved_win(
+    candidate: Candidate,
+    *,
+    http_status: int,
+    file_kind: str,
+    verdict: FreshnessVerdict,
+    parish_key: str,
+) -> Win | None:
+    """A guess becomes a win only with a real file and a date verdict."""
+    if http_status != 200:
+        return None
+    if file_kind not in {"pdf", "html", "image", "rtf", "docx"}:
+        return None
+    if verdict.status not in {"fresh", "stale"}:
+        return None
+    if _rejected(candidate.url):
+        return None
+    if verdict.status == "fresh" and verdict.extracted_date is None:
+        return None
+    when = verdict.extracted_date.isoformat() if verdict.extracted_date else ""
+    return Win(
+        strategy_id=candidate.strategy_id,
+        url=candidate.url,
+        parish_key=parish_key,
+        verdict=verdict.status,
+        bulletin_date=when,
+        file_kind=file_kind,
+    )
+
+
+def remember(win: Win, path: Path | None = None) -> dict:
+    """Append a proved win. The same parish and strategy is not stored twice."""
+    target = path or MEMORY_PATH
+    memory = {"version": 1, "wins": []}
+    if target.is_file():
+        loaded = json.loads(target.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict) and isinstance(loaded.get("wins"), list):
+            memory = loaded
+    wins = memory.setdefault("wins", [])
+    row = asdict(win)
+    for existing in wins:
+        if (
+            existing.get("parish_key") == row["parish_key"]
+            and existing.get("strategy_id") == row["strategy_id"]
+            and existing.get("url") == row["url"]
+        ):
+            return memory
+    wins.append(row)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(memory, indent=2), encoding="utf-8")
+    return memory

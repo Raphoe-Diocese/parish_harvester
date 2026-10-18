@@ -2053,6 +2053,148 @@ def _newest_dated_post_url_from_listing(
     return max(scored)[1]
 
 
+_JUNK_BULLETIN_RE = re.compile(
+    r"screenshot|mail\.google|80x80|150x150|287x250|495x400",
+    re.I,
+)
+
+
+def _brain_this_weekend(verdict, target_date: date) -> bool:
+    """High bar: this Sunday, or the Saturday dated with it. Not last Sunday."""
+    extracted = getattr(verdict, "extracted_date", None)
+    if extracted is None:
+        return False
+    return target_date - timedelta(days=1) <= extracted <= target_date
+
+
+def _brain_url_kind(url: str) -> str:
+    path = urlparse(url or "").path.lower()
+    if path.endswith((".docx", ".doc", ".rtf")):
+        return "docx"
+    if path.endswith(".pdf"):
+        return "pdf"
+    if path.endswith((".jpg", ".jpeg", ".png")):
+        return "image"
+    return "html"
+
+
+async def _brain_fetch_html(url: str) -> str:
+    result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        url,
+        max_attempts=2,
+        per_attempt_timeout_s=12.0,
+        total_budget_s=18.0,
+    )
+    if not result:
+        return ""
+    body, headers = result
+    ctype = (headers.get("content-type") or "").lower()
+    if "html" not in ctype and not body.lstrip().startswith(b"<"):
+        return ""
+    return body.decode("utf-8", errors="ignore")
+
+
+async def _save_brain_file(url: str, dest: Path) -> tuple[str, str] | None:
+    if _JUNK_BULLETIN_RE.search(url):
+        return None
+    result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        quote_http_url(url),
+        max_attempts=3,
+        per_attempt_timeout_s=12.0,
+        total_budget_s=20.0,
+    )
+    if not result:
+        return None
+    body, _headers = result
+    kind = _brain_url_kind(url)
+    if kind == "docx" or _office_bytes_look_like_rtf(body) or (
+        body[:2] == b"PK" and not _is_pdf_content(body)
+    ):
+        dest.write_bytes(await _convert_docx_to_pdf_bytes(body))
+        return url, "docx_to_pdf"
+    if _is_pdf_content(body):
+        dest.write_bytes(body)
+        return url, "pdf"
+    if kind == "image" or looks_like_image_bytes(body):
+        write_image_bytes_as_pdf(dest, body)
+        return url, "image_to_pdf"
+    return None
+
+
+async def _print_brain_html(
+    url: str, dest: Path, browser: Browser, target_date: date
+) -> tuple[str, str] | None:
+    context = await browser.new_context(accept_downloads=True)
+    page = await context.new_page()
+    try:
+        await _navigate_page(page, url, 30_000, wait_until="domcontentloaded")
+        await _smart_print_page_to_pdf(page, dest, target_date, skip_listing_nav=True)
+        return url, "print_to_pdf"
+    finally:
+        await context.close()
+
+
+async def _try_newsletter_brain(
+    listing_url: str,
+    dest: Path,
+    target_date: date,
+    browser: Browser,
+) -> tuple[str, str] | None:
+    """Last resort: read the page with the newsletter brain.
+
+    A Word file is saved as a PDF. A page image is saved as a PDF.
+    A dated bulletin post is opened once, then printed if the post itself
+    is the bulletin.
+    """
+    from .newsletter_brain import (
+        candidate_verdict,
+        choose,
+        invent_candidates,
+        section_links,
+    )
+
+    try:
+        html = await _brain_fetch_html(listing_url)
+        if not html:
+            return None
+        picked = choose(invent_candidates(html, listing_url, target_date), target_date)
+        verdict = candidate_verdict(picked, target_date) if picked is not None else None
+        if picked is None or not _brain_this_weekend(verdict, target_date):
+            for section in section_links(html, listing_url)[:2]:
+                section_html = await _brain_fetch_html(section)
+                if not section_html:
+                    continue
+                inner = choose(
+                    invent_candidates(section_html, section, target_date), target_date
+                )
+                if inner is None or _brain_url_kind(inner.url) == "html":
+                    continue
+                inner_verdict = candidate_verdict(inner, target_date)
+                if not _brain_this_weekend(inner_verdict, target_date):
+                    continue
+                saved = await _save_brain_file(inner.url, dest)
+                if saved:
+                    return saved
+            return None
+        url = picked.url
+        if picked.strategy_id == "dated_bulletin_post" or _brain_url_kind(url) == "html":
+            post_html = await _brain_fetch_html(url)
+            if post_html:
+                inner = choose(invent_candidates(post_html, url, target_date), target_date)
+                if inner is not None and _brain_url_kind(inner.url) != "html":
+                    inner_verdict = candidate_verdict(inner, target_date)
+                    if _brain_this_weekend(inner_verdict, target_date):
+                        saved = await _save_brain_file(inner.url, dest)
+                        if saved:
+                            return saved
+            return await _print_brain_html(url, dest, browser, target_date)
+        return await _save_brain_file(url, dest)
+    except Exception:
+        return None
+
+
 async def _try_http_scrape_newest_pdf(
     listing_url: str,
     dest: Path,
@@ -4434,6 +4576,9 @@ async def replay_recipe(
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
+        brain = await _try_newsletter_brain(start_url, dest, target_date, browser)
+        if brain:
+            return dest, brain[1], brain[0]
         raise RecipeReplayError(
             f"naomhfionan.com predicted PDF URL(s) for {target_date} did not "
             "resolve to a real PDF (not the listing-page block; retry later "
@@ -4466,6 +4611,9 @@ async def replay_recipe(
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
+        brain = await _try_newsletter_brain(start_url, dest, target_date, browser)
+        if brain:
+            return dest, brain[1], brain[0]
         raise RecipeReplayError(
             f"HTTP-scrape listing {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (not a selector problem; parish may not have posted)"
@@ -4553,6 +4701,9 @@ async def replay_recipe(
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
+        brain = await _try_newsletter_brain(start_url, dest, target_date, browser)
+        if brain:
+            return dest, brain[1], brain[0]
         raise RecipeReplayError(
             f"wp-json media at {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (listing page was not opened)"
@@ -4592,6 +4743,9 @@ async def replay_recipe(
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
+        brain = await _try_newsletter_brain(start_url, dest, target_date, browser)
+        if brain:
+            return dest, brain[1], brain[0]
         raise RecipeReplayError(
             f"wp-json/RSS/predicted post images at {start_url} — no Sunday "
             "bulletin post with enough page images (browser was not opened)"
@@ -4623,6 +4777,9 @@ async def replay_recipe(
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
+        brain = await _try_newsletter_brain(start_url, dest, target_date, browser)
+        if brain:
+            return dest, brain[1], brain[0]
         raise RecipeReplayError(
             f"HTTP-scrape images {start_url} — no bulletin page images matching "
             f"{href_patterns or ['wp-content/uploads']} (browser was not opened)"
