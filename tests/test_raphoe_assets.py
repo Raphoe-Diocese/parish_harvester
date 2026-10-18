@@ -45,6 +45,8 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertEqual(payload.get("site_type"), "cloud_folder")
         self.assertNotIn("skip", payload)
         self.assertIn("1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK", payload.get("start_url", ""))
+        # 2027 is a new year folder. The 2026 id must not be the start link.
+        self.assertNotIn("1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC", payload.get("start_url", ""))
         steps = payload.get("steps") or []
         self.assertTrue(any(step.get("year_folder") for step in steps if isinstance(step, dict)))
 
