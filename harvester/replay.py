@@ -38,6 +38,7 @@ from .cloud_folders import (
     newest_drive_pdf_on_or_before,
     newest_yy_mm_dd_label,
     parse_drive_embedded_entries,
+    parse_yy_mm_dd,
     rewrite_cloud_folder_click_step,
     rewrite_year_folder_click_step,
     recipe_uses_cloud_folder,
@@ -947,6 +948,27 @@ async def _convert_docx_to_pdf_bytes(docx_bytes: bytes) -> bytes:
         return fallback_pdf.read_bytes()
 
 
+_PAGE_ISSUE_DATES: dict[int, date] = {}
+
+
+def _remember_page_issue_date(page: Page, stated: date | None) -> None:
+    """Keep a Drive row date for the download URL that comes back later.
+
+    Bruckless clicks 26.10.18.pdf, then Drive redirects to a file-id link
+    with no date. The date has to travel with the page, not only the first URL.
+    """
+    if page is None or stated is None:
+        return
+    _PAGE_ISSUE_DATES[id(page)] = stated
+
+
+def _with_remembered_issue_date(page: Page | None, url: str) -> str:
+    stated = _PAGE_ISSUE_DATES.get(id(page)) if page is not None else None
+    if stated is None:
+        return url
+    return url_with_stated_issue_date(url or "", stated)
+
+
 def _download_source_url(download, page: Page) -> str:
     """Prefer the download's own resource URL over page.url.
 
@@ -964,9 +986,17 @@ def _download_source_url(download, page: Page) -> str:
         url = (download.url or "").strip()
     except Exception:
         url = ""
-    if url and _looks_like_http_url(url):
-        return url
-    return page.url
+    chosen = url if url and _looks_like_http_url(url) else page.url
+    suggested = ""
+    try:
+        suggested = download.suggested_filename or ""
+    except Exception:
+        suggested = ""
+    named = parse_yy_mm_dd(suggested)
+    if named is not None:
+        chosen = url_with_stated_issue_date(chosen, named)
+        _remember_page_issue_date(page, named)
+    return _with_remembered_issue_date(page, chosen)
 
 
 async def _save_download_to_pdf(download, dest: Path) -> str:
@@ -1016,19 +1046,22 @@ async def _download_document_url(
             content_type = response.headers.get("content-type", "")
 
     path = urlparse(url.lower()).path
+    def _done(kind: str) -> tuple[str, str]:
+        return _with_remembered_issue_date(page, raw_url), kind
+
     if path.endswith(".docx"):
         pdf_bytes = await _convert_docx_to_pdf_bytes(body)
         dest.write_bytes(pdf_bytes)
-        return raw_url, "docx_to_pdf"
+        return _done("docx_to_pdf")
 
     if _is_pdf_content(body):
         dest.write_bytes(body)
-        return raw_url, "pdf"
+        return _done("pdf")
 
     if looks_like_image_bytes(body):
         try:
             write_image_bytes_as_pdf(dest, body)
-            return raw_url, "image_to_pdf"
+            return _done("image_to_pdf")
         except Exception as exc:
             raise RecipeReplayError(f"Invalid image content for bulletin conversion: {raw_url}") from exc
 
@@ -1036,7 +1069,7 @@ async def _download_document_url(
         raise RecipeReplayError(f"Server returned HTML instead of document for {raw_url}")
 
     dest.write_bytes(body)
-    return raw_url, "pdf"
+    return _done("pdf")
 
 
 async def _click_dropfiles_locator_download(
@@ -4307,6 +4340,8 @@ async def _click_newest_cloud_pdf_row(page: Page, timeout_ms: int) -> bool:
     label = newest_yy_mm_dd_label([row.get("text") or "" for row in rows])
     if not label:
         return False
+    named = parse_yy_mm_dd(label)
+    _remember_page_issue_date(page, named)
     file_id = None
     for row in rows:
         if label in (row.get("text") or ""):
@@ -4314,7 +4349,10 @@ async def _click_newest_cloud_pdf_row(page: Page, timeout_ms: int) -> bool:
             if file_id:
                 break
     if file_id:
-        download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        download_url = url_with_stated_issue_date(
+            f"https://drive.google.com/uc?export=download&id={file_id}",
+            named,
+        )
         try:
             await page.goto(download_url, timeout=min(timeout_ms, 30_000))
         except Exception:

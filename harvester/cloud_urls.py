@@ -43,6 +43,7 @@ def unwrap_docs_viewer_url(url: str) -> str:
 def rewrite_gdrive_download_url(url: str) -> str:
     """Convert Google Drive view/share URLs to direct download when possible."""
     text = unwrap_docs_viewer_url(url)
+    stated = parse_qs(urlparse(text).query).get("bulletin_date", [""])[0].strip()
     for pattern in (_GDRIVE_FILE_RE, _GDRIVE_OPEN_RE, _GDRIVE_UC_RE):
         match = pattern.search(text)
         if match:
@@ -57,6 +58,11 @@ def rewrite_gdrive_download_url(url: str) -> str:
             resourcekey = parse_qs(urlparse(text).query).get("resourcekey", [""])[0].strip()
             if resourcekey:
                 download_url += f"&resourcekey={resourcekey}"
+            # Bruckless: the file id has no date. 26.10.18.pdf is 18/10/2026.
+            # Rebuilding the download link must not drop that name date, or
+            # an older line inside the PDF marks this Sunday as 13/09/2026.
+            if stated and "bulletin_date=" not in download_url:
+                download_url += f"&bulletin_date={stated}"
             return download_url
     return text
 
