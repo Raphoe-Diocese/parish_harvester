@@ -92,6 +92,7 @@
       ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-gutter:stable;background:#525659;padding:8px 0 16px;touch-action:pan-x pan-y pinch-zoom}" +
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;scrollbar-gutter:stable}" +
+      "a.ocr-open-text{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 auto;margin:4px 0 4px 8px;padding:8px 14px!important;background:#14524f!important;color:#fff!important;font-weight:700!important;font-size:0.95rem!important;line-height:1.2;text-decoration:none!important;border-radius:6px;white-space:nowrap}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;max-width:100%;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-first-preview{display:block;width:100%;height:auto;background:#fff}" +
@@ -869,9 +870,38 @@
     startViewer(host, pdfUrl);
   }
 
+  function promoteOpenTextLink() {
+    var links = document.querySelectorAll(".quiet-links a, a.ocr-open-text");
+    Array.prototype.forEach.call(links, function (a) {
+      var href = a.getAttribute("href") || "";
+      var at = href.indexOf("/bulletins/");
+      if (at >= 0 && href.indexOf("github.io") !== -1) {
+        a.setAttribute("href", href.slice(at));
+        href = a.getAttribute("href") || "";
+      }
+      if (/\/bulletins\/index\.html(?:$|\?)/.test(href)) {
+        var part = (location.pathname.split("/dioceses/")[1] || "").split("/")[0];
+        var shortName = part.split("-")[0];
+        var dated = (document.title || "").match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (shortName && dated) {
+          a.setAttribute(
+            "href",
+            "/bulletins/" + shortName + "-" + dated[3] + "-" + dated[2] + "-" + dated[1] + "-ocr.html"
+          );
+        }
+      }
+      a.classList.add("ocr-open-text");
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener noreferrer");
+      var row = document.querySelector("#panel-ocr .ocr-controls-row");
+      if (row && a.parentNode !== row) row.appendChild(a);
+    });
+  }
+
   function run() {
     document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });
     ensureStyles();
+    promoteOpenTextLink();
     ensureOcrStickyChrome();
     ensureScrollTop();
     fixMobilePdfLinks();

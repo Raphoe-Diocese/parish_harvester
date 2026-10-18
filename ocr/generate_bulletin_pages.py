@@ -1264,7 +1264,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260912a"
+PDF_INPAGE_VIEWER_VERSION = "20261018a"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -2135,16 +2135,23 @@ def render_bulletin_viewer_shell(
       margin-bottom: 4px;
     }}
 
-    .quiet-links {{
-      display: flex;
-      justify-content: flex-end;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
+    .ocr-open-text {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 8px;
+      padding: 8px 14px;
+      background: #14524f;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
     }}
-    .quiet-links a {{ color: {TEAL}; }}
+    .ocr-open-text:hover {{ background: #0e3b39; color: #fff; }}
     .pdf-wait-note {{
       display: none;
       margin: 0 0 10px;
@@ -2462,7 +2469,7 @@ def render_bulletin_viewer_shell(
       .mobile-jump {{ display: block; }}
       .pdf-wait-note {{ display: block; }}
       .download-link-top {{ display: none; }}
-      .quiet-links {{ justify-content: center; }}
+      .ocr-open-text {{ margin-left: 0; width: 100%; }}
       ul.parish-grid {{ grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }}
       #ocr-panel {{
         padding: 16px 14px 28px;
@@ -2541,9 +2548,7 @@ def render_bulletin_viewer_shell(
           <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
           <span class="ocr-zoom-hint">or pinch to zoom</span>
         </div>
-      </div>
-      <div class="quiet-links">
-        <a href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
+        <a class="ocr-open-text" href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
       </div>
       <div id="ocr-panel">{ocr_fragment}</div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>

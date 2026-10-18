@@ -846,11 +846,11 @@ def _ocr_html_from_viewer(path: Path | None) -> str:
     return match.group(1).strip()
 
 
-def _latest_ocr_standalone(diocese_key: str) -> Path | None:
-    if not BULLETINS_DIR.exists():
+def _latest_ocr_standalone_stem(stem: str) -> Path | None:
+    if not BULLETINS_DIR.exists() or not stem:
         return None
-    stem = diocese_key.replace("-", "[-_]")
-    regex = re.compile(rf"^{stem}-(\d{{4}}-\d{{2}}-\d{{2}})-ocr\.html$")
+    pattern = stem.replace("-", "[-_]")
+    regex = re.compile(rf"^{pattern}-(\d{{4}}-\d{{2}}-\d{{2}})-ocr\.html$")
     latest: tuple[Path, str] | None = None
     for path in sorted(BULLETINS_DIR.glob("*.html")):
         match = regex.match(path.name)
@@ -860,6 +860,16 @@ def _latest_ocr_standalone(diocese_key: str) -> Path | None:
         if latest is None or date_text > latest[1]:
             latest = (path, date_text)
     return latest[0] if latest else None
+
+
+def _latest_ocr_standalone(diocese_key: str) -> Path | None:
+    found = _latest_ocr_standalone_stem(diocese_key)
+    if found is not None:
+        return found
+    short = (diocese_key or "").split("-")[0]
+    if short and short != diocese_key:
+        return _latest_ocr_standalone_stem(short)
+    return None
 
 
 def _ocr_html_from_standalone(path: Path | None) -> str:
@@ -1411,14 +1421,14 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 
 
 def _ocr_standalone_url(diocese_key: str) -> str:
+    """Same-origin text page. A github.io address bounces and the tap misses."""
     standalone = _latest_ocr_standalone(diocese_key)
-    pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
-        return f"{pages_base}/bulletins/{standalone.name}"
+        return f"/bulletins/{standalone.name}"
     viewer_path, _viewer_date = _latest_viewer(diocese_key)
     if viewer_path is not None:
-        return f"{pages_base}/bulletins/{viewer_path.name}"
-    return f"{pages_base}/bulletins/index.html"
+        return f"/bulletins/{viewer_path.name}"
+    return "/bulletins/index.html"
 
 
 def _mega_pdf_url(

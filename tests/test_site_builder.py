@@ -209,6 +209,21 @@ class SiteBuilderTests(unittest.TestCase):
             "/mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-06&h=20260910T2324",
         )
 
+    def test_short_ocr_filename_is_used_when_the_folder_name_is_longer(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            folder = Path(tmpdir)
+            (folder / "ardagh-2026-10-18-ocr.html").write_text("ok", encoding="utf-8")
+            (folder / "galway-2026-10-18-ocr.html").write_text("ok", encoding="utf-8")
+            old = site_builder.BULLETINS_DIR
+            site_builder.BULLETINS_DIR = folder
+            try:
+                ardagh = site_builder._latest_ocr_standalone("ardagh-and-clonmacnoise")
+                galway = site_builder._latest_ocr_standalone("galway-kilmacduagh-and-kilfenora")
+            finally:
+                site_builder.BULLETINS_DIR = old
+        self.assertEqual(ardagh.name, "ardagh-2026-10-18-ocr.html")
+        self.assertEqual(galway.name, "galway-2026-10-18-ocr.html")
+
 
 if __name__ == "__main__":
     unittest.main()
