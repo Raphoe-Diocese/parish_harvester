@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import asdict, dataclass
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import unquote, urljoin, urlparse, urlunparse
 
@@ -190,6 +190,11 @@ LEARNED = (
         "label": "Same bulletin.pdf address every week",
         "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page.",
     },
+    {
+        "id": "sunday_named_upload",
+        "label": "This Sunday's file name on the uploads folder",
+        "how": "When the homepage has no file, try the uploads folder for this Sunday. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Crumlin is 2026-10-18-Newsletter.pdf. Wexford is Sunday-October-18th-1-scaled.jpg and the next page numbers. Falcarragh is Parish-Newsletter-42-Sun-A-18102026.pdf. The 2026 name has no word for in it.",
+    },
 )
 
 _HREF_RE = re.compile(r"""href\s*=\s*['"]([^'"]+)['"]""", re.I)
@@ -332,8 +337,20 @@ def filename_shapes(target: date) -> list[str]:
         f"Sunday-{_ordinal(day)}-{_MONTHS[month - 1]}-{year % 100:02d}.pdf",
     ]
     liturgical = get_liturgical_name(target)
+    full_month = (
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+    )[month - 1]
+    ordered = _ordinal(day)
     if liturgical:
         names.append(liturgical.replace("_", "-") + ".pdf")
+        names.insert(
+            0,
+            f"Newsletter-{ordered}-{full_month}-{year}-"
+            f"{liturgical.replace('_', '-')}.pdf",
+        )
+    names.insert(0, f"{year}-{month:02d}-{day:02d}-Newsletter.pdf")
+    names.append(f"Sunday-{full_month}-{ordered}-1-scaled.jpg")
     return names
 
 
@@ -677,6 +694,33 @@ def candidate_verdict(
         if labelled.status != "unknown":
             return labelled
     return referee(item.url, body_text, target)
+
+
+def weekend_files(candidates: list[Candidate], target: date) -> list[Candidate]:
+    """This Sunday's real files, uploads folder before a bare /pdf/ guess."""
+    picked: list[Candidate] = []
+    for item in candidates:
+        if item.strategy_id in _PROBE_STRATEGIES:
+            continue
+        if not _FILE_RE.search(item.url or ""):
+            continue
+        extracted = candidate_verdict(item, target).extracted_date
+        if extracted is None:
+            continue
+        if not (target - timedelta(days=1) <= extracted <= target):
+            continue
+        picked.append(item)
+
+    def _rank(item: Candidate) -> tuple[int, int, int]:
+        url = item.url.lower()
+        return (
+            0 if item.kind == "learned" else 1,
+            0 if "/wp-content/uploads/" in url else 1,
+            0 if any(word in url for word in ("newsletter", "bulletin", "sunday")) else 1,
+        )
+
+    picked.sort(key=_rank)
+    return picked
 
 
 def choose(candidates: list[Candidate], target: date, body_text: str = "") -> Candidate | None:

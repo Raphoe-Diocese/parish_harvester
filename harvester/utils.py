@@ -116,6 +116,15 @@ _YEARLESS_SLUG_RE = re.compile(
     rf"(?![a-z])(?![_\-\s+]\d{{2,4}})",
     re.IGNORECASE,
 )
+# Wexford names the page Sunday-October-18th-1-scaled.jpg (month, then day).
+_MONTH_THEN_ORDINAL_RE = re.compile(
+    rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)(?!\d)",
+    re.IGNORECASE,
+)
+_SUNDAY_MONTH_IMAGE_RE = re.compile(
+    rf"(?i)^Sunday-({_MONTH_ALT})-(\d{{1,2}})(?:st|nd|rd|th)"
+    rf"(?:-(\d+))?(-scaled)?\.(jpe?g|png)$"
+)
 
 # Glenavy: 2026-August-16-... ; Kilvarnet/Collooney: 2026Sept27RCB.pdf (no separators).
 _YEAR_MONTHNAME_DAY_RE = re.compile(
@@ -593,14 +602,21 @@ def yearless_slug_date(
     reads '28th-December' as last December, not next December.
     A 14-day window treated Sunday-29th-Sept.pdf on 18/09 as 29/09/2026.
     """
-    m = _YEARLESS_SLUG_RE.search(unquote(text or ""))
-    if not m:
-        return None
-    month = _MONTH_MAP.get(m.group(2).lower())
+    raw = unquote(text or "")
+    m = _YEARLESS_SLUG_RE.search(raw)
+    if m:
+        month = _MONTH_MAP.get(m.group(2).lower())
+        day = int(m.group(1))
+    else:
+        flipped = _MONTH_THEN_ORDINAL_RE.search(raw)
+        if not flipped:
+            return None
+        month = _MONTH_MAP.get(flipped.group(1).lower())
+        day = int(flipped.group(2))
     if not month:
         return None
     try:
-        candidate = date(assume_year, month, int(m.group(1)))
+        candidate = date(assume_year, month, day)
     except ValueError:
         return None
     if near is not None and (candidate - near).days > 7:
@@ -1845,6 +1861,58 @@ def naomhfionan_newsletter_number(target: date) -> int:
     """
     epoch = _naomhfionan_first_counted_sunday(target.year)
     return (target - epoch).days // 7 + 1
+
+
+def sunday_month_day_image_urls(
+    example_url: str,
+    target: date,
+    *,
+    count: int = 1,
+) -> list[str]:
+    """Shift Sunday-October-4th-1-scaled.jpg onto this Sunday's page images.
+
+    Wexford keeps the month name first and a page number. The homepage does
+    not list the pictures, so the old example name is the pattern.
+    """
+    raw = (example_url or "").strip()
+    if not raw:
+        return []
+    parsed = urlparse(raw)
+    path = unquote(parsed.path or "")
+    leaf = path.rsplit("/", 1)[-1]
+    match = _SUNDAY_MONTH_IMAGE_RE.match(leaf)
+    if not match:
+        return []
+    month_token = match.group(1)
+    if _MONTH_MAP.get(month_token.lower()) is None:
+        return []
+    month_name = _MONTH_NAMES[target.month]
+    if month_token[:1].isupper():
+        month_name = month_name.capitalize()
+    suffix = match.group(4) or ""
+    ext = leaf.rsplit(".", 1)[-1]
+    directory = path.rsplit("/", 1)[0]
+    directory = re.sub(
+        r"/\d{4}/\d{2}$",
+        f"/{target.year}/{target.month:02d}",
+        directory,
+    )
+    day_ord = f"{target.day}{_ordinal_suffix(target.day)}"
+    pages = max(1, int(count or 1))
+    found: list[str] = []
+    for number in range(1, pages + 1):
+        name = f"Sunday-{month_name}-{day_ord}-{number}{suffix}.{ext}"
+        found.append(parsed._replace(path=f"{directory}/{name}").geturl())
+    return found
+
+
+def naomhfionan_bulletin_urls(target: date, *, number_offset: int = 0) -> list[str]:
+    """Falcarragh file names. 2026 dropped the word ``for`` from the filename."""
+    primary = naomhfionan_bulletin_url(target, number_offset=number_offset)
+    current = primary.replace("-for-Sun-", "-Sun-", 1)
+    if current == primary:
+        return [primary]
+    return [current, primary]
 
 
 def naomhfionan_bulletin_url(target: date, *, number_offset: int = 0) -> str:

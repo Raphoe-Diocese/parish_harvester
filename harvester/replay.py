@@ -2192,12 +2192,26 @@ async def _try_newsletter_brain(
         choose,
         invent_candidates,
         section_links,
+        weekend_files,
     )
+
+    async def _save_first_weekend_file(page_html: str, page_url: str):
+        for item in weekend_files(
+            invent_candidates(page_html, page_url, target_date),
+            target_date,
+        )[:8]:
+            saved = await _save_brain_file(item.url, dest)
+            if saved:
+                return saved
+        return None
 
     try:
         html = await _brain_fetch_html(listing_url)
         if not html:
             return None
+        saved = await _save_first_weekend_file(html, listing_url)
+        if saved:
+            return saved
         picked = choose(invent_candidates(html, listing_url, target_date), target_date)
         verdict = candidate_verdict(picked, target_date) if picked is not None else None
         if picked is None or not _brain_this_weekend(verdict, target_date):
@@ -3176,6 +3190,43 @@ def _extract_wp_upload_images(html: str, year: int, month: int, base_url: str) -
     return out
 
 
+async def _try_sunday_month_images(
+    example_url: str,
+    dest: Path,
+    target_date: date,
+    *,
+    count: int,
+) -> tuple[str, str] | None:
+    """Download Sunday-October-18th-1-scaled.jpg and the following pages."""
+    from .utils import sunday_month_day_image_urls
+
+    urls = sunday_month_day_image_urls(example_url, target_date, count=count)
+    if not urls:
+        return None
+    images: list[bytes] = []
+    first = ""
+    for url in urls:
+        result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            url,
+            max_attempts=2,
+            per_attempt_timeout_s=12.0,
+            total_budget_s=18.0,
+        )
+        if not result:
+            break
+        body, headers = result
+        if _body_looks_like_html(headers, body) or not looks_like_image_bytes(body):
+            break
+        images.append(body)
+        if not first:
+            first = url
+    if not images:
+        return None
+    await _images_bytes_to_pdf(dest, images)
+    return first, "image_to_pdf"
+
+
 async def _images_bytes_to_pdf(dest: Path, image_bytes_list: list[bytes]) -> None:
     from PIL import Image as PILImage
 
@@ -3362,23 +3413,23 @@ async def _try_naomhfionan_predicted_pdf(
     """Predict + fetch naomhfionan.com's bulletin PDF straight from its
     unprotected wp-content/uploads path, skipping the Cloudflare-challenged
     listing page entirely. See module comment above for why this is safe."""
-    from .utils import naomhfionan_bulletin_url
+    from .utils import naomhfionan_bulletin_urls
 
     for offset in (0, -1, 1):
-        url = naomhfionan_bulletin_url(target_date, number_offset=offset)
-        result = await asyncio.to_thread(
-            _fetch_bytes_with_retries,
-            url,
-            max_attempts=_NAOMHFIONAN_HTTP_ATTEMPTS,
-            per_attempt_timeout_s=_NAOMHFIONAN_HTTP_PER_ATTEMPT_TIMEOUT_S,
-            total_budget_s=_NAOMHFIONAN_HTTP_BUDGET_PER_CANDIDATE_S,
-        )
-        if not result:
-            continue
-        body, _headers = result
-        if _is_pdf_content(body):
-            dest.write_bytes(body)
-            return url, "pdf"
+        for url in naomhfionan_bulletin_urls(target_date, number_offset=offset):
+            result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                url,
+                max_attempts=_NAOMHFIONAN_HTTP_ATTEMPTS,
+                per_attempt_timeout_s=_NAOMHFIONAN_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                total_budget_s=_NAOMHFIONAN_HTTP_BUDGET_PER_CANDIDATE_S,
+            )
+            if not result:
+                continue
+            body, _headers = result
+            if _is_pdf_content(body):
+                dest.write_bytes(body)
+                return url, "pdf"
     return None
 
 
@@ -4818,6 +4869,13 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        example_url = str(recipe.get("example_url") or "").strip()
+        if example_url:
+            shifted = await _try_sunday_month_images(
+                example_url, dest, target_date, count=image_count
+            )
+            if shifted:
+                return dest, shifted[1], shifted[0]
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
