@@ -842,6 +842,17 @@ class IssueDateTests(unittest.TestCase):
         self.assertEqual(fresh.status, "fresh")
         self.assertEqual(fresh.extracted_date, date(2026, 10, 11))
 
+    def test_milford_18_october_name_beats_a_december_notice(self) -> None:
+        link = check_bulletin_freshness(
+            "https://milfordrathmullanparishes.ie/wp-content/uploads/"
+            "Parish-Newsletter-Sunday-18th-October.pdf",
+            date(2026, 10, 18),
+        )
+        notice = verdict_for_extracted_date(date(2026, 12, 14), date(2026, 10, 18))
+        picked = issue_date_verdict(link, notice)
+        self.assertEqual(picked.status, "fresh")
+        self.assertEqual(picked.extracted_date, date(2026, 10, 18))
+
 
 if __name__ == "__main__":
     unittest.main()

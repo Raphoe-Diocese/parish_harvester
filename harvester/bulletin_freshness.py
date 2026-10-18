@@ -683,12 +683,29 @@ def issue_date_verdict(
     if body_verdict.status != "stale":
         # A this-week heading beats an older date on the link.
         # An undated link stays unknown — do not invent "fresh".
+        # A later notice (14 December inside an 18 October file) does not
+        # replace a file name that is already this Sunday.
         if url_verdict.extracted_date is not None:
+            body_date = body_verdict.extracted_date
+            if (
+                url_verdict.status == "fresh"
+                and body_date is not None
+                and body_date > url_verdict.extracted_date
+            ):
+                return url_verdict
             return body_verdict
         return url_verdict
     url_date = url_verdict.extracted_date
     body_date = body_verdict.extracted_date
     if url_date is not None and body_date is not None and body_date < url_date:
+        return url_verdict
+    if (
+        url_verdict.status == "fresh"
+        and url_date is not None
+        and body_date is not None
+        and body_date > url_date
+        and body_verdict.reason == "date_ahead_of_target"
+    ):
         return url_verdict
     return body_verdict
 
