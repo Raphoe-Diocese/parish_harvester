@@ -1195,6 +1195,7 @@ def _fetch_bytes_with_retries(
     max_attempts: int,
     per_attempt_timeout_s: float,
     total_budget_s: float,
+    want_file: bool = False,
 ) -> tuple[bytes, dict[str, str]] | None:
     """Plain-HTTP (no browser) GET with retries, run off the event loop.
 
@@ -1226,7 +1227,10 @@ def _fetch_bytes_with_retries(
                 request, timeout=per_attempt_timeout_s, context=ctx
             ) as response:
                 hit = _ok_http_body(response)
-                if hit:
+                if hit and (
+                    not want_file
+                    or _dropfiles_body_looks_like_file(hit[1], hit[0])
+                ):
                     return hit
         except HTTPError as exc:
             # Missing predicted files are a hard miss — do not burn the
@@ -1248,7 +1252,10 @@ def _fetch_bytes_with_retries(
                     context=insecure_ctx,
                 ) as response:
                     hit = _ok_http_body(response)
-                    if hit:
+                    if hit and (
+                        not want_file
+                        or _dropfiles_body_looks_like_file(hit[1], hit[0])
+                    ):
                         return hit
             except HTTPError as ssl_exc:
                 if ssl_exc.code in {404, 410}:
@@ -2140,9 +2147,10 @@ async def _save_brain_file(url: str, dest: Path) -> tuple[str, str] | None:
     result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
         quote_http_url(url),
-        max_attempts=3,
-        per_attempt_timeout_s=12.0,
-        total_budget_s=20.0,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
+        want_file=True,
     )
     if not result:
         return None
@@ -2207,9 +2215,9 @@ async def _try_newsletter_brain(
 
     try:
         html = await _brain_fetch_html(listing_url)
-        if not html:
-            return None
-        saved = await _save_first_weekend_file(html, listing_url)
+        # A challenge page, or no page at all, must not stop the Sunday
+        # filename guesses. Cloyne's PDF is not linked on the homepage.
+        saved = await _save_first_weekend_file(html or "", listing_url)
         if saved:
             return saved
         picked = choose(invent_candidates(html, listing_url, target_date), target_date)
@@ -3209,14 +3217,15 @@ async def _try_sunday_month_images(
         result = await asyncio.to_thread(
             _fetch_bytes_with_retries,
             url,
-            max_attempts=2,
-            per_attempt_timeout_s=12.0,
-            total_budget_s=18.0,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
+            want_file=True,
         )
         if not result:
             break
         body, headers = result
-        if _body_looks_like_html(headers, body) or not looks_like_image_bytes(body):
+        if not looks_like_image_bytes(body):
             break
         images.append(body)
         if not first:
