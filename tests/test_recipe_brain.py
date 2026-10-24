@@ -106,6 +106,17 @@ def test_sunday_guess_includes_cloyne_and_longford_names() -> None:
     assert "n18october2026.pdf" in joined
 
 
+def test_bree_weekend_name_is_18_october_not_2018() -> None:
+    from harvester.utils import extract_date_from_string
+
+    url = "https://www.bree.ie/wp-content/uploads/2026/10/Newsletter-3742-Oct-17th-18th.pdf"
+    assert extract_date_from_string(url) == date(2026, 10, 18)
+    assert extract_date_from_string("Newsletter-3742-Oct-17th-18th.pdf") is None
+    assert extract_date_from_string("Sunday-Sept-06-26.pdf") == date(2026, 9, 6)
+    later = "https://www.bree.ie/wp-content/uploads/2026/10/Newsletter-3743-Oct-24th-25th_page-0001.jpg"
+    assert extract_date_from_string(later) == date(2026, 10, 25)
+
+
 def test_st_senan_glued_name_is_18_october_and_rolls() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
