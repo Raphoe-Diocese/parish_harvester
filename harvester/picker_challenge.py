@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from urllib.parse import unquote
 
-from .bulletin_freshness import MAX_STALE_DAYS_FROM_TARGET, WEEK_LOOKBACK_DAYS
+from .bulletin_freshness import WEEK_LOOKBACK_DAYS
 
 
 @dataclass(frozen=True)
@@ -71,7 +71,11 @@ def challenge_pin_against_listing(
         )
 
     week_start = target_date - timedelta(days=WEEK_LOOKBACK_DAYS)
-    ahead = target_date + timedelta(days=MAX_STALE_DAYS_FROM_TARGET)
+    # Next Sunday is 7 days on. A listing that already has that file must
+    # not replace this Sunday. Three days covers a Monday or Tuesday date
+    # on the same bulletin. Kilmyshall listed October-25th while the harvest
+    # Sunday was 18/10/2026, and the old 8-day grace took the later file.
+    ahead = target_date + timedelta(days=3)
     in_window = [
         (d, u)
         for d, u in scored_listing
