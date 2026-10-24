@@ -201,7 +201,18 @@ def _is_non_bulletin_url(url: str) -> bool:
         return True
     if _BULLETIN_KEYWORD_RE.search(text):
         return False
-    return bool(_NON_BULLETIN_RE.search(text))
+    from .newsletter_brain import is_diocese_profile
+
+    if is_diocese_profile(text):
+        return True
+    parsed = urlparse(text)
+    host = parsed.netloc or ""
+    if re.search(r"catholicbishops\.ie|facebook\.com|fbcdn\.net", host, re.I):
+        return True
+    # "dioceseofkerry.ie" is the parish file host. Do not reject that word
+    # in the website name. Keep the check on the file path.
+    path_text = f"{parsed.path or ''} {parsed.query or ''}"
+    return bool(_NON_BULLETIN_RE.search(path_text))
 
 
 def _normalized_href_patterns(values) -> list[str]:
@@ -2359,11 +2370,12 @@ async def _try_http_scrape_newest_pdf(
         scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
     if not scored:
         return None
-    best_date = max(found for found, _url in scored)
-    same_day = [url for found, url in scored if found == best_date]
-    from .newsletter_brain import pick_same_day_file
+    from .newsletter_brain import pick_same_day_file, same_sunday_urls
 
-    pdf_url = pick_same_day_file(same_day, href_patterns) or max(scored)[1]
+    same_day = same_sunday_urls(scored, target_date)
+    if not same_day:
+        return None
+    pdf_url = pick_same_day_file(same_day, href_patterns) or same_day[0]
     pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,

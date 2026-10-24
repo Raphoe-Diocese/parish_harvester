@@ -23,6 +23,7 @@ from harvester.newsletter_brain import (
     remember,
     section_links,
     pick_same_day_file,
+    same_sunday_urls,
     weekend_files,
 )
 
@@ -212,6 +213,26 @@ class InventTests(unittest.TestCase):
         assert kept is not None
         self.assertTrue(
             kept.endswith("sunday-newsletter-18-10-2026-edgeworthstown_compressed.pdf")
+        )
+
+    def test_castleisland_keeps_this_sunday_not_next_sunday(self) -> None:
+        scored = [
+            (date(2026, 10, 4), "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/4th-October2026-1.pdf"),
+            (date(2026, 10, 18), "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/18th-October2026.pdf"),
+            (date(2026, 10, 25), "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/25th-October2026.pdf"),
+        ]
+        kept = same_sunday_urls(scored, date(2026, 10, 18))
+        self.assertEqual(
+            kept,
+            ["https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/18th-October2026.pdf"],
+        )
+        from harvester.replay import _is_non_bulletin_url
+
+        self.assertFalse(_is_non_bulletin_url(kept[0]))
+        self.assertTrue(
+            _is_non_bulletin_url(
+                "https://achonrydiocese.org/parishes/sligo/achonry-mullinabreena/"
+            )
         )
 
     def test_termonmaguirc_picks_twenty_ninth_sunday(self) -> None:

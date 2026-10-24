@@ -58,7 +58,7 @@ LEARNED = (
     {
         "id": "http_scrape_newest_pdf",
         "label": "Dated PDF link on the listing page",
-        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Milford and Rathmullan list Parish-Newsletter-Sunday-18th-October.pdf on https://milfordrathmullanparishes.ie/bulletins/. That name is 18/10/2026. A later notice date inside the file does not replace it. Do not keep a guessed Twenty-Sixth file.",
+        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Milford and Rathmullan list Parish-Newsletter-Sunday-18th-October.pdf on https://milfordrathmullanparishes.ie/bulletins/. That name is 18/10/2026. A later notice date inside the file does not replace it. Do not keep a guessed Twenty-Sixth file. A PDF on dioceseofkerry.ie is the bulletin. The word diocese in the website name is not an admin document. Castleisland links 18th-October2026.pdf. Do not take 25th-October2026.pdf while the harvest Sunday is 18/10/2026.",
     },
     {
         "id": "wp_json_newest_media",
@@ -749,6 +749,19 @@ def pick_same_day_file(urls: list[str], patterns: list[str] | None = None) -> st
 
     pool.sort(key=path_score, reverse=True)
     return pool[0]
+
+
+def same_sunday_urls(scored: list[tuple[date, str]], target: date) -> list[str]:
+    """Next Sunday's file is not this Sunday's bulletin.
+
+    Castleisland lists 4 Oct, 18 Oct and 25 Oct. For harvest Sunday 18/10/2026
+    the file is 18th-October2026.pdf.
+    """
+    on_or_before = [(found, url) for found, url in scored if found <= target]
+    if not on_or_before:
+        return []
+    best = max(found for found, _url in on_or_before)
+    return [url for found, url in on_or_before if found == best]
 
 
 def choose(candidates: list[Candidate], target: date, body_text: str = "") -> Candidate | None:
