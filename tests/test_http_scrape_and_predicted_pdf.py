@@ -1633,6 +1633,35 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         chrome.assert_called_once()
 
+    def test_short_user_agent_pdf_skips_chrome(self) -> None:
+        from unittest.mock import patch
+
+        from harvester.replay import _fetch_sunday_pdf_bytes
+
+        pdf = b"%PDF-1.7 sunday"
+        with patch(
+            "harvester.replay._fetch_pdf_short_ua", return_value=(200, pdf)
+        ), patch("harvester.replay._fetch_with_chrome_impersonation") as chrome:
+            body = _fetch_sunday_pdf_bytes(
+                "https://cloyneparish.com/wp-content/uploads/2026/10/Newsletter.pdf"
+            )
+        self.assertEqual(body, pdf)
+        chrome.assert_not_called()
+
+    def test_missing_sunday_upload_does_not_try_chrome(self) -> None:
+        from unittest.mock import patch
+
+        from harvester.replay import _fetch_sunday_pdf_bytes
+
+        with patch(
+            "harvester.replay._fetch_pdf_short_ua", return_value=(404, b"")
+        ), patch("harvester.replay._fetch_with_chrome_impersonation") as chrome:
+            body = _fetch_sunday_pdf_bytes(
+                "https://cloyneparish.com/wp-content/uploads/2026/10/missing.pdf"
+            )
+        self.assertIsNone(body)
+        chrome.assert_not_called()
+
     def test_file_uri_returns_body_without_http_status(self) -> None:
         import tempfile
         from pathlib import Path

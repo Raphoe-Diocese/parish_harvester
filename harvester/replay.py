@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import base64
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 import fnmatch
 import io
 import json
@@ -1234,11 +1236,11 @@ def _hard_page_forbidden(exc: HTTPError) -> bool:
     )
 
 
-def _fetch_with_chrome_impersonation(
+def _chrome_impersonation_get(
     url: str,
     timeout_s: float,
 ) -> tuple[bytes, dict[str, str]] | None:
-    """One GET using Chrome's TLS fingerprint. Only after a hard 403."""
+    """One Chrome-fingerprint GET. The caller caps how long this may run."""
     try:
         from curl_cffi import requests as curl_requests
     except ImportError:
@@ -1260,6 +1262,94 @@ def _fetch_with_chrome_impersonation(
     raw_headers = getattr(response, "headers", {}) or {}
     headers = {str(key).lower(): str(value) for key, value in raw_headers.items()}
     return body, headers
+
+
+def _fetch_with_chrome_impersonation(
+    url: str,
+    timeout_s: float,
+) -> tuple[bytes, dict[str, str]] | None:
+    """One GET using Chrome's TLS fingerprint. Only after a hard 403.
+
+    A stuck handshake must not hold the parish until the 190s budget dies.
+    The worker is not waited on after the cap.
+    """
+    cap = max(5.0, float(timeout_s))
+    pool = ThreadPoolExecutor(max_workers=1)
+    try:
+        future = pool.submit(_chrome_impersonation_get, url, cap)
+        return future.result(timeout=cap + 2)
+    except FuturesTimeout:
+        return None
+    except Exception:
+        return None
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
+
+
+def _fetch_pdf_short_ua(url: str, timeout_s: float) -> tuple[int | None, bytes]:
+    """GET with a short browser token.
+
+    Cloyne 24/10/2026 returns the PDF to ``Mozilla/5.0`` and a 403 page to
+    the long Chrome token the normal downloader sends.
+    """
+    request = Request(quote_http_url(url), headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with _urlopen_ipv4(request, timeout=timeout_s) as response:
+            body = response.read()
+            status = getattr(response, "status", None)
+            return status, body or b""
+    except HTTPError as exc:
+        return exc.code, b""
+    except Exception:
+        return None, b""
+
+
+def _fetch_sunday_pdf_bytes(url: str) -> bytes | None:
+    """One Sunday upload. 404 is a miss. A 403 page gets one Chrome GET."""
+    status, body = _fetch_pdf_short_ua(url, 12)
+    if body[:5] == b"%PDF-":
+        return body
+    if status == 404:
+        return None
+    hit = _fetch_with_chrome_impersonation(url, 12)
+    if hit and hit[0][:5] == b"%PDF-":
+        return hit[0]
+    return None
+
+
+async def _try_sunday_upload_pdf(
+    start_url: str,
+    dest: Path,
+    target_date: date,
+) -> tuple[str, str] | None:
+    """This Sunday's uploads file, before the media library or the browser.
+
+    Cloyne's homepage blocks the normal downloader. The Sunday name is
+    already generated. Ask for that file first, and stop on a 404.
+    """
+    from .newsletter_brain import filename_shapes
+
+    parsed = urlparse(start_url)
+    if not parsed.scheme or not parsed.netloc:
+        return None
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    folder = (
+        f"{origin}/wp-content/uploads/{target_date.year}/"
+        f"{target_date.month:02d}/"
+    )
+    names = [
+        name for name in filename_shapes(target_date) if name.lower().endswith(".pdf")
+    ]
+    names.sort(
+        key=lambda name: (0 if name.lower().startswith("newsletter-") else 1, name)
+    )
+    for name in names[:3]:
+        url = folder + name
+        body = await asyncio.to_thread(_fetch_sunday_pdf_bytes, url)
+        if body and body[:5] == b"%PDF-":
+            dest.write_bytes(body)
+            return url, "pdf"
+    return None
 
 
 def _chrome_file_or_none(
@@ -4877,6 +4967,9 @@ async def replay_recipe(
         )
 
     if site_type == "wp_json_newest_media" and target_date is not None:
+        sunday_pdf = await _try_sunday_upload_pdf(start_url, dest, target_date)
+        if sunday_pdf:
+            return dest, sunday_pdf[1], sunday_pdf[0]
         href_patterns = [
             str(p).strip().lower()
             for p in (recipe.get("href_patterns") or [])
