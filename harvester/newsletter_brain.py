@@ -193,7 +193,7 @@ LEARNED = (
     {
         "id": "sunday_named_upload",
         "label": "This Sunday's file name on the uploads folder",
-        "how": "When the homepage has no file, try the uploads folder for this Sunday. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Crumlin is 2026-10-18-Newsletter.pdf. Wexford is Sunday-October-18th-1-scaled.jpg and the next page numbers. Falcarragh is Parish-Newsletter-42-Sun-A-18102026.pdf. The 2026 name has no word for in it.",
+        "how": "When the homepage has no file, try the uploads folder for this Sunday. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Crumlin is 2026-10-18-Newsletter.pdf. Wexford is Sunday-October-18th-1-scaled.jpg and the next page numbers. Falcarragh is Parish-Newsletter-42-Sun-A-18102026.pdf. The 2026 name has no word for in it. A 403 forbidden page is not a missing file. Cloyne 24/10/2026: urllib got that page and the browser got the PDF. The same page on another parish is the same trick.",
     },
 )
 
