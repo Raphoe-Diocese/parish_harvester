@@ -344,11 +344,53 @@ def candidate_probe_urls(start_url: str) -> list[tuple[str, str, str]]:
             "wp_json+direct_download",
         )
         add(
-            origin.rstrip("/") + "/wp-json/wp/v2/media?per_page=20",
+            origin.rstrip("/") + "/wp-json/wp/v2/media?per_page=100",
             "wp_json_newest_media",
             "wp_json+direct_download",
         )
+        sunday = target_sunday()
+        for day in (sunday, sunday - timedelta(days=7)):
+            for url, site_type, pattern_key in _sunday_guess_probes(origin, day):
+                add(url, site_type, pattern_key)
     return out
+
+
+def _sunday_guess_probes(origin: str, sunday: date) -> list[tuple[str, str, str]]:
+    """This Sunday's usual filenames. The last hunt never asked for these.
+
+    Cloyne is the Newsletter liturgical name. Crumlin is the ISO name.
+    Longford is /pdf/DDMMYY.pdf. Homepage probes alone missed all three.
+    """
+    from harvester.newsletter_brain import filename_shapes
+
+    root = origin.rstrip("/")
+    picked: list[str] = []
+    for name in filename_shapes(sunday):
+        low = name.lower()
+        if low.startswith("newsletter-") or low.endswith("-newsletter.pdf"):
+            picked.append(name)
+        elif (
+            low.endswith(".pdf")
+            and len(low) == 10
+            and low[:6].isdigit()
+            and low[6] == "."
+        ):
+            picked.append(name)
+    names: list[str] = []
+    for name in picked:
+        if name not in names:
+            names.append(name)
+    names = names[:3]
+    folder = f"{root}/wp-content/uploads/{sunday.year}/{sunday.month:02d}/"
+    found: list[tuple[str, str, str]] = []
+    short = ""
+    for name in names:
+        found.append((folder + name, "wp_json_newest_media", "sunday_named_upload"))
+        if len(name) == 10 and name[:6].isdigit() and name[6] == ".":
+            short = name
+    if short:
+        found.append((f"{root}/pdf/{short}", "predicted_dated_pdf", "predicted_dated_pdf"))
+    return found
 
 
 def _http_get(url: str, timeout: int = 20) -> tuple[int, str, bytes, str]:
@@ -454,9 +496,24 @@ def _prove_from_wp_json(body: bytes, page_url: str, accepted: set[date]) -> dict
         mime = str((item.get("mime_type") or "")).lower()
         if not source.lower().endswith(".pdf") and "pdf" not in mime:
             continue
-        found = _date_ok(source, accepted)
+        raw_title = item.get("title")
+        if isinstance(raw_title, dict):
+            title = str(raw_title.get("rendered") or "")
+        else:
+            title = str(raw_title or "")
+        found = _date_ok(source, accepted) or _date_ok(title, accepted)
         if found is None:
-            continue
+            blob = f"{source} {title}".lower()
+            if not any(word in blob for word in ("newsletter", "bulletin", "sunday")):
+                continue
+            raw_media = str(item.get("date") or "")[:10]
+            try:
+                media_day = date.fromisoformat(raw_media)
+            except ValueError:
+                continue
+            if media_day not in accepted:
+                continue
+            found = media_day
         try:
             status, ctype, blob, final = _http_get(source)
         except Exception:

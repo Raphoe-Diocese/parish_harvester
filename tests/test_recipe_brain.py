@@ -91,6 +91,18 @@ def test_parish_site_gets_current_newsletter_and_wp_json_probes() -> None:
     joined = " ".join(u for u, _site, _key in urls)
     assert "/current-newsletter/" in joined
     assert "wp-json" in joined
+    assert "/wp-content/uploads/" in joined
+    assert "/pdf/" in joined
+
+
+def test_sunday_guess_includes_cloyne_and_longford_names() -> None:
+    from harvester.recipe_brain import _sunday_guess_probes
+
+    urls = _sunday_guess_probes("https://cloyneparish.com", date(2026, 10, 18))
+    joined = " ".join(url for url, _site, _key in urls)
+    assert "Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf" in joined
+    assert "/wp-content/uploads/2026/10/" in joined
+    assert "/pdf/181026.pdf" in joined
 
 
 def test_remember_win_writes_parish_into_site_patterns(tmp_path: Path) -> None:
