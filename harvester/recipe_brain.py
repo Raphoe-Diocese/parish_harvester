@@ -172,6 +172,23 @@ def hint_for_url(url: str) -> HubHint | None:
             pattern_key="wp_json+direct_download",
         )
 
+    if "/wp-content/uploads/" in path and path.endswith(".pdf"):
+        return HubHint(
+            key="forbidden_page_browser_pdf",
+            site_type="wp_json_newest_media",
+            label="Sunday upload. A 403 page means use the browser (Cloyne)",
+            confidence="high",
+            notes=(
+                "Cloyne 24/10/2026. urllib gets a page titled 403 - Forbidden. The browser GET of this Sunday's uploads name is the PDF.",
+                "Another parish that answers with that same page is the same problem. Do not pin the dated filename.",
+            ),
+            do_not=(
+                "Do not retry urllib until the parish time limit.",
+                "Do not pin the dated filename.",
+            ),
+            pattern_key="forbidden_page+browser_pdf",
+        )
+
     return None
 
 

@@ -27,6 +27,7 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 |---|---|---|
 | `http_scrape_newest_pdf` | Dated `.pdf` in listing HTML | Score **filename** not `/uploads/YYYY/MM/` folder |
 | `wp_json_newest_media` | WordPress media library | `href_patterns` for bulletin words; harvest UA |
+| 403 page, file is still there | Cloyne 24/10/2026. urllib gets a page titled 403 - Forbidden | Ask the browser for this Sunday's uploads name. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Harvest 40095219846 ok, 18/10/2026. Another parish with that same page is the same trick. Do not pin the dated name. Do not retry urllib until the time limit. |
 | `predicted_dated_pdf` / `js_dated_pdf_list` | `/pdf/DDMMYY.pdf` (Tempo, Enniskillen, Derry Pattern A) | Listing may be **JavaScript**. HTTP scrape of `news.html` looks empty. Fetch the rewritten PDF. Prefer HTTP if TLS fails. |
 | `js_overwritten_html_newsletter` | `parishnews.htm` view-source blank; live page has this Sunday | `print_to_pdf` + `skip_listing_nav` + wait for JS. Do not pin `109.228.27.39/templates/?a=` |
 | Wix `/_files/ugd/` hashed PDF | Date is in **link text** only | Click `newest_dated` — never pin the hash (Irvinestown, Truagh) |

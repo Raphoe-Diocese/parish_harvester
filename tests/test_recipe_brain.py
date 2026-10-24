@@ -51,6 +51,18 @@ def test_unknown_host_has_no_invented_hint() -> None:
     assert hint_for_url("https://example.invalid/parish") is None
 
 
+def test_cloyne_upload_is_the_forbidden_page_trick() -> None:
+    hint = hint_for_url(
+        "https://cloyneparish.com/wp-content/uploads/2026/10/"
+        "Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf"
+    )
+    assert hint is not None
+    assert hint.key == "forbidden_page_browser_pdf"
+    assert hint.site_type == "wp_json_newest_media"
+    assert any("403" in line for line in hint.notes)
+    assert any("pin" in line.lower() for line in hint.do_not)
+
+
 def test_facebook_is_not_probed() -> None:
     assert candidate_probe_urls("https://www.facebook.com/someparish/") == []
 
