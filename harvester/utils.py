@@ -1576,7 +1576,12 @@ def rewrite_date_url(url: str, target: date) -> str:
             month_str = month_str[0].upper() + month_str[1:]
         else:
             month_str = month_str.lower()
-        day_str = f"{target.day:02d}" if len(day_raw) == 2 else str(target.day)
+        after_day = path[month_first_m.end(2):]
+        had_ordinal = bool(re.match(r"(?:st|nd|rd|th)", after_day, re.I))
+        if had_ordinal:
+            day_str = f"{target.day}{_ordinal_suffix(target.day)}"
+        else:
+            day_str = f"{target.day:02d}" if len(day_raw) == 2 else str(target.day)
         year_str = f"{target.year % 100:02d}" if len(year_raw) == 2 else str(target.year)
         new_frag = f"{month_str}-{day_str}-{year_str}"
         new_path = path[: month_first_m.start()] + new_frag + path[month_first_m.end() :]
