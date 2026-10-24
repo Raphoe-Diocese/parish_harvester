@@ -1317,15 +1317,56 @@ def _fetch_sunday_pdf_bytes(url: str) -> bytes | None:
     return None
 
 
+async def _browser_pdf_bytes(browser: Browser, url: str) -> bytes | None:
+    """Read the PDF through the browser's own network stack.
+
+    urllib's long Chrome token gets a 403 page. The browser GET of the same
+    uploads URL is the file. Cloyne, 24/10/2026.
+    """
+    captured: dict[str, bytes] = {}
+    context = await browser.new_context()
+    page = await context.new_page()
+
+    async def handle(route):
+        try:
+            response = await route.fetch(timeout=15_000)
+            body = await response.body()
+            captured["body"] = body
+            await route.fulfill(
+                status=response.status,
+                headers=dict(response.headers),
+                body=body,
+            )
+        except Exception:
+            try:
+                await route.abort()
+            except Exception:
+                pass
+
+    try:
+        await page.route("**/*", handle)
+        try:
+            await page.goto(url, wait_until="commit", timeout=20_000)
+        except Exception:
+            pass
+        body = captured.get("body") or b""
+        if body[:5] == b"%PDF-":
+            return body
+        return None
+    finally:
+        await context.close()
+
+
 async def _try_sunday_upload_pdf(
     start_url: str,
     dest: Path,
     target_date: date,
+    browser: Browser | None = None,
 ) -> tuple[str, str] | None:
-    """This Sunday's uploads file, before the media library or the browser.
+    """This Sunday's uploads file, before the media library.
 
-    Cloyne's homepage blocks the normal downloader. The Sunday name is
-    already generated. Ask for that file first, and stop on a 404.
+    The browser's own network stack is asked first. urllib's long token
+    gets a 403 page from this site. A 404 is a miss.
     """
     from .newsletter_brain import filename_shapes
 
@@ -1343,6 +1384,23 @@ async def _try_sunday_upload_pdf(
     names.sort(
         key=lambda name: (0 if name.lower().startswith("newsletter-") else 1, name)
     )
+    if browser is not None and names:
+        first = next(
+            (name for name in names if name.lower().startswith("newsletter-")),
+            names[0],
+        )
+        url = folder + first
+        try:
+            body = await asyncio.wait_for(_browser_pdf_bytes(browser, url), 25)
+        except Exception:
+            body = None
+        print(
+            f"  sunday browser {first}: {'pdf' if body else 'miss'}",
+            flush=True,
+        )
+        if body and body[:5] == b"%PDF-":
+            dest.write_bytes(body)
+            return url, "pdf"
     for name in names[:3]:
         url = folder + name
         body = await asyncio.to_thread(_fetch_sunday_pdf_bytes, url)
@@ -4967,7 +5025,9 @@ async def replay_recipe(
         )
 
     if site_type == "wp_json_newest_media" and target_date is not None:
-        sunday_pdf = await _try_sunday_upload_pdf(start_url, dest, target_date)
+        sunday_pdf = await _try_sunday_upload_pdf(
+            start_url, dest, target_date, browser
+        )
         if sunday_pdf:
             return dest, sunday_pdf[1], sunday_pdf[0]
         href_patterns = [
