@@ -172,7 +172,100 @@ def hint_for_url(url: str) -> HubHint | None:
             pattern_key="wp_json+direct_download",
         )
 
+    if "/wp-content/uploads/" in path and path.endswith(".pdf"):
+        return HubHint(
+            key="forbidden_page_browser_pdf",
+            site_type="wp_json_newest_media",
+            label="Sunday upload. A 403 page means use the browser (Cloyne)",
+            confidence="high",
+            notes=(
+                "Cloyne 24/10/2026. urllib gets a page titled 403 - Forbidden. The browser GET of this Sunday's uploads name is the PDF.",
+                "Another parish that answers with that same page is the same problem. Do not pin the dated filename.",
+            ),
+            do_not=(
+                "Do not retry urllib until the parish time limit.",
+                "Do not pin the dated filename.",
+            ),
+            pattern_key="forbidden_page+browser_pdf",
+        )
+
+    lower = raw.lower()
+    if "/_files/ugd/" in path:
+        return _step_hint(
+            "wix_link_text_date",
+            "wix_link_text_date",
+            "Wix hash. The date is in the link text",
+            "Irvinestown and Truagh. Do not save the /_files/ugd/ hash.",
+            "Do not pin the Wix hash.",
+        )
+    if "onewebmedia/" in path and path.endswith(".pdf"):
+        return _step_hint(
+            "onewebmedia_pdf",
+            "onewebmedia_pdf",
+            "One.com onewebmedia PDF",
+            "Lisnaskea and Galloon. An expired certificate is not a missing file.",
+            "Do not pin the onewebmedia hash.",
+        )
+    if path.endswith(".rtf"):
+        return _step_hint(
+            "rtf_newsletter",
+            "rtf_newsletter",
+            "Weekly RTF",
+            "Magheracloone. Take the newest .rtf.",
+            "Do not invent a PDF name.",
+        )
+    if "/pdf/" in path and path.endswith(".pdf"):
+        return _step_hint(
+            "predicted_dated_pdf",
+            "predicted_dated_pdf",
+            "Dated /pdf/ file when the listing looks empty",
+            "Tempo, Longford and Beragh. Prove the date from the file name.",
+            "Do not pin the dated /pdf/ name.",
+        )
+    if "articledetail.aspx" in path:
+        return _step_hint(
+            "connect_news_article",
+            "connect_news_article",
+            "NEWS.aspx article titled Parish Newsletter",
+            "The date is in the link text. Do not save the diocese /parishes/ page.",
+            "Do not save a diocese profile page.",
+        )
+    if "fileid=" in lower or "/index.cfm/_api/render/file/" in lower:
+        return _step_hint(
+            "http_scrape_newest_pdf",
+            "http_scrape_newest_pdf",
+            "Hashed file link. The date is in the link text",
+            "Mura fileID. Do not pin the hash. Score the link text.",
+            "Do not pin a fileID.",
+        )
+
     return None
+
+
+def _step_hint(
+    key: str,
+    site_type: str,
+    label: str,
+    note: str,
+    do_not: str,
+) -> HubHint:
+    """One stored step, used when a new URL looks like a parish already solved."""
+    return HubHint(
+        key=key,
+        site_type=site_type,
+        label=label,
+        confidence="high",
+        notes=(note,),
+        do_not=(do_not, "Do not pin a dated filename."),
+        pattern_key=key,
+    )
+
+
+def brain_steps() -> tuple[dict, ...]:
+    """The proved steps. Hunt notes live in this list, not in a second copy."""
+    from harvester.newsletter_brain import stored_steps
+
+    return stored_steps()
 
 
 def accepted_hunt_dates(today: date | None = None) -> set[date]:

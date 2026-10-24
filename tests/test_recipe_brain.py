@@ -51,6 +51,37 @@ def test_unknown_host_has_no_invented_hint() -> None:
     assert hint_for_url("https://example.invalid/parish") is None
 
 
+def test_cloyne_upload_is_the_forbidden_page_trick() -> None:
+    hint = hint_for_url(
+        "https://cloyneparish.com/wp-content/uploads/2026/10/"
+        "Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf"
+    )
+    assert hint is not None
+    assert hint.key == "forbidden_page_browser_pdf"
+    assert hint.site_type == "wp_json_newest_media"
+    assert any("403" in line for line in hint.notes)
+    assert any("pin" in line.lower() for line in hint.do_not)
+
+
+def test_longford_pdf_folder_is_a_stored_step() -> None:
+    hint = hint_for_url("https://longfordparish.com/pdf/270926.pdf")
+    assert hint is not None
+    assert hint.key == "predicted_dated_pdf"
+
+
+def test_brain_steps_hold_the_hunt_lessons() -> None:
+    from harvester.recipe_brain import brain_steps
+
+    steps = brain_steps()
+    assert len(steps) == 28
+    by_id = {item["id"]: item["how"] for item in steps}
+    assert "403" in by_id["sunday_named_upload"]
+    assert "Crossmolina" in by_id["http_scrape_newest_pdf"]
+    assert "Duilleog" in by_id["http_scrape_newest_pdf"]
+    assert "Mohill" in by_id["print_html_newsletter"]
+    assert "Carrigtwohill" in by_id["wp_json_newest_media"]
+
+
 def test_facebook_is_not_probed() -> None:
     assert candidate_probe_urls("https://www.facebook.com/someparish/") == []
 

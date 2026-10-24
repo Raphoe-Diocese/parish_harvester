@@ -58,47 +58,47 @@ LEARNED = (
     {
         "id": "http_scrape_newest_pdf",
         "label": "Dated PDF link on the listing page",
-        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Milford and Rathmullan list Parish-Newsletter-Sunday-18th-October.pdf on https://milfordrathmullanparishes.ie/bulletins/. That name is 18/10/2026. A later notice date inside the file does not replace it. Do not keep a guessed Twenty-Sixth file. A PDF on dioceseofkerry.ie is the bulletin. The word diocese in the website name is not an admin document. Castleisland links 18th-October2026.pdf. Do not take 25th-October2026.pdf while the harvest Sunday is 18/10/2026.",
+        "how": "Score the filename date, not the /uploads/ year folder. On a bulletins list, take the Sunday named there. Twenty-Ninth for 18/10/2026. Milford and Rathmullan list Parish-Newsletter-Sunday-18th-October.pdf on https://milfordrathmullanparishes.ie/bulletins/. That name is 18/10/2026. A later notice date inside the file does not replace it. Do not keep a guessed Twenty-Sixth file. A PDF on dioceseofkerry.ie is the bulletin. The word diocese in the website name is not an admin document. Castleisland links 18th-October2026.pdf. Do not take 25th-October2026.pdf while the harvest Sunday is 18/10/2026. A file in an old uploads folder is still this Sunday when the filename says so, as at Crossmolina. A Mura fileID hash has the date in the link text. Cork family hubs are harvested once from the listing. Bearna's file is the Duilleog. Keep the Irish. Navan's Sunday is in the /bulletin/ slug and the PDF is on the inner /s/ page. Do not pin /s/ or a fileID.",
     },
     {
         "id": "wp_json_newest_media",
         "label": "WordPress media library",
-        "how": "Read /wp-json/wp/v2/media and take a newsletter source_url.",
+        "how": "Read /wp-json/wp/v2/media and take a newsletter source_url. The homepage can have no file while the media library has this Sunday. Carrigtwohill, Newmarket, Roscommon and Dingle were proved that way. Skip a JPEG preview. Keep Irish. Do not pin the dated name.",
     },
     {
         "id": "predicted_dated_pdf",
         "label": "Guess /pdf/DDMMYY.pdf",
-        "how": "Listing HTML can be empty because the links are JavaScript.",
+        "how": "Listing HTML can be empty because the links are JavaScript. Tempo, Enniskillen, Longford and Beragh use /pdf/DDMMYY.pdf. Meath St Mary's Drogheda uses a3-bulletin-DD.MM.YYYY.pdf. Prove the date from the file name. Do not pin it.",
     },
     {
         "id": "print_html_newsletter",
         "label": "Print the live HTML page",
-        "how": "The page is overwritten each week. Do not pin a 109.228 article id.",
+        "how": "The page is overwritten each week. Do not pin a 109.228 article id. Mohill's newsletter is a WordPress page, not a post. Fenagh and Gortletteragh are inside that Mohill page. Kiltubrid /news/ is the same kind of overwritten page.",
     },
     {
         "id": "wix_link_text_date",
         "label": "Wix hash with the date in the link text",
-        "how": "Never save the /_files/ugd/ hash. Click the newest dated row.",
+        "how": "Never save the /_files/ugd/ hash. Click the newest dated row. Irvinestown and Truagh. The date is in the link text.",
     },
     {
         "id": "onewebmedia_pdf",
         "label": "One.com onewebmedia PDF",
-        "how": "Ignore an expired certificate and do not pin the hash.",
+        "how": "Ignore an expired certificate and do not pin the hash. Lisnaskea and Galloon. An expired certificate is not a missing file.",
     },
     {
         "id": "dated_dotted_filename",
         "label": "DD.MM.YYYY or YY.MM.DD in the filename",
-        "how": "Read the 4-digit year before a 2-digit year.",
+        "how": "Read the 4-digit year before a 2-digit year. Newsletter-23.08.2026.pdf and Kilronan DD.MM.YYYY.pdf.",
     },
     {
         "id": "rtf_newsletter",
         "label": "Weekly RTF converted to PDF",
-        "how": "Take the newest .rtf. Do not invent a PDF name.",
+        "how": "Take the newest .rtf. Do not invent a PDF name. Magheracloone 23rd-August-2026-.rtf.",
     },
     {
         "id": "image_stack",
         "label": "Sunday image, including an old upload folder",
-        "how": "Stack the visible page images, including an img src. NextGEN gallery is not /uploads/.",
+        "how": "Stack the visible page images, including an img src. NextGEN gallery is not /uploads/. Fintona's Sunday image can sit in an old month folder. The filename date is the Sunday.",
     },
     {
         "id": "jetpack_image",
@@ -153,12 +153,12 @@ LEARNED = (
     {
         "id": "shared_bulletin",
         "label": "Two parishes, one file",
-        "how": "Download once. The other parish stays a labelled link.",
+        "how": "Download once. The other parish stays a labelled link. Moydow and Legan share one /pdf/ file. Kinvara and Ballinderreen share one file. St Nicholas and St Mary's Limerick share one file. Shannon West is one file for several parishes. Harvest once.",
     },
     {
         "id": "dead_hostname_twin",
         "label": "Official hostname is dead",
-        "how": "Try the live .ie .com or .co.uk twin. Skip Anglican twins.",
+        "how": "Try the live .ie .com or .co.uk twin. Skip Anglican twins. Kilronan's official host is dead. The live site is parishofkilronan.ie. parishardaghmoydow.com is dead. The live site is ardaghmoydow.com.",
     },
     {
         "id": "facebook_link_only",
@@ -188,14 +188,22 @@ LEARNED = (
     {
         "id": "permanent_bulletin_pdf",
         "label": "Same bulletin.pdf address every week",
-        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page.",
+        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page. A /current-newsletter/ address that redirects to this week's PDF is the same idea. Kildare, Meath Athboy, Dunshaughlin, Kells, Kilbeggan, and Limerick St Joseph's. Do not pin the dated file it redirects to.",
     },
     {
         "id": "sunday_named_upload",
         "label": "This Sunday's file name on the uploads folder",
-        "how": "When the homepage has no file, try the uploads folder for this Sunday. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Crumlin is 2026-10-18-Newsletter.pdf. Wexford is Sunday-October-18th-1-scaled.jpg and the next page numbers. Falcarragh is Parish-Newsletter-42-Sun-A-18102026.pdf. The 2026 name has no word for in it.",
+        "how": "When the homepage has no file, try the uploads folder for this Sunday. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Crumlin is 2026-10-18-Newsletter.pdf. Wexford is Sunday-October-18th-1-scaled.jpg and the next page numbers. Falcarragh is Parish-Newsletter-42-Sun-A-18102026.pdf. The 2026 name has no word for in it. A 403 forbidden page is not a missing file. Cloyne 24/10/2026: urllib got that page and the browser got the PDF. The same page on another parish is the same trick.",
     },
 )
+
+
+def stored_steps() -> tuple[dict, ...]:
+    """Proved steps for finding a website and a bulletin.
+
+    This is the list the recipe brain reads. Hunt notes are copied in here.
+    """
+    return LEARNED
 
 _HREF_RE = re.compile(r"""href\s*=\s*['"]([^'"]+)['"]""", re.I)
 _MEDIA_RE = re.compile(
