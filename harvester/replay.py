@@ -2359,7 +2359,11 @@ async def _try_http_scrape_newest_pdf(
         scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
     if not scored:
         return None
-    _best_date, pdf_url = max(scored)
+    best_date = max(found for found, _url in scored)
+    same_day = [url for found, url in scored if found == best_date]
+    from .newsletter_brain import pick_same_day_file
+
+    pdf_url = pick_same_day_file(same_day, href_patterns) or max(scored)[1]
     pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,

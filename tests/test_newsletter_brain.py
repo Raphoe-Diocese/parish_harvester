@@ -22,6 +22,7 @@ from harvester.newsletter_brain import (
     referee,
     remember,
     section_links,
+    pick_same_day_file,
     weekend_files,
 )
 
@@ -198,6 +199,20 @@ class InventTests(unittest.TestCase):
         self.assertTrue(files)
         self.assertTrue(files[0].url.endswith("sunday-newsletter-18-10-2026-edgeworthstown_compressed.pdf"))
         self.assertFalse(any("thought-for-the-week" in item.url for item in files))
+        same_day = [
+            "https://edgeworthstownparish.ie/wp-content/uploads/2026/10/sunday-newsletter-18-10-2026-thought-for-the-week_compressed.pdf",
+            "https://edgeworthstownparish.ie/wp-content/uploads/2026/10/sunday-newsletter-18-10-2026-edgeworthstown_compressed.pdf",
+            "https://edgeworthstownparish.ie/wp-content/uploads/2026/10/sunday-newsletter-18-10-2026-rathowenstreete_compressed.pdf",
+        ]
+        kept = pick_same_day_file(
+            same_day,
+            ["edgeworthstown_compressed.pdf", "edgeworthstown"],
+        )
+        self.assertIsNotNone(kept)
+        assert kept is not None
+        self.assertTrue(
+            kept.endswith("sunday-newsletter-18-10-2026-edgeworthstown_compressed.pdf")
+        )
 
     def test_termonmaguirc_picks_twenty_ninth_sunday(self) -> None:
         html = """

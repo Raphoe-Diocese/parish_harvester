@@ -729,6 +729,28 @@ def weekend_files(candidates: list[Candidate], target: date) -> list[Candidate]:
     return picked
 
 
+def pick_same_day_file(urls: list[str], patterns: list[str] | None = None) -> str | None:
+    """Several files can share this Sunday. Keep the parish file.
+
+    thought-for-the-week can be dated this Sunday and still not be the bulletin.
+    A pattern that only sits in the website name matches every file on that site.
+    Prefer the pattern that is in the file path.
+    """
+    if not urls:
+        return None
+    real = [url for url in urls if not _SIDE_PDF_RE.search(url)]
+    pool = real or list(urls)
+    pats = [p.lower() for p in (patterns or []) if p]
+
+    def path_score(url: str) -> int:
+        path = unquote(urlparse(url).path).lower()
+        hits = [len(pat) for pat in pats if pat in path]
+        return max(hits) if hits else 0
+
+    pool.sort(key=path_score, reverse=True)
+    return pool[0]
+
+
 def choose(candidates: list[Candidate], target: date, body_text: str = "") -> Candidate | None:
     """First fresh file. A stale file is kept only if nothing this week exists."""
     fresh: list[tuple[Candidate, FreshnessVerdict]] = []
