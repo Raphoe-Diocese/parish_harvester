@@ -45,6 +45,8 @@ _D_M_YYYY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(20\d{2})(?!\d)")
 _D_M_YYYY_DASH_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(20\d{2})(?!\d)")
 _ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")                     # 2025-08-31
 _ISO_NODASH_RE = re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)")  # 20250831
+# Konica scan SKM_C550i26101608340. YYMMDD is the scan day, then the clock.
+_SKM_SCAN_RE = re.compile(r"SKM_[A-Za-z0-9]*i(\d{2})(\d{2})(\d{2})\d", re.IGNORECASE)
 # Kilmore GoDaddy weekend file 2026100304.pdf means 3–4 October 2026.
 # The 8-digit ISO form refuses a trailing day, so the current file never
 # scored and the scraper kept the previous Sunday.
@@ -295,9 +297,37 @@ def _is_plausible_bulletin_year(year: int) -> bool:
     return (today.year - 50) <= year <= (today.year + 2)
 
 
+def newest_dated_url_on_or_before(urls: list[str], target: date) -> str | None:
+    """Newest URL whose own date is on or before the harvest Sunday.
+
+    A scan already dated next week must not win. Clonard's front-page photo
+    is scanned after this Sunday; the sheet for this Sunday is the older scan.
+    """
+    best_url: str | None = None
+    best_found: date | None = None
+    for url in urls:
+        found = extract_date_from_string(url)
+        if found is None or found > target:
+            continue
+        if best_found is None or found > best_found:
+            best_found = found
+            best_url = url
+    return best_url
+
+
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
     spans = _opaque_hash_spans(text)
+
+    # Scanner name first. The clock digits must not be read as a year.
+    m = _SKM_SCAN_RE.search(text or "")
+    if m:
+        try:
+            candidate = date(2000 + int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
+        except ValueError:
+            pass
 
     # ISO with dashes
     m = _first_match_outside_hash(_ISO_RE, text, spans)

@@ -69,6 +69,7 @@ from .utils import (
     dropfiles_task_download_url,
     extract_date_from_slug,
     extract_date_from_string,
+    newest_dated_url_on_or_before,
     churchmedia_channel_about_url,
     churchmedia_newsletter_url_from_about,
     churchmedia_slug_from_url,
@@ -2921,6 +2922,80 @@ async def _try_wp_json_newest_media(
     return pdf_url, "pdf"
 
 
+def _patterns_want_scan(href_patterns: list[str]) -> bool:
+    """True when the recipe is asking for a scanner photo, not a PDF."""
+    return any("skm_" in p for p in href_patterns)
+
+
+async def _try_wp_json_scan_on_or_before_sunday(
+    start_url: str,
+    dest: Path,
+    *,
+    href_patterns: list[str],
+    target_date: date,
+    href_skip_patterns: list[str] | None = None,
+) -> tuple[str, str] | None:
+    """Newest library scan dated on or before the harvest Sunday.
+
+    The homepage image can already be next Sunday. The scan filename is the
+    day it was scanned, so a file after this Sunday is left for next week.
+    """
+    parsed = urlparse(start_url)
+    if not parsed.scheme or not parsed.netloc:
+        return None
+    api = (
+        f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/media"
+        "?per_page=20&media_type=image&orderby=date&order=desc"
+    )
+    result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        api,
+        max_attempts=6,
+        per_attempt_timeout_s=10.0,
+        total_budget_s=25.0,
+    )
+    if not result:
+        return None
+    body, _headers = result
+    try:
+        items = json.loads(body.decode("utf-8", errors="replace"))
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(items, list):
+        return None
+    urls: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        src = str(item.get("source_url") or "").strip()
+        if not src or _is_non_bulletin_url(src):
+            continue
+        if _href_is_skipped(src, href_skip_patterns or []):
+            continue
+        if href_patterns and not _href_matches_patterns(src, href_patterns):
+            continue
+        urls.append(src)
+    image_url = newest_dated_url_on_or_before(urls, target_date)
+    if not image_url:
+        return None
+    image_url = quote_http_url(image_url)
+    file_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        image_url,
+        max_attempts=4,
+        per_attempt_timeout_s=15.0,
+        total_budget_s=30.0,
+        want_file=True,
+    )
+    if not file_result:
+        return None
+    file_body, file_headers = file_result
+    if not looks_like_image_bytes(file_body):
+        return None
+    kind = await _save_dropfiles_bytes_to_pdf(file_body, file_headers, image_url, dest)
+    return image_url, kind
+
+
 _RSS_ITEM_RE = re.compile(r"<item\b.*?</item>", re.IGNORECASE | re.DOTALL)
 _RSS_LINK_RE = re.compile(r"<link>\s*(https?://[^<\s]+)\s*</link>", re.IGNORECASE)
 
@@ -5041,6 +5116,20 @@ async def replay_recipe(
             for p in (recipe.get("href_skip_patterns") or [])
             if str(p).strip()
         ]
+        if _patterns_want_scan(href_patterns):
+            scan = await _try_wp_json_scan_on_or_before_sunday(
+                start_url,
+                dest,
+                href_patterns=href_patterns,
+                target_date=target_date,
+                href_skip_patterns=href_skip_patterns or None,
+            )
+            if scan:
+                return dest, scan[1], scan[0]
+            raise RecipeReplayError(
+                "No scanner photo on or before "
+                f"{target_date.isoformat()} in the media library"
+            )
         found = await _try_wp_json_newest_media(
             start_url,
             dest,

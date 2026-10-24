@@ -132,6 +132,30 @@ def test_kilmyshall_october_name_keeps_the_th() -> None:
     assert kept.endswith("Sunday-Sept-13-26.pdf")
 
 
+def test_clonard_keeps_the_scan_on_or_before_this_sunday() -> None:
+    from harvester.utils import extract_date_from_string, newest_dated_url_on_or_before
+
+    this_sunday = (
+        "https://clonardparish.ie/wp-content/uploads/2026/10/"
+        "SKM_C550i26101608340-scaled.jpg"
+    )
+    next_sheet = (
+        "https://clonardparish.ie/wp-content/uploads/2026/10/"
+        "SKM_C550i26102111250-scaled.jpg"
+    )
+    later_scan = (
+        "https://clonardparish.ie/wp-content/uploads/2026/10/"
+        "SKM_C550i26102308570-scaled.jpg"
+    )
+    assert extract_date_from_string(this_sunday) == date(2026, 10, 16)
+    assert extract_date_from_string(next_sheet) == date(2026, 10, 21)
+    chosen = newest_dated_url_on_or_before(
+        [later_scan, next_sheet, this_sunday],
+        date(2026, 10, 18),
+    )
+    assert chosen == this_sunday
+
+
 def test_st_senan_glued_name_is_18_october_and_rolls() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
