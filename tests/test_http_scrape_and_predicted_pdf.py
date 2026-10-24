@@ -1515,7 +1515,7 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         seen: list[tuple[str, bool]] = []
         pdf = b"%PDF-1.7 scraped"
 
-        def fake_urlopen(req, timeout=None, context=None):
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
             seen.append((req.full_url, context is not None))
             if context is None:
                 raise URLError(
@@ -1551,7 +1551,7 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         seen: list[bool] = []
         pdf = b"%PDF-1.7 limavady-expired-cert"
 
-        def fake_urlopen(req, timeout=None, context=None):
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
             seen.append(context is not None)
             if context is None:
                 raise URLError(
@@ -1586,7 +1586,7 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
 
         calls: list[object] = []
 
-        def fake_urlopen(req, timeout=None, context=None):
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
             calls.append(context)
             raise HTTPError(req.full_url, 404, "Not Found", EmailMessage(), None)
 
@@ -1600,6 +1600,38 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         self.assertIsNone(hit)
         self.assertEqual(len(calls), 1)
         self.assertIsNone(calls[0])
+
+    def test_forbidden_page_tries_chrome_once(self) -> None:
+        from email.message import EmailMessage
+        from io import BytesIO
+        from unittest.mock import patch
+        from urllib.error import HTTPError
+
+        calls: list[int] = []
+        pdf = b"%PDF-1.7 cloyne"
+        page = b"<html>Access to this page is forbidden.</html>"
+
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
+            calls.append(1)
+            raise HTTPError(
+                req.full_url, 403, "Forbidden", EmailMessage(), BytesIO(page)
+            )
+
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen), patch(
+            "harvester.replay._fetch_with_chrome_impersonation",
+            return_value=(pdf, {"content-type": "application/pdf"}),
+        ) as chrome:
+            hit = _fetch_bytes_with_retries(
+                "https://cloyneparish.com/wp-content/uploads/2026/10/Newsletter.pdf",
+                max_attempts=60,
+                per_attempt_timeout_s=5,
+                total_budget_s=45,
+                want_file=True,
+            )
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], pdf)
+        self.assertEqual(len(calls), 1)
+        chrome.assert_called_once()
 
     def test_file_uri_returns_body_without_http_status(self) -> None:
         import tempfile

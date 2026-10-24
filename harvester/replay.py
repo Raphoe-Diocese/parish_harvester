@@ -1216,6 +1216,65 @@ def _ok_http_body(response) -> tuple[bytes, dict[str, str]] | None:
     return body, headers
 
 
+def _hard_page_forbidden(exc: HTTPError) -> bool:
+    """A static 403 page. Retrying urllib never turns it into the PDF.
+
+    Cloyne 24/10/2026: HEAD is the newsletter, urllib and curl GET are this
+    HTML page, and a Chrome TLS fingerprint GET is the PDF.
+    """
+    if getattr(exc, "code", None) != 403:
+        return False
+    try:
+        snippet = (exc.read(2000) or b"").lower()
+    except Exception:
+        return False
+    return (
+        b"access to this page is forbidden" in snippet
+        or b"<title>403 - forbidden</title>" in snippet
+    )
+
+
+def _fetch_with_chrome_impersonation(
+    url: str,
+    timeout_s: float,
+) -> tuple[bytes, dict[str, str]] | None:
+    """One GET using Chrome's TLS fingerprint. Only after a hard 403."""
+    try:
+        from curl_cffi import requests as curl_requests
+    except ImportError:
+        return None
+    try:
+        response = curl_requests.get(
+            url,
+            impersonate="chrome",
+            timeout=max(5.0, float(timeout_s)),
+            allow_redirects=True,
+        )
+    except Exception:
+        return None
+    if getattr(response, "status_code", None) != 200:
+        return None
+    body = getattr(response, "content", None) or b""
+    if not body:
+        return None
+    raw_headers = getattr(response, "headers", {}) or {}
+    headers = {str(key).lower(): str(value) for key, value in raw_headers.items()}
+    return body, headers
+
+
+def _chrome_file_or_none(
+    url: str,
+    timeout_s: float,
+    want_file: bool,
+) -> tuple[bytes, dict[str, str]] | None:
+    hit = _fetch_with_chrome_impersonation(url, timeout_s)
+    if hit and (
+        not want_file or _dropfiles_body_looks_like_file(hit[1], hit[0])
+    ):
+        return hit
+    return None
+
+
 def _fetch_bytes_with_retries(
     url: str,
     *,
@@ -1268,6 +1327,11 @@ def _fetch_bytes_with_retries(
             # shared retry budget on 404/410 (newtownkillea dated uploads).
             if exc.code in {404, 410}:
                 return None
+            # Cloyne: this 403 page is final for urllib. One Chrome GET.
+            if _hard_page_forbidden(exc):
+                return _chrome_file_or_none(
+                    url, per_attempt_timeout_s, want_file
+                )
         except Exception as exc:
             if prefer_unverified or not _is_certificate_verify_error(exc):
                 continue
@@ -1292,6 +1356,10 @@ def _fetch_bytes_with_retries(
             except HTTPError as ssl_exc:
                 if ssl_exc.code in {404, 410}:
                     return None
+                if _hard_page_forbidden(ssl_exc):
+                    return _chrome_file_or_none(
+                        url, per_attempt_timeout_s, want_file
+                    )
             except Exception:
                 pass
     return None
