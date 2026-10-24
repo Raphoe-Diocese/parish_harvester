@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Cashel and Emly Diocese Bulletin Viewer — 24/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="../mega_pdf/cashel_and_emly_mega_bulletin_p1.jpg?d=2026-10-24&amp;h=20261024T1122" as="image">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #f4f6f6;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a6b6b;
+    }
+
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
+    .section-heading {
+      margin: 34px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .viewer-block {
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .ocr-open-text {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 8px;
+      padding: 8px 14px;
+      background: #14524f;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .ocr-open-text:hover { background: #0e3b39; color: #fff; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
+
+    .pdf-frame-wrap {
+      position: relative;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      max-width: 100%;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px !important;
+      min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+
+
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .search-clear {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 4px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
+    .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
+    .diocese-intro {
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }
+    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
+    .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
+    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
+    .diocese-intro h3 {
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: #14524f;
+    }
+    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
+    .diocese-intro .intro-names {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+    .diocese-intro .intro-names li { margin: 0 0 4px; }
+    
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .ocr-zoom-bar button {
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
+    }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
+    .ocr-zoom-pct {
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    
+    #ocr-panel {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h2.b-title, #ocr-panel .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    #ocr-panel h3.b-head, #ocr-panel .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.85em;
+    }
+    #ocr-panel h3.ocr-page-heading,
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    #ocr-panel hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    #ocr-panel strong { color: #0f2b5b; }
+    #ocr-panel a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    #ocr-panel mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    #ocr-panel mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+      max-width: 100%;
+      height: auto;
+    }
+    #ocr-panel > :first-child {
+      margin-top: 0;
+    }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      border: 1px solid #d4ddd9;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .note-box {
+      margin-top: 12px;
+      color: #8a3b3b;
+      font-weight: 400;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 4px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .empty-state[hidden],
+    #parish-empty[hidden] { display: none !important; }
+    .parish-section {
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
+    }
+    .parish-section h2.section-heading {
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+    .parish-filter {
+      width: 100%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
+    }
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: #1a6b6b;
+      font-weight: 700;
+    }
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
+    }
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
+    footer {
+      margin-top: 40px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
+      }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
+      /* Tap targets big enough for a thumb. */
+      .az-letter,
+      .ocr-zoom-bar button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
+      .download-link-top { display: none; }
+      .ocr-open-text { margin-left: 0; width: 100%; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
+      #ocr-panel {
+        padding: 16px 14px 28px;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      .ocr-search-tools button {
+        min-height: 44px;
+        width: 100%;
+      }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="/assets/pdf-inpage-viewer.js?v=20261018a" defer></script>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html" target="_blank" rel="noopener noreferrer">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">CASHEL AND EMLY</p>
+      <h1>Cashel and Emly Collated Bulletin</h1>
+      
+      <p class="meta">Generated for 24/10/2026.</p>
+      <a class="download-link-top pdf-force-download" href="../mega_pdf/cashel_and_emly_mega_bulletin.pdf?d=2026-10-24&amp;h=20261024T1122" download="cashel_and_emly_mega_bulletin.pdf">Download PDF</a>
+    </header>
+    
+
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+    </div>
+
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Anacarty &amp; Donohill" title="Anacarty &amp; Donohill" aria-label="Jump to Anacarty &amp; Donohill">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballina &amp; Boher|Ballinahinch &amp; Killoscully|Ballingarry|Ballybricken &amp; Bohermore|Ballylanders|Bansha &amp; Kilmoyler|Boherlahan &amp; Dualla|Borrisoleigh &amp; Ileigh" title="Ballina &amp; Boher, Ballinahinch &amp; Killoscully, Ballingarry, Ballybricken &amp; Bohermore, Ballylanders, Bansha &amp; Kilmoyler, Boherlahan &amp; Dualla, Borrisoleigh &amp; Ileigh" aria-label="Jump to Ballina &amp; Boher">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Caherconlish &amp; Inch St. Lawrence|Cappamore|Cappawhite|Cashel &amp; Rosegreen|Clerihan|Clonoulty &amp; Rossmore" title="Caherconlish &amp; Inch St. Lawrence, Cappamore, Cappawhite, Cashel &amp; Rosegreen, Clerihan, Clonoulty &amp; Rossmore" aria-label="Jump to Caherconlish &amp; Inch St. Lawrence">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Doon|Drangan &amp; Cloneen|Drom &amp; Inch" title="Doon, Drangan &amp; Cloneen, Drom &amp; Inch" aria-label="Jump to Doon">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Emly" title="Emly" aria-label="Jump to Emly">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fethard &amp; Killusty" title="Fethard &amp; Killusty" aria-label="Jump to Fethard &amp; Killusty">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Galbally &amp; Lisvernane|Golden &amp; Kilfeacle|Gortnahoe &amp; Glengoole" title="Galbally &amp; Lisvernane, Golden &amp; Kilfeacle, Gortnahoe &amp; Glengoole" aria-label="Jump to Galbally &amp; Lisvernane">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Holycross &amp; Ballycahill|Hospital &amp; Herbertstown" title="Holycross &amp; Ballycahill, Hospital &amp; Herbertstown" aria-label="Jump to Holycross &amp; Ballycahill">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilbehenny &amp; Anglesboro|Kilcommon &amp; Hollyford|Killenaule &amp; Moyglass|Kilteely &amp; Dromkeen|Knockainey &amp; Patrickswell|Knockavilla &amp; Donaskeigh|Knocklong &amp; Glenbrohane" title="Kilbehenny &amp; Anglesboro, Kilcommon &amp; Hollyford, Killenaule &amp; Moyglass, Kilteely &amp; Dromkeen, Knockainey &amp; Patrickswell, Knockavilla &amp; Donaskeigh, Knocklong &amp; Glenbrohane" aria-label="Jump to Kilbehenny &amp; Anglesboro">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lattin &amp; Cullen|Loughmore &amp; Castleiney" title="Lattin &amp; Cullen, Loughmore &amp; Castleiney" aria-label="Jump to Lattin &amp; Cullen">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Moycarkey, Littleton &amp; Two-Mile-Borris|Mullinahone|Murroe &amp; Boher" title="Moycarkey, Littleton &amp; Two-Mile-Borris, Mullinahone, Murroe &amp; Boher" aria-label="Jump to Moycarkey, Littleton &amp; Two-Mile-Borris">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="New Inn &amp; Knockgraffon|Newport, Birdhill &amp; Toor" title="New Inn &amp; Knockgraffon, Newport, Birdhill &amp; Toor" aria-label="Jump to New Inn &amp; Knockgraffon">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Pallasgreen &amp; Templebraden" title="Pallasgreen &amp; Templebraden" aria-label="Jump to Pallasgreen &amp; Templebraden">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Solohead &amp; Oola" title="Solohead &amp; Oola" aria-label="Jump to Solohead &amp; Oola">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Templemore, Clonmore &amp; Killea|Templetuohy &amp; Moyne|Thurles|Tipperary" title="Templemore, Clonmore &amp; Killea, Templetuohy &amp; Moyne, Thurles, Tipperary" aria-label="Jump to Templemore, Clonmore &amp; Killea">T</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Upperchurch &amp; Drombane" title="Upperchurch &amp; Drombane" aria-label="Jump to Upperchurch &amp; Drombane">U</button></nav>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe data-pdf-url="../mega_pdf/cashel_and_emly_mega_bulletin.pdf?d=2026-10-24&amp;h=20261024T1122" title="Cashel and Emly Diocese bulletin PDF"></iframe>
+        
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../mega_pdf/cashel_and_emly_mega_bulletin.pdf?d=2026-10-24&amp;h=20261024T1122" data-pdf-preview="../mega_pdf/cashel_and_emly_mega_bulletin_p1.jpg?d=2026-10-24&amp;h=20261024T1122">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a class="pdf-open-newtab" href="../mega_pdf/cashel_and_emly_mega_bulletin.pdf?d=2026-10-24&amp;h=20261024T1122" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="../mega_pdf/cashel_and_emly_mega_bulletin.pdf?d=2026-10-24&amp;h=20261024T1122" download="cashel_and_emly_mega_bulletin.pdf">Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="../mega_pdf/cashel_and_emly_mega_bulletin_p1.jpg?d=2026-10-24&amp;h=20261024T1122" alt="" style="display:block;width:100%;height:auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="ocr-sticky-chrome">
+      <div class="ocr-search-bar">
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+        </div>
+      </div>
+      </div>
+      <div class="ocr-controls-row">
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Anacarty &amp; Donohill" title="Anacarty &amp; Donohill" aria-label="Jump to Anacarty &amp; Donohill">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballina &amp; Boher|Ballinahinch &amp; Killoscully|Ballingarry|Ballybricken &amp; Bohermore|Ballylanders|Bansha &amp; Kilmoyler|Boherlahan &amp; Dualla|Borrisoleigh &amp; Ileigh" title="Ballina &amp; Boher, Ballinahinch &amp; Killoscully, Ballingarry, Ballybricken &amp; Bohermore, Ballylanders, Bansha &amp; Kilmoyler, Boherlahan &amp; Dualla, Borrisoleigh &amp; Ileigh" aria-label="Jump to Ballina &amp; Boher">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Caherconlish &amp; Inch St. Lawrence|Cappamore|Cappawhite|Cashel &amp; Rosegreen|Clerihan|Clonoulty &amp; Rossmore" title="Caherconlish &amp; Inch St. Lawrence, Cappamore, Cappawhite, Cashel &amp; Rosegreen, Clerihan, Clonoulty &amp; Rossmore" aria-label="Jump to Caherconlish &amp; Inch St. Lawrence">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Doon|Drangan &amp; Cloneen|Drom &amp; Inch" title="Doon, Drangan &amp; Cloneen, Drom &amp; Inch" aria-label="Jump to Doon">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Emly" title="Emly" aria-label="Jump to Emly">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Fethard &amp; Killusty" title="Fethard &amp; Killusty" aria-label="Jump to Fethard &amp; Killusty">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Galbally &amp; Lisvernane|Golden &amp; Kilfeacle|Gortnahoe &amp; Glengoole" title="Galbally &amp; Lisvernane, Golden &amp; Kilfeacle, Gortnahoe &amp; Glengoole" aria-label="Jump to Galbally &amp; Lisvernane">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Holycross &amp; Ballycahill|Hospital &amp; Herbertstown" title="Holycross &amp; Ballycahill, Hospital &amp; Herbertstown" aria-label="Jump to Holycross &amp; Ballycahill">H</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilbehenny &amp; Anglesboro|Kilcommon &amp; Hollyford|Killenaule &amp; Moyglass|Kilteely &amp; Dromkeen|Knockainey &amp; Patrickswell|Knockavilla &amp; Donaskeigh|Knocklong &amp; Glenbrohane" title="Kilbehenny &amp; Anglesboro, Kilcommon &amp; Hollyford, Killenaule &amp; Moyglass, Kilteely &amp; Dromkeen, Knockainey &amp; Patrickswell, Knockavilla &amp; Donaskeigh, Knocklong &amp; Glenbrohane" aria-label="Jump to Kilbehenny &amp; Anglesboro">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lattin &amp; Cullen|Loughmore &amp; Castleiney" title="Lattin &amp; Cullen, Loughmore &amp; Castleiney" aria-label="Jump to Lattin &amp; Cullen">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Moycarkey, Littleton &amp; Two-Mile-Borris|Mullinahone|Murroe &amp; Boher" title="Moycarkey, Littleton &amp; Two-Mile-Borris, Mullinahone, Murroe &amp; Boher" aria-label="Jump to Moycarkey, Littleton &amp; Two-Mile-Borris">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="New Inn &amp; Knockgraffon|Newport, Birdhill &amp; Toor" title="New Inn &amp; Knockgraffon, Newport, Birdhill &amp; Toor" aria-label="Jump to New Inn &amp; Knockgraffon">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Pallasgreen &amp; Templebraden" title="Pallasgreen &amp; Templebraden" aria-label="Jump to Pallasgreen &amp; Templebraden">P</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Solohead &amp; Oola" title="Solohead &amp; Oola" aria-label="Jump to Solohead &amp; Oola">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Templemore, Clonmore &amp; Killea|Templetuohy &amp; Moyne|Thurles|Tipperary" title="Templemore, Clonmore &amp; Killea, Templetuohy &amp; Moyne, Thurles, Tipperary" aria-label="Jump to Templemore, Clonmore &amp; Killea">T</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Upperchurch &amp; Drombane" title="Upperchurch &amp; Drombane" aria-label="Jump to Upperchurch &amp; Drombane">U</button></nav>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+        <a class="ocr-open-text" href="cashel_and_emly-2026-10-24-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-thurles" data-parish-name="Thurles"><h2 class="ocr-parish-name">Thurles</h2><p class="ocr-parish-date">24/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Saturday 17th October 6.30 Ned &amp; Paudi Ryan Croughmakeen anniversaries John Stokes Clonlusk anniversary</p>
+<p>Sunday 18th October 11.00 Mary McLoughlin Glasha Talann 1st anniversary Kitty Lonergan Lacka 6th anniversary</p>
+<p>Saturday 24th October 6.30</p>
+<p>Sunday 25th October 11.00 Recently deceased Please pray for the repose of the soul of Michael Reale Assumption Terrace whose funeral took place during the week.</p>
+<p>Please pray for Michael Ryan Toomaline. Reposing at Whites Funeral Home, Doon (V94 D450) Sunday evening (18th October) from 3.30 pm with removal at 6 pm to St. PatrickÕs Church, Doon.</p>
+<p>Requiem Mass Monday at 11.30 am with burial afterwards in Doon cemetery.</p>
+<p>Sympathy to the bereaved. Masses this week Liturgy of the Word with Holy Communion on</p>
+<p>Friday 9.30. Fr Jimmy is away from</p>
+<p>Tuesday 6th October until</p>
+<p>Tuesday 27th of October. Fr Browne in Cappamore or Fr Donoghue Cappawhite will cover any emergency that may arise.</p>
+<h3 class="b-head">Weekday Mass</h3>
+<p>Cappamore 10.00 Mon-Fri.</p>
+<h3 class="b-head">Weekday Mass</h3>
+<p>Cappawhite 9.30. Tues-Fri. Liturgy of the Word with Holy Communion here with Deacon Tom on</p>
+<p>Friday 16th, 23rd, 30th October at 9.30. Ministers of the Eucharist &amp; Readers for next weekend: Please refer to your rota.</p>
+<p>Eucharistic Adoration: Adoration takes place every Wednesday in the parish church from 3 p.m. to 7 p.m.</p>
+<p>Calling Eucharistic Adorers in the Cashel &amp; Emly Diocese Eucharistic Adoration Apostolate Healing Retreat with Fr. Oisin Martin Franciscan Friar</p>
+<p>Saturday 24th October 2026, Time 10.30 a.m. till 4 p.m. at Knockanrawley Resource Centre, Tipperary Town, E34D832. Refreshments provided.</p>
+<p>Bookings Moira <a href="tel:+353876598159" style="color:#1d4ed8;font-weight:600;">087 6598159</a> , Brigid: <a href="tel:+353876305889" style="color:#1d4ed8;font-weight:600;">087 6305889</a></p>
+<p>Organised by the Cashel and Emly Eucharistic Adoration Apostolate.</p>
+<p>Rosary . October is the month of the holy rosary.</p>
+<header class="ocr-parish-masthead" id="ocr-parish-doon" data-parish-name="Doon"><h2 class="ocr-parish-name">Doon</h2><p class="ocr-parish-date">24/10/2026</p></header>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Weekly Envelopes: Your financial support for your parish is very much appreciated and every contribution makes a difference.</p>
+<p>Please make cheques payable to Doon Parochial A/C. Basket collection taken up at weekend masses.</p>
+<p>Donations can also be made via parish website.</p>
+<p>Community Caf (10:00 - 16:00) FridayÕs (10.00-14.00) SaturdayÕs at Doon Social Farm.</p>
+<p>Cllr Noreen Stokes will be in the office at Doon Community Centre on the 1st Saturday every month from 11am-12, if you have any problems or questions.</p>
+<p>Doon and District Mens Shed Meet in the Shed at the Old Convent building from 8pm every Monday night for a chat, cuppa, game of cards or pool and a spot of Archery on a Friday night.</p>
+<p>New members always welcome. Doon Tidy Towns used clothes collection every Sunday in October at the Pastoral Centre from 10:30am to 12 noon.</p>
+<p>All Donations Welcome Doon Community Council Notes: For bookings of hall or Astro Turf pitch: please text/phone <a href="tel:+353857557318" style="color:#1d4ed8;font-weight:600;">085 755 7318</a> . Bookings must be made in advance.</p>
+<p>Annual Scrap Metal collection took place last weekend 3rd &amp; 4th October.</p>
+<p>Scrap metal will continue to be accepted at the community centre for the next few days.</p>
+<p>Enquiries to <a href="tel:+353868938984" style="color:#1d4ed8;font-weight:600;">086 8938984</a> . NO FRIDGES PLEASE. Doon GAA Note This weekÕs Lotto numbers 5,20,24,30. Jackpot €11,400. No Winner.</p>
+<p>Match 3 Winners. 1. Carmel O&#x27;Connor, Ballinahinch 2. Caireann Allis, Kilmoylan. 3. Cormac Crowe, Carrigmore (Online). 4. Ciarn Whelan, Bank Place. 5. Sarah Maher, Carrigbeg (Online). 6. Teresa Maharajh, Surrey (Online).</p>
+<p>Lucky dip. 1. Freddie Walsh c/o Ollie Walsh. 2. Ger Doyle, Doon. 3. Darragh, Robbie &amp; Sarah Jane O&#x27;Connell, Kilkenny. 4. Mike Ryan, Gurtnagera. 5. Aidan Fitzgerald c/o Tom Murphy. 6. Siobhn Hayes, Lough Gur. 7. Ava &amp; Margaret Griffin, Gurtavalla. 8. Niamh Hanley, Cooga (Online). 9. Pa Hynes, Moanduff (Online). 10. Michael, Angie &amp; Darragh Ryan, Reenavanna (Online).</p>
+<p>Promoters Prize: Barry Murphy. Play our Club Lotto online and be in with a chance to win €11,600 next week!</p>
+<p>Lotto Tickets can also be purchased in Doon at LenihanÕs Centra &amp; Damien Richardson Butchers.</p>
+<p>Legion of Mary: Our Lady Queen of Peace Praesidium Doon continues to seek new members.</p>
+<p>Meetings every Tuesday evening in the Pastoral centre from 6.30 to 7.30. All are welcome.</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>The Alzheimer society of Ireland holds a get together for people with dementia and their supporters each Tuesday morning from 11:00 - 13:00 In the Social farm Doon titled: &quot;Social farming for the brain&quot;.</p>
+<p>Contact Donal on <a href="tel:+353870296617" style="color:#1d4ed8;font-weight:600;">0870296617</a> for details all welcome. Beginner Line Dance classes</p>
+<p>Friday 7-8pm in Doon Community Centre. All welcome.</p>
+<p>Contact Pat OÕDea <a href="tel:+353872577761" style="color:#1d4ed8;font-weight:600;">0872577761</a> . Village Voices Choir</p>
+<p>Wednesday 7.30 pm to 8.30pm upstairs in the front room in the main hall.</p>
+<p>All are welcome. Gardening for Climate Action classes in Doon Social Farm running until the 29th October every Thursday 10am-12.30pm. Learn the basics of organic gardening.</p>
+<p>Cost is €3 donation per day with tea &amp; a scone included.</p>
+<p>All Welcome. Doon Badminton Club Monday nights from 8-10pm in Doon Community Centre.</p>
+<p>Old and New members welcome. Over 18Õs €5 per night. 16- 18 who must be accompanied by an adult €2 per night.</p>
+<p>Doon Convent are celebrating their 50th anniversary this year 1976-2026 since the present school was opened.</p>
+<p>Mass at 2pm in Doon Church on 21st November followed by refreshments in the school afterwards.</p>
+<p>If anyone has photographs, stories, copy books or any information they would consider that would be relevant to this event.</p>
+<p>Please send them to <a href="mailto:conventns@gmail.com" target="_blank" rel="noopener noreferrer">conventns@gmail.com</a> or call into us in the school.</p>
+<p>East Limerick Social club: will be hosting a social card night at least twice a month during the winter months in Moores, Doon starting at 9pm. The next night is Friday the 23rd October.</p>
+<p>The games are friendly non competitive, where we try and play a couple of different card games each time.</p>
+<p>The only game we don&#x27;t play 45 or games similar to 45. The games we play are simple not snap and fun so that anyone can play.</p>
+<p>Games such as 31, lives, rummy, horsey, etc.</p>
+<p>And if your not sure how to play these games we will show you how.</p>
+<p>Its a bit of fun where you get to meet people, socialise and have a laugh.</p>
+<p>If your interested or have any queries about it, please feel free to text Mikey at <a href="tel:+353876764345" style="color:#1d4ed8;font-weight:600;">0876764345</a> . Doon Parish Journal: As the closing date is well passed THIS IS THE FINAL CALL FOR ARTICLES, TRIBUTES, PHOTOGRAPHS ETC FOR POSSIBLE INCLUSION IN THE 35TH EDITION OF BLESICE. No items accepted after</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>this Sunday evening, Outstanding items can be given to Donal Anderson, Peggy Sweeney or emailed to <a href="mailto:doonparishjournal@hotmail.com" target="_blank" rel="noopener noreferrer">doonparishjournal@hotmail.com</a> . Please note that photographs must be in JPEG format with names attached.</p>
+<p>Thanks to everyone who have submitted articles to date.</p>
+<p>Part-time Vacancy - General Operative Slieve Felim Community Employment Scheme.</p>
+<p>Vacancy for 2 General Operatives based in Doon.</p>
+<p>This is a part-time role working 19.5hrs per week.</p>
+<p>Applicants for this role must be in receipt of a Department of Social Welfare payment.</p>
+<p>It is vital that we fill these positions in order to continue the great work that the project is doing.</p>
+<p>Contact: Mary Murphy <a href="tel:+353861697637" style="color:#1d4ed8;font-weight:600;">0861697637</a> for more information.</p>
+<p>October is Safeguarding Month. Week 3 Speaking Up Being attentive to the wellbeing and safety of children and young people is an important part of safeguarding.</p>
+<p>If you have a concern about the safety or welfare of a child or vulnerable person, please ensure that you know who to speak to and how to report your concern.</p>
+<p>Our Parish Safeguarding Representatives can provide information and guidance on safeguarding procedures.</p>
+<p>Beginner archery in Cappamore Archers of Limerick is running a four-week beginner archery course at Cappamore Sports Hall on Wednesdays 14, 21 and 28 October and 4 November 2026, at 6.00 pm each week.</p>
+<p>Open to adults and juniors, with no experience needed and all equipment provided.</p>
+<p>Full course fee: €80 for adults and €60 for juniors.</p>
+<p>Maximum ten archers. A parent or guardian must remain present during junior sessions.</p>
+<p>To book or enquire, Whats App Richard on <a href="tel:+353863402334" style="color:#1d4ed8;font-weight:600;">086 340 2334</a> or email <a href="mailto:archersoflimerick@gmail.com" target="_blank" rel="noopener noreferrer">archersoflimerick@gmail.com</a> .</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>ENTRANCE ANTIPHON</p>
+<p>Tell among the nations his glory, and all his wonders among the peoples, for the Lord is great and highly to be praised.</p>
+<p>PENITENTIAL ACT</p>
+<p>Lord Jesus, you came to gather the nations into the peace of God&#x27;s kingdom: Lord, have mercy.</p>
+<p>Lord, have mercy. You come in word and sacrament to strengthen us in holiness: Christ, have mercy.</p>
+<p>Christ, have mercy. You will come in glory with salvation for your people, Lord, have mercy.</p>
+<p>Lord, have mercy. May almighty God have mercy on</p>
+<p>THE GLORIA</p>
+<p>Glory to God in the highest, and on earth peace to people of good will.</p>
+<p>We praise you, we bless you, we adore you, we glorify you, we give you thanks for your great glory, Lord God, heavenly King, O God, almighty Father.</p>
+<p>Lord Jesus Christ, Only Begotten Son, Lord God, Lamb of God, Son of the Father you take away the sins of the world: have mercy on us; you take away the sins of the world, receive our prayer; you are seated at the right hand of the Father have mercy on us; For you alone are the Holy One, you alone are the Lord, you alone are the Most High, Jesus Christ, with the Holy Spirit, in the glory of God the Father.</p>
+<p>Amen.</p>
+<p>OPENING PRAYER</p>
+<p>O God, you have willed that your Church be the sacrament of salvation for all nations, so that Christ&#x27;s saving work may continue to the ends of the ages; stir up, we pray, the hearts of your faithful and grant that they may feel a more urgent call to work for the salvation of every creature, so that from all the peoples on earth one family and one people of your own may arise and increase.</p>
+<p>Through our Lord .</p>
+<p>LITURGY OF THE WORD</p>
+<h4 class="b-sub">FIRST READING Isaiah 45:1.4-6</h4>
+<p>A reading from the prophet Isaiah Thus says Yahweh to his anointed, to Cyrus, whom he has taken by his right hand to subdue nations before him and strip the loins of kings, to force gateways before him that their gates be closed no more: It is for the sake of my servant Jacob, of Israel my chosen one, that I have called you by your name, conferring a title though you do not know me.</p>
+<p>I am the Lord, unrivalled, there is no other God besides me.</p>
+<p>Though you do not know me, I arm you that men may know from the rising to the setting of the sun that, apart from me, all is nothing.</p>
+<p>The word of the Lord. Thanks be to God.</p>
+<p>RESPONOSORIAL PSALM Ps. 95:1, 3-5, 7-10</p>
+<p>R. Give the Lord glory and power. 1. Osing a new song to the Lord, sing to the Lord all the earth.</p>
+<p>Tell among the nations his glory and his wonders among all the peoples. 2. The Lord is great and worthy of praise, to be feared above all gods; the gods of the heathens are naught.</p>
+<p>It was the Lord who made the heavens. 3. Give the Lord, you families of peoples, give the Lord glory and power, give the Lord the glory of his name.</p>
+<p>Bring an offering and enter his courts. 4. Worship the Lord in his temple.</p>
+<p>Oearth, tremble before him. Proclaim to the nations: ‘God is king.</p>
+<p>He will judge the peoples in fairness.</p>
+<p>SECOND READING 1 Thessalonians 1:1-5</p>
+<p>A reading from the first letter of St Paul to the Thessalonians From Paul, Silvanus and Timothy, to the Church in Thessalonica which is in God the Father and the Lord Jesus Christ; wishing you grace and peace from God the Father and the Lord Jesus Christ. We always mention you in our prayers and thank God for you all, and constantly remember before God our Father how you have shown your faith in action, worked for love and persevered through hope, in our Lord Jesus Christ. We know, brothers, that God loves you and that you have been chosen, because when we brought the Good News to you, it came to you not only as words, but as power and as the Holy Spirit and as utter conviction.</p>
+<p>The word of the Lord. Thanks be to God.</p>
+<p>GOSPEL ACCLAMATION</p>
+<p>Alleluia, alleluia! Your word is truth, O Lord: consecrate us in the truth. Alleluia!</p>
+<p>GOSPEL Matthew 22:15-21</p>
+<p>A reading from the holy Gospel according to Matthew The Pharisees went away to work out between them how to trap Jesus in what he said.</p>
+<p>And they sent their disciples to him, together with the Herodians, to say, &#x27;Master, we know that you are an honest man and teach the way of God in an honest way, and that you are not afraid of anyone, because a man&#x27;s rank means nothing to you.</p>
+<p>Tell us your opinion, then. Is it permissible to pay taxes to Caesar or not?</p>
+<p>But Jesus was aware of their malice and replied, &#x27;You hypocrites!</p>
+<p>Why do you set this trap for me? Let me see the money you pay the tax with.</p>
+<p>They handed him a denarius, and he said, &#x27;Whose head is this?</p>
+<p>Whose name?&#x27; &#x27;Caesar&#x27;s,&#x27; they replied. He then said to them, &#x27;Very well, give back to Caesar what belongs to Caesar and to God what belongs to God.</p>
+<p>The Gospel of the Lord. Praise to you, Lord Jesus Christ.</p>
+<p>APOSTLES&#x27; CREED</p>
+<p>I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, his only Son, our Lord, All bow for following two lines: who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; he descended into hell; on the third day he rose again from the dead; he ascended into heaven, and is seated at the right hand of God, the Father almighty; from there he will come to judge the living and the dead.</p>
+<p>I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting.</p>
+<p>Amen.</p>
+<p>LITURGY OF THE EUCHARIST</p>
+<h4 class="b-sub">PRAYER OVER THE OFFERINGS</h4>
+<p>May the offerings and prayers of your Church, O Lord, rise up in the sight of your majesty and gain acceptance, just as the glorious Passion of your Son was pleasing to you for the salvation of the whole world.</p>
+<p>Through Christ our Lord.</p>
+<h4 class="b-sub">AFTER THE CONSECRATION</h4>
+<p>The mystery of faith. We proclaim your Death, O Lord, and profess your Resurrection until you come again.</p>
+<p>COMMUNION ANTIPHON</p>
+<p>Opraise the Lord, all you nations; acclaim him, all you peoples!</p>
+<p>For his merciful love has prevailed over us, and the faithfulness of the Lord endures for ever.</p>
+<h4 class="b-sub">PRAYER AFTER COMMUNION</h4>
+<p>May our participation at your table sanctify us, O Lord, we pray, and grant that through the Sacrament of your Church all nations may receive in rejoicing the salvation accomplished on the Cross by your Only Begotten Son.</p>
+<p>Who lives and reigns for ever and ever.</p>
+<p>MISSION SUNDAY: TWENTY-NINTH SUNDAY IN ORDINARY TIME 18th October 2026 Year A</p>
+<p>On this World Mission Sunday, we reach out and offer our love, our support, prayers and joy to all the Christian communities throughout the world. &quot;Then repay to Caesar what belongs to Caesar and to God what belongs to God&quot;. The Pharisees are looking to Jesus for advice on their taxes.</p>
+<p>They try to flatter him first, ironically by speaking the truth about him, but the tone is still disrespectful.</p>
+<p>This is a dangerous situation because in an unlikely alliance, the Pharisees have brought along the Herodians with them.</p>
+<p>The Herodians were great supporters of the Roman Empire, so tensions here would have been high.</p>
+<p>If Jesus answers &quot;no&quot; to their question about paying taxes to Caesar he risks being reported to the Roman authorities as a revolutionary; if he says &quot;yes&quot; then he may be accused of colluding with the occupying Empire and abandoning the people.</p>
+<p>Jesus sees through this &quot;malice&quot; and speaks truth to power.</p>
+<p>He invites us to explore another way, a third way, one that is not a revolt but neither does it lie down and submit to oppression.</p>
+<p>Yes, do your civic duty, but do not forget that what belongs to God; this overrides any political power.</p>
+<p>Sometimes kingdom values come into conflict with the status quo.</p>
+<p>We only have to glance at our newsfeeds to see this play out across our world right now.</p>
+<p>The Gospel calls us to walk a different path.</p>
+<p>A path that is inclusive, that builds peace, not walls; that welcomes the stranger, that calls out injustice and speaks up for those who have no voice.</p>
+<p>World Mission Sunday, 2026 marks a global effort to support missionary work across the world.</p>
+<p>The 2026 theme for the day is &quot;One in Christ, united in mission,&quot; a theme which reflects Pope Leo&#x27;s motto for his pontificate, although we are many, we are One in Christ. As we support Mission Sunday, how might each of us respond to this call to unity in our own communities?</p>
+<p>Jane Mellett &amp; Triona Doherty. Adapted from The Deep End - A Journey through the Sunday Gospels in the Year of Matthew, Messenger Publications, Dublin, 2022.</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>PARISH CENTRE: 22229/22779; CATHEDRAL PRESBYTERY: 22505 BÓTHAR NA NAOMH PRESBYTERY: 22688. PARISH CENTRE MOBILE NUMBER: <a href="tel:+353858819575" style="color:#1d4ed8;font-weight:600;">085 8819575</a></p>
+<p>WEBSITE: <a href="https://www.thurlesparish.ie" target="_blank" rel="noopener noreferrer">www.thurlesparish.ie</a></p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:parishcentre@thurlesparish.ie" target="_blank" rel="noopener noreferrer">parishcentre@thurlesparish.ie</a> THURLES PARISH</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>WEEKENDS: Cathedral: Saturday Vigil 7.00</p>
+<p>Sunday 11.00 a.m. Bothar na Naomh Church:</p>
+<p>Sunday 09.30 a.m. &amp; 7.00 p.m. WEEKDAYS: Cathedral: Monday - Friday: 11.00 a.m. Bothar na Naomh: Tuesday &amp;</p>
+<p>Thursday 7.00 p.m. Saturday: 11.00 a.m. FOR OUR STREAMING SERVICE ON-LINE visit <a href="https://www.thurlesparish.ie" target="_blank" rel="noopener noreferrer">www.thurlesparish.ie</a> . CATHEDRAL OF THE ASSUMPTION: “RAISE THE ROOF” LOTTO INITIATIVE Weekly Lotto Draw Results Oct 15th: Winning Numbers 1; 18; 21; 27. The Jackpot was not won.</p>
+<p>Cash Prize of €50 to the weekly winner — John O’Dwyer, Thurles.</p>
+<p>Next Draw: October 22&quot;4 - Jackpot: €11,700. We are deeply grateful to all who have supported to date our fundraising drive for the Cathedral Reroofing Project —- We are delighted to inform you that we now have exceeded 1.8 million!</p>
+<p>A big Mile Buíochas to all who are supporting this project.</p>
+<p>The lotto has assisted immensely in reaching the €1.8 million of the €2.5 million required for us to commence the Reroofing of our Cathedral.</p>
+<p>Thank you!‘IN OUR HANDS: PRESERVING OUR CATHEDRAL’ Having now commenced Phase 2 of our fundraising campaign which we hope will get us to the magic figure of €2.5 million. “In Our Hands: Preserving Our Cathedral” is a fundraising campaign that we hope will encourage people, near and far, to support the reroofing project by donating towards the cost of the slates.</p>
+<p>Our objective is to have all the necessary works to this magnificent building completed in time for the 150 anniversary of the Cathedral’s construction in 2029. You can purchase a slate or a bundle of 4 — a symbolic and practical way to help reroof the Cathedral.</p>
+<p>Let us preserve our sacred Cathedral, protect its rich history and ensure it continues to inspire for generations to come!</p>
+<p>Visit <a href="https://www.inourhandsthurles.ie" target="_blank" rel="noopener noreferrer">www.inourhandsthurles.ie</a> for more information.</p>
+<p>WEEKLY ENVELOPE CONTRIBUTION: We are very grateful for your Weekly Offertory Contributions - €3,911.00 received.</p>
+<p>THE CHOSEN: Join us for Season 5 of the award-winning mini-series on the life of Jesus.</p>
+<p>Season 5 documents the events of Easter Week and especially the Last Supper.</p>
+<p>A great opportunity to deepen your faith with time for prayer and conversation.</p>
+<p>Come along and join us in Lámh Chúnta, Monday October 12th at 7.30 p.m.</p>
+<p>THURLES YOUNG ADULT PRAYER: See the upcoming dates for our prayer group (open to 18-35 year olds) which meets in Bóthar na Naomh Church twice a month on Fridays 8pm. Prayer, Adoration, Scripture and friendship with other young people interested in their faith.</p>
+<p>All are welcome. ADORATION FOR YOUTH: Tuesday Oct. 20th in Bóthar na Naomh Church commencing with Mass at 7.00 pm. Followed by Adoration until 10 p.m.</p>
+<p>Come and pray for this intention. POPE JOHN AWARD - CALLING ALL 16-18-YEAR-OLDS: Get active, get involved and make a difference in your local parish and school community through the Pope John Paul H Award.</p>
+<p>This is a wonderful opportunity to meet others, develop your skills and put your faith into action.</p>
+<p>To find out more or take part locally, contact your parish priest or Fiona, Youth Coordinator, at <a href="mailto:youth@cashel-emly.ie" target="_blank" rel="noopener noreferrer">youth@cashel-emly.ie</a> . Applications close on 31 October.</p>
+<p>MISSION</p>
+<p>SUNDAY 11.00 A. M. MASS: The 11.00 a.m. Mass on Mission Sunday, October 18th will be broadcast live by in the Cathedral.</p>
+<p>Archbishop Kieran O&#x27;Reilly will celebrate the Mass.</p>
+<p>Come along and join us in the Cathedral on Mission Sunday.</p>
+<p>Annual Missions Collection Envelopes available at the back of both Churches.</p>
+<p>URSULINE SECONDARY SCHOOL: Presents Les Miserables.</p>
+<p>Saturday, October 17, Sunday, October 18, Tuesday, October 20 &amp; Thursday, October 22 - nightly at 8pm. Tickets on Gr8events.ie ANAM CARA: Parent Support Evening on</p>
+<p>Wednesday 21° Oct at 7.30 p.m. in Horse &amp; Jockey Hotel. This event is free and open to all bereaved parents regardless of the age your child died, the circumstances of their death or how recent their death was.</p>
+<p>You do not need to register in advance. To find our more call 01 4045378 or email <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> .</p>
+<p>MARKET 54 THURLES: Will hold a spooktacular event, Thurles Zombie Walk on Friday Oct. 23rd, from 5 — 9 p.m.</p>
+<p>Check out Market 54, social media pages for link to tickets.</p>
+<p>Proceeds are going towards the “In Our Hands” Preserving Our Cathedral Fundraising Campaign.</p>
+<p>ONE FLEW OVER THE CUCKOO&#x27;S NEST&quot;: Thurles Drama Group presents ‘One Flew Over the Cuckoo’s Nest’ in The Source Theatre commencing on</p>
+<p>Monday 16 November. The proceeds from the first night of the production on Monday,16&#x27;* November are being donated to Thurles Lions Club who have committed to raising a minimum of €50,000 towards the Cathedral of the Assumption Reroofing Fund.</p>
+<p>Tickets are €20 each and include a pre-show finger food reception at 7.15 pm. Tickets available from The Parish Office, Thurles Lions Club members &amp; The Source Theatre.</p>
+<p>CIRCLING THE SQUARE POETRY FESTIVAL: Continuing Sun. 11am, Stanwix Village: Heritage walk. 2pm, Monks Pub.</p>
+<p>All welcome. NEWLY BAPTISED: “Orla Bríd Russell, Leugh. “Harry Patrick Stapleton, Hazelwood Court.</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>“James (Seamus) Collings, Waterford, formerly Cathedral Street &amp; Cluain Glas, Thurles.</p>
+<p>Marie Walker née Culley, College Green, Monakeeba.</p>
+<p>Mary Anne Fogarty, née Ryan, Gurtacurra, Templemore.</p>
+<p>Una Doyle née Quinn, Glenbane Upper, Holycross.</p>
+<p>SAFEGUARDING MONTH IS OCTOBER: CREATING A SAFE PARISH: Being attentive to the wellbeing and safety of children and young people is an important part of safeguarding.</p>
+<p>If you have a concern about the safety or welfare of a child or vulnerable person, please ensure that you know who to speak to and how to report your concern.</p>
+<p>Our Parish Safeguarding Representatives can provide information and guidance on safeguarding procedures.</p>
+<p>Please note Safeguarding Representatives will speak at the following Masses this weekend, October 17th/18th: Cathedral: Saturday Vigil Mass 7.00 Bóthar na Naomh Church:</p>
+<p>Sunday 9.30 a.m. &amp; 7.00 p.m.“On this Mission Sunday we lift up to you all missionaries — the men and women of faith who have left their homelands, families and comforts to witness to your Gospel in remote corners and challenging areas of the world. “ ‘It follows that the fragmentation of knowledge and the isolation of bits of information can actually become a form of ignorance, unless they are integrated into a broader vision of reality”. Laudato Si</p></div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
+    </div>
+
+    <section class="parish-section">
+      <h2 class="section-heading">CASHEL AND EMLY Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="anacarty &amp; donohill"><a class="parish-link" href="https://cashel-emly.ie/parish/anacarty-donohill/" target="_blank" rel="noopener noreferrer">Anacarty &amp; Donohill</a></li><li class="parish-item" data-name="ballina &amp; boher"><a class="parish-link" href="https://cashel-emly.ie/parish/ballina-boher/" target="_blank" rel="noopener noreferrer">Ballina &amp; Boher</a></li><li class="parish-item" data-name="ballinahinch &amp; killoscully"><a class="parish-link" href="https://cashel-emly.ie/parish/ballinahinch-killoscully/" target="_blank" rel="noopener noreferrer">Ballinahinch &amp; Killoscully</a></li><li class="parish-item" data-name="ballingarry"><a class="parish-link" href="https://cashel-emly.ie/parish/ballingarry/" target="_blank" rel="noopener noreferrer">Ballingarry</a></li><li class="parish-item" data-name="ballybricken &amp; bohermore"><a class="parish-link" href="https://cashel-emly.ie/parish/ballybricken-bohermore/" target="_blank" rel="noopener noreferrer">Ballybricken &amp; Bohermore</a></li><li class="parish-item" data-name="ballylanders"><a class="parish-link" href="https://cashel-emly.ie/parish/ballylanders/" target="_blank" rel="noopener noreferrer">Ballylanders</a></li><li class="parish-item" data-name="bansha &amp; kilmoyler"><a class="parish-link" href="https://cashel-emly.ie/parish/bansha-kilmoyler/" target="_blank" rel="noopener noreferrer">Bansha &amp; Kilmoyler</a></li><li class="parish-item" data-name="boherlahan &amp; dualla"><a class="parish-link" href="https://cashel-emly.ie/parish/boherlahan-dualla/" target="_blank" rel="noopener noreferrer">Boherlahan &amp; Dualla</a></li><li class="parish-item" data-name="borrisoleigh &amp; ileigh"><a class="parish-link" href="https://cashel-emly.ie/parish/borrisoleigh-ileigh/" target="_blank" rel="noopener noreferrer">Borrisoleigh &amp; Ileigh</a></li><li class="parish-item" data-name="caherconlish &amp; inch st. lawrence"><a class="parish-link" href="https://cashel-emly.ie/parish/caherconlish-inch-st-laurence/" target="_blank" rel="noopener noreferrer">Caherconlish &amp; Inch St. Lawrence</a></li><li class="parish-item" data-name="cappamore"><a class="parish-link" href="https://cashel-emly.ie/parish/cappamore/" target="_blank" rel="noopener noreferrer">Cappamore</a></li><li class="parish-item" data-name="cappawhite"><a class="parish-link" href="https://cashel-emly.ie/parish/cappawhite/" target="_blank" rel="noopener noreferrer">Cappawhite</a></li><li class="parish-item" data-name="cashel &amp; rosegreen"><a class="parish-link" href="https://cashel-emly.ie/parish/cashel-rosegreen/" target="_blank" rel="noopener noreferrer">Cashel &amp; Rosegreen</a></li><li class="parish-item" data-name="clerihan"><a class="parish-link" href="https://cashel-emly.ie/parish/clerihan/" target="_blank" rel="noopener noreferrer">Clerihan</a></li><li class="parish-item" data-name="clonoulty &amp; rossmore"><a class="parish-link" href="https://cashel-emly.ie/parish/clonoulty-rossmore/" target="_blank" rel="noopener noreferrer">Clonoulty &amp; Rossmore</a></li><li class="parish-item" data-name="doon"><a class="parish-link" href="https://doonparish.ie/current-newsletter/" target="_blank" rel="noopener noreferrer">Doon</a></li><li class="parish-item" data-name="drangan &amp; cloneen"><a class="parish-link" href="https://cashel-emly.ie/parish/drangan-cloneen/" target="_blank" rel="noopener noreferrer">Drangan &amp; Cloneen</a></li><li class="parish-item" data-name="drom &amp; inch"><a class="parish-link" href="https://cashel-emly.ie/parish/drom-inch/" target="_blank" rel="noopener noreferrer">Drom &amp; Inch</a></li><li class="parish-item" data-name="emly"><a class="parish-link" href="https://emly.ie/category/parish-bulletin/" target="_blank" rel="noopener noreferrer">Emly</a></li><li class="parish-item" data-name="fethard &amp; killusty"><a class="parish-link" href="https://cashel-emly.ie/parish/fethard-killusty/" target="_blank" rel="noopener noreferrer">Fethard &amp; Killusty</a></li><li class="parish-item" data-name="galbally &amp; lisvernane"><a class="parish-link" href="https://cashel-emly.ie/parish/galbally-lisvernane/" target="_blank" rel="noopener noreferrer">Galbally &amp; Lisvernane</a></li><li class="parish-item" data-name="golden &amp; kilfeacle"><a class="parish-link" href="https://cashel-emly.ie/parish/golden-kilfeacle/" target="_blank" rel="noopener noreferrer">Golden &amp; Kilfeacle</a></li><li class="parish-item" data-name="gortnahoe &amp; glengoole"><a class="parish-link" href="https://cashel-emly.ie/parish/gortnahoe-glengoole/" target="_blank" rel="noopener noreferrer">Gortnahoe &amp; Glengoole</a></li><li class="parish-item" data-name="holycross &amp; ballycahill"><a class="parish-link" href="https://cashel-emly.ie/parish/holycross-ballycahill/" target="_blank" rel="noopener noreferrer">Holycross &amp; Ballycahill</a></li><li class="parish-item" data-name="hospital &amp; herbertstown"><a class="parish-link" href="https://cashel-emly.ie/parish/hospital-herbertstown/" target="_blank" rel="noopener noreferrer">Hospital &amp; Herbertstown</a></li><li class="parish-item" data-name="kilbehenny &amp; anglesboro"><a class="parish-link" href="https://cashel-emly.ie/parish/kilbehenny-anglesboro/" target="_blank" rel="noopener noreferrer">Kilbehenny &amp; Anglesboro</a></li><li class="parish-item" data-name="kilcommon &amp; hollyford"><a class="parish-link" href="https://cashel-emly.ie/parish/kilcommon-hollyford/" target="_blank" rel="noopener noreferrer">Kilcommon &amp; Hollyford</a></li><li class="parish-item" data-name="killenaule &amp; moyglass"><a class="parish-link" href="https://killenaule.net/category/newsletter/" target="_blank" rel="noopener noreferrer">Killenaule &amp; Moyglass</a></li><li class="parish-item" data-name="kilteely &amp; dromkeen"><a class="parish-link" href="https://cashel-emly.ie/parish/kilteely-dromkeen/" target="_blank" rel="noopener noreferrer">Kilteely &amp; Dromkeen</a></li><li class="parish-item" data-name="knockainey &amp; patrickswell"><a class="parish-link" href="https://cashel-emly.ie/parish/knockaney-patrickswell/" target="_blank" rel="noopener noreferrer">Knockainey &amp; Patrickswell</a></li><li class="parish-item" data-name="knockavilla &amp; donaskeigh"><a class="parish-link" href="https://cashel-emly.ie/parish/knockavilla-donaskeigh/" target="_blank" rel="noopener noreferrer">Knockavilla &amp; Donaskeigh</a></li><li class="parish-item" data-name="knocklong &amp; glenbrohane"><a class="parish-link" href="https://cashel-emly.ie/parish/knocklong-glenbrohane/" target="_blank" rel="noopener noreferrer">Knocklong &amp; Glenbrohane</a></li><li class="parish-item" data-name="lattin &amp; cullen"><a class="parish-link" href="https://cashel-emly.ie/parish/lattin-cullen/" target="_blank" rel="noopener noreferrer">Lattin &amp; Cullen</a></li><li class="parish-item" data-name="loughmore &amp; castleiney"><a class="parish-link" href="https://cashel-emly.ie/parish/loughmore-castleiney/" target="_blank" rel="noopener noreferrer">Loughmore &amp; Castleiney</a></li><li class="parish-item" data-name="moycarkey, littleton &amp; two-mile-borris"><a class="parish-link" href="https://cashel-emly.ie/parish/moycarkey-littleton-two-mile-borris/" target="_blank" rel="noopener noreferrer">Moycarkey, Littleton &amp; Two-Mile-Borris</a></li><li class="parish-item" data-name="mullinahone"><a class="parish-link" href="https://cashel-emly.ie/parish/mullinahone/" target="_blank" rel="noopener noreferrer">Mullinahone</a></li><li class="parish-item" data-name="murroe &amp; boher"><a class="parish-link" href="https://cashel-emly.ie/parish/murroe-boher/" target="_blank" rel="noopener noreferrer">Murroe &amp; Boher</a></li><li class="parish-item" data-name="new inn &amp; knockgraffon"><a class="parish-link" href="https://cashel-emly.ie/parish/new-inn-knockgraffon/" target="_blank" rel="noopener noreferrer">New Inn &amp; Knockgraffon</a></li><li class="parish-item" data-name="newport, birdhill &amp; toor"><a class="parish-link" href="https://cashel-emly.ie/parish/newport-birdhill-toor/" target="_blank" rel="noopener noreferrer">Newport, Birdhill &amp; Toor</a></li><li class="parish-item" data-name="pallasgreen &amp; templebraden"><a class="parish-link" href="https://cashel-emly.ie/parish/pallasgreen-templebraden/" target="_blank" rel="noopener noreferrer">Pallasgreen &amp; Templebraden</a></li><li class="parish-item" data-name="solohead &amp; oola"><a class="parish-link" href="https://cashel-emly.ie/parish/solohead-oola/" target="_blank" rel="noopener noreferrer">Solohead &amp; Oola</a></li><li class="parish-item" data-name="templemore, clonmore &amp; killea"><a class="parish-link" href="https://cashel-emly.ie/parish/templemore-clonmore-killea/" target="_blank" rel="noopener noreferrer">Templemore, Clonmore &amp; Killea</a></li><li class="parish-item" data-name="templetuohy &amp; moyne"><a class="parish-link" href="https://cashel-emly.ie/parish/templetuohy-moyne/" target="_blank" rel="noopener noreferrer">Templetuohy &amp; Moyne</a></li><li class="parish-item" data-name="thurles"><a class="parish-link" href="https://www.thurlesparish.ie/news/newsletter/" target="_blank" rel="noopener noreferrer">Thurles</a></li><li class="parish-item" data-name="tipperary"><a class="parish-link" href="https://cashel-emly.ie/parish/tipperary/" target="_blank" rel="noopener noreferrer">Tipperary</a></li><li class="parish-item" data-name="upperchurch &amp; drombane"><a class="parish-link" href="https://cashel-emly.ie/parish/upperchurch-drombane/" target="_blank" rel="noopener noreferrer">Upperchurch &amp; Drombane</a></li></ul>
+    </section>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
+      });
+    })();
+
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20261018a"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js?v=20261018a';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      if (parishFilter) {
+        parishFilter.addEventListener('input', function (event) {
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {
+              visibleCount += 1;
+            }
+          });
+          if (parishEmpty) {
+            parishEmpty.hidden = visibleCount !== 0;
+          }
+        });
+      }
+      if (parishEmpty) {
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+    
+    (function () {
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
+      }
+      function pageFor(name) {
+        var map = pageIndex();
+        if (map[name]) return map[name];
+        var n = norm(name);
+        var keys = Object.keys(map);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = map[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
+        }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          landInBox(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      document.addEventListener('click', function (ev) {
+        if (!ev.target || !ev.target.closest) return;
+        var btn = ev.target.closest('.az-letter');
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
+      });
+    })();
+    
+  </script>
+  <script type="application/json" id="parish-page-index">{}</script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>

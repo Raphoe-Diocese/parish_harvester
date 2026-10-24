@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Elphin Diocese Text Bulletin — 24/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="elphin-2026-10-24.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">ELPHIN Text Bulletin · 24/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-boyle" data-parish-name="Boyle"><h2 class="ocr-parish-name">Boyle</h2><p class="ocr-parish-date">24/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>St Joseph’s Church , Boyle 18th October 2026</p>
+<h3 class="b-head">Sunday Mass</h3>
+<p>Times: Sat. Vigil 7.30pm and Sunday 9.30am and 11.30am</p>
+<h3 class="b-head">Weekday Mass</h3>
+<p>Times: Monday - Saturday: 10:00am and Friday 10am and 7.30pm Confession: Saturday after 10 a.m.</p>
+<p>Mass in the Confession room. Adoration in the Adoration Room from 11 a.m. to 7 p.m.</p>
+<h3 class="b-head">Daily Mass</h3>
+<p>Intentions for Week</p>
+<p>Monday 19th to</p>
+<p>Sunday 25th October</p>
+<h3 class="b-head">Contacts</h3>
+<p>Fr. John Gannon <a href="tel:+353719662218" style="color:#1d4ed8;font-weight:600;">071 966 2218</a></p>
+<p>Fr. Jonas Rebamontan <a href="tel:+353719662012" style="color:#1d4ed8;font-weight:600;">071 966 2012</a></p>
+<h3 class="b-head">Parish Office</h3>
+<p>&amp; Sacristy: <a href="tel:+353719662643" style="color:#1d4ed8;font-weight:600;">071 966 2643</a> 24hr Duty</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353868262643" style="color:#1d4ed8;font-weight:600;">086 826 2643</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:office@boyleparish.ie" target="_blank" rel="noopener noreferrer">office@boyleparish.ie</a> Offertory Collection amounted to € 1770.84 on</p>
+<p>Sunday 11th October. Area Distributors : Area distributors are kindly asked to collect envelopes for ‘All Souls’ Collection from The Committee Room after all Masses this weekend October 17th and 18th October.</p>
+<p>In-Service Meetings - New and Existing Ministers of the Word: Elphin Diocesan In-Service Meetings for New and Existing Ministers of the Word (those who proclaim the readings at Mass) will take place in Abbey Community College Boyle, F52 HK46, 7.30pm - 8.45 pm on Wednesdays 21st and 28th October.</p>
+<p>All welcome. Group forming for 6 weeks to explore riches of St. John&#x27;s Gospe l.</p>
+<p>Group will meet on Mondays after 10 a.m.</p>
+<p>Mass in Committee Room of St. Joseph&#x27;s Church beginning2nd November.</p>
+<p>Facilitators: Eithne Deane &amp; Patrick Oshie.</p>
+<p>Everyone welcome. More details <a href="https://www.achonryelphin.ie/scripture" target="_blank" rel="noopener noreferrer">www.achonryelphin.ie/scripture</a> Rosary in Cemetery for November : Rosary will be prayed on two Sunday’s in November in Assylinn Cemetery.</p>
+<p>The Rosary will be prayed in Assylinn (New) Cemetery on</p>
+<p>Sunday 1st November at 12.30 p.m. and on</p>
+<p>Sunday 8th November in Assylinn (Old) Cemetery at 12.30 p.m. The Rosary will be prayed at Plunkett Avenue Cemetery on</p>
+<p>Sunday 1st November at 11 a.m Pro-Life Campaign : wishes to sincerely thank all those who gave so generously to their recent church gate collection, which raised €856.81. These funds will support our vital work in the protection of human life at every stage.</p>
+<p>Rosary Rally: Rosary for peace will be prayed in The Day Chapel here in St. Joseph’s on</p>
+<p>Saturday 31st October at 3 p.m. All are welcome.</p>
+<p>World Youth Day 2027 with Pope Leo XIV : The diocese is now accepting applications from parishioners aged 19-30 (at the time of the event) for the youth pilgrimage to Korea for World Youth Day in 2027. Travel dates are 27 July – 13 August 2027. For information and to apply, email Sheena at <a href="mailto:info@achonryelphin.ie" target="_blank" rel="noopener noreferrer">info@achonryelphin.ie</a> with your parish.</p>
+<p>Monday 10 a.m. Tessie and Jimmy Connors and Bob Allcock</p>
+<p>Tuesday 10 a.m. Thomas and Elizabeth Scanlon and Deceased Members of the Scanlon and Killoran Family</p>
+<p>Wednesday 10 a.m. Paddy Daly</p>
+<p>Thursday 10 a.m. Evelyn O’Mara – Coccoli (Months Mind)</p>
+<p>Friday 10 a.m. 7.30 p.m. Teresa, Mick, Jim and John Corrigan Brigid and Patrick Earley Hannah Spellman Fr. Gerard McAteer Lily Simon Rachel Moraghan and The Deceased Family</p>
+<p>Saturday 10 a.m. Vigil 7.30 p.m. Mary Ellen Gormley and The Deceased Members of The Tarpey and Shiel Families</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-sligo-cathedral" data-parish-name="Sligo Cathedral"><h2 class="ocr-parish-name">Sligo Cathedral</h2><p class="ocr-parish-date">24/10/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>WHAT BELONGS TO CEASAR AND WHAT BELONGS TO GOD If the earth and everything in it belongs to rulership of Gods.24:1), where is the place of the rulers of this earth?</p>
+<p>Does believing in God negate us from b eing a believer in the rulership of earth?</p>
+<p>This friction is part of what the readings of today seem to reflect upon.</p>
+<p>The Readings : First reading, Cyrus, a pagan king, ruler of the earth, conquered Babylon in 539BC without any bloodshed, the prophet Isaiah calls him “Shep herd, anointed, beloved…” etc, titles reserved for kings of Israel, sees him as part of God’s plan prepared by the Lord.</p>
+<p>Why? Despite being a pagan king, God can still of this earth to further his kingdom, believer or non believer.</p>
+<p>In the Gospel Jesus sa ys: “ Render to Ceasar what belongs to Caesar and to God what belongs to God” . Should this suggest a divide between the government of heaven and earth?</p>
+<p>I doubt. God has not created us into communities of people and at the same time united us by one faith throu gh baptism, one love and one hope by mistake (like Paul commended the Thessalonians for in the second reading).</p>
+<p>Take Home : John Michael Talbolt in his song titled “ St Theresa’s Prayer ” said Christ has no body now but yours, no hands, no feet on earth yours, yours are the eyes through which he looks. yours are the feet with which walks to do good. .” As Christians, we are called to be exemplars of obedience to earthly authorities and a litm us test of our obedience to God.</p>
+<p>The first law in heaven is orderliness. Order is w here there is peace, love joy, righteousness and the scripture says where there are all these, there is the kingdom of God (Rom.14:17).</p>
+<p>God can use any person anyone to h is glory whether Caesar or Jesus.</p>
+<p>In the end what should matter more for us is to render to God what belongs to God which is our hearts through faith, hope and charity . Prayer : For the grace of Obedience to the will of God both in the church and in the society.</p>
+<p>Amen. - Fr. John PARISH NEWSLET TER 18th Octobe r 2026 TWEN TY-NINTH SUN DAY IN ORD INARY TIME AREA DISTRIBUTORS November Envelopes and the new year Church Offering Boxes (2026 - 2027) are now ready.</p>
+<p>They are available from the Sacristy this weekend or from the Parish Office during the week.</p>
+<p>Please note November lists of deceased need to be returned before November 1st in order to be placed on the Altar for the month of the Holy Souls.</p>
+<header class="ocr-parish-masthead" id="ocr-parish-roscommon" data-parish-name="Roscommon"><h2 class="ocr-parish-name">Roscommon</h2><p class="ocr-parish-date">24/10/2026</p></header>
+<hr>
+<p class="page-label">Page 3</p>
+<p>SACRED HEART CHURCH, ROSCOMMON Saturday - 17th October 7 pm Padraig McNamara (Months Mind) Sunday - 18th October 9 am Ann Kilcline (Months Mind) 11.30 am Noelle Hynes (1st Anniversary) Monday - 19th October 11 am Patrick, Angela, Terry &amp; Johnny O’Brien Tuesday - 20th October 11 am Stephen Hession</p>
+<p>Wednesday 21st October 11 am Gerard Browne Thursday - 22nd October 11 am Padre Pio Mass for Peace Friday - 23rd October 11 am Peter &amp; Ellen Mahon Mike Costello Saturday - 24th October Vigil Mass 10 am Paul &amp; Mary Briody Annette Tully Joe Kirwan Brian &amp; Quigley &amp; Tess Casey &amp; deceased members of the Casey &amp; Farrell families Matthew Hogan &amp; deceased family members 7 pm Phelim Hoare (1st Anniversary) &amp; his parents Mary &amp; Gerry Sunday - 25th October 9 am Morning Mass 11.30 am Mick Fahey (Months Mind) We pray for the happy repose of the souls of DR. NOEL FARRELL , Ardsallagh, Roscommon Town MARY TERESA REGAN , Convent Court, Roscommon Town &amp; formerly Tulsk JOSEPHINE HENNIGAN , Goff Street, Roscommon Town TOM EGAN , Cloonbrackna Avenue, Roscommon Town BREEDA BURKE , Ballyhaunis, sister-in-law of Pat Burke, Court Avenue, Roscommon Town We offer sincere sympathy and the assurance of our prayers to their bereaved families and friends.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>Sunday - 18th October 10 am Jim &amp; Christina Hayden, Michael John Hanly &amp; Paddy &amp; Annie Dolan Sunday - 25th October 10 am Willie &amp; Josie Ryan &amp; deceased family members Patrick, Teresa &amp; Gerry Gilleran Offertory Collection 11th October 2026: €505 ST. JOSEPH’S CHURCH, KILTEEVAN BLESSED SACRAMENT CHAPEL - Adorers urgently required for the following hours: Saturday: 11 a.m. - 12 noon &amp; Sunday: 7 - 8 p.m.</p>
+<p>Thank you for your support. If you can help out please contact Tom Beirne <a href="tel:+353863861954" style="color:#1d4ed8;font-weight:600;">086 3861954</a> . ROSARY will be recited at the Grotto on Wednesday evenings at 7 p.m. for the month of October.</p>
+<p>GROUP FORMING FOR 6 WEEKS to explore riches of St. John&#x27;s Gospe l.</p>
+<p>Group will meet on Monday evenings, 7.30 - 8.30 pm in St. Coman&#x27;s Club , Abbey St., F42 YT51 beginning 26th Oct.</p>
+<p>Facilitators: Justin Harkin &amp; Wilker Costa.</p>
+<p>Everyone welcome. More details <a href="https://www.achonryelphin.ie/scripture" target="_blank" rel="noopener noreferrer">www.achonryelphin.ie/scripture</a> THANK YOU: As we find ourselves in the Autumn/Winter flu season we would like to thank again all the parishioners who in the interest of hygiene and courtesy to other parishioners continue to receive Holy Communion into the hand.</p>
+<p>CHURCH CALENDAR, 2027 : The 2027 Church Calendar is being prepared at present.</p>
+<p>If there are any voluntary Groups or Organisations who would like to be incl uded or change their existing contact details, please call the Parish Office <a href="tel:+353906626298" style="color:#1d4ed8;font-weight:600;">090 6626298</a> or email <a href="mailto:roscommonparish3@gmail.com" target="_blank" rel="noopener noreferrer">roscommonparish3@gmail.com</a> . Sacred Heart Church : Altar Society : - Week commencing: 19th October - Group III Offertory Collection 11th October 2026: €3,611 ROTA OF MINISTRIES - SACRED HEART CHURCH Date Eucharistic Minister Reader Sat Oct 17th - 7pm Maura Comiskey &amp; Michelle Ramos Aileen O’Gara Mary Law &amp; Anne Burke Dermot Cox Sun Oct 18th - 9am - 11.30am Pauline Mannion / Pauline Donohoe Martin Mannion Karen Lyons Sat Oct 24th - 7pm Mary Raftery &amp; Mary Boland Tom Beirne Sun Oct 25th - 9am - 11.30am Anne Kiernan &amp; Mary McDermott Kevin Bishop Margaret &amp; Wojciech Wawrzynek Mary Larkin Family Reading Thank You</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>N. A. physical meetings on Tuesday nights from 8 - 9 p.m. in Room 13 at St. Coman’s Club, Abbey St., Roscommon.</p>
+<p>OCIA : Adults who wish to become Catholics, or to complete their Christian Initiation (Confirmation and Holy Communion), are invited to make contact with Irene Feeney, who co-ordinates the OCIA Programme in the Diocese.</p>
+<p>For further informa tion, including contacts, see <a href="https://achonryelphin.ie/the-journey-to-becoming-catholic/IN-SERVICEMEETINGS-" target="_blank" rel="noopener noreferrer">https://achonryelphin.ie/the-journey-to-becoming-catholic/IN-SERVICEMEETINGS-</a> New and Existing Ministers of the Word: Elphin Diocesan In-Service Meetings for New and Existing Ministers of the Word (those who proclaim the readings at Mass) will take place Divine Word Retreat Centre, Donamon Castle, Donamon, F42V250, 7.30 - 9 pm on Thursdays 22nd &amp; 29th October.</p>
+<p>All welcome. A DISABILITY JOB &amp; Training Fair takes place in Kilbride Community Centre, Four Mile House, Roscommon on the 20th October 2026. It will be an opportunity to meet with employers, training providers and local support groups.</p>
+<p>For more inf o call <a href="tel:+353871080192" style="color:#1d4ed8;font-weight:600;">087 1080192</a> . ROSCOMMON DEMENTIA ALLIANCE hosts a monthly Cafe in Lough Key Forest park Boyle to help support people affected by Dementia their families and carers.</p>
+<p>This month’s Cafe takes place on Wednesday, October 21st from 2 - 4pm and will include music, song, advice and a chat.</p>
+<p>Please note change of venue. If you would like to attend please visit <a href="https://www.Roscommondementia.ie" target="_blank" rel="noopener noreferrer">www.Roscommondementia.ie</a> or contact Teresa Keegan on <a href="tel:+353877061183" style="color:#1d4ed8;font-weight:600;">0877061183</a> for more information.</p>
+<p>MORNING BRIDGE: The Morning Larks Bridge Club has resumed on Friday’s, in Hannon&#x27;s Hotel at 10 am. New members welcome.</p>
+<p>REGAIRI RECOVERY COLLEGE : Autumn/Winter: 20th Oct - A somatic approach to well being; 27th Oct - Exploring Individuality through Clay Modelling.</p>
+<p>For more info call <a href="tel:+353879684352" style="color:#1d4ed8;font-weight:600;">0879684352</a> / <a href="mailto:regairirecoverycollege@gmail.com" target="_blank" rel="noopener noreferrer">regairirecoverycollege@gmail.com</a> FREE DIGITAL SUPPORT FOR OLDER PEOPLE : The Click and Connect project offers free, friendly support to older people in our community who would like help with technology.</p>
+<p>Learn how to make video calls, online serv ices, stay safe online, and keep in touch with family and friends.</p>
+<p>This project aims to help reduce isolation, increase confidence, and support older people to stay connected and independent in today&#x27;s digital world.</p>
+<p>For more information or to register your interest, please contact: Linda on <a href="tel:+353906630252" style="color:#1d4ed8;font-weight:600;">090 6630252</a> or <a href="tel:+353867807438" style="color:#1d4ed8;font-weight:600;">086 7807438</a></p>
+<p>PARISH STAFF Fr. Kevin Fallon - <a href="tel:+353906626298" style="color:#1d4ed8;font-weight:600;">090 66 26298</a> / Fr. Joe Fitzgerald - <a href="tel:+353872903310" style="color:#1d4ed8;font-weight:600;">087 2903310</a></p>
+<p>Fr. Callistus Isara <a href="tel:+353906626374" style="color:#1d4ed8;font-weight:600;">090 66 26374</a> / Fr. John Akaolisa - <a href="tel:+353906626189" style="color:#1d4ed8;font-weight:600;">090 66 26189</a></p>
+<p>Parish Office - <a href="tel:+353906626298" style="color:#1d4ed8;font-weight:600;">090 6626298</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:roscommonparish3@gmail.com" target="_blank" rel="noopener noreferrer">roscommonparish3@gmail.com</a> Website: <a href="https://www.roscommonkilteevanparish.ie" target="_blank" rel="noopener noreferrer">www.roscommonkilteevanparish.ie</a> X (Twitter) @roscommonchurch Webcam : <a href="https://www.churchtv.ie/roscommontown" target="_blank" rel="noopener noreferrer">www.churchtv.ie/roscommontown</a> Church Radio : 105.9fm Facebook Page : <a href="https://www.facebook.com/roscommonandkilteevanparish/" target="_blank" rel="noopener noreferrer">https://www.facebook.com/roscommonandkilteevanparish/</a></p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>FROM THE PARISH There will be a Classical Music Concert by two Royal Northern College students, Colm Traynor-Bucknell and Olivia Trezise, on Saturday, 24th October, at 8:15pm. The 45-minute program will include music from Ralph Vaughn-Williams, Gustav Holst and Rebecca Clarke, among other composers.</p>
+<p>Everyone is welcome. Group forming for 6 weeks to explore riches of St. John&#x27;s Go spel . Group will meet on Wednesday mornings after 10.30 am Cathedral Mass in St. Mary&#x27;s Presbytery, F 91 KTX2 beginning 28th Oct.</p>
+<p>Everyone welcome. More details <a href="https://www.achonryelphin.ie/scripture" target="_blank" rel="noopener noreferrer">www.achonryelphin.ie/scripture</a> Parish OfÏce: All Anniversary Masses are to be booked through the parish ofÏce Monday— Friday 9am to 5pm <a href="tel:+353719162670" style="color:#1d4ed8;font-weight:600;">071 9162670</a> . First Friday Calls: If anyone would like to receive a house call on the First Friday of each month, please kindly contact the Parish OfÏce on <a href="tel:+353719162670" style="color:#1d4ed8;font-weight:600;">071 9162670</a> . Parish Shop: The Parish Shop at the back of the Cathedral is open on Saturdays &amp; Sundays from 11am to 2pm. You can also scan the QR Code to make a donation.</p>
+<p>Thank you for your on going contributions, we deeply appreciate your continued financial support.</p>
+<p>Tap donation system at the back of the Cathedral for donations.</p>
+<p>FROM THE DIOCESE World Youth Day 2027 with Pope Leo XIV The diocese is now accepting applications from parishioners aged 19-30 (at the time of the event) for the youth pilgrimage to Korea for World Youth Day in 2027. Travel dates are 27 July – 13 August 2027. For information and to apply, email Sheena at <a href="mailto:info@achonryelphin.ie" target="_blank" rel="noopener noreferrer">info@achonryelphin.ie</a> with your and parish.</p>
+<p>In-Service Meetings - New and Existing Ministers of the Word Elphin Diocesan In-Service Meetings for New and Existing Ministers of the Word (those who proclai m the readings at Mass) will take place in Summerhill College Sligo, F91 D5YF, 7.30pm - 8.45 pm on Tuesdays 20th &amp; 27th October; Abbey Community College Boyle, F52 HK46, 7.30pm - 8.45 pm on Wednesdays 21st &amp; 28th October, and Divine Word Retreat Centre, Donamon Castle, Donamon, F42V250, 7.30pm - 9.00 pm on Thursdays 22nd &amp; 29th October.</p>
+<p>All welcome. Faith &amp; Fun Clubs Supporting Children (8 - 11 years) grow in faith and friendship: New and emerging Faith &amp; Fun Clubs in the Achonry and Elphin Dioceses now enrol ling for 2026/2027 school year.</p>
+<p>For more info please visit: <a href="https://achonryelphin.ie/fafc/Pilgrimage" target="_blank" rel="noopener noreferrer">https://achonryelphin.ie/fafc/Pilgrimage</a> to San Giovanni Escorted Pilgrimage to San Giovanni for Franciscan Holy Year 2026 from Dublin with Marian Pilgrimages from 5th to 9th November.</p>
+<p>Includes visits to San Giovanni, Pietrelcina, Lanciano, Mont Santd&#x27;Angelo and St Philomena with full spiritual programme under the spiritual direction of Fr. Tomas Surlis.</p>
+<p>Return flights from Dublin and half board accommodation. €899pps.</p>
+<p>Contact 01 8788159 for more information and booking. Cathedral of the Immaculate Conception, Sligo LE TTER</p>
+<p>Sunday 18th October 2026 TWENTY-NINTH SUNDAY IN ORDINARY TIME CATHE DRAL MASS TIMES Monday —Thursday 8.00am &amp;10.30am Friday &amp;</p>
+<p>Saturday 10.30am &amp; 7.00pm Saturday Vigil Mass at 7pm Sunday at 8.30am, 10.30am, 12 Noon &amp; 7pm Confessions Saturday 2pm-4pm Tap donation system now operational at the back of the Cathedral.</p>
+<p>Please take both the newsletter and missalette home.</p>
+<p>Thank you. Sligo Cathedral <a href="https://sligocathedral.ie/category/newsletter/" target="_blank" rel="noopener noreferrer">https://sligocathedral.ie/category/newsletter/</a></p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>Dd WISHING YOU GRACE AND PEACE Paul made several missionary journeys to modern day Greece and Turkey (Asia Minor) establishing new Christian communities.</p>
+<p>Although he had to l eave the places after a relatively short time he never forgot the people and was constantly keeping up with their progress through the use of letters which we have today.</p>
+<p>He could admonish them if he heard the churches were deviating from what he taught or were getting caught up in petty politics (or worse).</p>
+<p>Most of the time it was to encourage them.</p>
+<p>He complimented them on how they were progressing and he praised them in their hard work.</p>
+<p>Encouragement is so important in lives. We all know what we should be doing but it is easier when people give us uplifting words.</p>
+<p>St Teresa of Kolkata said: “Kind words can be short and easy to speak, but their echoes are truly endless. ” It can be easy to find fault in others and sometimes correction is necessary.</p>
+<p>But it is far more important to uplift people with words of encouragement!</p>
+<p>Cover photograph: Icon of the Apostle Paul, Monument Vima Apostolou Pavlou, Veria, 75km southwest of Thessalonika TODAY - Twenty-Ninth Sunday in Ordinary Time 29th Week in Ordinary Time,</p>
+<p>Monday 19th October 29th Week in Ordinary Time,</p>
+<p>Tuesday 20th October 29th Week in Ordinary Time,</p>
+<p>Wednesday 21st October Ss. John de Brébeuf, Isaac Jogues, Priests, &amp; Companions, Martyrs (Optional Memorial) St. Paul of the Cross, Priest (Optional Memorial) 8am Mass: Tony Maguire (Month’s Mind) 10.30am Mass: Anna Clancy (First Anniversary) 8am Mass: Special Intention 10.30am Mass: Bessie Gillen (Anniversary) 8am Mass: Special Intention 10.30am Mass: Clare Garvey (Anniversary) St. John Paul Pope (Optional Memorial) 8am Mass: Patricia Sheridan (Anniversary) 10.30am Mass: Special Intention St. John of Capistrano, Priest (Optional Memorial) 10.30am Mass: Teresa &amp; Joseph O&#x27;Brien (Anniversary) 7.00pm Mass: Mairìn &amp; Michael Curley (First Anniversary) St. Anthony Mary Claret, Bishop (Optional Memorial) Saturday Mass of the Blessed Virgin Mary 10.30am Mass: Angela Heraghty (Month’s Mind) 7.00pm Mass 29th Week in Ordinary Time,</p>
+<p>Thursday 22nd October 29th Week in Ordinary Time,</p>
+<p>Friday 23rd October 29th Week in Ordinary Time,</p>
+<p>Saturday 24th October</p>
+<h3 class="b-head">Parish Office</h3>
+<p>Hours Monday to Thursday: 9:30am-5pm &amp; Friday: 9:30am-4pm <a href="tel:+353719162670" style="color:#1d4ed8;font-weight:600;">071 9162670</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:info@sligocathedral.ie" target="_blank" rel="noopener noreferrer">info@sligocathedral.ie</a> If you would like to donate to the Cathedral Parish please make cheques payable to the following A. I. B. bank account: Elphin Diocese Cathedral No.1 Parish account.</p>
+<p>THANK YOU for your support of our Parish and Cathedral.</p>
+<p>This w eek’s New sletter is sponsored in memory of Mairin Curley.</p>
+<p>Sunday Readings for 25th October 1st Reading: Ex 22:20-26; 2nd Reading: 1Th 1:5-10; Gospel: Mt 22:34-40.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
