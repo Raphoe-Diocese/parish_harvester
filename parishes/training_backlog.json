@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-19",
+  "generated_at": "2026-10-24",
   "target_date": "2026-10-18",
   "summary": {
     "downloaded": 267,
@@ -9,10 +9,10 @@
     "stale_rejected": 118
   },
   "action_counts": {
-    "investigate": 100,
+    "investigate": 101,
     "ok": 358,
     "mark_inactive": 19,
-    "skip": 789,
+    "skip": 788,
     "autofix_drive": 1
   },
   "parishes": [
@@ -4518,7 +4518,11 @@
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "total_timeout_s": 190,
+        "navigation_timeout_ms": 55000,
+        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
@@ -4553,8 +4557,12 @@
       },
       "bulletin_format": "download",
       "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
+      "host_profile": {
+        "total_timeout_s": 190,
+        "navigation_timeout_ms": 55000,
+        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
+      },
+      "has_extension_diagnosis": true,
       "harvest_status": "failed",
       "last_error": "Recipe replay failed: HTTP 404 for https://ballygallparish.ie/wp-content/uploads/2026/10/2026-10-18-newsletter.pdf",
       "suggested_action": "investigate",
@@ -5981,27 +5989,32 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/beechwoodavenue.json",
       "recipe": {
-        "start_url": "https://beechwoodparish.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://beechwoodparish.com/current-newsletter/",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "has_terminal": true,
+        "operator_notes": [
+          "23/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 18/10/2026. Do not pin https://beechwoodparish.com/wp-content/uploads/2026/10/Newsletter-18th-October-2026.pdf."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-23"
       },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "bulletin_format": "download",
+      "learned_pattern": "current-newsletter+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "bekan",
