@@ -2879,7 +2879,8 @@ async def _try_wp_json_newest_media(
             continue
         filename = src.rsplit("/", 1)[-1]
         found = (
-            extract_date_from_slug(filename)
+            extract_date_from_string(src)
+            or extract_date_from_slug(filename)
             or extract_date_from_string(filename)
             or extract_date_from_string(title)
             or liturgical_date_from_text(filename, target_date.year)

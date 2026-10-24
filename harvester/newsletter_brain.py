@@ -63,7 +63,7 @@ LEARNED = (
     {
         "id": "wp_json_newest_media",
         "label": "WordPress media library",
-        "how": "Read /wp-json/wp/v2/media and take a newsletter source_url. The homepage can have no file while the media library has this Sunday. Carrigtwohill, Newmarket, Roscommon and Dingle were proved that way. Skip a JPEG preview. Keep Irish. Do not pin the dated name.",
+        "how": "Read /wp-json/wp/v2/media and take a newsletter source_url. The homepage can have no file while the media library has this Sunday. Carrigtwohill, Newmarket, Roscommon and Dingle were proved that way. Bree is www.bree.ie. Newsletter-3742-Oct-17th-18th.pdf is 18/10/2026. The 18th is the Sunday, not the year 2018. Skip the Oct 24th-25th JPEG while the harvest Sunday is 18/10/2026. Skip a JPEG preview. Keep Irish. Do not pin the dated name.",
     },
     {
         "id": "predicted_dated_pdf",

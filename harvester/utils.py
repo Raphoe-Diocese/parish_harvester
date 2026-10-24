@@ -146,9 +146,15 @@ _YEAR_MONTHNUM_MONTHNAME_DAY_RE = re.compile(
 # Tawnawilly listing 2026-09-06: Sunday-Sept-06-26.pdf (Month-DD-YY),
 # not Sunday-6th-Sept.pdf (that name 404s).
 _MONTH_DAY_YY_RE = re.compile(
-    rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+](20\d{{2}}|\d{{2}})(?!\d)",
+    rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+](20\d{{2}}|\d{{2}})(?!\d)(?!(?:st|nd|rd|th)\b)",
     re.IGNORECASE,
 )
+# Bree: Newsletter-3742-Oct-17th-18th.pdf. The 18th is Sunday, not the year 2018.
+_WEEKEND_MONTH_SPAN_RE = re.compile(
+    rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)(?!\d)",
+    re.IGNORECASE,
+)
+_UPLOAD_YEAR_RE = re.compile(r"/(20\d{2})/")
 
 _MONTH_NAMES: list[str] = [
     "", "january", "february", "march", "april", "may", "june",
@@ -488,6 +494,25 @@ def extract_date_from_string(text: str) -> date | None:
                     return candidate
             except ValueError:
                 pass
+
+    # Oct-17th-18th in /2026/ is Sunday 18/10/2026. Do not read 18th as 2018.
+    m = _first_match_outside_hash(_WEEKEND_MONTH_SPAN_RE, text, spans)
+    if m:
+        month = _MONTH_MAP.get(m.group(1).lower())
+        year_m = _UPLOAD_YEAR_RE.search(text or "")
+        if month and year_m:
+            year = int(year_m.group(1))
+            days: list[date] = []
+            for raw_day in (m.group(2), m.group(3)):
+                try:
+                    days.append(date(year, month, int(raw_day)))
+                except ValueError:
+                    pass
+            if len(days) == 2 and 0 <= (days[1] - days[0]).days <= 3:
+                return days[1]
+            if days:
+                return max(days)
+        return None
 
     # Month-first: Sunday-Sept-06-26.pdf (Tawnawilly, found 2026-09-06)
     m = _first_match_outside_hash(_MONTH_DAY_YY_RE, text, spans)
