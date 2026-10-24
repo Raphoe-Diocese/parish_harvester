@@ -69,6 +69,24 @@ class PickerChallengeTests(unittest.TestCase):
         self.assertFalse(verdict.challenged)
         self.assertEqual(verdict.chosen_url, self.PIN_OLD)
 
+    def test_next_sunday_on_the_list_does_not_replace_this_sunday(self) -> None:
+        target = date(2026, 10, 18)
+        pin = (
+            "https://kilmyshallparish.com/wp-content/uploads/2026/10/"
+            "October-18th-2026.pdf"
+        )
+        later = (
+            "https://kilmyshallparish.com/wp-content/uploads/2026/10/"
+            "October-25th-2026.pdf"
+        )
+        verdict = challenge_pin_against_listing(
+            pin,
+            [(date(2026, 10, 25), later), (date(2026, 10, 18), pin)],
+            target,
+        )
+        self.assertFalse(verdict.challenged)
+        self.assertEqual(verdict.chosen_url, pin)
+
     def test_far_ahead_listing_does_not_beat_pin(self) -> None:
         # Outside MAX_STALE_DAYS_FROM_TARGET grace — ignore as challenger.
         scored = [(date(2026, 10, 25), self.FAR_AHEAD)]

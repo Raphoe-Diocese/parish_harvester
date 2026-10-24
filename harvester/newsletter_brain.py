@@ -68,7 +68,7 @@ LEARNED = (
     {
         "id": "predicted_dated_pdf",
         "label": "Guess /pdf/DDMMYY.pdf",
-        "how": "Listing HTML can be empty because the links are JavaScript. Tempo, Enniskillen, Longford and Beragh use /pdf/DDMMYY.pdf. Meath St Mary's Drogheda uses a3-bulletin-DD.MM.YYYY.pdf. St Senan's Enniscorthy uses n18october2026.pdf in the uploads folder. The current-newsletter link can already point at next Sunday. Kilmyshall, the Bunclody church, lists October-18th-2026.pdf. Keep the th. October-18-2026.pdf is the wrong name. Skip October-25th-2026.pdf while the harvest Sunday is 18/10/2026. Do not use the Church of Ireland Bunclody Union page. Ask for the harvest Sunday's name. Prove the date from the file name. Do not pin it.",
+        "how": "Listing HTML can be empty because the links are JavaScript. Tempo, Enniskillen, Longford and Beragh use /pdf/DDMMYY.pdf. Meath St Mary's Drogheda uses a3-bulletin-DD.MM.YYYY.pdf. St Senan's Enniscorthy uses n18october2026.pdf in the uploads folder. The current-newsletter link can already point at next Sunday. Kilmyshall, the Bunclody church, lists October-18th-2026.pdf. Keep the th. October-18-2026.pdf is the wrong name. Skip October-25th-2026.pdf while the harvest Sunday is 18/10/2026. A newer link on the same list must not replace this Sunday. Do not use the Church of Ireland Bunclody Union page. Ask for the harvest Sunday's name. Prove the date from the file name. Do not pin it.",
     },
     {
         "id": "print_html_newsletter",
