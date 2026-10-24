@@ -711,6 +711,12 @@ def weekend_files(candidates: list[Candidate], target: date) -> list[Candidate]:
             continue
         picked.append(item)
 
+    # thought-for-the-week can carry this Sunday's date and still not be
+    # the parish bulletin. Edgeworthstown 24/10/2026 saved that file first.
+    parish_files = [item for item in picked if not _SIDE_PDF_RE.search(item.url)]
+    if parish_files:
+        picked = parish_files
+
     def _rank(item: Candidate) -> tuple[int, int, int]:
         url = item.url.lower()
         return (

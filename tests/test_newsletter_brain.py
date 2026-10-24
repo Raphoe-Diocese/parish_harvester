@@ -22,6 +22,7 @@ from harvester.newsletter_brain import (
     referee,
     remember,
     section_links,
+    weekend_files,
 )
 
 
@@ -193,6 +194,10 @@ class InventTests(unittest.TestCase):
         assert picked is not None
         self.assertTrue(picked.url.endswith("sunday-newsletter-18-10-2026-edgeworthstown_compressed.pdf"))
         self.assertEqual(candidate_verdict(picked, date(2026, 10, 18)).status, "fresh")
+        files = weekend_files(found, date(2026, 10, 18))
+        self.assertTrue(files)
+        self.assertTrue(files[0].url.endswith("sunday-newsletter-18-10-2026-edgeworthstown_compressed.pdf"))
+        self.assertFalse(any("thought-for-the-week" in item.url for item in files))
 
     def test_termonmaguirc_picks_twenty_ninth_sunday(self) -> None:
         html = """
