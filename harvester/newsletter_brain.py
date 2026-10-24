@@ -68,12 +68,12 @@ LEARNED = (
     {
         "id": "predicted_dated_pdf",
         "label": "Guess /pdf/DDMMYY.pdf",
-        "how": "Listing HTML can be empty because the links are JavaScript. Tempo, Enniskillen, Longford and Beragh use /pdf/DDMMYY.pdf. Meath St Mary's Drogheda uses a3-bulletin-DD.MM.YYYY.pdf. Prove the date from the file name. Do not pin it.",
+        "how": "Listing HTML can be empty because the links are JavaScript. Tempo, Enniskillen, Longford and Beragh use /pdf/DDMMYY.pdf. Meath St Mary's Drogheda uses a3-bulletin-DD.MM.YYYY.pdf. St Senan's Enniscorthy uses n18october2026.pdf in the uploads folder. The current-newsletter link can already point at next Sunday. Ask for the harvest Sunday's name. Prove the date from the file name. Do not pin it.",
     },
     {
         "id": "print_html_newsletter",
         "label": "Print the live HTML page",
-        "how": "The page is overwritten each week. Do not pin a 109.228 article id. Mohill's newsletter is a WordPress page, not a post. Fenagh and Gortletteragh are inside that Mohill page. Kiltubrid /news/ is the same kind of overwritten page.",
+        "how": "The page is overwritten each week. Do not pin a 109.228 article id. Mohill's newsletter is a WordPress page, not a post. Fenagh and Gortletteragh are inside that Mohill page. Kiltubrid /news/ is the same kind of overwritten page. Adamstown's diocese card has no file. The Website line is saintabbans.com. The Newsletters page lists 18th October, 2026 at the top. Open that page and print it. Do not pin ?p=1605.",
     },
     {
         "id": "wix_link_text_date",
@@ -359,6 +359,7 @@ def filename_shapes(target: date) -> list[str]:
         )
     names.insert(0, f"{year}-{month:02d}-{day:02d}-Newsletter.pdf")
     names.append(f"Sunday-{full_month}-{ordered}-1-scaled.jpg")
+    names.append(f"n{day}{full_month.lower()}{year}.pdf")
     return names
 
 
