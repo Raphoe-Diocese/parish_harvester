@@ -103,6 +103,17 @@ def test_sunday_guess_includes_cloyne_and_longford_names() -> None:
     assert "Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf" in joined
     assert "/wp-content/uploads/2026/10/" in joined
     assert "/pdf/181026.pdf" in joined
+    assert "n18october2026.pdf" in joined
+
+
+def test_st_senan_glued_name_is_18_october_and_rolls() -> None:
+    from harvester.utils import extract_date_from_string, rewrite_date_url
+
+    url = "https://stsenansenniscorthy.ie/wp-content/uploads/2026/10/n18october2026.pdf"
+    assert extract_date_from_string(url) == date(2026, 10, 18)
+    assert rewrite_date_url(url, date(2026, 10, 18)).endswith("n18october2026.pdf")
+    rolled = rewrite_date_url(url, date(2026, 10, 25))
+    assert rolled.endswith("/2026/10/n25october2026.pdf")
 
 
 def test_remember_win_writes_parish_into_site_patterns(tmp_path: Path) -> None:

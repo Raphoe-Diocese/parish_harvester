@@ -131,6 +131,11 @@ _YEAR_MONTHNAME_DAY_RE = re.compile(
     rf"(20\d{{2}})[_\-\s]?({_MONTH_ALT})[_\-\s]?(\d{{1,2}})(?:st|nd|rd|th)?(?!\d)",
     re.IGNORECASE,
 )
+# St Senan's Enniscorthy: n18october2026.pdf (no hyphens, day then month).
+_GLUED_DAY_MONTH_YEAR_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})({_MONTH_ALT})(20\d{{2}})(?!\d)",
+    re.IGNORECASE,
+)
 # Our Lady of the Rosary, Limerick: OLR-News-2026-10-Oct-04.pdf is 4 Oct 2026.
 # The slug matcher otherwise reads the inner "10-Oct-04" as 10 Oct 2004.
 _YEAR_MONTHNUM_MONTHNAME_DAY_RE = re.compile(
@@ -459,6 +464,18 @@ def extract_date_from_string(text: str) -> date | None:
     slug_date = extract_date_from_slug(text)
     if slug_date:
         return slug_date
+
+    # Glued day-month-year: n18october2026.pdf (St Senan's, 18/10/2026).
+    m = _first_match_outside_hash(_GLUED_DAY_MONTH_YEAR_RE, text, spans)
+    if m:
+        month = _MONTH_MAP.get(m.group(2).lower())
+        if month:
+            try:
+                candidate = date(int(m.group(3)), month, int(m.group(1)))
+                if _is_plausible_bulletin_year(candidate.year):
+                    return candidate
+            except ValueError:
+                pass
 
     # Year-first month-name: 2026-August-16 (Glenavy / Killead)
     m = _first_match_outside_hash(_YEAR_MONTHNAME_DAY_RE, text, spans)
@@ -1350,6 +1367,36 @@ def rewrite_date_url(url: str, target: date) -> str:
         return parsed._replace(path=new_path).geturl()
 
     # ------------------------------------------------------------------
+    # Glued day+month+year: n18october2026.pdf -> n25october2026.pdf
+    orig_glued: date | None = None
+
+    def _replace_glued(m: re.Match) -> str:
+        nonlocal orig_glued
+        month = _MONTH_MAP.get(m.group(2).lower())
+        if not month:
+            return m.group(0)
+        try:
+            orig = date(int(m.group(3)), month, int(m.group(1)))
+        except ValueError:
+            return m.group(0)
+        if abs((orig - target).days) >= 365:
+            return m.group(0)
+        if orig_glued is None:
+            orig_glued = orig
+        month_raw = m.group(2)
+        month_str = _MONTH_NAMES[target.month]
+        if month_raw.isupper():
+            month_str = month_str.upper()
+        elif month_raw[0].isupper():
+            month_str = month_str.capitalize()
+        return f"{target.day}{month_str}{target.year}"
+
+    new_path = _GLUED_DAY_MONTH_YEAR_RE.sub(_replace_glued, path)
+    if new_path != path and orig_glued is not None:
+        if orig_glued != target:
+            new_path = _update_yyyymm_dir(orig_glued, new_path)
+        return parsed._replace(path=new_path).geturl()
+
     # Pattern D: DD-Month-YYYY slug (also updates /YYYY/MM/ dir)
     # e.g. Newsletter-12-April-2026.pdf  ->  Newsletter-19-April-2026.pdf
     # ------------------------------------------------------------------

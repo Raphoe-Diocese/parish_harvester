@@ -381,6 +381,11 @@ def _sunday_guess_probes(origin: str, sunday: date) -> list[tuple[str, str, str]
         if name not in names:
             names.append(name)
     names = names[:3]
+    for name in filename_shapes(sunday):
+        low = name.lower()
+        if low.startswith("n") and low[1:2].isdigit() and low.endswith(".pdf") and name not in names:
+            names.append(name)
+            break
     folder = f"{root}/wp-content/uploads/{sunday.year}/{sunday.month:02d}/"
     found: list[tuple[str, str, str]] = []
     short = ""

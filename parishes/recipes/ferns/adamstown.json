@@ -1,19 +1,47 @@
 {
+  "version": 2,
   "parish_key": "adamstown",
   "display_name": "Adamstown",
   "diocese": "ferns",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://ferns.ie/adamstown/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs.",
+  "start_url": "http://saintabbans.com/?page_id=21",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 4,
+  "recorded_date": "2026-10-24",
   "steps": [
     {
       "action": "goto",
-      "url": "https://ferns.ie/adamstown/"
+      "url": "http://saintabbans.com/?page_id=21"
+    },
+    {
+      "action": "click",
+      "selector": "h2.blog-entry-title a",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "article h2 a",
+        "a:has-text('October')"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "24/10/2026: ferns.ie/adamstown/ Website line is http://saintabbans.com/. Newsletters page ?page_id=21 lists 18th October, 2026 at the top, linking ?p=1605.",
+    "That page text is ADAMSTOWN PARISH NEWSLETTER, Saturday 17th and Sunday 18th October 2026, Volume 22 Number 41. No PDF on the page. Print the HTML. Do not pin ?p=1605."
+  ],
+  "do_not": [
+    "Do not pin ?p=1605.",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest Facebook.",
+    "Do not use the ferns.ie mass-times card as the bulletin."
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }
