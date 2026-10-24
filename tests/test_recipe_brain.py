@@ -117,6 +117,21 @@ def test_bree_weekend_name_is_18_october_not_2018() -> None:
     assert extract_date_from_string(later) == date(2026, 10, 25)
 
 
+def test_kilmyshall_october_name_keeps_the_th() -> None:
+    from harvester.utils import extract_date_from_string, rewrite_date_url
+
+    url = "https://kilmyshallparish.com/wp-content/uploads/2026/10/October-18th-2026.pdf"
+    assert extract_date_from_string(url) == date(2026, 10, 18)
+    assert rewrite_date_url(url, date(2026, 10, 18)).endswith("October-18th-2026.pdf")
+    rolled = rewrite_date_url(url, date(2026, 10, 25))
+    assert rolled.endswith("/2026/10/October-25th-2026.pdf")
+    kept = rewrite_date_url(
+        "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf",
+        date(2026, 9, 13),
+    )
+    assert kept.endswith("Sunday-Sept-13-26.pdf")
+
+
 def test_st_senan_glued_name_is_18_october_and_rolls() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
