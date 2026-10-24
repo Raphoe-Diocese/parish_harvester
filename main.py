@@ -68,6 +68,31 @@ def _silence_playwright_shutdown(
     loop.default_exception_handler(context)
 
 
+def _diocese_for_one_parish(
+    dioceses: list[str],
+    target_key: str,
+    parishes_dir: Path,
+) -> list[str]:
+    """Run a one-parish test in that parish's diocese only.
+
+    The recipe file is visible from every diocese. Repeating the fetch once
+    per diocese turned one timeout into a four-hour run (Cloyne and Wexford,
+    19/10/2026).
+    """
+    if not target_key or len(dioceses) <= 1:
+        return dioceses
+    from harvester.replay import recipe_path_for
+
+    recipe = recipe_path_for(target_key, parishes_dir)
+    folder = recipe.parent.name
+    if not folder or folder == "recipes":
+        return dioceses
+    for name in dioceses:
+        if name == folder or name.removesuffix("_diocese") == folder:
+            return [name]
+    return dioceses
+
+
 def _discover_dioceses(parishes_dir: Path) -> list[str]:
     """Return diocese names from evidence files, Raphoe first.
 
@@ -195,6 +220,8 @@ def main() -> int:
     diocese_results: dict[str, list] = {}
     raw_target_parish = (args.target_parish or "").strip().lower()
     target_parish_key = resolve_harvest_key(raw_target_parish)
+    if target_parish_key:
+        dioceses = _diocese_for_one_parish(dioceses, target_parish_key, PARISHES_DIR)
 
     if not target_parish_key:
         dns_summary = apply_dns_inactive_flags(parishes_dir=PARISHES_DIR)

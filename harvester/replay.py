@@ -17,7 +17,15 @@ from pathlib import Path
 from urllib.error import HTTPError
 from html import unescape
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
-from urllib.request import HTTPHandler, HTTPSHandler, Request, build_opener, urlopen
+from http.cookiejar import CookieJar
+from urllib.request import (
+    HTTPCookieProcessor,
+    HTTPHandler,
+    HTTPSHandler,
+    Request,
+    build_opener,
+    urlopen,
+)
 
 from playwright.async_api import (
     Browser,
@@ -1170,12 +1178,20 @@ class _IPv4HTTPSHandler(HTTPSHandler):
         return self.do_open(_IPv4HTTPSConnection, req, context=self._context)
 
 
-def _urlopen_ipv4(request, timeout=None, context=None):
-    """urlopen-compatible GET that connects via IPv4 A-records first."""
+def _urlopen_ipv4(request, timeout=None, context=None, cookie_jar=None):
+    """urlopen-compatible GET that connects via IPv4 A-records first.
+
+    *cookie_jar* is kept across retries. A SiteGround challenge sets a
+    cookie on the first answer. The next try with that cookie is the file.
+    """
+    handlers = []
+    if cookie_jar is not None:
+        handlers.append(HTTPCookieProcessor(cookie_jar))
     if context is None:
-        opener = build_opener(_IPv4HTTPHandler, _IPv4HTTPSHandler())
+        handlers.extend((_IPv4HTTPHandler, _IPv4HTTPSHandler()))
     else:
-        opener = build_opener(_IPv4HTTPHandler, _IPv4HTTPSHandler(context=context))
+        handlers.extend((_IPv4HTTPHandler, _IPv4HTTPSHandler(context=context)))
+    opener = build_opener(*handlers)
     return opener.open(request, timeout=timeout)
 
 
@@ -1209,6 +1225,7 @@ def _fetch_bytes_with_retries(
     """
     started = time.monotonic()
     attempts = 0
+    cookie_jar = CookieJar()
     headers_out = {"User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -1224,7 +1241,10 @@ def _fetch_bytes_with_retries(
         try:
             ctx = insecure_ctx if prefer_unverified else None
             with _urlopen_ipv4(
-                request, timeout=per_attempt_timeout_s, context=ctx
+                request,
+                timeout=per_attempt_timeout_s,
+                context=ctx,
+                cookie_jar=cookie_jar,
             ) as response:
                 hit = _ok_http_body(response)
                 if hit and (
@@ -1250,6 +1270,7 @@ def _fetch_bytes_with_retries(
                     request,
                     timeout=per_attempt_timeout_s,
                     context=insecure_ctx,
+                    cookie_jar=cookie_jar,
                 ) as response:
                     hit = _ok_http_body(response)
                     if hit and (
