@@ -7,12 +7,36 @@ import unittest
 from pathlib import Path
 
 from harvester.priority_queue import prioritise
-from main import _prioritise_entries
+from main import _diocese_for_one_parish, _prioritise_entries
 
 
 class _Entry:
     def __init__(self, key: str) -> None:
         self.key = key
+
+
+class OneParishDioceseTests(unittest.TestCase):
+    def test_cloyne_is_not_fetched_in_every_diocese(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            recipe = root / "recipes" / "cloyne" / "cloyneparish.json"
+            recipe.parent.mkdir(parents=True)
+            recipe.write_text("{}", encoding="utf-8")
+            picked = _diocese_for_one_parish(
+                ["raphoe_diocese", "cloyne_diocese", "ferns_diocese"],
+                "cloyneparish",
+                root,
+            )
+            self.assertEqual(picked, ["cloyne_diocese"])
+            wexford = root / "recipes" / "ferns" / "wexford.json"
+            wexford.parent.mkdir(parents=True)
+            wexford.write_text("{}", encoding="utf-8")
+            picked_wexford = _diocese_for_one_parish(
+                ["raphoe_diocese", "cloyne_diocese", "ferns_diocese"],
+                "wexford",
+                root,
+            )
+            self.assertEqual(picked_wexford, ["ferns_diocese"])
 
 
 class PriorityQueueTests(unittest.TestCase):
