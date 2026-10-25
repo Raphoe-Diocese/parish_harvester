@@ -136,6 +136,16 @@ def test_bree_page_photo_is_this_sunday_once_the_week_rolls() -> None:
     assert image_newsletter_is_newer(photo_date, pdf_date, date(2026, 10, 25)) is True
 
 
+def test_horeswood_thirtieth_sunday_is_25_october() -> None:
+    from harvester.bulletin_freshness import extract_bulletin_date
+
+    url = (
+        "https://horeswoodparish.ie/wp-content/uploads/2026/10/"
+        "Thirtieth-Sunday-in-Ordinary-Time-2026-page-001-scaled.jpg"
+    )
+    assert extract_bulletin_date(url) == date(2026, 10, 25)
+
+
 def test_kilmyshall_october_name_keeps_the_th() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
