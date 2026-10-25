@@ -117,6 +117,25 @@ def test_bree_weekend_name_is_18_october_not_2018() -> None:
     assert extract_date_from_string(later) == date(2026, 10, 25)
 
 
+def test_bree_page_photo_is_this_sunday_once_the_week_rolls() -> None:
+    from harvester.utils import extract_date_from_string, image_newsletter_is_newer
+
+    photo = (
+        "https://www.bree.ie/wp-content/uploads/2026/10/"
+        "Newsletter-3743-Oct-24th-25th_page-0001.jpg"
+    )
+    older = (
+        "https://www.bree.ie/wp-content/uploads/2026/10/"
+        "Newsletter-3742-Oct-17th-18th.pdf"
+    )
+    photo_date = extract_date_from_string(photo)
+    pdf_date = extract_date_from_string(older)
+    assert photo_date == date(2026, 10, 25)
+    assert pdf_date == date(2026, 10, 18)
+    assert image_newsletter_is_newer(photo_date, pdf_date, date(2026, 10, 18)) is False
+    assert image_newsletter_is_newer(photo_date, pdf_date, date(2026, 10, 25)) is True
+
+
 def test_kilmyshall_october_name_keeps_the_th() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 

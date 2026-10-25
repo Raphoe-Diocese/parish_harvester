@@ -315,6 +315,23 @@ def newest_dated_url_on_or_before(urls: list[str], target: date) -> str | None:
     return best_url
 
 
+def image_newsletter_is_newer(
+    image_date: date | None,
+    pdf_date: date | None,
+    target: date,
+) -> bool:
+    """A page photo wins only when it is this Sunday and newer than the PDF.
+
+    Bree's Oct 24th-25th JPEG is 25/10/2026. While the harvest Sunday is
+    18/10/2026 that photo is next week. On 25/10/2026 the older PDF is last week.
+    """
+    if image_date is None or image_date > target:
+        return False
+    if pdf_date is None:
+        return True
+    return image_date > pdf_date
+
+
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
     spans = _opaque_hash_spans(text)
