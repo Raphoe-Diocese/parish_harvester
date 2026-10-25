@@ -98,7 +98,7 @@ LEARNED = (
     {
         "id": "image_stack",
         "label": "Sunday image, including an old upload folder",
-        "how": "Stack the visible page images, including an img src. NextGEN gallery is not /uploads/. Fintona's Sunday image can sit in an old month folder. The filename date is the Sunday. Clonard scans the sheet as SKM_C550iYYMMDD. That is the scan day, not the Sunday. The front-page photo can already be next Sunday. Take the newest SKM scan dated on or before the harvest Sunday. On 18/10/2026 that is the 16/10/2026 scan, the sheet for Saturday 17 and Sunday 18 October. Skip the 21/10/2026 scan. Do not pin the jpeg name.",
+        "how": "Stack the visible page images, including an img src. NextGEN gallery is not /uploads/. Fintona's Sunday image can sit in an old month folder. The filename date is the Sunday. Clonard scans the sheet as SKM_C550iYYMMDD. That is the scan day, not the Sunday. The front-page photo can already be next Sunday. Take the newest SKM scan dated on or before the harvest Sunday. On 18/10/2026 that is the 16/10/2026 scan, the sheet for Saturday 17 and Sunday 18 October. On 25/10/2026 the newest scan on or before Sunday is the 23/10/2026 scan, the sheet for Saturday 24 and Sunday 25 October. The 21/10/2026 scan is the development-fund results, not the newsletter. Do not pin the jpeg name.",
     },
     {
         "id": "jetpack_image",

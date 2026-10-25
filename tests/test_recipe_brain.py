@@ -154,6 +154,19 @@ def test_clonard_keeps_the_scan_on_or_before_this_sunday() -> None:
         date(2026, 10, 18),
     )
     assert chosen == this_sunday
+    newsletter = (
+        "https://clonardparish.ie/wp-content/uploads/2026/10/"
+        "SKM_C550i26102308570-scaled.jpg"
+    )
+    lotto = (
+        "https://clonardparish.ie/wp-content/uploads/2026/10/"
+        "SKM_C550i26102120120-scaled.jpg"
+    )
+    assert extract_date_from_string(newsletter) == date(2026, 10, 23)
+    assert newest_dated_url_on_or_before(
+        [lotto, next_sheet, newsletter],
+        date(2026, 10, 25),
+    ) == newsletter
 
 
 def test_st_senan_glued_name_is_18_october_and_rolls() -> None:
