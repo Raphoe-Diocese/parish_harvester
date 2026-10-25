@@ -2854,6 +2854,24 @@ async def _try_wp_json_newest_media(
         return None
     if not isinstance(items, list):
         return None
+    image_api = (
+        f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/media"
+        "?per_page=10&media_type=image&orderby=date&order=desc"
+    )
+    image_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        image_api,
+        max_attempts=4,
+        per_attempt_timeout_s=10.0,
+        total_budget_s=20.0,
+    )
+    if image_result:
+        try:
+            extra = json.loads(image_result[0].decode("utf-8", errors="replace"))
+        except json.JSONDecodeError:
+            extra = None
+        if isinstance(extra, list):
+            items.extend(extra)
     # Prefer a date parsed from the filename/title; when the weekly file is
     # named like Athlone I-Sept2726.pdf (no parseable day), fall back to the
     # WP media `date` field — never the /uploads/2024/11/ folder year, which
