@@ -37,6 +37,7 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 | Status | Added | Item | Where in the code |
 |--------|--------|------|-------------------|
+| doing | 2026-10-25 | Raphoe book left out Annagry, Irish Martyrs, Newtown Killea and Tawnawilly. Their 25/10/2026 files were on the sites. The book must not stitch last week's file. Not live until the Raphoe harvest is on https://www.parishpress.ie/dioceses/raphoe/ | `harvester/week_audit.py`, `harvester/utils.py`, recipes `annagryparish.json`, `tawnawillyparish.json` |
 | done | 2026-08-20 | Living backlog file (this document) so website/OCR requests cannot be memory-holed | `docs/WEBSITE_OCR_BACKLOG.md` |
 | done | 2026-08-20 | Cursor rule: read this file first; 850/450; new-tab links; mega PDF stays on | `.cursor/rules/website-ocr-backlog.mdc` |
 | done | 2026-08-20 | Short pointer in the agent guide | `AGENTS.md` (Website / OCR backlog) |

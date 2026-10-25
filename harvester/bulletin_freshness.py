@@ -199,7 +199,9 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             # as 15 days stale against 16/08/2026 (found 2026-08-18).
             filename_date = extract_date_from_string(basename)
             if filename_date:
-                return filename_date
+                from .utils import prefer_upload_folder_year
+
+                return prefer_upload_folder_year(text, filename_date)
             from .liturgical import liturgical_date_from_text
 
             liturgical = liturgical_date_from_text(basename, folder_year)
