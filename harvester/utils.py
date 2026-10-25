@@ -361,6 +361,25 @@ def _irish_october_date(text: str) -> date | None:
     return candidate
 
 
+def prefer_upload_folder_year(text: str, parsed: date) -> date:
+    """Annagry's 251025.pdf sits in /uploads/2026/10/. That is 25/10/2026.
+
+    The trailing 25 is not the year 2025. A real 2025 file in /uploads/2025/
+    stays 2025. 181026.pdf in /2026/10/ stays 18/10/2026.
+    """
+    match = re.search(r"/uploads/(20\d{2})/(0?\d{1,2})/", text or "", re.I)
+    if not match:
+        return parsed
+    folder_year = int(match.group(1))
+    folder_month = int(match.group(2))
+    if parsed.year == folder_year - 1 and parsed.month == folder_month:
+        try:
+            return date(folder_year, folder_month, parsed.day)
+        except ValueError:
+            return parsed
+    return parsed
+
+
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
     irish = _irish_october_date(text)
@@ -432,7 +451,8 @@ def extract_date_from_string(text: str) -> date | None:
     if m:
         try:
             year = 2000 + int(m.group(3))
-            return date(year, int(m.group(2)), int(m.group(1)))
+            parsed = date(year, int(m.group(2)), int(m.group(1)))
+            return prefer_upload_folder_year(text, parsed)
         except ValueError:
             pass
 
@@ -712,6 +732,8 @@ def month_first_sunday_upload_urls(example_url: str, week: date) -> list[str]:
     for name in month_names:
         cap = name[0].upper() + name[1:]
         names.append(f"Sunday-{day_ord}-{cap}-{yy}.pdf")
+        # Tawnawilly 25/10/2026 is Sunday-25th-Oct.-26.pdf. The dot is part of the name.
+        names.append(f"Sunday-{day_ord}-{cap}.-{yy}.pdf")
         # WordPress adds .1 when the same name was uploaded twice.
         # Tawnawilly 11/10/2026 listing href is Sunday-11th-Oct-26.1.pdf.
         names.append(f"Sunday-{day_ord}-{cap}-{yy}.1.pdf")

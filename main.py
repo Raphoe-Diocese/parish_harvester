@@ -534,6 +534,18 @@ def main() -> int:
 
     # Stitch mega PDF (opt-in via HARVEST_MEGA_PDF=1 — default is current-week parish PDFs only)
     harvest_mega = os.environ.get("HARVEST_MEGA_PDF", "0").strip().lower() in {"1", "true", "yes"}
+    if not target_parish_key and harvest_mega:
+        from harvester.week_audit import book_is_blocked, redownload_warnings
+
+        blocked = book_is_blocked(all_results, target)
+        for line in redownload_warnings(all_results):
+            print(f"  ⚠️  {line}")
+        if blocked:
+            print("\n── This Sunday was missed ─────────────────────────────────")
+            for line in blocked:
+                print(f"  ::error::{line}")
+            print("  The book was not stitched. Fix the finder, then run this diocese again.")
+            return 1
     print("\n── Stitch Mega PDF ─────────────────────────────────────────")
     if target_parish_key:
         print(f"  ⏭️  Skipped (single-parish test for {target_parish_key})")

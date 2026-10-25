@@ -195,6 +195,52 @@ def test_salthill_october_page_name_is_25_october() -> None:
     assert yearless_slug_date(flipped, 2026, near=sunday) == sunday
 
 
+def test_annagry_251025_in_the_2026_folder_is_25_october() -> None:
+    from harvester.bulletin_freshness import extract_bulletin_date
+    from harvester.utils import extract_date_from_string
+
+    current = "https://annagryparish.ie/wp-content/uploads/2026/10/251025.pdf"
+    last_week = "https://annagryparish.ie/wp-content/uploads/2026/10/181026.pdf"
+    real_2025 = "https://annagryparish.ie/wp-content/uploads/2025/10/251025.pdf"
+    assert extract_date_from_string(current) == date(2026, 10, 25)
+    assert extract_bulletin_date(current) == date(2026, 10, 25)
+    assert extract_bulletin_date(last_week) == date(2026, 10, 18)
+    assert extract_bulletin_date(real_2025) == date(2025, 10, 25)
+
+
+def test_tawnawilly_dot_after_oct_is_25_october() -> None:
+    from harvester.utils import extract_date_from_string, month_first_sunday_upload_urls
+
+    url = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-25th-Oct.-26.pdf"
+    assert extract_date_from_string(url) == date(2026, 10, 25)
+    guesses = month_first_sunday_upload_urls(
+        "https://tawnawillyparish.ie/wp-content/uploads/Sunday-27th-Sept-26.pdf",
+        date(2026, 10, 25),
+    )
+    assert any(item.endswith("Sunday-25th-Oct.-26.pdf") for item in guesses)
+
+
+def test_week_audit_stops_the_book_when_last_week_was_kept() -> None:
+    from datetime import date as day
+    from harvester.week_audit import book_is_blocked
+
+    class Row:
+        def __init__(self, key: str, url: str) -> None:
+            self.key = key
+            self.url = url
+
+    old = book_is_blocked(
+        [Row("annagryparish", "https://annagryparish.ie/wp-content/uploads/2026/10/181026.pdf")],
+        day(2026, 10, 25),
+    )
+    assert old
+    current = book_is_blocked(
+        [Row("annagryparish", "https://annagryparish.ie/wp-content/uploads/2026/10/251025.pdf")],
+        day(2026, 10, 25),
+    )
+    assert current == []
+
+
 def test_kilmyshall_october_name_keeps_the_th() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
