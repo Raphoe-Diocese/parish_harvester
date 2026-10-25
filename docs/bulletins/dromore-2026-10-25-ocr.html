@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Dromore Diocese Text Bulletin — 25/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="dromore-2026-10-25.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">DROMORE Text Bulletin · 25/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-st-paul-s-lurgan-shankill" data-parish-name="St Paul&#x27;s Lurgan (Shankill)"><h2 class="ocr-parish-name">St Paul&#x27;s Lurgan (Shankill)</h2><p class="ocr-parish-date">25/10/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>SICK CALLS AND Fr Kingsley and members of the Parish Prayer Group will be carrying out Apostolic Work of EMERGENCIES Mercy sometime in October/November this year, to visit sick parishioners, the lonely or the PARISH BU LLETI Nhousebound, to say the Rosary with them, or a wee chat and to let them know they are not</p>
+<h4 class="b-sub">TEL</h4>
+<p>(028) 3832 3161 alone because the parish remembers and always prays for them.</p>
+<p>H We extend a warm welcome to all who attend our church.</p>
+<p>We hope you will find</p>
+<h4 class="b-sub">TEL</h4>
+<p>(028) 38321289</p>
+<p>If you or your family would like avisit, could you please leave your name and address into the | our parish community a place where your life of faith will be nourished.</p>
+<p>Your Parish</p>
+<h4 class="b-sub">web</h4>
+<p><a href="https://www.lurganparish.com" target="_blank" rel="noopener noreferrer">www.lurganparish.com</a> Parish Office.</p>
+<p>This will help Fr Kingsley and the Prayer Group to plan the visit. i Prayers, your presence and your talents are most welcome!</p>
+<h4 class="b-sub">Facebook</h4>
+<p>@lurganparish á Mav God hless all of us.</p>
+<p>Parish Ape. Parish365 NOVENA TO OUR LADY OF I CELEBRATIONS i TINE OUR PARISH CLERGY Download App Store or Google Play PERPETUAL HELP This year marks two very special me Father Colum Murphy PP (208) 3832 3161</p>
+<p>Fr Colum Wright CC Saint Vincent de Paul The Novena in St Paul&#x27;s continues at St Paul&#x27;s Church. “Cl | | I Father Kingsley Idoghor (028) 3832 3161</p>
+<p>St Paul&#x27;s Presbytery William Street: For nine weeks until :</p>
+<p>66-70 North Street, Lurgan BT67 9AH 54 Francis Street (028) 3832 5725 thlt is the 20th anniversary of the 10.30am Ceeee Father Anthony Moffet, CC (028) 3832 3161 — Lurgan BT66 6DL &quot;Volunteers needed.</p>
+<p>Please give your</p>
+<p>Monday 7 &#x27; December 2026. Family Mass and the 10th anniversary of IPEEL 66-70 North Street, Lurgan BT67 9AH (028) 3832 7173 time&quot; The Novena prayers wil be said at the formation St Paul’s Junior Choir.</p>
+<p>colum.wright: btintemet.com SAFEGUARDING CHILDREN AND , : To celebrate these wonderful</p>
+<p>SUNDAY 18 OCTOBER 2026 Father Maciej Zacharek, PP:</p>
+<h4 class="b-sub">Tel</h4>
+<p>0739 466 3709</p>
+<p>ADULTS WHO REQUIRE PROTECTION: The Novena in St Peter&#x27;s will continues achievements, we&#x27;ll be treating the 29&quot;</p>
+<p>SUNDAY 25 Bottier Road, Moirae: <a href="mailto:magheralinparish@dromorediocese.org" target="_blank" rel="noopener noreferrer">magheralinparish@dromorediocese.org</a> Dromore Diocesan For nine weeks until children to refreshments after IN ORDINARY TIME Our Parish Deacons: Rev Kevin Devine (028) 3832 3161</p>
+<p>Designated Liaison Person</p>
+<p>Tuesday 8&quot; December. Mass this Sunday, 18th October. WORLD MISSION SUNDAY Rev. Pearse Thombury (028) 3832 3161</p>
+<p>Mr Stephen Sherry: <a href="tel:+3537301246329" style="color:#1d4ed8;font-weight:600;">07301246329</a></p>
+<p>The Novena prayers will be said at the We look forward to celebrating together mail: <a href="mailto:ppmtho@gmail.com" target="_blank" rel="noopener noreferrer">ppmtho@gmail.com</a> <a href="mailto:safequardingdirector@dromorediocese.org" target="_blank" rel="noopener noreferrer">safequardingdirector@dromorediocese.org</a> 8.00am and 7.00pm Masses. and can&#x27;t wait to see you all there!</p>
+<p>Saint Paul’s Parish Safeguarding Representative and Parish Sacristan.</p>
+<h4 class="b-sub">Telephone</h4>
+<p>07563 293429</p>
+<p>SUNDAY 18TH OCTOBER MISSION</p>
+<p>SUNDAY 7 ; This weekend parishes worldwide celebrate World Mission Sunday.</p>
+<p>The Holy Father&#x27;s SI Ass SCHEDULE. TASS SCHEDULE annual appeal to support overseas mission and missionaries.</p>
+<p>Sunday Sund : : BAPTISMS The kindness shown will help overseas missionaries to continue to share the love of Vigil 7:00pm (Saturday) Vigil aled God with some of the world’s most marginalised and vulnerable people. 9:00am and 10:30am. is! :00pm (Saturday) Thank you for supporting in whatever way you can, and please remember it is more than Weekdays 8:00am and 12 Noon With great joy and thanksgiving we welcome the an appeal for financial help.</p>
+<p>Missionaries also need spiritual support.</p>
+<p>Monday to Friday: 10:00am Weekdays following children into our parish community On World Mission Sunday missionaries take great strength in knowing that the faithful of</p>
+<p>Saturday 10 30am Monday to Friday: 8:00am who were baptized recently in St Paul&#x27;s: the world are keeping them in their thoughts and prayers.</p>
+<p>To learn more, go to : . i Brianna Grace McCavana <a href="https://www.mission.ie" target="_blank" rel="noopener noreferrer">www.mission.ie</a> Saint Paul&#x27;s Parish Office Tuesday: and</p>
+<p>Friday 8.00 am and Parish Secret 7:00pm Jayn Sean Carvalho arish secreialy</p>
+<p>Saturday 9.30am All parents wishing to have a child baptised DAILY PRAYER i THECHOSEN</p>
+<h4 class="b-sub">Telephone</h4>
+<p>(028) 3832 1289</p>
+<p>Saint Peter&#x27;s Parish Offi in St Paul’s Parish, must notify the PRAYER FOR MISSIONARIES Calling all fans of ‘The Chosen’ multi</p>
+<h4 class="b-sub">Email</h4>
+<p>aint Feters Faris ice Parish Office in person.</p>
+<p>Lord our God, loving Father, we season drama series about the life of <a href="mailto:stpaulsparishlurgan@dromorediocese.or" target="_blank" rel="noopener noreferrer">stpaulsparishlurgan@dromorediocese.or</a> Parish Secretary ONE MONTH&#x27;S NOTICE IS humbly pray to you for our beloved Jesus and the disciples.</p>
+<p>Season 6 (the (028) 3832 3161 lei i crucifixion season) is launching before the Office Hours ete ní 4 d REOUIRED missionaries, heralds of the Gospel. end of this year, but we have special i <a href="mailto:stpetersparishlurgan@dromorediocese.org" target="_blank" rel="noopener noreferrer">stpetersparishlurgan@dromorediocese.org</a> . . Mr i i Monday to</p>
+<p>Friday 9.00am to 12.30pm Baptisms take place on the second and May our prayers reach their hearts permission for an early viewing of Episode Requests for Anniversaries and Month’s Office Hours fourth Sunday of each month. that they may feel our love, our 1 of the new season!</p>
+<p>Mind notices must be left into the</p>
+<p>Monday 10:00am — 1:00pm and strength, our faith. “Ean Season 6 | Episode 1 , Parish Office on or before 12 noon on 1:45pm —4.00pm OCTOBER ROSARY May our prayers reach their hearts any genera oteose on Prime before the Wednesday prior to the week before Tuesday-Thursday 9.00am — 1.00pm Lurgan Lourdes Committee will be reciting that they continue with your zeal the Episode 1 will be shown in if they are to be included in the Bulletin. and 1:45pm — 4.00 pm the Rosary at: mission you entrust them with.</p>
+<p>St Anthony&#x27;s Centre The minimum diocesan stipend is £10. Fridav 9.00am—1.000m May their presence in their</p>
+<p>Friday 23 October at 7:45pm. ENVELOPES ARE PROVIDED AT THE Our Lady of Lourdes Grotto community be a reminder of your All welcome; give it a try.cer . th A (Previous seasons available to watch for BACK OF THE CHURCH WHICH WE at St Paul&#x27;s on</p>
+<p>Monday 19th October at presence among us.</p>
+<p>Amen. : , ADORATION CHAPEL Missionary Society of St Columban free on&#x27;The Chosen’ app) WOULD ASK YOU TO PLEASE USE. EDWARD STREET 7pm y Aic Grotto at Kilwilkie on 26th October at THOUGHT FOR THE DAY doration 9am to Spm 7.00pm PRAYER FOR PEACE - Based on plea for peace by Pope John Paul at World Mission Sunday Our Mission m- . . Drogheda 29 September 1979 . Send me, Lord, out into the world COMMUNITY EVENT! Everyone welcome to come and join in Father in heaven, your loving plan is to draw all men closer together in the peace and that begins at my front door.</p>
+<p>St Ronan&#x27;s College is delighted to host our love of Christ your Son.</p>
+<p>We pray for all those to whom violence has brough sorrow and May my every word flow from your heart &quot; 8 h or 4 H MONTH OF THE HOLY SOULS sadness.</p>
+<p>Comfort the many relatives and friends who carry the marks of the loss of a and my actions be of love and peace first ‘Vinted in Real (ife’ community clothing NOVEMBER DEAD LIST loved on throughout the remaining years of their lives.</p>
+<p>May the homeless and injured that everything | do or say Changing your style this season?</p>
+<p>November dead list and envelopes can be experience your compassion through the loving action of others.</p>
+<p>Help us all to realise reflects your great mercy to all.</p>
+<p>Got old clothes laying around? picked up at the back of the Chapel. that whatever the cause, violence breeds violence and delays the day of justice.</p>
+<p>Help me witness to your truth his is the perfect opportunity to flip the cloth Remember also on your lists, old Inspire all political leaders to strive unceasingly to find a just and peaceful solution to our no less in my silence than in my words for cash! neighbours, friends and those who have no social and political problems. We prayer that the fear and intolerance which prevent a and show me, Lord, the way | should go.</p>
+<p>When?</p>
+<p>Saturday 24° October one left to pray for them political solution may give way to mutual understanding and trust. I Help me to see that my solemn duty 10am-1pm at St Ronan&#x27;s College, Lurgan PItidput into the box.</p>
+<p>We place in the hands of Our Lady an urgent and agonizing problem which so far has , : ease return and put into the black box. the defied a reasonable and just solution.</p>
+<p>Through her intersession, may the wounds and ills to spread your gospel to everyone : i envelopes are opened in the Sacristy and all i i rit Sellers: Tables can be booked by calling velop P&#x27; isty that divide us be healed.</p>
+<p>We ask this through Christ Our Lord. Amen. in the world is second only to their right&#x27; donations taken out before the lists are - : i I to hear and respond to it.</p>
+<p>St Ronan&#x27; s on <a href="tel:+442838323" style="color:#1d4ed8;font-weight:600;">028 38 323</a> 192. dded to the basket in front of the Alt O Mary conceived without sin, pray for us who have recourse to three (3 times) Open my eyes to your presence in others Tables are £20 to nite fr you to pitch up and added to the basket In front of the Altar.</p>
+<p>Imprimatur: Michael Harty, Bishop of Killaloe. and my ears to recognise your voice . an ó N 4 i Shoppers: £3 donation entry to browse and k especially in the poor and oppressed. ppbuy.y ” DONA ONS PSNh COMMUNITY OUTREACH GROUP LURGAN Amen.</p>
+<p>Prayer by Fr Joe Veneroso MM All donations go towards funding our 26/27 your phone camera to donate Presents: A STEP TOOFAR? school production of&#x27;Shrek!</p>
+<p>The Musical.’ peed | A CONTEMPLATIVE MOVIE ON FORGIVENESS . . We hope you can join us!vie at 4 ‘A STEP TOOFAR’ explores the power of forgiveness through the real-life stores of people láimh pev OTION wn Fr ingstey fat who have faced hurt, injustice and the desire for revenge. ere will be exposition of the Blesse feooa Sacrament, Confession, and Rosary from MUSICAL EVENING AT THE CELLAR BAR at</p>
+<p>WEDNESDAY 21 OCTOBER 2026 at 7.30pm .</p>
+<p>Friday 23rd October 7.30pm. Admission £5. operas 6:30pm. Benediction by 7pm i - - The Jethro Centre, Flush Place, Lurgan Each Wed. in October at St Peter&#x27;s Church.</p>
+<p>Pay at the door. All proceeds to Evora Hospice Or visit httos://donate.mydona.com/st-pauls- i , All welcome &quot; formerly Southern Area Hospice. eaishludan All welcome, light refreshments</p>
+<p>&quot;Tteee ? As parishioners we offer our sincere sympathy, prayers and support to c the family members of those who have died $ recently: 9</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>“5 Veronica Mloore, Sperrin Drive a Gary Griffin, Enniskeen 2 Eugene McEvoy, Victoria Street Marie Robinson (née Scullion), Derytrasna/Maghery</p>
+<p>SATURDAY 17 OCTOBER 2026 10.30AM Sister Anna Haughian, Silverwood Drive Vincent McGovern, Lisacorran Road Geraldine Codd, Oakleigh Manor Conor Murray, Milltown Deirdre and Edward Goodfellow, Drumlin Drive Josie Tipping, Silverwood Drive</p>
+<p>SATURDAY 17 OCTOBER VIGIL MASS 7.00PM Leonard and Joan McCann, Cafolla Gardens Sean and Paddy Toman, Elmwood Terrace Michael and Kathleen Heaney, Richmount Gardens Vera Jordan, Portadown</p>
+<p>SUNDAY 18 OCTOBER 2026 9.00AM No Anniversaries</p>
+<p>SUNDAY 18 OCTOBER 2026 10.30AM Charles McDonald Ailsbury Park Joseph and Ellen Bailey, Brown Street Jim B Seeley, Old Portadown Road Lily Haughey, Lower North Street Mary Ford, Grattan Street</p>
+<p>MONDAY 19 OCTOBER 2026 10.00AM Mary Ann McConville, Ballinary North Road</p>
+<p>TUESDAY 20 OCTOBER 2026 10.00AM Bernadette Hamill Carrickvale Avenue Joe French North Circular Road Sheila Magee, Grattan Street</p>
+<p>WEDNESDAY 21 OCTOBER 2026 10.00AM Brendan Leathem, Lemington Spa William Leathem, North Street Mary Curran, New Street</p>
+<p>THURSDAY 22 OCTOBER 2026 10.00AM Phyllis Magee, Cornakinnegar Road Kathleeen McKinstry, Avondale Green Hugh McAlinden, Silverwood Marian McStay, Lough Road</p>
+<p>FRIDAY 23 OCTOBER 2026 10.00</p>
+<p>AM Donal Kerr (Senior), Taghnevan Drive Joseph Corey, O’Neills Terrace Alex and Jane McVeigh, Ashwood</p>
+<p>SATURDAY 24 OCTOBER 2026 10.30AM Denis Armstrong, Monbrief Walk Monica Jordan (née Toal), Grattan Street Gemma O’Neill, Carrickvale Avenue Alex Thornbury, Francis Street</p>
+<p>SATURDAY 24 OCTOBER 2026 - VIGIL 7.00PM Barney Keenan, Oakfield Terrace Rita Coleman, Wolfisland Terrace ETERNAL REST GRANT UNTO THEM, 0 LORD ‘The Rosary is my favourite prayer’ St John Paul Il Memorial 22 October Years ago, | read a little spiritual gem called The Secret of the Rosary by St Louis de Montfortand 2 learned about the abundant graces and even 3 miracles that have been attributed to the Rosary.</p>
+<p>Many saints who were devotees of the Rosary attested to this, as well.</p>
+<p>Even in our modern day, Our Lady and Jesus are knocking on the doors of &amp; human hearts through this beautiful prayer. | have 5 a few friends who were adamantly anti-Catholic yet &amp; converted to the Church after being introduced to &amp; the Rosary.</p>
+<p>We must never underestimate the id showers of graces we receive when praying it.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-st-peter-s-lurgan-shankill" data-parish-name="St Peter&#x27;s Lurgan (Shankill)"><h2 class="ocr-parish-name">St Peter&#x27;s Lurgan (Shankill)</h2><p class="ocr-parish-date">25/10/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>Fr Colum Murphy, PPFr Colum Wright, CCFr Anthony Moffett, CCFr Kingsley Idoghor, SMMM Deacon Kevin Devine Deacon Pearse Thornbury St Peter’s Parish, Shankill 18th OCTOBER 2026 – TWENTY-NINETH SUNDAY IN ORDINARY TIME World Mission Sunday</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>Veronica Moore nee McAvoy, Sperrin Drive Gary Griffin, Enniskeen Eugene McEvoy, Victoria Street</p>
+<h3 class="b-head">ANNIVERSARIES</h3>
+<p>Sunday 18th October Sadie McIntyre, Levin Road Maureen Hoy, North Circular Road Lena Creaney, Drumnamoe Avenue Vincent McCarron, Castor Bay Road Declan Drainey, Shore Road Margaret Jordan, Belvedere Manor Mary McKee, Lough Road Mary Ford, Grattan Street Nuala Henderson, Castor Bay Road Sarah Ann Mallon, Manor Park Annie &amp; Joseph Monteith, Mary Street Margaret Furphy, Levin Road Susan Mulholland, Wesley Place Lily Haughey, Lower North Street May McElroy</p>
+<p>Monday 19th October Frank Molloy, Kilwilke Road Margaret McCluskey, Mary Street Peggy McNeice, Sloan Street/Edward Street John McKeown, Church Walk Hugh McStravick, Mary Street Brian McCann, The Wood</p>
+<p>Tuesday 20th October Jimmy McDonald, Lake Street Gerard French, Windsor Avenue Eileen McNally, Oakleigh Sheila Magee, Grattan Street Patrick Conlon, Blair Park Sr Bronach Meehan, Keady Convent</p>
+<p>Wednesday 21st October James Murray, Killaghy Patrick (Paddy) Maguire, Aghagallon</p>
+<p>Thursday 22nd October Elizabeth Coleman, Castor Bay Road James Howard, Antrim Road Winnie McCaffrey, Oakleigh Heights Phyllis Magee, Cornakinnegar Road Ann Douglas, Ballyoran Park, Portadown</p>
+<p>Friday 23rd October Karen Dickson, Belvedere Manor Mary McSherry, Lower North Street Colm Gilmore, Allenhill Park Joseph Corey, O’Neill’s Terrace</p>
+<p>Saturday 24th October Danny &amp; Maggie Geary, Francis Street Hugh &amp; Hannah McAlinden, Silverwood Monica Jordan, Grattan Street Requests for Anniversaries and Month’s Mind notices should be left into the Parish Office on or before 12 noon on the Wednesday of the week before if they are to be included in the Bulletin.</p>
+<p>The minimum diocesan stipend is £10. As we have a booking system, anniversaries can be booked in advance till the end of the year.</p>
+<p>Please use the anniversary envelopes at the back of the Church Parochial House 3834 9338 and Parish Office - Tel. 3832 3161</p>
+<h4 class="b-sub">E-mail</h4>
+<p><a href="mailto:stpetersparishlurgan@dromorediocese.org" target="_blank" rel="noopener noreferrer">stpetersparishlurgan@dromorediocese.org</a> Website: <a href="https://www.lurganparish.com" target="_blank" rel="noopener noreferrer">www.lurganparish.com</a> St Paul’s Parish Office 38321289 &amp; Parochial House, 54 Francis Street 38327173 Safeguarding Children and Adults who require protection.</p>
+<p>Designated person for Dromore Diocese – Mr Stephen Sherry <a href="tel:+3537301246329" style="color:#1d4ed8;font-weight:600;">07301246329</a></p>
+<p>Or email <a href="mailto:safeguardingdirector@dromorediocese.org" target="_blank" rel="noopener noreferrer">safeguardingdirector@dromorediocese.org</a> Parish Safeguarding Representative –Tel. 0756 329 3431</p>
+<p>St Vincent De Paul, Ozanam Centre 3832 5725</p>
+<h3 class="b-head">MASS SCHEDULE</h3>
+<p>Saturday 9.30am, 6pm (Vigil) Sunday 8am, &amp; 12.00 noon Monday, Wednesday &amp; Thursday 8am Tuesday &amp; Friday 8am &amp; 7pm ST PAUL’S CHURCH Sunday: 9am &amp; 10.30am, Monday–Friday: 10am Saturday: 10.30 am &amp; 7pm (Vigil) NIGHT PRAYER Dear Lord, as this day is coming to an end, please help me to relax and let go of all my stress.</p>
+<p>I ask for your peace to overtake my heart and to embrace my dreams and sleep.</p>
+<p>May your words and promises quiet the worried and anxious thoughts that filled my head.</p>
+<p>I give you all the things that are beyond my control and trust them to your hands.</p>
+<p>I give you thanks in advance for all you will do.</p>
+<p>In Jesus’ name I pray. Amen St Peter’s Parish now accepts ONLINE DONATIONS Just scan the QR code with your phone camera to donate.</p>
+<p>Or visit <a href="https://donate.mydona.com/st-peters-parish-lurgan.Scan" target="_blank" rel="noopener noreferrer">https://donate.mydona.com/st-peters-parish-lurgan.Scan</a> the QR code.</p>
+<p>Enter your amount. Input your card details.</p>
+<p>Please do not forget to Gift Aid BULLETIN OFERTORY COLLECTION 11th October - £3637.26 Plus, Standing Orders £303.60 weekly Donations – £20.00 Thank you for your continued support and generosity.</p>
+<p>All parents wishing to have a child baptised in St Peter’s Parish, must notify the Parish Office in person.</p>
+<p>One month’s notice is required. Baptisms take place on the first, third &amp; Fifth Sunday of each month SACRAMENT OF RECONCILIATION</p>
+<p>Friday 6.00pm - 6.45pm EUCHARISTIC ADORATION: It is planned to renew, increase and consolidate the practice of Eucharistic Adoration in parishes of The Diocese of Dromore.</p>
+<p>All are welcome to attend an Information Meeting on</p>
+<p>Friday 23rd October 2026 at 8.00 p.m.in the Parish Centre, Edenderry Rd, Banbridge BT32 3AF Light refreshments from 7.30pm</p>
+<p>Sunday 18th October Mission Sunday DAILY PRAYER FOR MISSIONARIES Lord our God loving Father, we humbly pray to you for our beloved missionaries, heralds of the Gospel.</p>
+<p>May our prayers reach their hearts that they may feel our love, our strength, our faith.</p>
+<p>May our prayers reach their hearts that they continue with your zeal the mission you entrust them with.</p>
+<p>May their presence in their community be a reminder of your presence among us.</p>
+<p>Amen. Mission, we see, is a tireless going out to all men and women, in order to invite then to encounter God and enter into communion with him.</p>
+<p>Tireless God, great in love and rich in mercy, constantly sets out to encounter all men and women, and to call them to the h appiness of his kingdom, even in the face of their indifference or refusal Jesus Christ, the Good Shepherd and messenger of the Father , went out in search of the lost sheep of the people of Israel and desired to go even further, in order to reach even the most distant sheep (cf.</p>
+<p>Jn 10:16). Both before and after his resurrection, he told his disciples, thus involving them in his own mission.</p>
+<p>The Church, for part, in fidelity to the mission she has received from the Lord, will co ntinue to go to the ends of the earth, to set out over and over again, without ever growing weary or losing heart in the face of difficul ties and obstacles.</p>
+<p>Let us not forget that every Christian is called to take part in his or her own universal mission by offering his or her witness to the Gospel in every context, so that the whole Church can conti nually go forth with her Lord and Master to the ‘crossroads’ of t oday’s world.</p>
+<p>Today’s drama in the Church is that Jesus keeps knocking on the door, but from within, so that we let himout!</p>
+<p>Often, we end up being an ‘imprisoning’ Church which does not let the Lord which keeps him as ‘itsown&#x27;, whereas the Lord came for mission and want us to be missionaries.</p>
+<p>THE CHOSEN Calling all fans of&#x27;The Chosen&#x27; multi-season drama series about the life of Jesus and the disciples.</p>
+<p>Season 6 (the crucifixion season) is launching before the end of this year, but we have special permission for an early viewing of Episode 1 of the new season!</p>
+<p>Season 6 | Episode 1 Early access screening, showing before general release on Prime Episode 1 will be shown in St Anthony&#x27;s Centre</p>
+<p>Friday 23 October at 7:45pm. All welcome; give it a try. (Previous seasons available to watch for free on&#x27;The Chosen&#x27; app) OCTOBER DEVOTION: With Fr Kingsley There will be exposition of the Blessed Sacrament, Confession, and Rosary from 6:30pm. Benediction by 7pm each Wednesday in October at St Peter&#x27;s Church.</p>
+<p>All welcome &quot; MUSICAL EVENING AT THE CELLAR BAR</p>
+<p>Friday 23rd October 7.30pm. Admission £5. Pay at the door All proceeds to Evora Hospice formerly Southern Area Hospice NOVENA TO OUR LADY OF PERPETUAL HELP The Novena in St Peter’s will continue on Tuesday’s concluding on the 8th December.</p>
+<p>The Novena prayers will be recited at the 8.00am and 7.00pm Masses.</p>
+<p>The Novena in St Paul’s will continue on Monday’s and will conclude on 7th December.</p>
+<p>The Novena prayers will be recited at the 10.00am Mass daily.</p>
+<p>OCTOBER ROSARY Lurgan Lourdes Committee will be reciting the Rosary at Our Lady of Lourdes Grotto, St Paul’s Monday evening (19th) 7.00pm. Next Monday (26th), Rosary will be recited at the Grotto in Kilwilke 7.00pm Everyone welcome Community Outreach Group: presents the viewing of the film: A STEP TOOFAR by Marina and the late Paul Moorehead on</p>
+<p>Wednesday 21 October at 7:30pm in the Jethro Centre.</p>
+<p>The film is a contemplative movie on forgiveness.</p>
+<p>It explains the power of forgiveness through the real-life stories of people who have faced hurt, injustice and the desire for revenge.</p>
+<p>A discussion will follow. Please invite family and friends to attend.</p>
+<p>Forgiveness is difficult, but it is important in order to help free the burden of the hurt.</p>
+<p>Light refreshments afterwards. MONTH’S MIND</p>
+<p>Tuesday 20th October Joe French, North Circular Road Jackie McGuigan, Filbin Crescent St Ronan&#x27;s College is delighted to host our first&#x27;Vinted in Real Life&#x27; community clothing market.</p>
+<p>Changing your style this season? Got old clothes lying around?</p>
+<p>This is the perfect opportunity to flip the cloth for cash!</p>
+<p>When?</p>
+<p>Saturday 24th Oct 10am-1pm at St Ronan&#x27;s College.</p>
+<p>Sellers: Tables can be booked by calling St Ronan&#x27;s on <a href="tel:+442838323192" style="color:#1d4ed8;font-weight:600;">028 3832 3192</a> . Tables are £20 to hire for you to pitch up and sell!</p>
+<p>Shoppers: £3 donation entry to browse and buy.</p>
+<p>All donations go towards funding our 26/27 school production of&#x27;Shrek!</p>
+<p>The Musical.&#x27; We hope you can join us!</p>
+<p>PARISH OFFICE The Parish Secretary will be unavailable over the next couple weeks. The Parish office will be open during the following times:</p>
+<p>Monday 19th – 10.00am-1.00pm</p>
+<p>Tuesday 20th – 1.00-4.00pm</p>
+<p>Wednesday 21st – CLOSED</p>
+<p>Thursday 22nd – 9.00am – 4.00pm</p>
+<p>Friday 23rd – CLOSED</p>
+<p>Monday 26th – 10.00am – 4.00pm</p>
+<p>Tuesday 27th 9.00am-4.00pm</p>
+<p>Wednesday 28th – CLOSED Lunch daily 1.00-2.00pm Normal hours resume</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
