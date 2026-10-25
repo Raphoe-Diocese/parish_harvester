@@ -176,6 +176,25 @@ def test_anspideal_irish_october_name_is_25_october() -> None:
     assert extract_bulletin_date(url) == date(2026, 10, 25)
 
 
+def test_salthill_october_page_name_is_25_october() -> None:
+    from harvester.bulletin_freshness import extract_bulletin_date
+    from harvester.utils import yearless_slug_date
+
+    named = (
+        "https://salthillparish.ie/wp-content/uploads/2026/10/"
+        "Newsletter-25th-Oct-1.pdf"
+    )
+    flipped = (
+        "https://salthillparish.ie/wp-content/uploads/2026/10/"
+        "Newsletter-Oct-25th-1.pdf"
+    )
+    sunday = date(2026, 10, 25)
+    assert extract_bulletin_date(named) == sunday
+    assert extract_bulletin_date(flipped) == sunday
+    assert yearless_slug_date(named, 2026, near=sunday) == sunday
+    assert yearless_slug_date(flipped, 2026, near=sunday) == sunday
+
+
 def test_kilmyshall_october_name_keeps_the_th() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
