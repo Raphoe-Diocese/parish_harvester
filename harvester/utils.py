@@ -156,6 +156,14 @@ _WEEKEND_MONTH_SPAN_RE = re.compile(
     rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)(?!\d)",
     re.IGNORECASE,
 )
+# Ferns parish: October-24th-October-25th-2026.pdf. The second ordinal is
+# Sunday. A slug read of "17th-October-18" was the year 2018.
+_MONTH_ORDINAL_REPEAT_YEAR_RE = re.compile(
+    rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)"
+    rf"[_\-\s+]({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)"
+    rf"[_\-\s+]+(20\d{{2}})(?!\d)",
+    re.IGNORECASE,
+)
 _UPLOAD_YEAR_RE = re.compile(r"/(20\d{2})/")
 
 _MONTH_NAMES: list[str] = [
@@ -512,6 +520,26 @@ def extract_date_from_string(text: str) -> date | None:
                     return candidate
             except ValueError:
                 pass
+
+    # October-24th-October-25th-2026 is Sunday 25/10/2026, not 17 October 2018.
+    m = _first_match_outside_hash(_MONTH_ORDINAL_REPEAT_YEAR_RE, text, spans)
+    if m:
+        month_a = _MONTH_MAP.get(m.group(1).lower())
+        month_b = _MONTH_MAP.get(m.group(3).lower())
+        if month_a and month_a == month_b:
+            try:
+                year = int(m.group(5))
+                first = date(year, month_a, int(m.group(2)))
+                second = date(year, month_a, int(m.group(4)))
+            except ValueError:
+                first = second = None
+            if (
+                first is not None
+                and second is not None
+                and _is_plausible_bulletin_year(year)
+                and 0 <= (second - first).days <= 3
+            ):
+                return second
 
     # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
     slug_date = extract_date_from_slug(text)

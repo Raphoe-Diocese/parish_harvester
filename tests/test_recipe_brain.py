@@ -146,6 +146,24 @@ def test_horeswood_thirtieth_sunday_is_25_october() -> None:
     assert extract_bulletin_date(url) == date(2026, 10, 25)
 
 
+def test_ferns_parish_weekend_file_is_this_sunday_not_2018() -> None:
+    from harvester.bulletin_freshness import extract_bulletin_date
+    from harvester.utils import extract_date_from_string
+
+    older = (
+        "https://fernsparish.ie/wp-content/uploads/2026/10/"
+        "October-17th-October-18th-2026.pdf"
+    )
+    current = (
+        "https://fernsparish.ie/wp-content/uploads/2026/10/"
+        "October-24th-October-25th-2026.pdf"
+    )
+    assert extract_date_from_string(older) == date(2026, 10, 18)
+    assert extract_date_from_string(current) == date(2026, 10, 25)
+    assert extract_bulletin_date(older) == date(2026, 10, 18)
+    assert extract_bulletin_date(current) == date(2026, 10, 25)
+
+
 def test_kilmyshall_october_name_keeps_the_th() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 
