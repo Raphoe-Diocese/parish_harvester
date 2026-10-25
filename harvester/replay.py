@@ -69,6 +69,7 @@ from .utils import (
     dropfiles_task_download_url,
     extract_date_from_slug,
     extract_date_from_string,
+    image_newsletter_is_newer,
     newest_dated_url_on_or_before,
     churchmedia_channel_about_url,
     churchmedia_newsletter_url_from_about,
@@ -2858,6 +2859,7 @@ async def _try_wp_json_newest_media(
     # WP media `date` field — never the /uploads/2024/11/ folder year, which
     # would lose to an older PalmSunday-29th-March-2026.pdf (proved 01/10/2026).
     scored: list[tuple[date, str]] = []
+    image_scored: list[tuple[date, str]] = []
     ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
     for item in items:
         if not isinstance(item, dict):
@@ -2876,7 +2878,9 @@ async def _try_wp_json_newest_media(
         if href_patterns and not _href_matches_patterns(blob, href_patterns):
             continue
         path = urlparse(src).path.lower()
-        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")):
+        is_image = path.endswith((".jpg", ".jpeg", ".png"))
+        is_doc = path.endswith((".pdf", ".docx", ".doc", ".rtf"))
+        if not is_image and not is_doc:
             continue
         filename = src.rsplit("/", 1)[-1]
         found = (
@@ -2887,6 +2891,10 @@ async def _try_wp_json_newest_media(
             or liturgical_date_from_text(filename, target_date.year)
             or liturgical_date_from_text(title, target_date.year)
         )
+        if is_image:
+            if found and found <= target_date:
+                image_scored.append((found, src))
+            continue
         if found is None:
             raw_media = str(item.get("date") or "")[:10]
             try:
@@ -2895,9 +2903,41 @@ async def _try_wp_json_newest_media(
                 found = None
         if found and found <= ahead:
             scored.append((found, src))
-    if not scored:
+    best_pdf = max(scored) if scored else None
+    best_image = max(image_scored) if image_scored else None
+    use_image = image_newsletter_is_newer(
+        best_image[0] if best_image else None,
+        best_pdf[0] if best_pdf else None,
+        target_date,
+    )
+    if use_image and best_image is not None:
+        page_urls = sorted(
+            src for found, src in image_scored if found == best_image[0]
+        )
+        images: list[bytes] = []
+        first = ""
+        for page_url in page_urls:
+            page_url = quote_http_url(page_url)
+            file_result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                page_url,
+                max_attempts=4,
+                per_attempt_timeout_s=15.0,
+                total_budget_s=30.0,
+                want_file=True,
+            )
+            if not file_result or not looks_like_image_bytes(file_result[0]):
+                continue
+            images.append(file_result[0])
+            if not first:
+                first = page_url
+        if not images or not first:
+            return None
+        await _images_bytes_to_pdf(dest, images)
+        return first, "image_to_pdf"
+    if not scored or best_pdf is None:
         return None
-    _best_date, pdf_url = max(scored)
+    _best_date, pdf_url = best_pdf
     pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
