@@ -164,6 +164,18 @@ def test_ferns_parish_weekend_file_is_this_sunday_not_2018() -> None:
     assert extract_bulletin_date(current) == date(2026, 10, 25)
 
 
+def test_anspideal_irish_october_name_is_25_october() -> None:
+    from harvester.bulletin_freshness import extract_bulletin_date
+    from harvester.utils import extract_date_from_string
+
+    url = (
+        "https://cilleinde.ie/newsletters/2026/q4/"
+        "30ú Domhnach A 25 Deireadh  Fómhair 2026.pdf"
+    )
+    assert extract_date_from_string(url) == date(2026, 10, 25)
+    assert extract_bulletin_date(url) == date(2026, 10, 25)
+
+
 def test_kilmyshall_october_name_keeps_the_th() -> None:
     from harvester.utils import extract_date_from_string, rewrite_date_url
 

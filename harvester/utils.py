@@ -6,6 +6,7 @@ from __future__ import annotations
 import io
 import re
 import time
+import unicodedata
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlparse, urlunparse
@@ -340,8 +341,31 @@ def image_newsletter_is_newer(
     return image_date > pdf_date
 
 
+def _irish_october_date(text: str) -> date | None:
+    """25 Deireadh Fómhair 2026 is 25/10/2026. The Irish month name stays Irish."""
+    folded = unicodedata.normalize("NFD", text or "")
+    folded = "".join(ch for ch in folded if unicodedata.category(ch) != "Mn")
+    folded = re.sub(r"\s+", " ", folded.lower())
+    match = re.search(
+        r"(?<!\d)(\d{1,2})(?:st|nd|rd|th|u)? deireadh fomhair (20\d{2})(?!\d)",
+        folded,
+    )
+    if not match:
+        return None
+    try:
+        candidate = date(int(match.group(2)), 10, int(match.group(1)))
+    except ValueError:
+        return None
+    if not _is_plausible_bulletin_year(candidate.year):
+        return None
+    return candidate
+
+
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
+    irish = _irish_october_date(text)
+    if irish:
+        return irish
     spans = _opaque_hash_spans(text)
 
     # Scanner name first. The clock digits must not be read as a year.

@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "anspideal",
-  "display_name": "An Spid\u00e9al",
+  "display_name": "An Spidéal",
   "diocese": "galway",
-  "recorded_date": "2026-10-02",
-  "start_url": "https://clonfertgalway.ie/parish/an-spideal/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 Galway kitchen-sink still open. Do not invent Facebook PDFs.",
+  "start_url": "https://cilleinde.ie/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "newsletters",
+    ".pdf",
+    "Domhnach"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-25",
   "steps": [
     {
       "action": "goto",
-      "url": "https://clonfertgalway.ie/parish/an-spideal/"
+      "url": "https://cilleinde.ie/"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "25/10/2026: clonfertgalway.ie/parish/an-spideal/ is the mass-times card. The newsletter is on https://cilleinde.ie/.",
+    "The page links 30ú Domhnach A 25 Deireadh Fómhair 2026.pdf. Deireadh Fómhair is October. The referee reads that as 25/10/2026. Proved application/pdf.",
+    "The site certificate is incomplete. The downloader already retries once without verify. Do not pin the Irish filename. Do not harvest Facebook."
+  ],
+  "do_not": [
+    "Do not pin the Irish filename.",
+    "Do not use the clonfertgalway.ie card as the bulletin.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
