@@ -364,6 +364,26 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(marked.status, "error")
         self.assertEqual(marked.retry_strategy, "rescrape_bulletin_page")
 
+    def test_drive_download_is_not_opened_in_the_browser_again(self) -> None:
+        entry = ParishEntry(
+            key="drive-1kna8f6t54",
+            display_name="Gartan/Termon (Kilmacrenan)",
+            pattern="A",
+            content_type="pdf",
+            example_url="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view",
+            bulletin_page="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view",
+        )
+        result = FetchResult(
+            key="drive-1kna8f6t54",
+            display_name="Gartan/Termon (Kilmacrenan)",
+            status="ok",
+            url=(
+                "https://drive.usercontent.google.com/download"
+                "?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&export=download"
+            ),
+        )
+        self.assertEqual(suggest_retry_strategy(result, entry), "manual_review")
+
     def test_suggest_retry_strategy_for_pattern_parish(self) -> None:
         entry = ParishEntry(
             key="p",
