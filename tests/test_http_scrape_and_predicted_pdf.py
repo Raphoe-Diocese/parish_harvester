@@ -1978,22 +1978,23 @@ class LoughshoreRecipeTests(unittest.TestCase):
 class HarvestMissRecipeTests(unittest.TestCase):
     """Recipes for this-week files the 07/09/2026 harvest raised away."""
 
-    def test_annagry_predicts_september_from_july_example(self) -> None:
+    def test_annagry_uses_the_permanent_bulletin(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/annagryparish.json").read_text()
         )
-        example = recipe["example_url"]
-        self.assertIn("260726.pdf", example)
-        self.assertEqual(recipe["site_type"], "dated_pdf_path")
-        predicted = predicted_dated_upload_urls(example, date(2026, 9, 6), weeks_back=0)
-        self.assertTrue(
-            any(u.endswith("/2026/09/060926.pdf") for u in predicted),
-            predicted[:8],
+        public = "https://annagryparish.ie/bulletin/raphoe/annagry"
+        weekly = (
+            "https://annagryparish.ie/wp-content/uploads/"
+            "parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf"
         )
-        self.assertEqual(
-            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 6)),
-            [],
-        )
+        self.assertEqual(recipe["start_url"], public)
+        self.assertEqual(recipe["site_type"], "permanent_redirect_document")
+        self.assertEqual(recipe["steps"][0]["url"], weekly)
+        self.assertTrue(recipe["steps"][0].get("use_target_url"))
+        self.assertIn(weekly, recipe.get("fallback_document_urls") or [])
+        self.assertNotIn("newsletter-2", json.dumps(recipe["steps"]))
+        self.assertNotIn("unassigned", weekly)
+        self.assertNotIn("?t=", weekly)
 
     def test_waterside_allows_five_page_weekly(self) -> None:
         recipe = json.loads(
