@@ -2110,16 +2110,20 @@ async def _recover_stale_bulletin(
                         print(f"  ✅ {entry.key}: HTML recapture found current-week bulletin")
                         return refreshed
                 continue
-            scraped = await _scrape_and_download(
-                entry,
-                target,
-                scrape_url,
-                dest,
-                browser,
-                recipe_meta=recipe_meta,
-                host_profile=host_profile,
-                allow_html_render=not is_generic,
-            )
+            try:
+                scraped = await _scrape_and_download(
+                    entry,
+                    target,
+                    scrape_url,
+                    dest,
+                    browser,
+                    recipe_meta=recipe_meta,
+                    host_profile=host_profile,
+                    allow_html_render=not is_generic,
+                )
+            except Exception as exc:
+                print(f"  ↩️  {entry.key}: rescrape failed: {exc}")
+                continue
             if scraped.status != "ok" or not scraped.url:
                 continue
             retry_pdf = (

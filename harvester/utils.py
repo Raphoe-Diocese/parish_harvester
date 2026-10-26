@@ -2105,12 +2105,20 @@ def sunday_month_day_image_urls(
 
 
 def naomhfionan_bulletin_urls(target: date, *, number_offset: int = 0) -> list[str]:
-    """Falcarragh file names. 2026 dropped the word ``for`` from the filename."""
+    """Falcarragh file names.
+
+    18/10/2026 is Parish-Newsletter-42-Sun-A-18102026.pdf.
+    25/10/2026 is Parish-Newsletter-43for-Sun-A-25102026.pdf.
+    The hyphen before for is missing on that file.
+    """
     primary = naomhfionan_bulletin_url(target, number_offset=number_offset)
-    current = primary.replace("-for-Sun-", "-Sun-", 1)
-    if current == primary:
-        return [primary]
-    return [current, primary]
+    dropped_for = primary.replace("-for-Sun-", "-Sun-", 1)
+    stuck_for = primary.replace("-for-Sun-", "for-Sun-", 1)
+    found: list[str] = []
+    for url in (stuck_for, dropped_for, primary):
+        if url and url not in found:
+            found.append(url)
+    return found
 
 
 def naomhfionan_bulletin_url(target: date, *, number_offset: int = 0) -> str:

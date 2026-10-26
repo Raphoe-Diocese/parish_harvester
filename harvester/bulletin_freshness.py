@@ -534,6 +534,10 @@ def suggest_retry_strategy(
 
     if "recipe" in (result.file_type or "") or pattern in {"learned", "recipe"}:
         return "retrain_recipe"
+    # A Drive file has no listing page. Opening the download address in the
+    # browser aborts (ERR_ABORTED) and the parish is then marked failed.
+    if "drive.google.com" in url or "drive.usercontent.google.com" in url:
+        return "manual_review"
     if has_bulletin_page and content_type != "html_link":
         return "rescrape_bulletin_page"
     if pattern and pattern not in {"html_link", "F", "greenlough", "clonleigh"}:

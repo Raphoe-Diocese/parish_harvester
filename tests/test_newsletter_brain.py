@@ -407,6 +407,12 @@ class MemoryTests(unittest.TestCase):
             "Parish-Newsletter-42-Sun-A-18102026.pdf",
             falcarragh,
         )
+        this_sunday = naomhfionan_bulletin_urls(date(2026, 10, 25))
+        self.assertIn(
+            "https://naomhfionan.com/wp-content/uploads/2026/10/"
+            "Parish-Newsletter-43for-Sun-A-25102026.pdf",
+            this_sunday,
+        )
         pages = sunday_month_day_image_urls(
             "https://wexfordparish.com/wp-content/uploads/2026/10/"
             "Sunday-October-4th-1-scaled.jpg",
