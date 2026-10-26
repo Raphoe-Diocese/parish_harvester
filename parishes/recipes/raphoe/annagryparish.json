@@ -3,32 +3,31 @@
   "parish_key": "annagryparish",
   "display_name": "Annagry",
   "diocese": "raphoe",
-  "start_url": "https://annagryparish.ie/newsletter-2/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    ".pdf",
-    "uploads"
-  ],
+  "start_url": "https://annagryparish.ie/bulletin/raphoe/annagry",
+  "site_type": "permanent_redirect_document",
+  "playbook_type": "direct_download",
+  "recorded_date": "2026-10-26",
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-25",
+  "total_timeout_s": 120,
+  "fallback_document_urls": [
+    "https://annagryparish.ie/wp-content/uploads/parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf"
+  ],
   "steps": [
     {
-      "action": "goto",
-      "url": "https://annagryparish.ie/newsletter-2/"
+      "action": "download",
+      "url": "https://annagryparish.ie/wp-content/uploads/parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf",
+      "use_target_url": true
     }
   ],
   "operator_notes": [
-    "25/10/2026: the newsletter page links 251025.pdf in /uploads/2026/10/. Proved application/pdf. That name is 25/10/2026. The trailing 25 is not the year 2025.",
-    "Guessing 251026.pdf 404s. Last week's 181026.pdf is 18/10/2026 and must not be kept. Do not pin 251025.pdf."
+    "26/10/2026: the newsletter page no longer links 251025.pdf. The permanent link is https://annagryparish.ie/bulletin/raphoe/annagry.",
+    "That link opens bulletin.pdf under parish-bulletins/raphoe/raphoe/annagry/. Proved application/pdf. The server last changed it on 24/10/2026. The unassigned folder is 404."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not read 251025 as 25/10/2025 while it is in the 2026/10 folder.",
-    "Do not keep 181026.pdf when 251025.pdf is on the newsletter page."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+    "Do not scrape https://annagryparish.ie/newsletter-2/.",
+    "Do not keep 181026.pdf.",
+    "Do not pin 251025.pdf.",
+    "Do not use the unassigned folder.",
+    "Do not add a ?t= cache-buster on bulletin.pdf."
+  ]
 }
