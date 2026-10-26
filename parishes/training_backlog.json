@@ -2,55 +2,19 @@
   "generated_at": "2026-10-26",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 312,
+    "downloaded": 315,
     "html_links": 0,
     "skipped": 784,
     "failed": 112,
-    "stale_rejected": 105
+    "stale_rejected": 102
   },
   "action_counts": {
     "investigate": 94,
-    "ok": 390,
+    "ok": 391,
     "mark_inactive": 2,
-    "skip": 780,
-    "retrain": 1
+    "skip": 780
   },
   "parishes": [
-    {
-      "parish_key": "annagryparish",
-      "display_name": "Annagry",
-      "diocese": "raphoe",
-      "recipe_file": "parishes/recipes/raphoe/annagryparish.json",
-      "recipe": {
-        "start_url": "https://annagryparish.ie/newsletter-2/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
-        "status": "",
-        "skip": false,
-        "placeholder": true,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [
-          "25/10/2026: the newsletter page links 251025.pdf in /uploads/2026/10/. Proved application/pdf. That name is 25/10/2026. The trailing 25 is not the year 2025.",
-          "Guessing 251026.pdf 404s. Last week's 181026.pdf is 18/10/2026 and must not be kept. Do not pin 251025.pdf."
-        ],
-        "do_not": [
-          "Do not pin a dated filename.",
-          "Do not read 251025 as 25/10/2025 while it is in the 2026/10 folder.",
-          "Do not keep 181026.pdf when 251025.pdf is on the newsletter page."
-        ],
-        "recorded_date": "2026-10-25"
-      },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "direct_pdf",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "retrain",
-      "suggested_reason": "placeholder recipe"
-    },
     {
       "parish_key": "abbeydorney",
       "display_name": "Abbeydorney",
@@ -1130,6 +1094,43 @@
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "annagryparish",
+      "display_name": "Annagry",
+      "diocese": "raphoe",
+      "recipe_file": "parishes/recipes/raphoe/annagryparish.json",
+      "recipe": {
+        "start_url": "https://annagryparish.ie/bulletin/raphoe/annagry",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "26/10/2026: the newsletter page no longer links 251025.pdf. The permanent link is https://annagryparish.ie/bulletin/raphoe/annagry.",
+          "That link opens bulletin.pdf under parish-bulletins/raphoe/raphoe/annagry/. Proved application/pdf. The server last changed it on 24/10/2026. The unassigned folder is 404."
+        ],
+        "do_not": [
+          "Do not scrape https://annagryparish.ie/newsletter-2/.",
+          "Do not keep 181026.pdf.",
+          "Do not pin 251025.pdf.",
+          "Do not use the unassigned folder.",
+          "Do not add a ?t= cache-buster on bulletin.pdf."
+        ],
+        "recorded_date": "2026-10-26"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "direct_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
