@@ -188,7 +188,7 @@ LEARNED = (
     {
         "id": "permanent_bulletin_pdf",
         "label": "Same bulletin.pdf address every week",
-        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page. A /current-newsletter/ address that redirects to this week's PDF is the same idea. Kildare, Meath Athboy, Dunshaughlin, Kells, Kilbeggan, and Limerick St Joseph's. Do not pin the dated file it redirects to.",
+        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page. Templecrone's Drive file was last changed on 14/09/2026. The weekly file is https://templecroneparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/templecrone/bulletin.pdf and it was updated on 24/10/2026. A /current-newsletter/ address that redirects to this week's PDF is the same idea. Kildare, Meath Athboy, Dunshaughlin, Kells, Kilbeggan, and Limerick St Joseph's. Do not pin the dated file it redirects to.",
     },
     {
         "id": "sunday_named_upload",
