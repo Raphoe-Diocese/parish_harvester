@@ -16,6 +16,7 @@ import tempfile
 import time
 from dataclasses import dataclass, field
 from datetime import date, timedelta
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Optional
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
@@ -2020,7 +2021,47 @@ def freshness_after_unknown_url(url: str, dest: Path, target: date) -> Freshness
     )
     if not dest.exists():
         return verdict
-    return issue_date_verdict(verdict, pdf_body_heading_verdict(dest, target))
+    body = pdf_body_heading_verdict(dest, target)
+    combined = issue_date_verdict(verdict, body)
+    if combined.extracted_date is None and combined.status != "stale":
+        modified = _server_last_modified(url)
+        if modified is not None:
+            from .bulletin_freshness import stale_if_server_file_is_old
+
+            server = stale_if_server_file_is_old(modified, target)
+            if server is not None and server.status == "stale":
+                return server
+    return combined
+
+
+def _server_last_modified(url: str) -> date | None:
+    """Date the server last replaced this file. Not the printed Sunday.
+
+    Used only when the link and the PDF text have no date. A failure here
+    leaves the bulletin unknown. example.com is the unit-test host.
+    """
+    raw = (url or "").strip()
+    if not raw.lower().startswith(("http://", "https://")):
+        return None
+    host = (urlparse(raw).hostname or "").lower()
+    if host in {"example.com", "example.org", "localhost"}:
+        return None
+    req = Request(
+        raw,
+        headers={"User-Agent": "ParishHarvester", "Range": "bytes=0-0"},
+    )
+    try:
+        with urlopen(req, timeout=12) as resp:
+            header = resp.headers.get("Last-Modified")
+            resp.read(1)
+    except Exception:
+        return None
+    if not header:
+        return None
+    try:
+        return parsedate_to_datetime(header).date()
+    except (TypeError, ValueError, OverflowError):
+        return None
 
 
 def _retry_pdf_still_stale(url: str, dest: Path, target: date) -> bool:
