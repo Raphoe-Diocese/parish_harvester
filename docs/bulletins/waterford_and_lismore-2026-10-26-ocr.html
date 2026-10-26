@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Waterford and Lismore Diocese Text Bulletin — 26/10/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="waterford_and_lismore-2026-10-26.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">WATERFORD AND LISMORE Text Bulletin · 26/10/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 1</p>
+<p>a SEGE Sa SS Easa Weter ana Wauts, Clonmet | |. on tine 108tm Radio 5 tory, 4, Parish Newsletter tomorrow isa | “WW-churchservices.ty vi</p>
+<p>Sunday 25th October 2026 wystery, today if Clonmelpeterpaul Im Fr. John Treacy PP.&#x27;od&#x27;s gift, thacd Parish Shop 61 22138 J Fr. Brendan Crowley PRFr. Deo Mayanja | why we call it 61 27747 5 2 Wi] CCTV Cameras/Live Stream Masses are live | the present, Pay Zone for online i streamed and broadcast on Church Services TV | oan Rivers Donations on FB Peter Pauls Clonmel If you are a new Parishioner or just visiting Ss Peter and Paul&#x27;s church, you]aig on our Webpage are very welcome and we hope you feel at home here.</p>
+<p>I&#x27;you are new to sepeterandpaul a . parish, Please make yourself known to Fr John Treacy Fr Deo Mayanja or Fr Brendan Crowley PEsom ‘The Energy of True Religion ‘To love God and love your neighbour - this is one of the most attractive of the sayings of Jesus.</p>
+<p>It is an lencouragement to live fully with what brings the greatest joy in life - true love of God and the neighbour.</p>
+<p>Iris at the heart of good religion, and what attracts many to Jesus.</p>
+<p>Bad religion puts law above love. Bad religion fights for the partial truth of religion.</p>
+<p>We risk being victims of bad religion, just as we can be victims of bad nationalism, bad psychology or any other badway of living.</p>
+<p>Jesus&#x27; life was to propose lgood religion and to live by it.</p>
+<p>The religion of some of the Pharisees was bad, in that it was incomplete in its scope.</p>
+<p>We admire those who give energy in love and service.</p>
+<p>We are proud of pcople we know whose lives make a great and good difference to others, We know that our family and neighbourhood, parish choc, workplace and Íeisare time have been cnriched by the seleaacrifeing love of many peal, youre and old, He gave it his all&#x27;- we say that of a good player at the end of a match.</p>
+<p>We say of parents that they &quot;were always there for the children, May we give all we have in our lives, giving in love, knowing that all we give is itself a gift from God, the giver of all good gifts.</p>
+<p>Picture Jesus with a sick person; watch him touching the person, This would he against the law!</p>
+<p>What would you say to him? Lord, let love be the guiding principle of all I say and think. l A Clocks Go Back Pastoral Council Meeting will take CED Remember that clocks went back by 1 hour in the] ‘place on</p>
+<p>Monday 2nd November at | carly hours of Saturday night/ Sunday Morning, 7.30pm in the Sacriaty. ale Contessions C-Saw Tipperary Bereavement Listening Service Sat 12pm to Ipm and 7pm to 7.25pm. will take place on the Ist Wednesday of every T Exposition of Blessed Sacrament month from 7-8pm at C-Saw House, i Wed and Fri !2pm-Ipm. 24 William Street, Clonmel, Co. Tipperary E91NX34. November Novenas for the Dead ‘Walk-In Free Service, Non-Judgemental and Totally The Novena in the Church of the Resurrection will Confidential run from Sunday the Ist November to Monday the 9th November.</p>
+<p>The 1st and 8th day of the Novena Active Retirement Grou will be at the 10am Sunday Mass and will follow Jmatey cearca oemin with the 9.30am Mass on weekdays.</p>
+<p>The Saturday | as Place4U at 3pm. Novena will be at the 7.30pm Mass in Ss Peter and Pauls.</p>
+<p>The Novena in SS Peter and Pauls runs from This Mondae laa Tae Masses in the 22nd November to the 30th.</p>
+<p>Envelopes and : . : 8 ‘esurrection and Ss Peter and Pauls are at the for names of those remembered are available in bot! normal times of 9.30am and 1pm. churches.</p>
+<p>Offerings may be enclosed with the lists.</p>
+<p>Envelopes may be returned to the Parish Shop or | putin he weekly collection bugs! baskets, Chutelo the Resurrection Mass in Irish | November Table at “gá at the Church of the.</p>
+<p>Resurrection During the Month of November we plan to create a .cadings and Sermons in English.</p>
+<p>November table to honour our dead. We would ask you to bring in a picture af your loved one to place | Did 7 offer peace today?</p>
+<p>Did I bring a smile to ‘on the table where it will stay for the month and we | Someone&#x27;s face?</p>
+<p>Did I say words of healing? lwill remember them in our prayers and at all Masscs.</p>
+<p>Did I let go of my anger and resentment? ic can be collected aficrwards, We will have the usual] Did 1 forgive?</p>
+<p>Did I love? These are the reat lists and envelopes where we remember all who have) #uestons.</p>
+<p>Jmust srust that the lite bitro hreeássrú passed on before us.</p>
+<p>You can drop your picture into |/ one new Bear many fruits, here in this the Parish Shop over the next few weeks, beyala esta</p>
+<p>7.30pm PJ Hawkins (Months Mind) 11.00am May Thornton (Anniv) 12.30pm Peter Mulroy and daughter Maria (An Gary Bates (Sth Anniv) Church of the Resurrection 10.00 am Tony Smith (Anniv) Masses Next Weekend Ss.</p>
+<p>Peter &amp; Paul&#x27;s Church 7.30pm Mass as Usual 11,00am Ita Donney (1st Anniv) Anna O&#x27;Brien (Anniv) Willie Whelan (12th Anniv) 12.30pm Paddy Ryan (Anniv) Jamic Lonergan (Anniv) Andy and Ann Conran (Anniv) Philip Egan (1st Anniv) Church of the Resurrection 10.00 am People of the Parish (Novena 1) Readers Rota This Week 24th/25th October Team B Bobby Walsh, Leah O&#x27;Regan, Emma Sweeney, Ned O&#x27;Dwyer, Next Week 31st October/ 1st November Tean Sr Bridie Mullins, Bobby Walsh, Martina Flavin, Brian O&#x27;Keeffe.</p>
+<p>Extraordinary Ministers of Holy Communic This Week 24th/25th October Team 2 M Kearney, Cuddihy, C Noonan, C Gentles, T Maunsell, P Hanley, J Sexton.</p>
+<p>Next Week 31st October/ Ist November Tean M Kearney, Cuddihy, K Griffin, R Slattery, Souza.</p>
+<p>M Berrigan. YOUTH 2000 MUNSTER RETR! : “For 16 35 year olds.</p>
+<p>Donation only. Lámh Chúnta, Tóchar na Naomh, Thurles, E41 HT44 on</p>
+<p>Saturday 24th October. Registration opens at 9am (Under 18s must register in advance).</p>
+<p>Donation only. For more info or to register go to htips://youth2000. ic!</p>
+<p>Clonmel Citizens Information Centre ‘Clonmel CIC has recently relocated to Tower Hot The Quays Clonmel.</p>
+<p>Clonmel CIC is a tree independent &amp; impartial Information, Advice é Advocacy Service and is open to the public Monday to Friday 10am — Ipin and 2pm - 4pm No appointment is required; this is a walk in sery Our phones are open to the public on 0818 07 64</p>
+<p>Alone Volunteers Needed. Would you b interested im volunteering to visit or WUFENo TALOE “older people in your area?</p>
+<p>Alone Support and Beftiending service matches older po who would like additional social contact with volunteers who provide companionship, support i social activity.</p>
+<p>If you would like to find out mor about the support and Befriending volunteer rol contact alone.ie/get-involvedivoluntect/ (Alcoholics Anonymous) You&#x27;re not Alone,</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+35387289456" style="color:#1d4ed8;font-weight:600;">087 289456</a></p>
+<p>a dled dell alll Remember Those Who Died Recently Daniel Dan O&#x27;Mahony.</p>
+<p>Ard Gaoithe, Clonmel Sheila O&#x27;Dea, Irishtown, Clonmel, ) [Patrick Burke, King Street and late Rathgormack Susan McCormack Litronagh, Clonmel Months Min PJ Hawkins, Frank Kennard.</p>
+<p>Anniversaries of Jerry Moynihan, Billy, Peggy and David Kenrick, Tony Smith, May Thornton, Peter Mulroy and daughter Maria, Gary Bates, Paddy and Mary Meaney, Thomas Culley, Burke, Christine Cosgrave, Mary Cooney, Jimmy, and Nellie Phelan, Sr. Therese (Winnie) Farrell, Pat and Annemarie O&#x27;Neill, Terry Fraher.</p>
+<p>Birthday Rem: Mark Smith, Stanley Griffin.</p>
+<p>Envelopes: €1,055 Collection: €1,215 Clonmel Flower Club 1965-2026 Cá Flower arranging demonstration Christmas flowers &quot;Xmas Cheer” with Mary McKee.</p>
+<p>Takes place in Hotel Minella on Monday the 2nd of November at 7.30pm. All are ‘Welcome.</p>
+<p>Supporting Breast Cancer and a local Charity.</p>
+<p>Refreshments and ratile. Admission €15, Raising Hope Caring for our Common Home fogether.</p>
+<p>A Laudato Si” Conference for the Dioce: lof Cloyne, Cork and Ross, Waterford and Lismore In the midst of environmental crises, how can parish communities care more deeply for Gods creation?</p>
+<p>Join us for a day to equip yourself and your parish community to walk more gently on the earth, with dynamic speakers, practical workshops and a ‘marketplace’ of support.</p>
+<p>Saturday 21st November from 10am to 4pm. Clayton Hotel, Silversprings, Tivoli, Cork, T23 E244. To register please email <a href="mailto:maria.murphy@trocaire.org" target="_blank" rel="noopener noreferrer">maria.murphy@trocaire.org</a> Suggested Donation of €10 on the Day. c&amp; Gras Fees Colle Moning 24 William St. Clonmel.</p>
+<p>Monday and Wednesday from 10.30am to 12.30pm Labrar Tent,</p>
+<p>Clonme! Library is running another 5-woek block of the popular digital skills course from Thursday the Sth of October Sth of November, 2026 Classes are free however spaces are limited.</p>
+<p>Please call Clonmel Library on <a href="tel:+353526166130" style="color:#1d4ed8;font-weight:600;">052 616 6130</a> to reserve a space.</p>
+<p>Story Time and Costume tober 2026 at 3.30pm in Clonmel Library.</p>
+<p>Please contact Clonmel! Library on</p>
+<p><a href="tel:+353526166130" style="color:#1d4ed8;font-weight:600;">052 616 6130</a> or <a href="mailto:clonmellibrary@tipperarycoco.ie" target="_blank" rel="noopener noreferrer">clonmellibrary@tipperarycoco.ie</a> | to book a space.</p>
+<p>Light The Fire: Monthly Mecting for Ages TES Parhh Chae Clonme.</p>
+<p>Scripture, Rosary, Adoration, Talk, Benediction.</p>
+<p>Tea &amp; Chat! Last Wednesday of month. For monthly meeting dates contact <a href="tel:+353879108654" style="color:#1d4ed8;font-weight:600;">0879108654</a> ¢.ourladyolknock @servidoras. ore</p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Dungarvan Ctfee otitis ed Weaatag thylacextbai ‘Sunday Mass Readings First Reading: Exodus 22:20-26 Responsorial Psaim: Psalm 182-4,47;1 Second Reading: 1 Thessalonians 15-10 Gospel: Matthew 22:34:40</p>
+<p>ittps://dungarvanparish: , Yie LL lánmianeia bts Gl] Foon von anama</p>
+<hr>
+<p class="page-label">Page 3</p>
+<h3 class="b-head">ANNIVERSARIES</h3>
+<p>ST. PAUL’S GEORGE O’BRIEN DILLON RINALDO PHILIP BRENNAN LIAM RYAN ANN DUNNE MICHAEL O’DWYER (BR) HELEN McGARRY &amp; Her father PAUDIE CASEY PETER MALONE DANNY MALONE &amp; his son GEORGE MAURICE QUINLAN &amp; his son MAURICE CIARAN RUSSELL DANIEL COWMAN PAT &amp; PHYLLIS McENEANEY &amp; their son TERRY LEE SALKELD BRENDAN DONNELLY WILLIE WARD BUTLERSTOWN ANNETTE MURPHY JOHN &amp; BRIDGET KELLY May they Rest in Peace PARISH INFORMATION Fr. Pat Fitzgerald, Parochial House 372257 Sr.de Lourdes Breen <a href="tel:+3535841359" style="color:#1d4ed8;font-weight:600;">058 41359</a></p>
+<h3 class="b-head">Parish Office</h3>
+<p>Parish Centre Parish Secretary Maura Cooney 357730 Open: Monday, Tuesday, Wednesday, Thursday,</p>
+<p>Friday 9.15 am to 12.45 pm. and</p>
+<p>Tuesday 2 to 3pm</p>
+<h4 class="b-sub">E-mail</h4>
+<p><a href="mailto:stpaulschurchwt@gmail.com" target="_blank" rel="noopener noreferrer">stpaulschurchwt@gmail.com</a></p>
+<h4 class="b-sub">Web</h4>
+<p><a href="https://www.stpaulsandbutlerstown.ie" target="_blank" rel="noopener noreferrer">www.stpaulsandbutlerstown.ie</a></p>
+<h4 class="b-sub">Facebook</h4>
+<p>St Pauls Church Lisduggan. Butlerstown Parish Facebook Faith, Hope and Love Faith lit a candle in the night and set it for my soul to see; Hope whispered courage to my heart and shod my feet and girded me; But it was Love that showed the way, that held my hand and walked with me.</p>
+<p>LIVE STREAMING Mass and other services (including weddings and funeral masses) are live streamed from our churches on <a href="https://www.mcn.live/Camera/st-paul-s" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/st-paul-s</a> and <a href="https://www.mcn.live/Camera/buttlerstown" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/buttlerstown</a> and <a href="https://www.stpaulsandbutlerstown.ie" target="_blank" rel="noopener noreferrer">www.stpaulsandbutlerstown.ie</a> . so that the parish can extend its reach to those who cannot visit the church . This may mean that your image will be broadcast on those websites, in particular, if you are on or near the sanctuary or sit in the first three rows of the middle aisle.</p>
+<p>If you do not wish your image to be captured in this way, please sit in another area of the church. if you have concerns , please contact us. ‘I invite all Christia ns, everywh ere, at this very moment, to a renewed personal encounter with Jesus Christ, or at least an openness to letting him encounter them; I ask all of you to do this unfailingly each day.</p>
+<p>Pope Francis 25th of October 2026 —THIRTIETH SUNDAY IN ORDINARY TIME St Paul’s Parish is in St. Otteran’s Pastoral Area with the parishes of Ballybricken, Holy Family, St. Saviour Butlerstown, Dunhill &amp; Fenor, Tramore &amp; Carbally. ’ The Energy of True Religion (Matthew 22:34-40) &#x27;To love God and love your neighbour - this is one of the most attractive of the sayings of Jesus.</p>
+<p>It is an encouragement to live fully with what brings the greatest joy in life - true love of God and the neighbour.</p>
+<p>It is at the heart of good religion, and what attracts many to Jesus.</p>
+<p>We admire those who give energy in love and service.</p>
+<p>We are proud of people we know whose lives make a great and good difference to others.</p>
+<p>We know that our family and neighbour­hood, parish and school, workplace and leisure time have been enriched by the self - sacrificing love of many people, young and old.&#x27;He gave it his all&#x27; - we say that of a good player at the end of a match.</p>
+<p>We say of parents that they &quot;were always there for the children . May we give all we have in our lives, giving in love, knowing that all we give is itself a gift from God, the giver of all good gifts.</p>
+<p>Donal Neary SJSt Paul&#x27;s (Butlerstown) <a href="http://www.stpaulschurch.ie" target="_blank" rel="noopener noreferrer">http://www.stpaulschurch.ie</a></p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>PARISHES OF ST PAUL’S &amp; BUTLERSTOWN LIVE STREAMING AND RADIO BROADCAST LIVE STREAMING FROM ST. PAUL’S <a href="https://www.mcn.live/Camera/st-paul-sLIVESTREAMING" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/st-paul-sLIVESTREAMING</a> FROM BUTLERSTOWN <a href="https://www.mcn.live/Camera/buttlerstown" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/buttlerstown</a> You can also read our latest Newsletter at the above links.</p>
+<p>RADIO: Mass from St. Paul’s Church on the Radio at 107.9FM CHURCH OPENING FOR PRIVATE PRAYER St Paul’s Church weekdays 11am-1pm Butlerstown Church daily 12 to 4.00pm CHECK IT OUT For updates on events/series in the Diocese of Waterford &amp; Lismore to the web address below for the current issue of Check it out! <a href="https://waterfordlismore.ie/resources/LAST" target="_blank" rel="noopener noreferrer">https://waterfordlismore.ie/resources/LAST</a> WEEK’S COLLECTION ST. PAUL’S CHURCH €1,909 DONATIONS If you wish to make a donation to Parishes of St. Paul’s &amp; Butlerstown please click the Donate Button on our website. <a href="https://stpaulsandbutlerstown.ie/VISIT" target="_blank" rel="noopener noreferrer">https://stpaulsandbutlerstown.ie/VISIT</a> OUR WEBSITE To read our Newsletter and for all Parish News and Information <a href="https://stpaulsandbutlerstown.ie/BANKHOLIDAY" target="_blank" rel="noopener noreferrer">https://stpaulsandbutlerstown.ie/BANKHOLIDAY</a> MASS TIMES 26TH OF OCTOBER MASS IN ST. PAUL’S AT 10.30AM HOLY SOULS NOVENA PARISHES OF ST PAUL’S &amp; BUTLERSTOWN The Holy Souls Novena will take place in St. Paul’s Church beginning on the 2nd of November and will continue for nine days until the 10th of November.</p>
+<p>Mass each weekday morning (including Thursday) at 10am. Weekend Schedule as Normal Envelopes for your remembrance intentions will be available in the Church.</p>
+<p>BEREAVEMENT MASS Our special Mass for all who have been bereaved recently or in the past will take place in St. Paul’s Church on</p>
+<p>Thursday 5th November at 7.30pm DETAILS FOR OUR BUTLERSTOWN BEREAVEMENT MASS WILL BE IN NEXT WEEK’S NEWSLETTER. SEASON OF CREATION MASS The Season of Creation Mass celebrated on 11th October in St. Paul’s highlighted the importance of “Water” which was this year’s theme.</p>
+<p>Thank you to all who attended. Thank you to Cois Ceim, Pathfinders St. Paul WIDDA, Millennium Youth Group, the Scouts, Larchville and Lisduggan Resident’s Association , St. Paul’s Pastoral Council and to the Gospel Choir who added greatly to the Mass.</p>
+<p>Thanks to Tesco, Lisduggan who donated fruit &amp; vegetables.</p>
+<p>Fr. Pat encouraged us all on our faith journey protecting creation and remembering the stranger and the vulnerable in our society.</p>
+<p>LUMEN CHRISTI YOUNG ADULT PRAYER &amp; SCRIPTURE GROUP Mondays 7 – 8.30pm. Ages 18 – 35. Luke Wadding House, Lady Lane, . <a href="mailto:info@waterford-cathedral.com" target="_blank" rel="noopener noreferrer">info@waterford-cathedral.com</a> SOME FEEDBACK FROM STUDENTS WHO TOOK PART IN THE POPE JOHN AWARD 2026 I realised that faith is not only about praying or going to Mass.</p>
+<p>It is also about how you treat people and whether you are willing to help others when they need support.</p>
+<p>It helped me connect faith with actions instead of just saying I will.</p>
+<p>If this experience taught me anything, it’s that there are people who do believe and are really close to their religion and I have developed my respect for them.</p>
+<p>I think the one obstacle I had to overcome was finding going to Mass an enjoyable place as when I was younger I used to find mass very long and I was not really able to understand what was being said, but since going to mass more since taking part in JP2 I have been able to understand the gospel, readings and hymns etc.</p>
+<p>I think my faith has become stronger from taking part in JP2. Over time my confidence grew and I even decided to join the choir that our JP2 team founded.</p>
+<p>I would go to practise any Friday it was on and try my best to learn the songs and just do my best even though I am not the best singer.</p>
+<p>But I was doing it for the Church so it didn’t feel as uncomfortable or out of the ordinary when it usually would if I sang outside the Church.</p>
+<p>Through these activities I have learned more about my religion and what it actually means.</p>
+<p>Mass before was routine, but being involved made it more meaningful.</p>
+<p>I have started paying more attention to the readings and think about how they apply to real life.</p>
+<p>THE NEXT MEDUGORJE HEALING MASS will take place on</p>
+<p>Wednesday 28th of October. at Mount Sion Chapel.</p>
+<p>Rosary 7pm Holy Mass 7.30pm Celebrant Fr. Bobby.</p>
+<p>All Welcome ST. VINCENT DE PAUL COLLECTION Our next collection in St. Paul’s will take place on the 31st October/1st of November.</p>
+<p>Our collectors can also now accept non cash donations with our Tap and Go Machine.</p>
+<p>Thank you for all your great continued support.</p>
+<p>TRACTOR &amp; VINTAGE RUN IN AID OF LOURDES PILGRIMAGE VOLUNTEERS TRAVEL FUND</p>
+<p>Sunday 8th November. Gardenmorris Estate, Kill, Co. Waterford.</p>
+<p>Registration at 11am. Entry €20. Raffle on the day.</p>
+<p>Refreshments served. PRAYER VIGIL WITH THE RELICS OF ST THERESE (FOR AGES 15 – 30)</p>
+<p>Sat 14th November 8pm – 9pm followed by Adoration at the Chapel of the Sisters of Mary Morning Star X91YD70, Lady Lane, Waterford. More info: <a href="tel:+353873928734" style="color:#1d4ed8;font-weight:600;">087 3928734</a></p>
+<p>RSA CHECK IT FITS CHILDRENS CAR SEAT CHECK will be visiting Waterford this November.</p>
+<p>The Check it Fits service is quick and it’s free.</p>
+<p>Our experts will advise on how to fix any problem, demonstrate how to fit the restraint correctly and answer any queries you might have.</p>
+<p>Our experts aim to put your mind at ease that the child’s car seat is safely and securely fitted in the car.</p>
+<p>We will be visiting the following locations: Tesco Tramore X91TV05</p>
+<p>Thursday 12th of November Tesco Waterford, Kilbarry Road, Ballybeg X91 XD9C</p>
+<p>Friday 13th November.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
