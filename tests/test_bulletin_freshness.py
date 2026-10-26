@@ -17,7 +17,6 @@ from harvester.bulletin_freshness import (
     issue_date_verdict,
     mark_result_stale,
     suggest_retry_strategy,
-    stale_if_server_file_is_old,
     verdict_for_extracted_date,
     week_window,
 )
@@ -384,14 +383,6 @@ class BulletinFreshnessTests(unittest.TestCase):
             ),
         )
         self.assertEqual(suggest_retry_strategy(result, entry), "manual_review")
-
-    def test_september_server_date_is_stale_for_this_sunday(self) -> None:
-        target = date(2026, 10, 25)
-        old = stale_if_server_file_is_old(date(2026, 9, 14), target)
-        self.assertIsNotNone(old)
-        self.assertEqual(old.status, "stale")
-        self.assertEqual(old.extracted_date, date(2026, 9, 14))
-        self.assertIsNone(stale_if_server_file_is_old(date(2026, 10, 24), target))
 
     def test_suggest_retry_strategy_for_pattern_parish(self) -> None:
         entry = ParishEntry(

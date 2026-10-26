@@ -112,19 +112,6 @@ def week_window(target: date) -> tuple[date, date]:
     return target - timedelta(days=WEEK_LOOKBACK_DAYS), target
 
 
-def stale_if_server_file_is_old(modified: date, target: date) -> FreshnessVerdict | None:
-    """A file the server has not replaced since before this week is old.
-
-    Templecrone's Drive copy was last changed on 14/09/2026. The link has
-    no date, and the PDF text had no heading date, so it was published.
-    A file changed on 24/10/2026 is inside this week and is left alone.
-    """
-    week_start, _week_end = week_window(target)
-    if modified < week_start:
-        return verdict_for_extracted_date(modified, target)
-    return None
-
-
 def extract_bulletin_date(url_or_text: str) -> date | None:
     """Extract the most likely bulletin date from a URL or link label."""
     # Wix's `/_files/ugd/<hash>.docx?dn=<original filename>` pattern (and
