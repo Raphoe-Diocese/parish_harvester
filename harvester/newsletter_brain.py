@@ -113,7 +113,7 @@ LEARNED = (
     {
         "id": "google_drive_static",
         "label": "One Drive file replaced each week",
-        "how": "Irish Martyrs replaces one Drive file each week: /file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR. The title Newsletter 18th October 2026 is this Sunday. A later notice date is not the issue date. Train on the /file/d/ preview, not the instant download link.",
+        "how": "Irish Martyrs replaces one Drive file each week: /file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR. The title Newsletter 18th October 2026 is this Sunday. A later notice date is not the issue date. The day the file was uploaded is not the printed Sunday. Do not throw the bulletin out for that. Train on the /file/d/ preview, not the instant download link.",
     },
     {
         "id": "mcn_bulletin_date",
