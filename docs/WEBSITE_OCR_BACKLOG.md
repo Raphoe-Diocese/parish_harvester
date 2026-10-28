@@ -37,7 +37,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 | Status | Added | Item | Where in the code |
 |--------|--------|------|-------------------|
-| doing | 2026-10-25 | Raphoe book left out Annagry, Irish Martyrs, Newtown Killea and Tawnawilly. Their 25/10/2026 files were on the sites. The book must not stitch last week's file. Not live until the Raphoe harvest is on https://www.parishpress.ie/dioceses/raphoe/ | `harvester/week_audit.py`, `harvester/utils.py`, recipes `annagryparish.json`, `tawnawillyparish.json` |
+| doing | 2026-10-28 | Frank: check Raphoe OCR, other dioceses for stale text, sticky words, and make OCR far more readable (subheadings, spelling, background). Live Raphoe 28/10: page title 25/10/2026; split-word samples clean; sticky search works. Raphoe parish masthead said 25/10/2026 while body still says Sunday 27 September 2026. Cork OCR still has week beginning 18/10 and 04/10 in places. Code: honest per-parish masthead dates + stronger reading CSS. **Not live** until next OCR/Pages. Do not call this gold standard. | `ocr/bulletin_layout.py`, `ocr/generate_bulletin_pages.py`, `ocr/convert_bulletin.py` |
+| done | 2026-10-25 | Raphoe book left out Annagry, Irish Martyrs, Newtown Killea and Tawnawilly. Fixed and live-proved 28/10 (harvest 40698549750; Glenfin in; Gartan still older Drive only). | `harvester/week_audit.py`, recipes |
 | done | 2026-08-20 | Living backlog file (this document) so website/OCR requests cannot be memory-holed | `docs/WEBSITE_OCR_BACKLOG.md` |
 | done | 2026-08-20 | Cursor rule: read this file first; 850/450; new-tab links; mega PDF stays on | `.cursor/rules/website-ocr-backlog.mdc` |
 | done | 2026-08-20 | Short pointer in the agent guide | `AGENTS.md` (Website / OCR backlog) |

@@ -523,6 +523,7 @@ def structure_ocr_html(
     *,
     parish_entries: Iterable[tuple[str, str]] | None = None,
     bulletin_date: str = "",
+    parish_dates: dict[str, str] | None = None,
     parish_urls: dict[str, str] | None = None,
     single_parish_name: str | None = None,
     parish_page_spans: dict[str, tuple[int, int]] | None = None,
@@ -548,6 +549,7 @@ def structure_ocr_html(
         strong, weak = _name_patterns(display_name)
         packed.append((key, display_name, strong, weak))
     urls = parish_urls or {}
+    dates = parish_dates or {}
     # The stitcher index and the evidence file can spell a parish differently
     # ("Drumholm" vs "Drumholm (Ballintra)"); without this both get a header.
     resolved = {name: _match_entry_name(name, entries_raw) for name in parish_page_spans or {}}
@@ -561,8 +563,23 @@ def structure_ocr_html(
     out: list[str] = []
     current_page = 0
 
+    def date_for(display_name: str, key: str = "") -> str:
+        # Prefer the parish's own bulletin date. Do not stamp the harvest
+        # Sunday on every masthead — Raphoe parish showed 25/10/2026 while
+        # the text still said Sunday 27 September 2026.
+        for token in (key, display_name, (display_name or "").lower()):
+            raw = str(dates.get(token) or "").strip()
+            if raw:
+                return raw
+        return ""
+
     if single_parish_name and "ocr-parish-masthead" not in source:
-        out.append(render_parish_masthead(single_parish_name, bulletin_date))
+        out.append(
+            render_parish_masthead(
+                single_parish_name,
+                date_for(single_parish_name) or bulletin_date,
+            )
+        )
         seen_parish.add(single_parish_name.lower())
 
     def add_masthead(display_name: str, key: str = "") -> None:
@@ -571,7 +588,13 @@ def structure_ocr_html(
             return
         seen_parish.add(marker)
         website = urls.get(key) or urls.get(display_name) or ""
-        out.append(render_parish_masthead(display_name, bulletin_date, website=""))
+        out.append(
+            render_parish_masthead(
+                display_name,
+                date_for(display_name, key),
+                website="",
+            )
+        )
         _ = website  # name + date only — grid/PDF already carry the URL
 
     def process_plain_lines(raw_lines: list[str], *, allow_parish: bool) -> None:
@@ -607,7 +630,11 @@ def structure_ocr_html(
                 flush()
                 owner = starts.get(current_page)
                 if owner:
-                    add_masthead(owner)
+                    owner_key = next(
+                        (key for key, name, _strong, _weak in packed if name == owner),
+                        "",
+                    )
+                    add_masthead(owner, owner_key)
                 out.append(f'<p class="page-label">{html.escape(plain)}</p>')
                 continue
             nxt = expanded[idx + 1][0] if idx + 1 < len(expanded) else ""

@@ -307,6 +307,26 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn('data-parish-name="St Mary&#x27;s &lt;Parish&gt;"', html_out)
         self.assertIn('target="_blank"', render_parish_masthead("X", website="https://x.ie"))
 
+    def test_parish_masthead_uses_that_parish_date_not_harvest_sunday(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Page 1</p><p>Sunday 27 September 2026 RAPHOE PARISH NEWSLETTER</p>",
+            parish_entries=[("drive-1jmslbrliw", "Raphoe")],
+            bulletin_date="2026-10-25",
+            parish_dates={"drive-1jmslbrliw": "2026-09-28"},
+            parish_page_spans={"Raphoe": (1, 1)},
+        )
+        self.assertIn("28/09/2026", html_out)
+        self.assertNotIn("25/10/2026", html_out)
+        undated = structure_ocr_html(
+            "<p>Page 1</p><p>Sunday 27 September 2026 RAPHOE PARISH NEWSLETTER</p>",
+            parish_entries=[("drive-1jmslbrliw", "Raphoe")],
+            bulletin_date="2026-10-25",
+            parish_dates={},
+            parish_page_spans={"Raphoe": (1, 1)},
+        )
+        self.assertNotIn("25/10/2026", undated)
+        self.assertNotIn("ocr-parish-date", undated)
+
     def test_convert_bulletin_promotes_plain_topic_lines(self) -> None:
         from ocr.convert_bulletin import render_markdown_lines
 
