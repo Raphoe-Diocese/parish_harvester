@@ -679,6 +679,10 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
     site = str(recipe_meta.get("site_type") or recipe_meta.get("playbook_type") or "").lower()
     if "parish_messenger" in site:
         merged["prefer_headful"] = True
+    # Recipe-level TLS bypass (expired / wrong-host certs). host_profiles.json
+    # is sparse; Newry and Clonmany set ignore_https_errors on the recipe.
+    if "ignore_https_errors" in recipe_meta:
+        merged["ignore_https_errors"] = bool(recipe_meta.get("ignore_https_errors"))
     return merged
 
 
@@ -2072,7 +2076,13 @@ async def _recover_stale_bulletin(
     if verdict.status != "stale":
         return result
 
+    recipe_meta = recipe_meta or {}
     strategy = suggest_retry_strategy(result, entry)
+    # Permanent redirect recipes already have the canonical file. Homepage
+    # rescrape pulls admin PDFs (Bellaghy pope-francis jpeg, 28/10/2026).
+    site_type = str(recipe_meta.get("site_type") or "").lower()
+    if site_type == "permanent_redirect_document":
+        strategy = "manual_review"
     print(
         f"  ⚠️  {entry.key}: stale bulletin ({verdict.extracted_date}) "
         f"— retry via {strategy}"
@@ -2082,7 +2092,6 @@ async def _recover_stale_bulletin(
     navigation_timeout_ms = int(
         host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)
     )
-    recipe_meta = recipe_meta or {}
 
     if strategy == "rescrape_bulletin_page" and _is_recipe_fallback_enabled(
         recipe_meta, "disable_stale_rescrape_fallback"

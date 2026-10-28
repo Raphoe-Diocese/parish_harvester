@@ -538,6 +538,12 @@ def suggest_retry_strategy(
     # browser aborts (ERR_ABORTED) and the parish is then marked failed.
     if "drive.google.com" in url or "drive.usercontent.google.com" in url:
         return "manual_review"
+    # Permanent newsletter redirects (e.g. /current-newsletter/) are the
+    # bulletin itself. Rescraping the site homepage pulls admin PDFs.
+    if "/current-newsletter" in url or "current-newsletter" in (
+        (entry.bulletin_page if entry else "") or ""
+    ).lower():
+        return "manual_review"
     if has_bulletin_page and content_type != "html_link":
         return "rescrape_bulletin_page"
     if pattern and pattern not in {"html_link", "F", "greenlough", "clonleigh"}:
