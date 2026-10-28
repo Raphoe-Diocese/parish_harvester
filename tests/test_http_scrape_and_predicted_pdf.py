@@ -2004,6 +2004,18 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
         self.assertIn("newsletter_060926oo.pdf", recipe["example_url"])
 
+    def test_claudy_allows_five_page_weekly_docx(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/derry/parishofclaudy.json").read_text()
+        )
+        self.assertEqual(recipe["site_type"], "oneweb_docx")
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
+        step_url = recipe["steps"][0]["url"]
+        self.assertIn("NEWSLETTER", step_url)
+        self.assertIn("25-10-26", step_url)
+        self.assertTrue(step_url.lower().endswith(".docx"))
+        self.assertNotIn("13-9-26", step_url)
+
     def test_monaghan_has_dated_example(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/clogher/monaghanrackwallace.json").read_text()

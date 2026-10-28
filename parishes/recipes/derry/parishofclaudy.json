@@ -1,19 +1,31 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofclaudy",
   "display_name": "Claudy",
   "diocese": "derry",
   "start_url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html",
+  "site_type": "oneweb_docx",
+  "playbook_type": "direct_download",
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-10-28",
+  "timeout_ms": 90000,
+  "total_timeout_s": 300,
+  "navigation_wait_until": "commit",
   "steps": [
     {
       "action": "download",
-      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 13-9-26.docx",
+      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 25-10-26.docx",
       "use_captured_url": true
     }
   ],
-  "observed_load_ms": 45060,
-  "timeout_ms": 300000,
-  "total_timeout_s": 600,
-  "navigation_wait_until": "commit",
-  "recorded_date": "2026-09-14"
+  "operator_notes": [
+    "28/10/2026: the weekly page embeds NEWSLETTER 25-10-26.docx in a Google viewer. Direct onewebmedia download is application/vnd.openxmlformats-officedocument.wordprocessingml.document.",
+    "Harvest already rewrote the dated name, then failed Too many pages: 5 (max 4). max_bulletin_pages=8 allows the weekly Word newsletter.",
+    "Do not download GDPR, Privacy Notice, financial statement, or mcn seats files from the same page."
+  ],
+  "do_not": [
+    "Do not pin last week's NEWSLETTER 13-9-26.docx.",
+    "Do not open the Google Docs viewer as the download.",
+    "Do not keep the default 4-page cap for this parish."
+  ]
 }
