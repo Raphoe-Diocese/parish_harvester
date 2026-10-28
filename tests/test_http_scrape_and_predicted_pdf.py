@@ -495,9 +495,14 @@ class PermanentBulletinUrlTests(unittest.TestCase):
             Path("parishes/recipes/raphoe/newtownkilleaparish.json").read_text()
         )
         url = "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea"
+        weekly = (
+            "https://newtownkilleaparish.ie/wp-content/uploads/"
+            "parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf"
+        )
         self.assertEqual(recipe["start_url"], url)
         self.assertEqual(recipe["site_type"], "permanent_redirect_document")
-        self.assertEqual(recipe["steps"][0]["url"], url)
+        # Cloudflare 403 on the HTML path — download bulletin.pdf first.
+        self.assertEqual(recipe["steps"][0]["url"], weekly)
         self.assertTrue(recipe["steps"][0].get("use_target_url"))
         self.assertNotEqual(
             recipe["start_url"],
@@ -505,10 +510,6 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         )
         self.assertNotIn("2024/06", json.dumps(recipe["steps"]))
         self.assertEqual(parishpress_weekly_upload_url(recipe["start_url"]).endswith("bulletin.pdf"), True)
-        weekly = (
-            "https://newtownkilleaparish.ie/wp-content/uploads/"
-            "parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf"
-        )
         self.assertIn(weekly, recipe.get("fallback_document_urls") or [])
         self.assertIn(weekly, _recipe_recorded_file_urls(recipe))
 

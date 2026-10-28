@@ -270,10 +270,14 @@ class BulletinLayoutTests(unittest.TestCase):
             "<p>MASS TIMES ANNIVERSARIES /INTENTIONS<br>\n"
             "Saturday 15th August 10:00am</p>"
         )
+        # Harvest Sunday alone must not stamp every masthead (Raphoe parish
+        # showed 25/10 while the body still said 27 September). Prefer
+        # parish_dates; without one, name-only masthead.
         html_out = structure_ocr_html(
             fragment,
             parish_entries=[("annagryparish", "Annagry")],
             bulletin_date="2026-08-16",
+            parish_dates={"annagryparish": "2026-08-16"},
         )
         self.assertIn('class="ocr-parish-masthead"', html_out)
         self.assertIn('class="ocr-parish-name"', html_out)
@@ -283,6 +287,14 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn("MASS TIMES", html_out)
         self.assertNotIn("<details", html_out)
         self.assertLess(html_out.index("ocr-parish-masthead"), html_out.index("MASS TIMES"))
+        undated = structure_ocr_html(
+            fragment,
+            parish_entries=[("annagryparish", "Annagry")],
+            bulletin_date="2026-08-16",
+            parish_dates={},
+        )
+        self.assertIn("Annagry", undated)
+        self.assertNotIn("16/08/2026", undated)
 
     def test_masthead_is_idempotent(self) -> None:
         first = structure_ocr_html(
