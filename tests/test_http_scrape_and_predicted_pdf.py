@@ -2016,6 +2016,20 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertTrue(step_url.lower().endswith(".docx"))
         self.assertNotIn("13-9-26", step_url)
 
+    def test_bellaghy_uses_current_newsletter_not_homepage(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/derry/bellaghyparish.json").read_text()
+        )
+        self.assertEqual(recipe["site_type"], "permanent_redirect_document")
+        self.assertIn("/current-newsletter/", recipe["start_url"])
+        self.assertEqual(recipe["steps"][0]["url"], recipe["start_url"])
+        self.assertNotIn("uploads/2025/06", recipe["start_url"])
+        self.assertTrue(any("homepage" in line.lower() for line in recipe.get("do_not") or []))
+
+    def test_raphoe_parish_is_excluded_from_mega_until_newer_file(self) -> None:
+        excludes = json.loads(Path("parishes/mega_excludes.json").read_text())
+        self.assertIn("drive-1jmslbrliw", excludes)
+
     def test_monaghan_has_dated_example(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/clogher/monaghanrackwallace.json").read_text()
