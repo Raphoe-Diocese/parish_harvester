@@ -633,6 +633,16 @@ def _host_profile_for_start_url(start_url: str) -> dict:
     return merged
 
 
+def _apply_recipe_host_overrides(host_profile: dict, recipe: dict | None) -> dict:
+    """Merge recipe TLS / host knobs onto the host_profiles.json baseline."""
+    merged = dict(host_profile or {})
+    if not isinstance(recipe, dict):
+        return merged
+    if "ignore_https_errors" in recipe:
+        merged["ignore_https_errors"] = bool(recipe.get("ignore_https_errors"))
+    return merged
+
+
 def _recipe_navigation_wait_until(recipe: dict) -> str:
     """How eagerly goto waits — slow WordPress hosts often need ``commit``."""
     raw = str(recipe.get("navigation_wait_until") or "").strip().lower()
@@ -4935,7 +4945,11 @@ async def replay_recipe(
     start_url = (recipe.get("start_url") or "").strip()
     if not start_url:
         start_url = (target_url or "").strip()
-    host_profile = _host_profile_for_start_url(start_url)
+    # Recipes carry ignore_https_errors (expired / wrong-host certs). host_profiles.json
+    # is sparse — without this merge Clonmany stayed on ERR_CERT_COMMON_NAME_INVALID.
+    host_profile = _apply_recipe_host_overrides(
+        _host_profile_for_start_url(start_url), recipe
+    )
     site_type = str(recipe.get("site_type") or "").strip().lower()
     dropfiles_example = _dropfiles_example_href_from_recipe(recipe)
 
