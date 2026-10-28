@@ -225,17 +225,23 @@ def test_week_audit_stops_the_book_when_last_week_was_kept() -> None:
     from harvester.week_audit import book_is_blocked
 
     class Row:
-        def __init__(self, key: str, url: str) -> None:
+        def __init__(self, key: str, url: str, *, is_stale: bool = False, status: str = "ok") -> None:
             self.key = key
             self.url = url
+            self.is_stale = is_stale
+            self.status = status
 
-    old = book_is_blocked(
-        [Row("annagryparish", "https://annagryparish.ie/wp-content/uploads/2026/10/181026.pdf")],
+    old_url = "https://annagryparish.ie/wp-content/uploads/2026/10/181026.pdf"
+    current_url = "https://annagryparish.ie/wp-content/uploads/2026/10/251025.pdf"
+    old = book_is_blocked([Row("annagryparish", old_url)], day(2026, 10, 25))
+    assert old
+    already_out = book_is_blocked(
+        [Row("annagryparish", old_url, is_stale=True)],
         day(2026, 10, 25),
     )
-    assert old
+    assert already_out == []
     current = book_is_blocked(
-        [Row("annagryparish", "https://annagryparish.ie/wp-content/uploads/2026/10/251025.pdf")],
+        [Row("annagryparish", current_url)],
         day(2026, 10, 25),
     )
     assert current == []

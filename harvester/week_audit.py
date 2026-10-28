@@ -3,7 +3,8 @@
 The referee was right to refuse an old file. The miss was saving last week's
 file when this week's file was already on the site. This list is the proved
 Raphoe misses for 25/10/2026. The date and filename fixes live in utils.py.
-If a result is still the old file, the book must not be stitched.
+An old file that is already marked stale is left out by the stitcher. It must
+not cancel the rest of the diocese.
 """
 
 from __future__ import annotations
@@ -39,14 +40,20 @@ def raphoe_still_on_last_week(key: str, url: str) -> str | None:
 
 
 def book_is_blocked(results: list, target: date) -> list[str]:
-    """Stop the book only when it would stitch last week's file.
+    """Stop the book only when last week's file would be stitched in.
 
-    Newtown Killea and Irish Martyrs use one address every week. They are
-    listed by redownload_warnings and do not, on their own, stop the book.
+    A stale result is already skipped in stitcher.py. Cancelling the book
+    there also drops every other parish. Newtown Killea and Irish Martyrs
+    use one address every week. They are listed by redownload_warnings and
+    do not, on their own, stop the book.
     """
     del target
     blocked: list[str] = []
     for result in results:
+        if getattr(result, "is_stale", False):
+            continue
+        if str(getattr(result, "status", "") or "") != "ok":
+            continue
         key = str(getattr(result, "key", "") or "")
         url = str(getattr(result, "url", "") or "")
         old = raphoe_still_on_last_week(key, url)
