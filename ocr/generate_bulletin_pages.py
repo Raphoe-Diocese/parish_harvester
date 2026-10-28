@@ -68,10 +68,11 @@ FOOTER = "#114b4b"
 
 # Calm reading palette for OCR text (viewer pane + distraction-free page).
 # Soft cool stone paper — easier on the eye than harsh white; not cream/terracotta.
-OCR_PAPER = "#eef1f0"
-OCR_INK = "#1a1f1e"
-OCR_MEASURE = "min(72ch, 100%)"
-OCR_LINE_HEIGHT = "1.65"
+# Contrast kept high for long reading (dark ink on soft paper).
+OCR_PAPER = "#f3f5f4"
+OCR_INK = "#141918"
+OCR_MEASURE = "min(68ch, 100%)"
+OCR_LINE_HEIGHT = "1.7"
 OCR_BASE_SIZE = "1.125rem"  # 18px at default root — readable on phones
 
 
@@ -115,29 +116,34 @@ def ocr_reading_css(selector: str) -> str:
       margin-top: 1.5em;
     }}
     {selector} h3.b-head, {selector} .b-head {{
-      font-size: 1.15em;
-      color: #0f3d3d;
-      margin: 1.35em 0 0.45em;
-      padding-bottom: 0.2em;
-      border-bottom: 1px solid #d4ddd9;
+      font-size: 1.2em;
+      color: #0a3333;
+      margin: 1.5em 0 0.5em;
+      padding: 0.35em 0.55em 0.35em 0.65em;
+      border-left: 4px solid {TEAL};
+      border-bottom: 1px solid #cfd8d4;
+      background: #e7ecea;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.35;
       max-width: 100%;
+      letter-spacing: 0.01em;
     }}
     {selector} h4.b-sub, {selector} .b-sub {{
-      font-size: 1.04em;
-      color: #1f6f4a;
-      margin: 0.95em 0 0.3em;
+      font-size: 1.08em;
+      color: #145a3d;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
     }}
     {selector} h3, {selector} h4 {{
       color: {TEAL};
-      margin: 1.1em 0 0.35em;
+      margin: 1.2em 0 0.4em;
       font-weight: 700;
       line-height: 1.35;
       max-width: 100%;
     }}
     {selector} p {{
-      margin: 0 0 0.85em;
+      margin: 0 0 0.95em;
     }}
     {selector} h3.ocr-page-heading,
     {selector} .page-label {{
@@ -641,6 +647,42 @@ def _parish_page_spans(diocese: str) -> dict[str, tuple[int, int]]:
     return {}
 
 
+def _parish_bulletin_dates(diocese: str) -> dict[str, str]:
+    """ISO bulletin dates from parish_status for this diocese, by key and name.
+
+    Empty when the status file has no date for that parish. Callers must not
+    fall back to the harvest Sunday — that stamped 25/10/2026 on Raphoe parish
+    while the OCR text still said 27 September 2026.
+    """
+    path = REPO_ROOT / "parishes" / "parish_status.json"
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    rows = payload.get("parishes") if isinstance(payload, dict) else None
+    if not isinstance(rows, dict):
+        return {}
+    want = (diocese or "").strip().lower().replace("-", "_")
+    out: dict[str, str] = {}
+    for key, row in rows.items():
+        if not isinstance(row, dict):
+            continue
+        row_diocese = str(row.get("diocese") or "").strip().lower().replace(" ", "_")
+        if want and want not in row_diocese and row_diocese not in want:
+            continue
+        iso = str(row.get("bulletin_date") or "").strip()
+        if not iso:
+            continue
+        out[str(key)] = iso
+        name = str(row.get("display_name") or "").strip()
+        if name:
+            out[name] = iso
+            out[name.lower()] = iso
+    return out
+
+
 def prepare_ocr_fragment(
     diocese: str,
     ocr_fragment: str,
@@ -659,13 +701,14 @@ def prepare_ocr_fragment(
     prepends a failure banner when OCR produced nothing usable at all for
     any known parish this week.
     """
+    del bulletin_date  # diocese harvest Sunday must not label every parish
     cleaned = tighten_ocr_paragraphs(_flatten_legacy_parish_accordions(ocr_fragment or ""))
     entries = _load_parish_entries(diocese, parish_links or []) if parish_links else []
     url_by_name = {name: url for name, url in (parish_links or [])}
     structured = structure_ocr_html(
         cleaned,
         parish_entries=entries,
-        bulletin_date=bulletin_date,
+        parish_dates=_parish_bulletin_dates(diocese),
         parish_urls=url_by_name,
         parish_page_spans=_parish_page_spans(diocese),
     )

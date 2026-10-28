@@ -24,16 +24,16 @@ CSS = """
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    background: #eef1f0;
-    color: #1a1f1e;
+    background: #f3f5f4;
+    color: #141918;
   }
   .scrollable-viewer {
-    max-width: min(72ch, 100%);
+    max-width: min(68ch, 100%);
     margin: 0 auto;
-    background: #eef1f0;
+    background: #f3f5f4;
     font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
     font-size: 1.125rem;
-    line-height: 1.65;
+    line-height: 1.7;
     padding: 22px 26px 36px;
     overflow-wrap: anywhere;
     word-wrap: break-word;
@@ -104,19 +104,22 @@ CSS = """
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   .b-head {
-    font-size: 1.12em;
+    font-size: 1.2em;
     font-weight: 700;
-    color: #134e9c;
-    margin: 1.45em 0 0.5em;
-    padding-bottom: 0.12em;
-    border-bottom: 1px solid #d4ddd9;
+    color: #0a3333;
+    margin: 1.5em 0 0.5em;
+    padding: 0.35em 0.55em 0.35em 0.65em;
+    border-left: 4px solid #1a6b6b;
+    border-bottom: 1px solid #cfd8d4;
+    background: #e7ecea;
     line-height: 1.35;
+    letter-spacing: 0.01em;
   }
   .b-sub {
-    font-size: 1.04em;
+    font-size: 1.08em;
     font-weight: 700;
-    color: #1f6f4a;
-    margin: 0.95em 0 0.3em;
+    color: #145a3d;
+    margin: 1.1em 0 0.35em;
     line-height: 1.35;
   }
   strong { color: #0f2b5b; }

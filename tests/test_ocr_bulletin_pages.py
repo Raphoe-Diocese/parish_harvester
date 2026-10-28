@@ -1076,12 +1076,14 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", shared)
         self.assertIn(f"max-width: {OCR_MEASURE}", shared)
         self.assertIn("overflow-wrap: anywhere", shared)
-        self.assertIn("72ch", OCR_MEASURE)
-        self.assertEqual(OCR_LINE_HEIGHT, "1.65")
+        self.assertIn("68ch", OCR_MEASURE)
+        self.assertEqual(OCR_LINE_HEIGHT, "1.7")
         self.assertEqual(OCR_BASE_SIZE, "1.125rem")
         # Soft cool stone — not pure white, not cream/terracotta cliché.
         self.assertNotEqual(OCR_PAPER.lower(), "#ffffff")
         self.assertNotEqual(OCR_PAPER.lower(), "#fff")
+        self.assertIn("border-left: 4px solid", shared)
+        self.assertIn("background: #e7ecea", shared)
 
         viewer = render_bulletin_viewer_shell(
             page_title="Example Diocese Collated Bulletin",
@@ -1128,15 +1130,16 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('class="ocr-body"', standalone)
         # Body/OCR reading measure — not the old cramped 1.35 body default.
         self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", standalone)
-        self.assertRegex(standalone, r"\.ocr-body\s*\{[^}]*line-height:\s*1\.65")
+        self.assertRegex(standalone, r"\.ocr-body\s*\{[^}]*line-height:\s*1\.7")
         self.assertNotRegex(standalone, r"body\s*\{[^}]*line-height:\s*1\.35")
 
         from ocr import convert_bulletin
 
-        self.assertIn("line-height: 1.65", convert_bulletin.CSS)
-        self.assertIn("min(72ch, 100%)", convert_bulletin.CSS)
-        self.assertIn("#eef1f0", convert_bulletin.CSS)
+        self.assertIn("line-height: 1.7", convert_bulletin.CSS)
+        self.assertIn("min(68ch, 100%)", convert_bulletin.CSS)
+        self.assertIn("#f3f5f4", convert_bulletin.CSS)
         self.assertIn("overflow-wrap: anywhere", convert_bulletin.CSS)
+        self.assertIn("border-left: 4px solid #1a6b6b", convert_bulletin.CSS)
 
 
     def test_az_parish_html_shows_failed_banner_when_no_markers_found(self) -> None:
