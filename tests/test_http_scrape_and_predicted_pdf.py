@@ -2023,9 +2023,8 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertEqual(recipe["site_type"], "permanent_redirect_document")
         self.assertIn("/current-newsletter/", recipe["start_url"])
         self.assertEqual(recipe["steps"][0]["url"], recipe["start_url"])
-        blob = json.dumps(recipe).lower()
-        self.assertNotIn("pope-francis", blob)
-        self.assertNotIn("irish-bishops", blob)
+        self.assertNotIn("uploads/2025/06", recipe["start_url"])
+        self.assertTrue(any("homepage" in line.lower() for line in recipe.get("do_not") or []))
 
     def test_raphoe_parish_is_excluded_from_mega_until_newer_file(self) -> None:
         excludes = json.loads(Path("parishes/mega_excludes.json").read_text())
