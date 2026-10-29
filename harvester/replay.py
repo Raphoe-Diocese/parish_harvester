@@ -5164,6 +5164,53 @@ async def replay_recipe(
             f"{href_patterns} (not a selector problem; parish may not have posted)"
         )
 
+    # WordPress HTML newsletter pages (Mohill): listing order is not newest-first
+    # and Playwright click selectors time out on the archive. Fetch listing HTML
+    # over plain HTTP, score newsletter-* slugs by date, then print_to_pdf.
+    if site_type == "http_scrape_newest_html" and target_date is not None:
+        post_slug_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("post_slug_patterns") or [])
+            if str(p).strip()
+        ] or ["newsletter-"]
+        listing_html = ""
+        listing_fetched_from = start_url
+        for candidate in _mdocs_listing_url_candidates(start_url):
+            listing_result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                candidate,
+                max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
+            )
+            if not listing_result:
+                continue
+            listing_body, listing_headers = listing_result
+            if "text/html" not in (listing_headers.get("content-type") or "").lower():
+                continue
+            listing_html = listing_body.decode("utf-8", errors="ignore")
+            listing_fetched_from = candidate
+            break
+        post_url = None
+        if listing_html:
+            post_url = _newest_dated_post_url_from_listing(
+                listing_html,
+                listing_fetched_from,
+                post_slug_patterns,
+                target_date,
+            )
+        if post_url:
+            printed = await _print_brain_html(post_url, dest, browser, target_date)
+            if printed:
+                return dest, printed[1], printed[0]
+        brain = await _try_newsletter_brain(start_url, dest, target_date, browser)
+        if brain:
+            return dest, brain[1], brain[0]
+        raise RecipeReplayError(
+            f"HTTP-scrape HTML listing {start_url} — no dated newsletter page "
+            f"matching {post_slug_patterns}"
+        )
+
     # Listing/index is Cloudflare-challenged; dated wp-content/uploads files
     # are not. Predict this Sunday and a few previous Sundays and fetch
     # directly. Never navigate to the challenged HTML page.

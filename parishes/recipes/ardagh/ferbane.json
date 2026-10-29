@@ -1,30 +1,36 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "ferbane",
   "display_name": "Ferbane (Tisarn & Fuithre)",
   "diocese": "ardagh",
   "start_url": "https://www.ferbaneparish.ie/index.php/archived-bulletins",
   "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
-    "images/bulletins/"
+    "images/bulletins/",
+    "2026",
+    ".pdf"
+  ],
+  "href_skip_patterns": [
+    "CurrentBulletin"
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-09-29",
-  "example_url": "https://www.ferbaneparish.ie/images/bulletins/20260927%2027%20September%202026.pdf",
+  "recorded_date": "2026-10-29",
+  "example_url": "https://www.ferbaneparish.ie/images/bulletins/20261025%2025%20October%202026.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.ferbaneparish.ie/images/bulletins/20260927%2027%20September%202026.pdf"
+      "action": "goto",
+      "url": "https://www.ferbaneparish.ie/index.php/archived-bulletins"
     }
   ],
   "operator_notes": [
-    "29/09/2026: archived-bulletins lists '20260927 27 September 2026.pdf' (GET 200 application/pdf 299,885 bytes). Homepage also has permanent images/bulletins/CurrentBulletin.pdf.",
-    "site_type:http_scrape_newest_pdf — score listing hrefs by filename date."
+    "29/10/2026: Old recipe kept a Sept download step; status stayed on CurrentBulletin.pdf dated 27/09. Archive lists 20261025 25 October 2026.pdf (scored locally as 25/10).",
+    "site_type:http_scrape_newest_pdf on archived-bulletins. Skip undated CurrentBulletin.pdf. Do not pin the dated archive filename."
   ],
   "do_not": [
-    "Do not pin 20260927.",
-    "Do not treat CurrentBulletin.pdf as dated — scrape the archive list."
+    "Do not pin 20260927 or 20261025.",
+    "Do not treat CurrentBulletin.pdf as dated — scrape the archive list.",
+    "Do not keep a download step with a Sept dated URL."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

@@ -1,11 +1,14 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "mohill",
   "display_name": "Mohill (includes Fenagh & Gortletteragh)",
   "diocese": "ardagh",
   "start_url": "https://mohillparish.ie/newsletter/",
-  "site_type": "html_text_bulletin",
+  "site_type": "http_scrape_newest_html",
   "playbook_type": "html_text_bulletin",
+  "post_slug_patterns": [
+    "newsletter-"
+  ],
   "timeout_ms": 60000,
   "total_timeout_s": 180,
   "max_bulletin_pages": 8,
@@ -17,30 +20,19 @@
       "url": "https://mohillparish.ie/newsletter/"
     },
     {
-      "action": "click",
-      "selector": "a[href*='newsletter-']",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "article .entry-title a",
-        "article h2 a",
-        "h2.entry-title a"
-      ]
-    },
-    {
       "action": "print_to_pdf",
       "skip_listing_nav": true
     }
   ],
   "operator_notes": [
-    "29/10/2026: Old recipe pinned newsletter-27th-september-2026 — honest stale. WP pages API newest is newsletter-25th-october-2026 (published 27/10/2026). Listing /newsletter/ order is not newest-first — must use pick_strategy newest_dated on a[href*='newsletter-'].",
-    "Weekly bulletin is a WordPress PAGE (not post). Page text includes Mohill + Fenagh + Gortletteragh Mass intentions — harvest once here; fenagh and gortletteragh are aliases.",
-    "print_to_pdf with skip_listing_nav. Do not pin a dated newsletter slug."
+    "29/10/2026: Playwright click on /newsletter/ timed out (selectors never matched in headless). Plain HTTP listing HTML still has newsletter-* links; newest by date is newsletter-25th-october-2026 (WP pages API agrees).",
+    "site_type:http_scrape_newest_html scores newsletter- slugs over HTTP then print_to_pdf. Listing order is not newest-first — do not use first_match.",
+    "Page text includes Mohill + Fenagh + Gortletteragh — harvest once here."
   ],
   "do_not": [
     "Do not harvest Fenagh or Gortletteragh separately from this file.",
-    "Do not pin newsletter-27th-september-2026 or any dated newsletter-*-YYYY slug.",
-    "Do not use first_match on /newsletter/ — thumbnails are not newest-first.",
+    "Do not pin newsletter-27th-september-2026 or any dated newsletter slug.",
+    "Do not rely on Playwright click of a[href*='newsletter-'] on this archive — it times out in harvest.",
     "Do not remove skip_listing_nav."
   ],
   "bulletin_layout": {
