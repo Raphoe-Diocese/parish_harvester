@@ -146,6 +146,11 @@ LEARNED = (
         "how": "Wait for the JS widget. Click CLICK HERE to load Current Newsletter, then download use_captured_url. Same as Buncrana and Carndonagh. Do not fall back to a[href$=.pdf] on the page — Sion grabbed dead /pdf/090820.pdf. Skip Gift Aid, Data Entry, CatholicIreland readings. Melmount 29/10/2026: parishnews.html is already this week's HTML (no Messenger click) — print_to_pdf with skip_listing_nav. Sion shares that page; alias Sion to Melmount.",
     },
     {
+        "id": "clonleigh_homepage_not_category",
+        "when": "WordPress parish where /category/newsletter/ lags the homepage by a week",
+        "how": "Start on the homepage. Click the top Strabane Pastoral Area Newsletter (or newest post title). print_to_pdf with skip_listing_nav. Do not trust Saturday-only URL prediction — Clonleigh 25/10/2026 published on Sunday /2026/10/25/. Try Sat then Sun folders if predicting.",
+    },
+    {
         "id": "wp_block_file",
         "label": "Permanent bulletin page, changing PDF name",
         "how": "Match *bulletin*.pdf. Never pin one week's filename.",

@@ -2011,14 +2011,18 @@ def rewrite_clonleigh_url(target: date) -> str:
     """
     Predict the Clonleigh (Strabane Pastoral Area) newsletter WordPress post URL.
 
-    The newsletter is published on the Saturday before the target Sunday.
-    Slug format: strabane-pastoral-area-newsletter-for-sunday-DDth-month-YYYY
+    Historically published the Saturday before the target Sunday. Proved 29/10/2026:
+    the 25 Oct issue was published on Sunday itself (/2026/10/25/...), so callers that
+    only HEAD the Saturday path can 404 while the real post is live. Prefer recipe
+    homepage first_match when available; this helper still returns the Saturday path
+    for evidence Pattern clonleigh math, and predicted_wordpress_dated_post_urls should
+    also try the Sunday folder.
 
     Example for target 2026-04-19 (Sunday):
         published: 2026-04-18 (Saturday)
         → https://clonleighparish.com/2026/04/18/strabane-pastoral-area-newsletter-for-sunday-19th-april-2026/
     """
-    post_date = target - timedelta(days=1)  # Saturday
+    post_date = target - timedelta(days=1)  # Saturday (legacy default)
     day_ord = _ordinal(target.day)
     month_lower = _MONTH_NAMES[target.month]
     slug = (
@@ -2029,6 +2033,23 @@ def rewrite_clonleigh_url(target: date) -> str:
         f"https://clonleighparish.com"
         f"/{post_date.year}/{post_date.month:02d}/{post_date.day:02d}/{slug}/"
     )
+
+
+def clonleigh_candidate_urls(target: date) -> list[str]:
+    """Saturday-then-Sunday publish folders for the Strabane pastoral newsletter."""
+    day_ord = _ordinal(target.day)
+    month_lower = _MONTH_NAMES[target.month]
+    slug = (
+        f"strabane-pastoral-area-newsletter-for-sunday-"
+        f"{day_ord}-{month_lower}-{target.year}"
+    )
+    out: list[str] = []
+    for post_date in (target - timedelta(days=1), target):
+        out.append(
+            f"https://clonleighparish.com"
+            f"/{post_date.year}/{post_date.month:02d}/{post_date.day:02d}/{slug}/"
+        )
+    return out
 
 
 def _naomhfionan_first_counted_sunday(year: int) -> date:
