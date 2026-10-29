@@ -2,56 +2,18 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 356,
+    "downloaded": 358,
     "html_links": 0,
     "skipped": 783,
-    "failed": 97,
-    "stale_rejected": 78
+    "failed": 94,
+    "stale_rejected": 79
   },
   "action_counts": {
-    "ok": 404,
+    "ok": 407,
     "skip": 782,
-    "investigate": 84,
-    "retrain": 1
+    "investigate": 82
   },
   "parishes": [
-    {
-      "parish_key": "mohill",
-      "display_name": "Mohill (includes Fenagh & Gortletteragh)",
-      "diocese": "ardagh",
-      "recipe_file": "parishes/recipes/ardagh/mohill.json",
-      "recipe": {
-        "start_url": "https://mohillparish.ie/newsletter/",
-        "site_type": "http_scrape_newest_html",
-        "playbook_type": "html_text_bulletin",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 0,
-        "has_terminal": true,
-        "operator_notes": [
-          "29/10/2026: Playwright click on /newsletter/ timed out (selectors never matched in headless). Plain HTTP listing HTML still has newsletter-* links; newest by date is newsletter-25th-october-2026 (WP pages API agrees).",
-          "site_type:http_scrape_newest_html scores newsletter- slugs over HTTP then print_to_pdf. Listing order is not newest-first \u2014 do not use first_match.",
-          "Page text includes Mohill + Fenagh + Gortletteragh \u2014 harvest once here."
-        ],
-        "do_not": [
-          "Do not harvest Fenagh or Gortletteragh separately from this file.",
-          "Do not pin newsletter-27th-september-2026 or any dated newsletter slug.",
-          "Do not rely on Playwright click of a[href*='newsletter-'] on this archive \u2014 it times out in harvest.",
-          "Do not remove skip_listing_nav."
-        ],
-        "recorded_date": "2026-10-29"
-      },
-      "bulletin_format": "html",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for Mohill (includes Fenagh & Gortletteragh) is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Mohill (includes Fenagh & Gortletteragh)\" (detail: Recipe outdated \u2014 re-train with --train (all selectors",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
     {
       "parish_key": "abbeydorney",
       "display_name": "Abbeydorney",
@@ -17660,10 +17622,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "fermoy",
@@ -28203,6 +28165,44 @@
       "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
     },
     {
+      "parish_key": "mohill",
+      "display_name": "Mohill (includes Fenagh & Gortletteragh)",
+      "diocese": "ardagh",
+      "recipe_file": "parishes/recipes/ardagh/mohill.json",
+      "recipe": {
+        "start_url": "https://mohillparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_html",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "29/10/2026: Playwright click on /newsletter/ timed out (selectors never matched in headless). Plain HTTP listing HTML still has newsletter-* links; newest by date is newsletter-25th-october-2026 (WP pages API agrees).",
+          "29/10/2026 harvest: found the page then Too many pages 6 (max 4) \u2014 print path ignored max_bulletin_pages 8. Fixed _print_brain_html to honour the recipe ceiling.",
+          "site_type:http_scrape_newest_html scores newsletter- slugs over HTTP then print_to_pdf. Listing order is not newest-first \u2014 do not use first_match.",
+          "Page text includes Mohill + Fenagh + Gortletteragh \u2014 harvest once here."
+        ],
+        "do_not": [
+          "Do not harvest Fenagh or Gortletteragh separately from this file.",
+          "Do not pin newsletter-27th-september-2026 or any dated newsletter slug.",
+          "Do not rely on Playwright click of a[href*='newsletter-'] on this archive \u2014 it times out in harvest.",
+          "Do not remove skip_listing_nav."
+        ],
+        "recorded_date": "2026-10-29"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "monagea",
       "display_name": "Monagea",
       "diocese": "limerick",
@@ -35627,10 +35627,10 @@
         "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
       },
       "has_extension_diagnosis": true,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP 404 for https://stoliverplunkettparish.ie/wp-content/uploads/2026/10/Sun-25th-October-26.pdf",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP 404 for https://stoliverplunkettparish.ie/wp-content/uploads/2026/10/Sun-25th-October-26.pdf"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "stpatrickgalway",
@@ -37505,7 +37505,7 @@
       "recipe_file": "parishes/recipes/armagh/termonmaguirc.json",
       "recipe": {
         "start_url": "https://www.termonmaguircparish.com/bulletins/",
-        "site_type": "http_scrape_newest_pdf",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -37514,13 +37514,13 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "29/10/2026: Old recipe kept a Sept download step that fought http_scrape and contributed to Total timeout exceeded (12 failures). Listing already has Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf and Thirty-First-Sunday-in-Ordinary-Time-1-Nov-2026.pdf.",
-          "site_type:http_scrape_newest_pdf only \u2014 no pinned download step. Do not pin the dated filename."
+          "29/10/2026: http_scrape_newest_pdf timed out 3x190s on GitHub Actions (local scrape of Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf works). WP media API lists the same PDFs (Thirty-First 1 Nov, Thirtieth 25 Oct).",
+          "site_type:wp_json_newest_media. Do not invent Twenty-Sixth for 25 Oct \u2014 live name is Thirtieth. Do not pin the dated filename."
         ],
         "do_not": [
           "Do not pin this week's dated filename.",
-          "Do not keep a download step with a Sept or Oct dated URL.",
-          "Do not invent Twenty-Sixth for 25 Oct \u2014 live name is Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf."
+          "Do not keep a download step with a Sept dated URL.",
+          "Do not invent Twenty-Sixth-Sunday for 25 Oct."
         ],
         "recorded_date": "2026-10-29"
       },
