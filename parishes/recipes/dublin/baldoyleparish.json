@@ -1,44 +1,35 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "baldoyleparish",
-  "display_name": "Baldoyleparish",
+  "display_name": "Baldoyle",
   "diocese": "dublin",
   "start_url": "https://www.baldoyleparish.ie/parish-newsletter",
-  "steps": [
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.baldoyleparish.ie/s/Newsletter-18th-October.pdf",
-      "text": "18th October 2026 | 18th October 2026",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.baldoyleparish.ie/s/Newsletter-18th-October.pdf"
-    }
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Newsletter-",
+    "/s/Newsletter"
   ],
-  "observed_load_ms": 5909.39990234375,
+  "playbook_type": "pdf_download_list",
   "timeout_ms": 55000,
   "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "recorded_date": "2026-10-29",
+  "example_url": "https://www.baldoyleparish.ie/s/Newsletter-25th-October.pdf",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.baldoyleparish.ie/parish-newsletter"
+    }
+  ],
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "29/10/2026: listing has Newsletter-25th-October.pdf. Old recipe pinned 18th-October download.",
+    "site_type:http_scrape_newest_pdf. Score /s/Newsletter-Dth-Month.pdf."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin Newsletter-25th-October.pdf.",
+    "Do not pick GDPR or financial PDFs."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  },
-  "recorded_date": "2026-10-19"
+  }
 }

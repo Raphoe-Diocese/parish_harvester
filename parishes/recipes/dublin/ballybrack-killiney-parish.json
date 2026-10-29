@@ -1,31 +1,44 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "ballybrack-killiney-parish",
-  "display_name": "Ballybrack-killiney-parish",
+  "display_name": "Ballybrack-Killiney",
   "diocese": "dublin",
   "start_url": "https://www.ballybrack-killiney-parish.org/news.html",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 90000,
+  "total_timeout_s": 250,
+  "recorded_date": "2026-10-29",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.ballybrack-killiney-parish.org/news/newsletter-17th-18th-october-2026.html"
+      "url": "https://www.ballybrack-killiney-parish.org/news.html"
     },
     {
-      "action": "print_to_pdf"
+      "action": "click",
+      "selector": "a:has-text('Newsletter')",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='/news/newsletter-']",
+        "h3 a"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "observed_load_ms": 41905.699951171875,
-  "timeout_ms": 93811.39990234375,
-  "total_timeout_s": 250,
-  "playbook_type": "wix_html",
-  "site_type": "html_text_bulletin",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "29/10/2026: news.html top is Newsletter 24th & 25th October 2026. Old recipe pinned newsletter-17th-18th-october-2026.html.",
+    "Click top Newsletter title (not Download), then print_to_pdf with skip_listing_nav."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
+    "Do not pin a dated /news/newsletter-… URL.",
+    "Do not use Pick bulletin image for the HTML article."
   ],
-  "recorded_date": "2026-10-19"
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }

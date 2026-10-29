@@ -1,44 +1,35 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "ballinteerparish",
-  "display_name": "Ballinteerparish",
+  "display_name": "Ballinteer",
   "diocese": "dublin",
   "start_url": "https://www.ballinteerparish.ie/Sunday-Message.htm",
-  "steps": [
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.ballinteerparish.ie/Sunday_Message_20261018.pdf",
-      "text": "Open the newsletter as PDF",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.ballinteerparish.ie/Sunday_Message_20261018.pdf"
-    }
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Sunday_Message_",
+    ".pdf"
   ],
-  "observed_load_ms": 10011.60009765625,
+  "playbook_type": "pdf_download_list",
   "timeout_ms": 55000,
   "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "recorded_date": "2026-10-29",
+  "example_url": "https://www.ballinteerparish.ie/Sunday_Message_20261025.pdf",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.ballinteerparish.ie/Sunday-Message.htm"
+    }
+  ],
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "29/10/2026: page links Sunday_Message_20261025.pdf. Old recipe pinned 20261018.",
+    "site_type:http_scrape_newest_pdf."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin Sunday_Message_YYYYMMDD.pdf.",
+    "Do not pick Payzone or admin PDFs."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  },
-  "recorded_date": "2026-10-19"
+  }
 }

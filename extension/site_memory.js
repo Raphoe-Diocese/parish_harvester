@@ -112,11 +112,13 @@
         "Bulletin text is on the web page — not a downloadable PDF file.",
         "Use Save page as PDF on the newsletter article page.",
         "29/10/2026 Clonleigh: start on the homepage, not /category/newsletter/ (that listing lagged a week). Click top Strabane Pastoral Area Newsletter, then print_to_pdf. Publish day can be Sunday, not only Saturday.",
+        "29/10/2026 Ballybrack-Killiney: start on news.html, click top Newsletter title (24th & 25th October), print_to_pdf. Do not pin last week's article URL.",
       ],
       do_not: [
         "Do not use Pick bulletin image when the page is mostly text paragraphs.",
         "Do not stop at click-only — need print_to_pdf as the final step.",
         "Do not train only on /category/newsletter/ when the homepage already shows a newer post.",
+        "Do not pin a dated /news/newsletter-… URL.",
       ],
     },
     dated_pdf_bulletin: {
@@ -388,10 +390,10 @@
       operator_notes: [
         "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
         "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-        "Do not worry if the filename or date in the link text changes every week.",
+        "29/10/2026 Baldoyle/Ballinteer: pinned 18 Oct downloads went stale while 25 Oct files were already listed — prefer http_scrape_newest_pdf; never pin the download URL.",
       ],
       do_not: [
-        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) — it breaks next week.",
         "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
       ],
     },
