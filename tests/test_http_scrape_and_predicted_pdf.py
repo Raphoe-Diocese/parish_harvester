@@ -1857,6 +1857,33 @@ class NewtownbutlerRecipeTests(unittest.TestCase):
         self.assertEqual(max(scored)[1], self.THIS_WEEK)
 
 
+class MayoJpegWeekTests(unittest.TestCase):
+    """mayo.ie Balla: this Sunday can be .jpg while older weeks are .pdf."""
+
+    JPG = (
+        "https://www.mayo.ie/getmedia/062d41aa-8c8c-48da-84a4-68c70d9a007b/"
+        "Balla-and-Belcarra-25-10-2026.jpg"
+    )
+    PDF = (
+        "https://www.mayo.ie/getmedia/342a9fee-48e1-4986-a532-52f595939c49/"
+        "Balla-and-Belcarra-18-10-2026.pdf"
+    )
+
+    def test_dated_jpg_beats_older_pdf(self) -> None:
+        labels = {
+            self.JPG: "Balla and Belcarra Parish Newsletter October 25th 2026",
+            self.PDF: "Balla and Belcarra Parish Newsletter October 18th 2026",
+        }
+        scored = _score_http_scrape_pdf_hrefs(
+            [self.JPG, self.PDF],
+            date(2026, 10, 25),
+            labels=labels,
+        )
+        self.assertTrue(scored)
+        self.assertEqual(max(scored)[1], self.JPG)
+        self.assertEqual(max(scored)[0], date(2026, 10, 25))
+
+
 class AntrimRecipeTests(unittest.TestCase):
     LISTING = "https://www.antrimparish.com/bulletinpage/"
     THIS_WEEK = (

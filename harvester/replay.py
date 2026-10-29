@@ -2329,7 +2329,12 @@ def _score_http_scrape_pdf_hrefs(
         extensionless_ok = bool(
             re.search(r"/b/\d+/?$", path) or path.endswith("dlc.php")
         )
-        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")) and not extensionless_ok:
+        # Mayo.ie sometimes posts this Sunday as .jpg while older weeks stay .pdf
+        # (Balla-Belcarra 25-10-2026.jpg vs 18-10-2026.pdf — proved 29/10/2026).
+        if (
+            not path.endswith((".pdf", ".docx", ".doc", ".rtf", ".jpg", ".jpeg", ".png"))
+            and not extensionless_ok
+        ):
             continue
         found = _http_scrape_item_date(href, target_date)
         if not found and labels:
@@ -2615,12 +2620,26 @@ async def _try_http_scrape_newest_pdf(
     if not file_result:
         return None
     file_body, file_headers = file_result
-    is_rtf = _office_bytes_look_like_rtf(file_body) or urlparse(pdf_url).path.lower().endswith(".rtf")
+    path_lower = urlparse(pdf_url).path.lower()
+    is_rtf = _office_bytes_look_like_rtf(file_body) or path_lower.endswith(".rtf")
+    is_image = (
+        file_body[:3] == b"\xff\xd8\xff"
+        or file_body[:8] == b"\x89PNG\r\n\x1a\n"
+        or path_lower.endswith((".jpg", ".jpeg", ".png"))
+    )
     if not (
         _dropfiles_body_looks_like_file(file_headers, file_body)
-        and (_is_pdf_content(file_body) or file_body[:2] == b"PK" or is_rtf)
+        and (
+            _is_pdf_content(file_body)
+            or file_body[:2] == b"PK"
+            or is_rtf
+            or is_image
+        )
     ):
         return None
+    if is_image and not _is_pdf_content(file_body):
+        await _images_bytes_to_pdf(dest, [file_body])
+        return pdf_url, "image_to_pdf"
     if is_rtf or (file_body[:2] == b"PK" and not _is_pdf_content(file_body)):
         pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
         dest.write_bytes(pdf_bytes)
