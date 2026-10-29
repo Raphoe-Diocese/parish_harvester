@@ -3,39 +3,31 @@
   "parish_key": "edenderry",
   "display_name": "Edenderry",
   "diocese": "kildare_and_leighlin",
-  "start_url": "https://www.edenderryparish.ie/newsletter/",
-  "site_type": "http_scrape_newest_images",
-  "href_patterns": [
-    "Edenderry",
-    "Oct",
-    "Sept",
-    ".jpg",
-    "uploads"
-  ],
-  "timeout_ms": 45000,
+  "start_url": "https://mcn.live/Camera/st-marys-church-3",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 434,
+  "timeout_ms": 90000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
-  "example_url": "https://www.edenderryparish.ie/wp-content/uploads/2026/10/Edenderry-4th-Oct-2026.jpg",
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-10-29",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.edenderryparish.ie/newsletter/"
+      "url": "https://mcn.live/Camera/st-marys-church-3"
     },
     {
-      "action": "image_stack",
-      "count": 2,
-      "position": "first",
-      "selector": "img[src*='Edenderry']",
-      "min_long_side": 500
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: edenderryparish.ie/newsletter/. Weekly file is a JPEG, not a PDF.",
-    "Proved Edenderry-4th-Oct-2026.jpg GET 200 image/jpeg 1808833 bytes, magic JPEG. Filename date is 04/10/2026.",
-    "wp-json media lists the same file. Do not pin the dated filename. Do not pick the -300x212 thumbnail."
+    "29/10/2026 Ireland MCN dig: st-marys-church-3 (Edenderry) church_id 434 Latest Bulletin — dig card date 28/10/2026. Site image_stack lagged on 18/10 JPEGs. Do not pin CloudFront UUID. Camera slug is numbered (st-marys-church-3), not edenderry in the path."
   ],
   "do_not": [
-    "Do not pin Edenderry-4th-Oct-2026.jpg.",
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not screenshot the camera feed.",
+    "Do not pin Edenderry-*-Oct-2026.jpg.",
     "Do not harvest Facebook."
   ]
 }
