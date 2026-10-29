@@ -27,39 +27,30 @@ HARVEST_SUNDAY = date(2026, 8, 23)
 
 
 class ArdstrawEastRecipeTests(unittest.TestCase):
-    def test_recipe_prints_newest_html_newsletter_and_skips_forms(self) -> None:
+    def test_recipe_prints_latest_on_parishnews_page(self) -> None:
+        """29/10/2026: Latest block on parishnews.html is this week; Past list lagged."""
         payload = json.loads(RECIPE_PATH.read_text(encoding="utf-8"))
         self.assertEqual(payload.get("parish_key"), "parishofardstraweast")
         self.assertEqual(payload.get("start_url"), LISTING)
         self.assertTrue(payload.get("disable_stale_rescrape_fallback"))
         self.assertNotIn("skip", payload)
+        self.assertEqual(payload.get("site_type"), "html_text_bulletin")
 
-        patterns = " ".join(payload.get("href_patterns") or [])
-        self.assertIn("templates/?a=", patterns)
-        skip = " ".join(payload.get("href_skip_patterns") or []).lower()
-        for token in ("dataentry", "parishioner", "gdpr", "privacy"):
-            self.assertIn(token, skip)
-
-        notes = " ".join(payload.get("do_not") or []).lower()
-        self.assertIn("dataentryform", notes)
-        self.assertIn("parishioner", notes)
+        notes = " ".join(
+            (payload.get("do_not") or []) + (payload.get("operator_notes") or [])
+        ).lower()
+        self.assertIn("dataentry", notes)
         self.assertIn("gdpr", notes)
-        self.assertIn("privacy", notes)
+        self.assertIn("past", notes)
 
         steps = payload.get("steps") or []
-        self.assertGreaterEqual(len(steps), 3)
+        self.assertEqual(len(steps), 2)
         self.assertEqual(steps[0].get("action"), "goto")
         self.assertEqual(steps[0].get("url"), LISTING)
-
-        click = steps[1]
-        self.assertEqual(click.get("action"), "click")
-        self.assertEqual(click.get("pick_strategy"), "newest_dated")
-        self.assertIn("templates/?a=", click.get("selector") or "")
-        self.assertNotIn("DataEntry", json.dumps(steps))
-
-        print_step = steps[-1]
-        self.assertEqual(print_step.get("action"), "print_to_pdf")
-        self.assertTrue(print_step.get("skip_listing_nav"))
+        self.assertEqual(steps[1].get("action"), "print_to_pdf")
+        self.assertTrue(steps[1].get("skip_listing_nav"))
+        actions = [str(s.get("action") or "") for s in steps]
+        self.assertNotIn("click", actions)
 
 
 class ArdstrawEastSkipNameTests(unittest.TestCase):
