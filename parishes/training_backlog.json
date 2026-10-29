@@ -2,57 +2,19 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 319,
+    "downloaded": 320,
     "html_links": 0,
-    "skipped": 784,
-    "failed": 111,
+    "skipped": 785,
+    "failed": 109,
     "stale_rejected": 99
   },
   "action_counts": {
-    "investigate": 93,
-    "ok": 392,
+    "investigate": 92,
+    "ok": 393,
     "mark_inactive": 1,
-    "skip": 780,
-    "retrain": 1
+    "skip": 781
   },
   "parishes": [
-    {
-      "parish_key": "parishofsionmills",
-      "display_name": "Sion Mills",
-      "diocese": "derry",
-      "recipe_file": "parishes/recipes/derry/parishofsionmills.json",
-      "recipe": {
-        "start_url": "http://www.parishofsionmills.com/news.html",
-        "site_type": "parish_messenger",
-        "playbook_type": "parish_messenger",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "Parish Messenger widget (theparishmessenger.com z=725) injects the Current Newsletter link after JS load.",
-          "29/10/2026: bare print_to_pdf left September text. Click Current Newsletter then download (Buncrana pattern).",
-          "29/10/2026 harvest 40866608255: fallback a[href$='.pdf'] grabbed dead /pdf/090820.pdf (404). Removed .pdf fallback. Skip GiftAid / CatholicIreland / old pdf names."
-        ],
-        "do_not": [
-          "Do not print_to_pdf the listing page alone \u2014 that captures last month's text.",
-          "Do not fall back to a[href$='.pdf'] \u2014 homepage has a dead 090820.pdf.",
-          "Do not pick admin PDFs from the widget list.",
-          "Do not click CatholicIreland Daily Readings links."
-        ],
-        "recorded_date": "2026-10-29"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "Parish Services / Parish Messenger widget",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for Sion Mills is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Sion Mills\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a:has-text(\"CLICK HERE to load Current Newsletter\")",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
     {
       "parish_key": "abbeydorney",
       "display_name": "Abbeydorney",
@@ -27401,34 +27363,34 @@
       "recipe_file": "parishes/recipes/derry/melmountparish.json",
       "recipe": {
         "start_url": "https://www.melmountparish.com/parishnews.html",
-        "site_type": "parish_messenger",
-        "playbook_type": "parish_messenger",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 2,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Parish Messenger widget (theparishmessenger.com z=21) injects the Current Newsletter link after JS load.",
-          "29/10/2026: bare print_to_pdf left September text. Click Current Newsletter then download (Buncrana pattern).",
-          "Do not use a[href$='.pdf'] fallback \u2014 Sion Mills proved that grabs a dead homepage PDF."
+          "29/10/2026 browser check: parishnews.html already shows this week's HTML newsletter \u2014 30th Sunday / 25th October 2026, Fr Sean, Melmount + Sion Mills collections.",
+          "Parish Messenger click for Current Newsletter is gone / not needed. Print the page.",
+          "Same bulletin names Sion Mills \u2014 harvest once under melmountparish; Sion is alias."
         ],
         "do_not": [
-          "Do not print_to_pdf the listing page alone \u2014 that captures last month's text.",
-          "Do not fall back to a[href$='.pdf'] on the listing page.",
-          "Do not pick admin PDFs from the widget list."
+          "Do not click Gift Aid or Standing Order Form.",
+          "Do not train a parish_messenger Current Newsletter click on this page anymore.",
+          "Do not harvest the same HTML twice for Sion Mills."
         ],
         "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "html",
       "learned_pattern": "Parish Services / Parish Messenger widget",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL; headful fallback: Recipe replay failed: Refusing non-bulletin document URL: https://www.melmountparish.com/pdf/GiftAidForm.pdf",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL; headful fallback: Recipe replay failed: Refusing non-bulletin document URL: htt"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "menloughskehanakillascobe",
@@ -34023,6 +33985,40 @@
       "last_error": "",
       "suggested_action": "investigate",
       "suggested_reason": ""
+    },
+    {
+      "parish_key": "parishofsionmills",
+      "display_name": "Sion Mills",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/parishofsionmills.json",
+      "recipe": {
+        "start_url": "https://www.melmountparish.com/parishnews.html",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 0,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "29/10/2026: Melmount parishnews.html is the shared Melmount + Sion Mills weekly (25 Oct 2026). Do not print Sion's news.html alone.",
+          "Old parish_messenger recipe and dead /pdf/090820.pdf are retired."
+        ],
+        "do_not": [
+          "Do not harvest Facebook.",
+          "Do not click CatholicIreland readings on the old Sion news.html."
+        ],
+        "recorded_date": "2026-10-29"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "Parish Services / Parish Messenger widget",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same weekly HTML newsletter as Melmount on melmountparish.com/parishnews.html (collections list both parishes). Harvest once under melmountparish."
     },
     {
       "parish_key": "sixmilebridge",
