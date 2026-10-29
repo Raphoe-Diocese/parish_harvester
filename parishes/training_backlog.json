@@ -4744,27 +4744,36 @@
       "diocese": "tuam",
       "recipe_file": "parishes/recipes/tuam/ballyhaunisannagh.json",
       "recipe": {
-        "start_url": "https://www.mayo.ie/en-ie/parish-newsletters/ballyhaunis-parish-newsletter",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
+        "start_url": "https://mcn.live/Camera/st-patricks-church-ballyhaunis",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "05/10/2026 cloud leftover hunt: mayo.ie Ballyhaunis listing. Proved Ballyhaunis-04-10-2026.pdf GET 200 application/pdf 7106300 bytes magic %PDF. Link text October 4th 2026. PDF text Sundays 4th October / ballyhaunisparish.ie. Do not pin the getmedia GUID."
+          "29/10/2026 Ireland MCN dig: st-patricks-church-ballyhaunis church_id 22 Latest Bulletin stated 2026-10-25. mayo.ie listing lagged on 18/10. Do not pin CloudFront UUID.",
+          "Older mayo.ie getmedia scrape left as do_not \u2014 use MCN first."
         ],
         "do_not": [
-          "Do not pin the getmedia GUID or dated filename.",
+          "Do not pin the CloudFront UUID PDF.",
+          "Do not screenshot the camera feed.",
+          "Do not pin mayo.ie getmedia GUID.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "Mayo County Council parish-newsletters",
-      "host_profile": null,
+      "host_profile": {
+        "navigation_timeout_ms": 90000,
+        "wait_after_load_ms": 8000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -5865,27 +5874,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/bayside.json",
       "recipe": {
-        "start_url": "https://www.baysideparish.ie/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
+        "start_url": "https://mcn.live/Camera/bayside-parish-church",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "03/10/2026 cloud hunt: proved GET 200 pdf 1308201 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+          "29/10/2026 Ireland MCN dig: bayside-parish-church church_id 453 Latest Bulletin stated 2026-10-25. Parish site HTTP-scrape was failing. Do not pin CloudFront UUID."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
+          "Do not pin the CloudFront UUID PDF.",
+          "Do not screenshot the camera feed.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "navigation_timeout_ms": 90000,
+        "wait_after_load_ms": 8000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Recipe replay failed: HTTP-scrape listing https://www.baysideparish.ie/ \u2014 no dated bulletin PDF matching ['newsletter', 'october', '.pdf'] (not a selector problem; parish may not have posted)",
@@ -16577,9 +16593,9 @@
       "diocese": "kildare_and_leighlin",
       "recipe_file": "parishes/recipes/kildare_and_leighlin/edenderry.json",
       "recipe": {
-        "start_url": "https://www.edenderryparish.ie/newsletter/",
-        "site_type": "http_scrape_newest_images",
-        "playbook_type": "",
+        "start_url": "https://mcn.live/Camera/st-marys-church-3",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -16587,19 +16603,25 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "03/10/2026 cloud hunt: edenderryparish.ie/newsletter/. Weekly file is a JPEG, not a PDF.",
-          "Proved Edenderry-4th-Oct-2026.jpg GET 200 image/jpeg 1808833 bytes, magic JPEG. Filename date is 04/10/2026.",
-          "wp-json media lists the same file. Do not pin the dated filename. Do not pick the -300x212 thumbnail."
+          "29/10/2026 Ireland MCN dig: st-marys-church-3 (Edenderry) church_id 434 Latest Bulletin \u2014 dig card date 28/10/2026. Site image_stack lagged on 18/10 JPEGs. Do not pin CloudFront UUID. Camera slug is numbered (st-marys-church-3), not edenderry in the path."
         ],
         "do_not": [
-          "Do not pin Edenderry-4th-Oct-2026.jpg.",
+          "Do not pin the CloudFront UUID PDF.",
+          "Do not screenshot the camera feed.",
+          "Do not pin Edenderry-*-Oct-2026.jpg.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "image_stack",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "navigation_timeout_ms": 90000,
+        "wait_after_load_ms": 8000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
