@@ -2,18 +2,56 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 356,
+    "downloaded": 355,
     "html_links": 0,
     "skipped": 783,
-    "failed": 95,
-    "stale_rejected": 80
+    "failed": 97,
+    "stale_rejected": 79
   },
   "action_counts": {
-    "ok": 406,
+    "ok": 404,
     "skip": 782,
-    "investigate": 83
+    "investigate": 84,
+    "retrain": 1
   },
   "parishes": [
+    {
+      "parish_key": "mohill",
+      "display_name": "Mohill (includes Fenagh & Gortletteragh)",
+      "diocese": "ardagh",
+      "recipe_file": "parishes/recipes/ardagh/mohill.json",
+      "recipe": {
+        "start_url": "https://mohillparish.ie/newsletter/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "29/10/2026: Old recipe pinned newsletter-27th-september-2026 \u2014 honest stale. WP pages API newest is newsletter-25th-october-2026 (published 27/10/2026). Listing /newsletter/ order is not newest-first \u2014 must use pick_strategy newest_dated on a[href*='newsletter-'].",
+          "Weekly bulletin is a WordPress PAGE (not post). Page text includes Mohill + Fenagh + Gortletteragh Mass intentions \u2014 harvest once here; fenagh and gortletteragh are aliases.",
+          "print_to_pdf with skip_listing_nav. Do not pin a dated newsletter slug."
+        ],
+        "do_not": [
+          "Do not harvest Fenagh or Gortletteragh separately from this file.",
+          "Do not pin newsletter-27th-september-2026 or any dated newsletter-*-YYYY slug.",
+          "Do not use first_match on /newsletter/ \u2014 thumbnails are not newest-first.",
+          "Do not remove skip_listing_nav."
+        ],
+        "recorded_date": "2026-10-29"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Mohill (includes Fenagh & Gortletteragh) is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Mohill (includes Fenagh & Gortletteragh)\" (detail: Recipe outdated \u2014 re-train with --train (all selectors",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
+    },
     {
       "parish_key": "abbeydorney",
       "display_name": "Abbeydorney",
@@ -1596,10 +1634,10 @@
         "navigation_timeout_ms": 55000
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
     },
     {
       "parish_key": "ardlea",
@@ -28162,43 +28200,6 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
-    },
-    {
-      "parish_key": "mohill",
-      "display_name": "Mohill (includes Fenagh & Gortletteragh)",
-      "diocese": "ardagh",
-      "recipe_file": "parishes/recipes/ardagh/mohill.json",
-      "recipe": {
-        "start_url": "https://mohillparish.ie/newsletter/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "html_text_bulletin",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "29/10/2026: Old recipe pinned newsletter-27th-september-2026 \u2014 honest stale. WP pages API newest is newsletter-25th-october-2026 (published 27/10/2026). Listing /newsletter/ order is not newest-first \u2014 must use pick_strategy newest_dated on a[href*='newsletter-'].",
-          "Weekly bulletin is a WordPress PAGE (not post). Page text includes Mohill + Fenagh + Gortletteragh Mass intentions \u2014 harvest once here; fenagh and gortletteragh are aliases.",
-          "print_to_pdf with skip_listing_nav. Do not pin a dated newsletter slug."
-        ],
-        "do_not": [
-          "Do not harvest Fenagh or Gortletteragh separately from this file.",
-          "Do not pin newsletter-27th-september-2026 or any dated newsletter-*-YYYY slug.",
-          "Do not use first_match on /newsletter/ \u2014 thumbnails are not newest-first.",
-          "Do not remove skip_listing_nav."
-        ],
-        "recorded_date": "2026-10-29"
-      },
-      "bulletin_format": "html",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "monagea",
