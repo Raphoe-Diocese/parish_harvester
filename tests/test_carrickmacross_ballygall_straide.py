@@ -19,9 +19,10 @@ class CarrickmacrossBallygallStraideTests(unittest.TestCase):
         payload = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(payload.get("site_type"), "http_scrape_newest_pdf")
         self.assertIn("blog", payload.get("start_url", ""))
-        dump = json.dumps(payload)
-        self.assertNotIn("2026-09-27-newsletter.pdf", dump)
-        self.assertIn("Newsletter-for-", dump)
+        steps = payload.get("steps") or []
+        self.assertEqual([s.get("action") for s in steps], ["goto"])
+        self.assertIn("Newsletter-for-", " ".join(payload.get("href_patterns") or []))
+        self.assertIn("October25th", payload.get("example_url") or "")
 
     def test_straide_scrapes_and_bohola_aliases(self) -> None:
         straide = json.loads(
