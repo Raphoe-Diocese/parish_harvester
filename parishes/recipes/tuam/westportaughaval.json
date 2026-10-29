@@ -1,19 +1,39 @@
 {
+  "version": 2,
   "parish_key": "westportaughaval",
   "display_name": "Westport (Aughaval)",
   "diocese": "tuam",
-  "recorded_date": "2026-10-05",
-  "start_url": "https://www.westportparish.ie/news/categories/newsletter",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Wix post Newsletter Week Beginning 4th October 2026 exists. PDF Viewer Pro embeds the file; no scrapeable .pdf / ugd href / JPEG proved this pass. mayo.ie/westport-parish listing empty. Leave skip (same rule as Balbriggan Wix). kilmeena aliases here.",
+  "start_url": "https://www.mayo.ie/en-ie/parish-newsletters/westport-parish",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Westport",
+    ".docx",
+    ".pdf",
+    "getmedia"
+  ],
+  "max_bulletin_pages": 16,
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-29",
+  "example_url": "https://www.mayo.ie/getmedia/03bfa783-bfce-4244-aa32-a48560e971e2/Westport-25-10-2026.docx",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.westportparish.ie/news/categories/newsletter"
+      "url": "https://www.mayo.ie/en-ie/parish-newsletters/westport-parish"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "29/10/2026: Wix westportparish.ie had no scrapeable PDF. mayo.ie listing now has Westport-25-10-2026.docx (link text October 25th 2026). Convert Word to PDF. Do not pin getmedia GUID.",
+    "kilmeena aliases here. Do not merge with Carnacon / Ballintubber Abbey / Killawalla."
+  ],
+  "do_not": [
+    "Do not leave skip/link_only — mayo.ie has this week's Word file.",
+    "Do not pin the getmedia GUID or dated filename.",
+    "Do not harvest Facebook.",
+    "Do not merge Westport with Carnacon / Ballintubber Abbey / Killawalla."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
