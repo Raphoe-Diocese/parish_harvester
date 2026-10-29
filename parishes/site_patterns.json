@@ -671,18 +671,24 @@
       "page_type": "permanent_redirect_document",
       "recipe_flow": "direct_download",
       "label": "Kandle /current-newsletter/ permanent redirect",
-      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Do not pin the dated uploads path.",
+      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Set disable_stale_rescrape_fallback. Do not pin the dated uploads path. When the file is last week, leave it stale — never homepage-rescrape.",
       "operator_notes": [
         "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
         "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only.",
         "05/10/2026 Kildare leftover: Kilcock /current-newsletter/ \u2192 27th-Sunday-in-Ordinary-Time-.pdf 2818821 bytes (04/10 liturgical). Monasterevin /current-newsletter/ \u2192 3341_001.pdf 644493 bytes (listing text 4th October). Abbeyleix still June 2020 \u2014 leave skip.",
         "05/10/2026 Limerick leftover: stjosephsparish.ie /current-newsletter/ \u2192 4th-October.pdf 372227 bytes (Sunday 4th October 2026). Diocese card had no twin \u2014 kitchen-sink host.",
-        "05/10/2026 Armagh continuous: dunleerparish.ie /current-newsletter/ \u2192 Twenty_Seventh_Sunday\u2026[2026-10-4].pdf 429671 bytes."
+        "05/10/2026 Armagh continuous: dunleerparish.ie /current-newsletter/ \u2192 Twenty_Seventh_Sunday\u2026[2026-10-4].pdf 429671 bytes.",
+        "28/10/2026 Derry Bellaghy: /current-newsletter/ was 11-October PDF (honest stale). Homepage rescrape downloaded pope-francis jpeg and marked failed. disable_stale_rescrape_fallback + referee manual_review. Harvest 40778631994 stale 11/10/2026."
       ],
       "do_not": [
         "Do not pin the dated PDF filename.",
-        "Do not unskip when the redirect is a stale year (Abbeyleix still pointed at June 2020)."
+        "Do not unskip when the redirect is a stale year (Abbeyleix still pointed at June 2020).",
+        "Do not rescrape the homepage when /current-newsletter/ is stale.",
+        "Do not download pope-francis, Irish-Bishops, Gaza appeal, GDPR, or other admin PDFs from the homepage."
       ],
+      "recipe_defaults": {
+        "disable_stale_rescrape_fallback": true
+      },
       "example_parishes": [
         "bagenalstown",
         "borris",
@@ -690,9 +696,10 @@
         "kilcockandnewtownparish",
         "monasterevin",
         "stjosephs",
-        "dunleer"
+        "dunleer",
+        "bellaghyparish"
       ],
-      "success_count": 7
+      "success_count": 8
     },
     "limerick_diocese_card_website+http_scrape_newest_pdf": {
       "page_type": "pdf_link_list",
@@ -1155,33 +1162,43 @@
       "page_type": "current-newsletter",
       "recipe_flow": "direct_download",
       "label": "current-newsletter+direct_download",
-      "advice": "23/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 18/10/2026. Do not pin https://beechwoodparish.com/wp-content/uploads/2026/10/Newsletter-18th-October-2026.pdf.",
+      "advice": "Same as permanent_redirect_document. Point at /current-newsletter/ only. disable_stale_rescrape_fallback. Stale file stays stale.",
       "operator_notes": [
-        "23/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 18/10/2026. Do not pin https://beechwoodparish.com/wp-content/uploads/2026/10/Newsletter-18th-October-2026.pdf."
+        "23/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 18/10/2026. Do not pin https://beechwoodparish.com/wp-content/uploads/2026/10/Newsletter-18th-October-2026.pdf.",
+        "28/10/2026 Bellaghy proved the referee rule: last-week redirect must not trigger homepage rescrape."
       ],
       "do_not": [
         "Do not pin a dated filename.",
-        "Do not harvest Facebook."
+        "Do not harvest Facebook.",
+        "Do not rescrape the homepage when the redirect is stale."
       ],
+      "recipe_defaults": {
+        "disable_stale_rescrape_fallback": true
+      },
       "example_parishes": [
-        "beechwoodavenue"
+        "beechwoodavenue",
+        "bellaghyparish"
       ],
-      "success_count": 1
+      "success_count": 2
     }
   },
   "parishes": {
     "bellaghyparish": {
-      "page_type": "direct_pdf",
-      "recipe_flow": "click_then_pdf",
-      "combined_key": "direct_pdf+click_then_pdf",
+      "page_type": "permanent_redirect_document",
+      "recipe_flow": "direct_download",
+      "combined_key": "permanent_redirect_document+direct_download",
       "display_name": "Bellaghy",
       "start_url_host": "bellaghyparish.com",
-      "updated": "2026-06-25",
-      "step_count": 4,
-      "bulletin_layout": {
-        "strategy": "newest_dated",
-        "position": "middle"
-      }
+      "updated": "2026-10-28",
+      "step_count": 1,
+      "operator_notes": [
+        "28/10/2026: start_url https://bellaghyparish.com/current-newsletter/ returns application/pdf. Today 11-October-2026.pdf (stale until they replace it).",
+        "disable_stale_rescrape_fallback. Homepage has pope-francis and Irish-Bishops admin files."
+      ],
+      "do_not": [
+        "Do not scrape the homepage.",
+        "Do not pin a dated Newsletter-D-Month filename."
+      ]
     },
     "parishofballinascreen": {
       "page_type": "html_text_bulletin",
