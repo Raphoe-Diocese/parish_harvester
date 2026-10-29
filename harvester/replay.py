@@ -2436,13 +2436,24 @@ async def _save_brain_file(url: str, dest: Path) -> tuple[str, str] | None:
 
 
 async def _print_brain_html(
-    url: str, dest: Path, browser: Browser, target_date: date
+    url: str,
+    dest: Path,
+    browser: Browser,
+    target_date: date,
+    *,
+    max_pages: int | None = None,
 ) -> tuple[str, str] | None:
     context = await browser.new_context(accept_downloads=True)
     page = await context.new_page()
     try:
         await _navigate_page(page, url, 30_000, wait_until="domcontentloaded")
-        await _smart_print_page_to_pdf(page, dest, target_date, skip_listing_nav=True)
+        await _smart_print_page_to_pdf(
+            page,
+            dest,
+            target_date,
+            skip_listing_nav=True,
+            max_pages=max_pages,
+        )
         return url, "print_to_pdf"
     finally:
         await context.close()
@@ -5199,8 +5210,19 @@ async def replay_recipe(
                 post_slug_patterns,
                 target_date,
             )
+        max_pages = recipe.get("max_bulletin_pages")
+        try:
+            max_pages_i = int(max_pages) if max_pages is not None else None
+        except (TypeError, ValueError):
+            max_pages_i = None
         if post_url:
-            printed = await _print_brain_html(post_url, dest, browser, target_date)
+            printed = await _print_brain_html(
+                post_url,
+                dest,
+                browser,
+                target_date,
+                max_pages=max_pages_i,
+            )
             if printed:
                 return dest, printed[1], printed[0]
         brain = await _try_newsletter_brain(start_url, dest, target_date, browser)

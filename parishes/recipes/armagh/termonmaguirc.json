@@ -1,14 +1,16 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "termonmaguirc",
   "display_name": "Termonmaguirc (Carrickmore, Loughmacrory & Creggan)",
   "diocese": "armagh",
   "start_url": "https://www.termonmaguircparish.com/bulletins/",
-  "site_type": "http_scrape_newest_pdf",
+  "site_type": "wp_json_newest_media",
   "href_patterns": [
-    "uploads/",
     "Sunday",
     "Ordinary",
+    "Oct",
+    "Nov",
+    "Sept",
     ".pdf"
   ],
   "timeout_ms": 45000,
@@ -22,13 +24,13 @@
     }
   ],
   "operator_notes": [
-    "29/10/2026: Old recipe kept a Sept download step that fought http_scrape and contributed to Total timeout exceeded (12 failures). Listing already has Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf and Thirty-First-Sunday-in-Ordinary-Time-1-Nov-2026.pdf.",
-    "site_type:http_scrape_newest_pdf only — no pinned download step. Do not pin the dated filename."
+    "29/10/2026: http_scrape_newest_pdf timed out 3x190s on GitHub Actions (local scrape of Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf works). WP media API lists the same PDFs (Thirty-First 1 Nov, Thirtieth 25 Oct).",
+    "site_type:wp_json_newest_media. Do not invent Twenty-Sixth for 25 Oct — live name is Thirtieth. Do not pin the dated filename."
   ],
   "do_not": [
     "Do not pin this week's dated filename.",
-    "Do not keep a download step with a Sept or Oct dated URL.",
-    "Do not invent Twenty-Sixth for 25 Oct — live name is Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf."
+    "Do not keep a download step with a Sept dated URL.",
+    "Do not invent Twenty-Sixth-Sunday for 25 Oct."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
