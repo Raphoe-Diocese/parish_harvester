@@ -3,32 +3,30 @@
   "parish_key": "bayside",
   "display_name": "Bayside",
   "diocese": "dublin",
-  "start_url": "https://www.baysideparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Newsletter",
-    "October",
-    ".pdf"
-  ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
+  "start_url": "https://mcn.live/Camera/bayside-parish-church",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 453,
+  "timeout_ms": 90000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-10-29",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.baysideparish.ie/"
+      "url": "https://mcn.live/Camera/bayside-parish-church"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 1308201 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "29/10/2026 Ireland MCN dig: bayside-parish-church church_id 453 Latest Bulletin stated 2026-10-25. Parish site HTTP-scrape was failing. Do not pin CloudFront UUID."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not screenshot the camera feed.",
     "Do not harvest Facebook."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  ]
 }
