@@ -1,34 +1,31 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "blanchardstown",
   "display_name": "Blanchardstown",
   "diocese": "dublin",
-  "start_url": "https://www.blanchardstownparish.ie/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "newsletter",
-    "2026",
-    ".pdf"
-  ],
+  "start_url": "https://www.blanchardstownparish.ie/current-newsletter/",
+  "site_type": "permanent_redirect_document",
+  "playbook_type": "direct_download",
+  "disable_stale_rescrape_fallback": true,
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-10-29",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.blanchardstownparish.ie/newsletter/"
+      "action": "download",
+      "url": "https://www.blanchardstownparish.ie/current-newsletter/",
+      "use_target_url": true
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 1118691 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "29/10/2026: /current-newsletter/ is the live weekly PDF. Past list also has newsletter-2026-10-18and25_new.pdf.",
+    "Old start_url /newsletter/ (singular) was wrong — archive is /newsletters/.",
+    "disable_stale_rescrape_fallback — do not scrape homepage admin PDFs when redirect is stale."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
-    "Do not harvest Facebook."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+    "Do not pin a dated newsletter-2026-10-*.pdf.",
+    "Do not harvest Facebook.",
+    "Do not scrape Past Newsletters when /current-newsletter/ works."
+  ]
 }
