@@ -312,13 +312,15 @@
       recipe_flow: "direct_download",
       label: "MCN camera page newsletter (not the webcam)",
       operator_notes: [
-        "Frank trained this: the weekly PDF sits on the mcn.live /Camera/ page.",
-        "Harvest reads the church profile JSON, then downloads the newsletter URL.",
-        "Start at the camera URL. Do not pin a dated PDF.",
+        "Frank 29/10/2026: MCN is a prime dig for unknown bulletins — search mcn.live Cameras by county, then open the parish Camera page.",
+        "Frank trained this: the weekly PDF sits on the mcn.live /Camera/ page (not the video stream).",
+        "Harvest reads the church profile JSON, then downloads the newsletter URL. Recipe already knows where on the page.",
+        "Start at the camera URL. Do not pin a dated PDF or CloudFront UUID.",
       ],
       do_not: [
         "Do not harvest the webcam video.",
         "Do not pin a dated newsletter filename.",
+        "Do not skip MCN when the diocese card has no website.",
       ],
     },
     churchmedia_newsletter: {
@@ -357,16 +359,18 @@
       site_type: "link_only",
       page_type: "kitchen_sink_search",
       recipe_flow: "html_capture",
-      label: "Google / WebSearch for parish site or Facebook",
+      label: "Search AIs + dig for parish site / Drive / MCN",
       operator_notes: [
-        "Frank 29/10/2026: use Google Search / Cursor WebSearch on every leftover — finds .ie hosts, Facebook pages, and multi-parish hubs (mayo.ie/parish-newsletter).",
-        "Query: \"{parish} parish newsletter\", \"{parish} parish bulletin\", \"{parish} facebook\".",
+        "Frank 29/10/2026: use every search AI / website-finder available (Cursor WebSearch/Google and any other search agent in the chat) — not memory.",
+        "Also dig mcn.live and churchmedia.tv. Read old bulletin text for printed website, Google Drive, OneDrive, Outlook/SharePoint, Dropbox links.",
+        "Query: \"{parish} parish newsletter\", \"bulletin\", \"facebook\", \"mcn.live\", \"churchmedia\", \"google drive newsletter\".",
         "Open every promising href. Facebook stays clickable only — do not scrape posts.",
       ],
       do_not: [
         "Do not invent a URL from memory when search can find the live host.",
         "Do not scrape Facebook or Instagram posts.",
         "Do not take Church of Ireland twins.",
+        "Do not skip MCN/churchmedia when the official card is empty.",
       ],
     },
     churchservices_tv_pointer: {
