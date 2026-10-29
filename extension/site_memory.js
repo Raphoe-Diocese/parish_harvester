@@ -342,12 +342,31 @@
       recipe_flow: "direct_download",
       label: "Mayo County Council parish-newsletters",
       operator_notes: [
-        "mayo.ie hosts parish PDFs (Belmullet proved 04/10/2026).",
-        "Date is in the link text and filename. Scrape the listing.",
+        "Hub: https://www.mayo.ie/parish-newsletter shows many Mayo parishes with DD-MM-YYYY on each card (Frank 29/10/2026 — lots already 25-10-2026).",
+        "mayo.ie hosts parish PDFs (Belmullet proved 04/10/2026). Also covers Killala/Tuam/Achonry leftovers when the parish or diocese site is dead.",
+        "Date is in the link text and filename. Scrape the parish listing under /en-ie/parish-newsletters/…",
       ],
       do_not: [
         "Do not pin the getmedia GUID.",
         "Do not treat a PNG as a PDF recipe.",
+        "Do not skip mayo.ie when the official diocese card has no file.",
+      ],
+    },
+    google_search_parish_host: {
+      playbook_type: "link_only",
+      site_type: "link_only",
+      page_type: "kitchen_sink_search",
+      recipe_flow: "html_capture",
+      label: "Google / WebSearch for parish site or Facebook",
+      operator_notes: [
+        "Frank 29/10/2026: use Google Search / Cursor WebSearch on every leftover — finds .ie hosts, Facebook pages, and multi-parish hubs (mayo.ie/parish-newsletter).",
+        "Query: \"{parish} parish newsletter\", \"{parish} parish bulletin\", \"{parish} facebook\".",
+        "Open every promising href. Facebook stays clickable only — do not scrape posts.",
+      ],
+      do_not: [
+        "Do not invent a URL from memory when search can find the live host.",
+        "Do not scrape Facebook or Instagram posts.",
+        "Do not take Church of Ireland twins.",
       ],
     },
     churchservices_tv_pointer: {

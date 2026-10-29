@@ -119,12 +119,14 @@ def hint_for_url(url: str) -> HubHint | None:
             label="Mayo County Council parish-newsletters listing",
             confidence="high",
             notes=(
+                "Hub https://www.mayo.ie/parish-newsletter — Google/WebSearch finds it. Many Mayo cards with DD-MM-YYYY (Frank 29/10/2026).",
                 "Belmullet proved GET 200 on mayo.ie parish-newsletters. Date is in the link text and filename.",
-                "Scrape the listing each week. The getmedia GUID changes.",
+                "Scrape the listing each week. The getmedia GUID changes. Use for Killala/Tuam/Achonry leftovers.",
             ),
             do_not=(
                 "Do not pin the getmedia GUID.",
                 "Do not treat a PNG as a PDF recipe.",
+                "Do not skip mayo.ie when the diocese card has no file.",
             ),
             pattern_key="mayo_ie+direct_download",
         )
