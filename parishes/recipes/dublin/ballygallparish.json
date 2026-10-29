@@ -1,28 +1,36 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "ballygallparish",
-  "display_name": "Ballygallparish",
+  "display_name": "Ballygall",
   "diocese": "dublin",
   "start_url": "https://ballygallparish.ie/index.php/blog/",
-  "steps": [
-    {
-      "action": "download",
-      "url": "https://ballygallparish.ie/wp-content/uploads/2026/09/2026-09-27-newsletter.pdf"
-    }
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Newsletter-for-",
+    "newsletter"
   ],
-  "observed_load_ms": 2795.5,
+  "playbook_type": "pdf_download_list",
   "timeout_ms": 55000,
   "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "recorded_date": "2026-10-29",
+  "example_url": "https://ballygallparish.ie/wp-content/uploads/2026/10/Newsletter-for-October25th.pdf",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://ballygallparish.ie/index.php/blog/"
+    }
+  ],
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "29/10/2026: blog lists Newsletter-for-October25th.pdf (this week). Old recipe pinned 2026-09-27-newsletter.pdf and guessed 2026-10-25-newsletter.pdf (404).",
+    "site_type:http_scrape_newest_pdf. Score Newsletter-for-MonthDDth style names."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin Newsletter-for-October25th.pdf.",
+    "Do not invent 2026-10-25-newsletter.pdf — that name 404s.",
+    "Do not pick GDPR or financial PDFs."
   ],
-  "recorded_date": "2026-10-19"
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

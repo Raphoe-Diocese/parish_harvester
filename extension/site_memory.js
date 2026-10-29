@@ -19,12 +19,13 @@
         "Iframe src URLs are in the HTML immediately; no need to wait for previews.",
         "Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx).",
         "28/10/2026 Claudy: NEWSLETTER 25-10-26.docx is 5 pages. Set max_bulletin_pages 8 (default 4 rejects real Word weeklies).",
+        "29/10/2026 Carrickmacross PDF also hit Too many pages: 5 — same fix max_bulletin_pages 8 on the recipe.",
       ],
       do_not: [
         "Do not pick the first iframe PDF — often a GDPR or Privacy notice.",
         "Do not use goto-only recipes on this page.",
         "Do not train on financial-statement or admin docx files.",
-        "Do not keep the default 4-page cap for a multi-page Word newsletter.",
+        "Do not keep the default 4-page cap for a multi-page Word or PDF newsletter.",
       ],
     },
     permanent_redirect_document: {
