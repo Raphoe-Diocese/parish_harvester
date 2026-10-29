@@ -42,6 +42,7 @@
         "Point the recipe at /current-newsletter/ only. Do not pin the dated upload name.",
         "28/10/2026 Bellaghy: when the redirect is last week, leave it stale. Homepage rescrape pulled a pope-francis jpeg.",
         "29/10/2026 Bellaghy: /current-newsletter/ now resolves to 25-Oct-2026.pdf — reharvest; keep disable_stale_rescrape_fallback.",
+        "29/10/2026 Blanchardstown: same pattern at blanchardstownparish.ie/current-newsletter/ (archive is /newsletters/ plural).",
         "Always set disable_stale_rescrape_fallback so the referee does not scrape the homepage.",
       ],
       do_not: [
