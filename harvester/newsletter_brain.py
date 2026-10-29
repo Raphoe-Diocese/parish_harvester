@@ -173,7 +173,7 @@ LEARNED = (
     {
         "id": "mayo_ie_getmedia",
         "label": "Mayo County Council parish newsletter list",
-        "how": "Open /en-ie/parish-newsletters/{name}-parish-newsletter or the plural. Take the newest /getmedia/ PDF. A diocese profile page is not the bulletin.",
+        "how": "Hub first: https://www.mayo.ie/parish-newsletter (also /en-ie/parish-newsletters/) lists many Mayo parishes with DD-MM-YYYY on each card — Frank screenshot 29/10/2026 showed Attymass, Balla & Belcarra, Ballintubber, Ballycroy, Belmullet, Bonniconlon, Burrishoole, Carnacon, Charlestown, Kilawalla, Kilmovee, Knock, Mayo Abbey, Partry & Tourmakeady, Westport all dated 25-10-2026. When a parish recipe fails on its own site or Achonry diocese admin page, check this hub before inventing. Then open /en-ie/parish-newsletters/{name}-parish-newsletter(s). Take the newest /getmedia/ PDF. Date is in the link text and filename. Do not pin the getmedia GUID. PNG is not a PDF recipe. A diocese profile page is not the bulletin. Shared files (Ballintubber/Carnacon/Killawalla) harvest once.",
     },
     {
         "id": "connect_news_article",

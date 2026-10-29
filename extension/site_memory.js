@@ -342,12 +342,14 @@
       recipe_flow: "direct_download",
       label: "Mayo County Council parish-newsletters",
       operator_notes: [
-        "mayo.ie hosts parish PDFs (Belmullet proved 04/10/2026).",
-        "Date is in the link text and filename. Scrape the listing.",
+        "Hub: https://www.mayo.ie/parish-newsletter shows many Mayo parishes with DD-MM-YYYY on each card (Frank 29/10/2026 — lots already 25-10-2026).",
+        "mayo.ie hosts parish PDFs (Belmullet proved 04/10/2026). Also covers Killala/Tuam/Achonry leftovers when the parish or diocese site is dead.",
+        "Date is in the link text and filename. Scrape the parish listing under /en-ie/parish-newsletters/…",
       ],
       do_not: [
         "Do not pin the getmedia GUID.",
         "Do not treat a PNG as a PDF recipe.",
+        "Do not skip mayo.ie when the official diocese card has no file.",
       ],
     },
     churchservices_tv_pointer: {
