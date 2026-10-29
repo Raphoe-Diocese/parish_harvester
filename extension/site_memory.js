@@ -67,10 +67,15 @@
       recipe_flow: "click_then_pdf",
       label: "Parish Messenger widget",
       operator_notes: [
-        "Wait for widget to load, then pick newest View Newsletter row.",
+        "Wait for widget to load, then click CLICK HERE to load Current Newsletter.",
+        "Then capture the PDF download (use_captured_url). Same as Buncrana / Carndonagh.",
+        "29/10/2026 Melmount + Sion Mills: bare print_to_pdf left September stale text.",
         "Ignore Gift Aid and Data Entry PDFs in the menu.",
       ],
-      do_not: ["Do not pick admin PDFs from the widget list."],
+      do_not: [
+        "Do not pick admin PDFs from the widget list.",
+        "Do not print_to_pdf the listing page alone — that captures last month's text.",
+      ],
     },
     weekly_bulletin_download: {
       playbook_type: "weekly_bulletin_download",
