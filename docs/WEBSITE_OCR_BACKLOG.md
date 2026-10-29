@@ -56,6 +56,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **todo · QUEUE** · 2026-10-29 · **Image-based bulletins OCR tidy.** Frank 29/10: OCR is not really reading scanned / photo / image-only bulletins well. Needs a proper tidy: detect image pages, run vision OCR where embedded text is missing or junk, keep Irish as Irish, do not invent notices, then prove on generated parish OCR + live parishpress.ie. Fits AGENTS locked item 1 (OCR reader: prefer embedded text; vision only for image/banner pages). Do not start until Frank says go. · `ocr/convert_bulletin.py`, vision path, `ocr/bulletin_layout.py`
+
 - [ ] **NOW · doing** · 2026-10-07 · **OCR still splits ordinary words.** Frank screenshot 07/10: Ovens/Farran text shows `S ept`, `C ather ine`, `Anniversa ry`, `Anyo ne`, `C onfessions`. The old joiner only fixed lines broken into lots of tiny pieces. It left one-gap words alone. Code fix is in `collapse_ocr_spacing` and tests pass. **Not live.** The page he opened was already generated, and it is still September wording (19th/20th Sept, 27th September). Next OCR run will not use this until it is on main. Do not tick done without a live text page. · `ocr/convert_bulletin.py`, `tests/test_text_extract.py`
 
 - [ ] **doing** · 2026-10-07 · **Homepage ETA on each diocese card while harvest is running.** Small grey line, clock time (ETA HH:MM). Hidden when no harvest is in progress. In the generator and in `docs/index.html`. **Not live yet** until merge+Pages. Do not tick done without https://www.parishpress.ie/ showing the line during a harvest. · `harvester/site_builder.py` `_harvest_eta_script`, `docs/index.html`
