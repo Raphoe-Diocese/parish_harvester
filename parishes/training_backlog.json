@@ -2,15 +2,15 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 349,
+    "downloaded": 350,
     "html_links": 0,
-    "skipped": 785,
+    "skipped": 784,
     "failed": 99,
     "stale_rejected": 81
   },
   "action_counts": {
-    "ok": 400,
-    "skip": 784,
+    "ok": 401,
+    "skip": 783,
     "investigate": 87
   },
   "parishes": [
@@ -1386,26 +1386,35 @@
       "recipe_file": "parishes/recipes/armagh/ardboe.json",
       "recipe": {
         "start_url": "https://ardboeparish.my.canva.site/website",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "site_type": "canva_site_bulletin_image",
+        "playbook_type": "canva_site",
+        "status": "",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
+        "has_terminal": true,
+        "operator_notes": [
+          "29/10/2026: Canva site hosts a photo of the printed bulletin (Sunday 25th October 2026 proved). ardboeparish.com redirects here. No PDF link.",
+          "Weekly sheet is the largest _assets/media image. Hash in the media path changes when they swap the photo \u2014 never pin it.",
+          "Skip Canva blob: currentSrc \u2014 not re-fetchable. Prefer durable http(s) _assets/media src + prefer=largest."
+        ],
+        "do_not": [
+          "Do not pin /_assets/media/<hash>.png \u2014 it changes every week.",
+          "Do not pin blob: image URLs.",
+          "Do not leave skip/link_only \u2014 the bulletin is on the Canva page as an image.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "bulletin_format": "image",
+      "learned_pattern": "Canva parish site \u2014 photo of printed bulletin",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Website found (https://ardboeparish.my.canva.site/website) but no this-week PDF proved on 29/09/2026 kitchen-sink \u2014 link only until bulletin URL proved."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ardcarne",
