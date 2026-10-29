@@ -2,11 +2,11 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 355,
+    "downloaded": 356,
     "html_links": 0,
     "skipped": 783,
     "failed": 96,
-    "stale_rejected": 80
+    "stale_rejected": 79
   },
   "action_counts": {
     "ok": 405,
@@ -1596,10 +1596,10 @@
         "navigation_timeout_ms": 55000
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ardlea",
@@ -17606,18 +17606,19 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "29/09/2026: archived-bulletins lists '20260927 27 September 2026.pdf' (GET 200 application/pdf 299,885 bytes). Homepage also has permanent images/bulletins/CurrentBulletin.pdf.",
-          "site_type:http_scrape_newest_pdf \u2014 score listing hrefs by filename date."
+          "29/10/2026: Old recipe kept a Sept download step; status stayed on CurrentBulletin.pdf dated 27/09. Archive lists 20261025 25 October 2026.pdf (scored locally as 25/10).",
+          "site_type:http_scrape_newest_pdf on archived-bulletins. Skip undated CurrentBulletin.pdf. Do not pin the dated archive filename."
         ],
         "do_not": [
-          "Do not pin 20260927.",
-          "Do not treat CurrentBulletin.pdf as dated \u2014 scrape the archive list."
+          "Do not pin 20260927 or 20261025.",
+          "Do not treat CurrentBulletin.pdf as dated \u2014 scrape the archive list.",
+          "Do not keep a download step with a Sept dated URL."
         ],
-        "recorded_date": "2026-09-29"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -28170,23 +28171,23 @@
       "recipe_file": "parishes/recipes/ardagh/mohill.json",
       "recipe": {
         "start_url": "https://mohillparish.ie/newsletter/",
-        "site_type": "html_text_bulletin",
+        "site_type": "http_scrape_newest_html",
         "playbook_type": "html_text_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 2,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "29/10/2026: Old recipe pinned newsletter-27th-september-2026 \u2014 honest stale. WP pages API newest is newsletter-25th-october-2026 (published 27/10/2026). Listing /newsletter/ order is not newest-first \u2014 must use pick_strategy newest_dated on a[href*='newsletter-'].",
-          "Weekly bulletin is a WordPress PAGE (not post). Page text includes Mohill + Fenagh + Gortletteragh Mass intentions \u2014 harvest once here; fenagh and gortletteragh are aliases.",
-          "print_to_pdf with skip_listing_nav. Do not pin a dated newsletter slug."
+          "29/10/2026: Playwright click on /newsletter/ timed out (selectors never matched in headless). Plain HTTP listing HTML still has newsletter-* links; newest by date is newsletter-25th-october-2026 (WP pages API agrees).",
+          "site_type:http_scrape_newest_html scores newsletter- slugs over HTTP then print_to_pdf. Listing order is not newest-first \u2014 do not use first_match.",
+          "Page text includes Mohill + Fenagh + Gortletteragh \u2014 harvest once here."
         ],
         "do_not": [
           "Do not harvest Fenagh or Gortletteragh separately from this file.",
-          "Do not pin newsletter-27th-september-2026 or any dated newsletter-*-YYYY slug.",
-          "Do not use first_match on /newsletter/ \u2014 thumbnails are not newest-first.",
+          "Do not pin newsletter-27th-september-2026 or any dated newsletter slug.",
+          "Do not rely on Playwright click of a[href*='newsletter-'] on this archive \u2014 it times out in harvest.",
           "Do not remove skip_listing_nav."
         ],
         "recorded_date": "2026-10-29"
@@ -28195,10 +28196,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: \u274c Too many pages: 6 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: \u274c Too many pages: 6 pages (max 4)"
     },
     {
       "parish_key": "monagea",
@@ -35598,26 +35599,26 @@
       "recipe_file": "parishes/recipes/down_and_connor/stoliverplunkettparish.json",
       "recipe": {
         "start_url": "https://stoliverplunkettparish.ie/bulletins/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "29/10/2026: Old recipe pinned Sun-13th-September-26.pdf. Status later guessed Sun-25th-October-26.pdf (HTTP 404). Live listing top is 25-Oct-26.pdf (HEAD 200 application/pdf 631793 bytes). Filename pattern varies (Sun-DDth-Month-26.pdf vs DD-Mon-26.pdf).",
+          "site_type:http_scrape_newest_pdf. Do not pin a dated filename."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pin Sun-13th-September-26.pdf or invent Sun-25th-October-26.pdf.",
+          "Do not pin this week's dated PDF.",
           "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-09-14"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": {
         "total_timeout_s": 190,
