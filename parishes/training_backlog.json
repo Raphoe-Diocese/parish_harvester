@@ -2,11 +2,11 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 329,
+    "downloaded": 330,
     "html_links": 0,
     "skipped": 786,
     "failed": 107,
-    "stale_rejected": 91
+    "stale_rejected": 90
   },
   "action_counts": {
     "investigate": 90,
@@ -6484,25 +6484,28 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/blanchardstown.json",
       "recipe": {
-        "start_url": "https://www.blanchardstownparish.ie/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
+        "start_url": "https://www.blanchardstownparish.ie/current-newsletter/",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "03/10/2026 cloud hunt: proved GET 200 pdf 1118691 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+          "29/10/2026: /current-newsletter/ is the live weekly PDF. Past list also has newsletter-2026-10-18and25_new.pdf.",
+          "Old start_url /newsletter/ (singular) was wrong \u2014 archive is /newsletters/.",
+          "disable_stale_rescrape_fallback \u2014 do not scrape homepage admin PDFs when redirect is stale."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
-          "Do not harvest Facebook."
+          "Do not pin a dated newsletter-2026-10-*.pdf.",
+          "Do not harvest Facebook.",
+          "Do not scrape Past Newsletters when /current-newsletter/ works."
         ],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
