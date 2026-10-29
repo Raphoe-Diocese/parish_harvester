@@ -20,12 +20,14 @@ class ClonmanyParishRecipeTests(unittest.TestCase):
         self.assertEqual(payload.get("start_url"), PDF)
         self.assertEqual(payload.get("example_url"), PDF)
         self.assertTrue(payload.get("ignore_https_errors"))
-        self.assertNotIn("clonmanyparish.ie/newsletter", json.dumps(payload))
-        self.assertNotIn("2026-06-28", json.dumps(payload))
+        self.assertTrue(payload["start_url"].startswith("https://clonmanyparish.com/pdf/"))
+        self.assertNotIn("2026-06-28", json.dumps(payload.get("steps") or []))
 
         steps = payload.get("steps") or []
         self.assertEqual(steps[0].get("action"), "download")
         self.assertEqual(steps[0].get("url"), PDF)
+        notes = " ".join(payload.get("do_not") or []).lower()
+        self.assertIn("clonmanyparish.ie/newsletter", notes)
 
         merged = _apply_recipe_host_overrides(
             {"ignore_https_errors": False},
