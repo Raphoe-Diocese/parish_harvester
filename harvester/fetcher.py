@@ -94,6 +94,7 @@ from .utils import (
     is_valid_pdf,
     wrap_image_file_as_pdf,
     oneweb_newsletter_download_urls,
+    clonleigh_candidate_urls,
     rewrite_clonleigh_url,
     rewrite_date_url,
     rewrite_greenlough_url,
@@ -375,7 +376,9 @@ def calculate_url(entry: ParishEntry, target: date) -> str:
         result = rewrite_greenlough_url(url, target)
         return result if result else url
     if pattern == "clonleigh":
-        return rewrite_clonleigh_url(target)
+        # Saturday folder first (legacy), then Sunday — 25/10/2026 published on Sunday.
+        candidates = clonleigh_candidate_urls(target)
+        return candidates[0] if candidates else rewrite_clonleigh_url(target)
     if pattern == "H":
         return rewrite_newsletter_number_for_target(url, target)
     # Patterns A, B, C, D, E (and G) — generic date rewrite

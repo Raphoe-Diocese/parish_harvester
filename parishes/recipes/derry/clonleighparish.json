@@ -1,22 +1,23 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "clonleighparish",
   "display_name": "Clonleigh (Strabane Pastoral Area)",
   "diocese": "derry",
-  "start_url": "https://clonleighparish.com/category/newsletter/",
+  "start_url": "https://clonleighparish.com/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://clonleighparish.com/category/newsletter/"
+      "url": "https://clonleighparish.com/"
     },
     {
       "action": "click",
-      "selector": "article .entry-title a",
+      "selector": "a:has-text('Strabane Pastoral Area Newsletter')",
       "pick_strategy": "first_match",
       "bulletin_position": "top",
       "fallback_selectors": [
+        "article .entry-title a",
         "article h2 a",
-        "a:has-text('Strabane Pastoral Area Newsletter')"
+        "h2.entry-title a"
       ]
     },
     {
@@ -24,42 +25,24 @@
       "skip_listing_nav": true
     }
   ],
-  "observed_load_ms": 2354,
   "timeout_ms": 45000,
-  "total_timeout_s": 90,
+  "total_timeout_s": 120,
   "playbook_type": "html_text_bulletin",
   "site_type": "html_text_bulletin",
   "max_bulletin_pages": 16,
+  "recorded_date": "2026-10-29",
   "operator_notes": [
-    "Newsletter list at /category/newsletter/ — newest post is top entry-title link.",
-    "Bulletin is HTML in article .entry-content — click newest post, then print_to_pdf.",
-    "skip_listing_nav=true prevents html_capture re-navigating away from the article.",
-    "Do not pin post IDs or dated weekly URLs — pick_strategy=first_match selects the current top post.",
-    "Strabane Pastoral Area newsletter covers multiple parishes and is genuinely long —",
-    "confirmed 11 pages for 2 Aug 2026 issue via operator screenshot (not page-chrome bloat).",
-    "max_bulletin_pages raised to 16 (11 + margin) — default cap of 4 was rejecting real content."
+    "29/10/2026: /category/newsletter/ lagged on 18 Oct while homepage already listed Sunday 25 Oct (published /2026/10/25/...). Start from homepage.",
+    "Click top Strabane Pastoral Area Newsletter link, then print_to_pdf with skip_listing_nav.",
+    "Do not pin dated weekly slugs. Do not use Saturday-only URL prediction — this week published on Sunday.",
+    "max_bulletin_pages 16 — pastoral area newsletter is long."
   ],
   "do_not": [
-    "Do not train on the homepage — use /category/newsletter/ only.",
+    "Do not train only on /category/newsletter/ — it can lag the homepage by a week.",
     "Do not hardcode article#post-NNNN or a dated newsletter slug."
   ],
-  "recorded_date": "2026-08-08",
   "bulletin_layout": {
     "strategy": "first_match",
     "position": "top"
-  },
-  "operator_notes_2026_08_18": [
-    "CASUALTY recheck: /category/newsletter/ newest post is still",
-    "strabane-pastoral-area-newsletter-for-sunday-2nd-august-2026.",
-    "No 9 Aug or 16 Aug post. Recipe already prints the top article.",
-    "Keep as stale/actionable until the pastoral area posts again."
-  ],
-  "operator_notes_2026_08_19": [
-    "CASUALTY recheck: wp-json posts newest is still strabane-pastoral-area-newsletter-for-sunday-2nd-august-2026 (2026-07-31). 9 Aug / 16 Aug slugs 404. Recipe already prints the top article. Keep stale/actionable."
-  ],
-  "operator_notes_2026_08_23": [
-    "After Sunday harvest ended (10:18 UTC) the 23 Aug newsletter is live:",
-    "https://clonleighparish.com/2026/08/21/strabane-pastoral-area-newsletter-for-sunday-23rd-august-2026/",
-    "Page Last-Modified Sun 23/08/2026 11:14 UTC — after harvest. Recipe already first_match. Re-harvest; do not pin the dated slug."
-  ]
+  }
 }
