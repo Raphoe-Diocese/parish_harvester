@@ -168,7 +168,7 @@ LEARNED = (
     {
         "id": "facebook_link_only",
         "label": "Facebook or Instagram only",
-        "how": "Leave a clickable link. Do not scrape the post.",
+        "how": "When the official card has no website, Google / Cursor WebSearch often finds the parish Facebook or a live .ie host (Frank 29/10/2026 — use search, do not guess). Leave Facebook as a clickable link. Do not scrape the post.",
     },
     {
         "id": "mayo_ie_getmedia",

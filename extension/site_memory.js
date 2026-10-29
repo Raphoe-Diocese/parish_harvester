@@ -352,6 +352,23 @@
         "Do not skip mayo.ie when the official diocese card has no file.",
       ],
     },
+    google_search_parish_host: {
+      playbook_type: "link_only",
+      site_type: "link_only",
+      page_type: "kitchen_sink_search",
+      recipe_flow: "html_capture",
+      label: "Google / WebSearch for parish site or Facebook",
+      operator_notes: [
+        "Frank 29/10/2026: use Google Search / Cursor WebSearch on every leftover — finds .ie hosts, Facebook pages, and multi-parish hubs (mayo.ie/parish-newsletter).",
+        "Query: \"{parish} parish newsletter\", \"{parish} parish bulletin\", \"{parish} facebook\".",
+        "Open every promising href. Facebook stays clickable only — do not scrape posts.",
+      ],
+      do_not: [
+        "Do not invent a URL from memory when search can find the live host.",
+        "Do not scrape Facebook or Instagram posts.",
+        "Do not take Church of Ireland twins.",
+      ],
+    },
     churchservices_tv_pointer: {
       playbook_type: "link_only",
       site_type: "link_only",
