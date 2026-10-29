@@ -2,17 +2,17 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 320,
+    "downloaded": 321,
     "html_links": 0,
     "skipped": 785,
     "failed": 109,
-    "stale_rejected": 99
+    "stale_rejected": 98
   },
   "action_counts": {
     "investigate": 92,
-    "ok": 393,
+    "ok": 391,
     "mark_inactive": 1,
-    "skip": 781
+    "skip": 783
   },
   "parishes": [
     {
@@ -1719,18 +1719,20 @@
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 2,
+        "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [],
+        "operator_notes": [
+          "29/10/2026 browser: Latest Parish Newsletter on parishnews.html already shows Sunday 25th October 2026 (30th Sunday) inline \u2014 full Mass/anniversary text.",
+          "Past Newsletters list still tops at 18 Oct. Clicking Past newest_dated kept harvest stale. Print the page.",
+          "If Latest widget is ever '...' again, fall back to Past Newsletters click \u2014 see older notes. Do not harvest DataEntry/GDPR forms."
+        ],
         "do_not": [
           "Do not harvest DataEntryFormPdf.pdf, DataEntryFormWord.doc, New Parishioner, GDPR, or privacy files.",
-          "Do not pin templates/?a= article ids or dated weekly URLs.",
-          "Do not stamp harvest Sunday on a July article. If the newest Past Newsletter is still 5 July 2026, harvest that HTML and leave it stale.",
-          "Do not print parishnews.html itself \u2014 Latest Parish Newsletter widget is the placeholder '...'.",
-          "Do not rescrape the listing after a stale July capture \u2014 that can pick the undated form and report a false ok."
+          "Do not click Past Newsletters when Latest already has this week's body text.",
+          "Do not pin templates/?a= article ids."
         ],
-        "recorded_date": "2026-08-28"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "html",
       "learned_pattern": "Parish Services / Parish Messenger widget",
@@ -6079,16 +6081,17 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "28/10/2026: /current-newsletter/ returns this week's PDF directly. Proved application/pdf. Today it is 11-October-2026.pdf. That is last week until they replace the file.",
+          "29/10/2026: /current-newsletter/ now resolves to /wp-content/uploads/2026/10/25-Oct-2026.pdf (application/pdf). Recipe unchanged \u2014 reharvest.",
+          "28/10/2026: /current-newsletter/ returns this week's PDF directly. Was 11-October-2026.pdf (honest stale) until they replaced it.",
           "Do not scrape the homepage. The homepage links Irish-Bishops Gaza and other admin PDFs. That is why the harvest saved a pope-francis document.",
-          "28/10/2026 harvest 40752194172: stale 11-Oct then rescrape_bulletin_page grabbed a pope-francis jpeg and marked failed. disable_stale_rescrape_fallback keeps the honest stale outcome."
+          "disable_stale_rescrape_fallback stays on \u2014 homepage rescrape grabbed a pope-francis jpeg."
         ],
         "do_not": [
           "Do not download pope-francis or Irish-Bishops PDFs from the homepage.",
           "Do not pin a dated Newsletter-D-Month filename. The redirect name changes.",
           "Do not enable stale homepage rescrape \u2014 that is how the pope jpeg got in."
         ],
-        "recorded_date": "2026-10-28"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "download",
       "learned_pattern": "Menu then redirect PDF",
@@ -10093,29 +10096,26 @@
     },
     {
       "parish_key": "churchtv",
-      "display_name": "Churchtv",
+      "display_name": "Churchtv (misfiled)",
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/churchtv.json",
       "recipe": {
         "start_url": "https://www.churchtv.ie/gurteen/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "wix_html",
+        "site_type": "",
+        "playbook_type": "",
         "status": "",
-        "skip": false,
+        "skip": true,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 0,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
-          "Use Save page as PDF on the newsletter article page.",
-          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+          "29/10/2026: recipe was a Derry duplicate of Achonry Gurteen ChurchTV PDF. Skip so Problems is not polluted."
         ],
         "do_not": [
-          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+          "Do not re-enable under Derry \u2014 use achonry/gurteen."
         ],
-        "recorded_date": "2026-10-09"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "html",
       "learned_pattern": "Wix HTML bulletin",
@@ -10123,8 +10123,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "skip",
+      "suggested_reason": "Misfiled under Derry. Gurteen lives as recipes/achonry/gurteen.json. No Derry evidence row \u2014 harvest correctly reported no_evidence."
     },
     {
       "parish_key": "cillnamartra",
@@ -11212,7 +11212,7 @@
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/clonleighparish.json",
       "recipe": {
-        "start_url": "https://clonleighparish.com/category/newsletter/",
+        "start_url": "https://clonleighparish.com/",
         "site_type": "html_text_bulletin",
         "playbook_type": "html_text_bulletin",
         "status": "",
@@ -11222,19 +11222,16 @@
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Newsletter list at /category/newsletter/ \u2014 newest post is top entry-title link.",
-          "Bulletin is HTML in article .entry-content \u2014 click newest post, then print_to_pdf.",
-          "skip_listing_nav=true prevents html_capture re-navigating away from the article.",
-          "Do not pin post IDs or dated weekly URLs \u2014 pick_strategy=first_match selects the current top post.",
-          "Strabane Pastoral Area newsletter covers multiple parishes and is genuinely long \u2014",
-          "confirmed 11 pages for 2 Aug 2026 issue via operator screenshot (not page-chrome bloat).",
-          "max_bulletin_pages raised to 16 (11 + margin) \u2014 default cap of 4 was rejecting real content."
+          "29/10/2026: /category/newsletter/ lagged on 18 Oct while homepage already listed Sunday 25 Oct (published /2026/10/25/...). Start from homepage.",
+          "Click top Strabane Pastoral Area Newsletter link, then print_to_pdf with skip_listing_nav.",
+          "Do not pin dated weekly slugs. Do not use Saturday-only URL prediction \u2014 this week published on Sunday.",
+          "max_bulletin_pages 16 \u2014 pastoral area newsletter is long."
         ],
         "do_not": [
-          "Do not train on the homepage \u2014 use /category/newsletter/ only.",
+          "Do not train only on /category/newsletter/ \u2014 it can lag the homepage by a week.",
           "Do not hardcode article#post-NNNN or a dated newsletter slug."
         ],
-        "recorded_date": "2026-08-08"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "html",
       "learned_pattern": "Wix HTML bulletin",
@@ -17799,18 +17796,18 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "27/09/2026: https://foxfordparish.com/newsletter-1 lists Foxford Parish Newsletter 27th Sept 2026.pdf on img1.wsimg.com (HTTP 200, %PDF). Date is in the filename text, not only the hash folder.",
-          "site_type:http_scrape_newest_pdf. Do not pin the wsimg blob path."
+          "29/10/2026: Foxford Parish Newsletter 25th Oct 2026.pdf on img1.wsimg.com. http_scrape_newest_pdf from filename date.",
+          "Do not pin the wsimg blob path."
         ],
         "do_not": [
           "Do not pin the wsimg hash path for next week.",
           "Do not harvest the Google calendar .ics as a bulletin."
         ],
-        "recorded_date": "2026-09-27"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": {
         "total_timeout_s": 310,
@@ -17825,31 +17822,28 @@
     },
     {
       "parish_key": "foxfordparish",
-      "display_name": "Foxfordparish",
+      "display_name": "Foxfordparish (misfiled)",
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/foxfordparish.json",
       "recipe": {
         "start_url": "https://foxfordparish.com/newsletter-1",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "site_type": "",
+        "playbook_type": "",
         "status": "",
-        "skip": false,
+        "skip": true,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 0,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "29/10/2026: recipe was a Derry duplicate of Achonry Foxford. Skip so Problems is not polluted."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not re-enable under Derry \u2014 use achonry/foxford."
         ],
-        "recorded_date": "2026-10-09"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": {
         "total_timeout_s": 310,
@@ -17859,8 +17853,8 @@
       "has_extension_diagnosis": true,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "skip",
+      "suggested_reason": "Misfiled under Derry. Foxford lives as recipes/achonry/foxford.json. No Derry evidence row \u2014 harvest correctly reported no_evidence."
     },
     {
       "parish_key": "foxrock",
@@ -19523,18 +19517,18 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "27/09/2026: gurteenparish.com redirects to churchtv.ie/gurteen/. Proved this week PDF Gurteen-Parish-Newsletter-27-Sept.-2026.pdf (HTTP 200, application/pdf).",
-          "site_type:http_scrape_newest_pdf. Score filename date. Folder /2021/02/ is not the bulletin date."
+          "29/10/2026: newest file Gurteen-Parish-Newsletter-25-Oct.-2026-2.pdf (HTTP 200). http_scrape_newest_pdf \u2014 do not pin Sept or the -2 suffix.",
+          "gurteenparish.com redirects to churchtv.ie/gurteen/. Folder /2021/02/ is not the bulletin date."
         ],
         "do_not": [
-          "Do not pin 27-Sept.-2026 as next week.",
+          "Do not pin 25-Oct.-2026-2 as next week.",
           "Do not harvest ChurchTV camera pages."
         ],
-        "recorded_date": "2026-09-27"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
