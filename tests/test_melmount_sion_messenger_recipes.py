@@ -20,8 +20,12 @@ class MelmountSionMessengerRecipeTests(unittest.TestCase):
         self.assertNotIn("print_to_pdf", actions)
         blob = json.dumps(payload.get("steps") or [])
         self.assertIn("CLICK HERE to load Current Newsletter", blob)
+        self.assertNotIn('a[href$=\'.pdf\']', blob)
+        self.assertNotIn('a[href$=".pdf"]', blob)
         notes = " ".join(payload.get("do_not") or []).lower()
         self.assertIn("print_to_pdf", notes)
+        skip = " ".join(payload.get("href_skip_patterns") or []).lower()
+        self.assertIn("giftaid", skip)
 
     def test_melmount_clicks_current_newsletter(self) -> None:
         self._assert_click_then_download(
