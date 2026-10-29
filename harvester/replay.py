@@ -2284,6 +2284,12 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
 _HTTP_SCRAPE_AHEAD_DAYS = 7
 
 
+_NEWSLETTER_MDY_RE = re.compile(
+    r"Newsletter-(\d{1,2})-(\d{1,2})-(\d{4})",
+    re.IGNORECASE,
+)
+
+
 def _http_scrape_item_date(text: str, target_date: date) -> date | None:
     """Date from a URL or listing-page label. Empty text is a miss."""
     from .bulletin_freshness import extract_bulletin_date
@@ -2291,6 +2297,20 @@ def _http_scrape_item_date(text: str, target_date: date) -> date | None:
     blob = (text or "").strip()
     if not blob:
         return None
+    # Enniskeane Newsletter-10-25-2026.pdf is US MM-DD-YYYY (25/10/2026).
+    # Plain UK DD-MM-YYYY would reject 10-25 (month 25) and misread 10-04 as
+    # 10 April. Prefer the DD/MM vs MM/DD reading nearer the harvest Sunday.
+    m = _NEWSLETTER_MDY_RE.search(blob)
+    if m:
+        a, b, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        candidates: list[date] = []
+        for day, month in ((a, b), (b, a)):
+            try:
+                candidates.append(date(year, month, day))
+            except ValueError:
+                continue
+        if candidates:
+            return min(candidates, key=lambda d: abs((d - target_date).days))
     # Prefer the filename's own date over WordPress /uploads/YYYY/MM/
     # folder dates — Malin uploads March bulletins into /2026/04/, and
     # extract_bulletin_date then treats "29th-March" as 29/04.
