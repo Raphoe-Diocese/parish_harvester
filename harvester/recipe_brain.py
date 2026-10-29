@@ -149,12 +149,19 @@ def hint_for_url(url: str) -> HubHint | None:
         return HubHint(
             key="current_newsletter_redirect",
             site_type="permanent_redirect_document",
-            label="Permanent /current-newsletter/ path (Kildare / Naas pattern)",
+            label="Permanent /current-newsletter/ path (Kildare / Naas / Bellaghy pattern)",
             confidence="high",
             notes=(
                 "Same URL every week. It redirects to this Sunday's PDF. Do not pin the dated upload.",
+                "28/10/2026 Bellaghy: when the redirect is last week, leave it stale. "
+                "Homepage rescrape pulled a pope-francis jpeg and marked the parish failed.",
+                "Always set disable_stale_rescrape_fallback on these recipes.",
             ),
-            do_not=("Do not pin the dated wp-content filename.",),
+            do_not=(
+                "Do not pin the dated wp-content filename.",
+                "Do not rescrape the homepage when /current-newsletter/ is stale.",
+                "Do not download pope-francis, Irish-Bishops, Gaza appeal, or GDPR PDFs from the homepage.",
+            ),
             pattern_key="current-newsletter+direct_download",
         )
 
@@ -584,10 +591,17 @@ def _unskip_recipe(recipe: dict[str, Any], *, site_type: str, start_url: str, no
     data["steps"] = [{"action": "goto", "url": start_url}]
     if site_type == "permanent_redirect_document":
         data["steps"] = [{"action": "download", "url": start_url, "use_target_url": True}]
+        # Referee must not homepage-rescrape when the permanent file is last week
+        # (Bellaghy 28/10/2026: pope-francis jpeg → false failed).
+        data["disable_stale_rescrape_fallback"] = True
     notes = data.setdefault("operator_notes", [])
     notes.append(note)
     do_not = data.setdefault("do_not", [])
-    for line in ("Do not pin a dated filename.", "Do not harvest Facebook."):
+    for line in (
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook.",
+        "Do not rescrape the homepage when the permanent newsletter link is stale.",
+    ):
         if line not in do_not:
             do_not.append(line)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")

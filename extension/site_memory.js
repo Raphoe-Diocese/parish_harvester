@@ -12,16 +12,40 @@
       label: "One.com + slow Google preview iframes",
       auto_direct: true,
       skip_goto_on_push: true,
+      max_bulletin_pages: 8,
       operator_notes: [
         "Many docs.google.com/viewer iframes load slowly (2–4 min) — ignore previews.",
         "Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly.",
         "Iframe src URLs are in the HTML immediately; no need to wait for previews.",
         "Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx).",
+        "28/10/2026 Claudy: NEWSLETTER 25-10-26.docx is 5 pages. Set max_bulletin_pages 8 (default 4 rejects real Word weeklies).",
       ],
       do_not: [
         "Do not pick the first iframe PDF — often a GDPR or Privacy notice.",
         "Do not use goto-only recipes on this page.",
         "Do not train on financial-statement or admin docx files.",
+        "Do not keep the default 4-page cap for a multi-page Word newsletter.",
+      ],
+    },
+    permanent_redirect_document: {
+      playbook_type: "direct_download",
+      site_type: "permanent_redirect_document",
+      page_type: "permanent_redirect_document",
+      recipe_flow: "direct_download",
+      label: "Permanent /current-newsletter/ (or same weekly PDF path)",
+      auto_direct: true,
+      skip_goto_on_push: true,
+      disable_stale_rescrape_fallback: true,
+      operator_notes: [
+        "Same URL every week. It redirects to this Sunday's PDF (Naas / Kildare / Meath / Bellaghy).",
+        "Point the recipe at /current-newsletter/ only. Do not pin the dated upload name.",
+        "28/10/2026 Bellaghy: when the redirect is last week, leave it stale. Homepage rescrape pulled a pope-francis jpeg.",
+        "Always set disable_stale_rescrape_fallback so the referee does not scrape the homepage.",
+      ],
+      do_not: [
+        "Do not pin a dated wp-content filename.",
+        "Do not rescrape the homepage when /current-newsletter/ is stale.",
+        "Do not download pope-francis, Irish-Bishops, Gaza appeal, or GDPR PDFs from the homepage.",
       ],
     },
     cloud_folder: {
@@ -429,6 +453,14 @@
       return CATALOG.faithful_ie_family_newsletters;
     }
     const start = String(safeRecipe.start_url || pageCtx?.url || "").toLowerCase();
+    if (
+      start.includes("/current-newsletter") ||
+      key === "permanent_redirect_document" ||
+      key === "current-newsletter" ||
+      String(safeRecipe.site_type || "").includes("permanent_redirect")
+    ) {
+      return CATALOG.permanent_redirect_document;
+    }
     if (start.includes("mcn.live")) {
       return CATALOG.mcn_live_parish_page;
     }
@@ -458,6 +490,15 @@
     base.playbook_type = memory.playbook_type;
     base.site_type = memory.site_type;
     if (memory.auto_direct) base.auto_direct = true;
+    if (memory.disable_stale_rescrape_fallback) {
+      base.disable_stale_rescrape_fallback = true;
+    }
+    if (memory.ignore_https_errors) {
+      base.ignore_https_errors = true;
+    }
+    if (memory.max_bulletin_pages && !base.max_bulletin_pages) {
+      base.max_bulletin_pages = memory.max_bulletin_pages;
+    }
     base.operator_notes = [...memory.operator_notes];
     base.do_not = [...memory.do_not];
 

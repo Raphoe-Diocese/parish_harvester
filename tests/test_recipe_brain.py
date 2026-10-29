@@ -45,6 +45,35 @@ def test_current_newsletter_is_permanent_redirect() -> None:
     hint = hint_for_url("https://www.naasparish.ie/current-newsletter/")
     assert hint is not None
     assert hint.site_type == "permanent_redirect_document"
+    assert any("disable_stale_rescrape_fallback" in line for line in hint.notes)
+    assert any("homepage" in line.lower() for line in hint.do_not)
+
+
+def test_unskip_permanent_redirect_disables_homepage_rescrape(tmp_path: Path) -> None:
+    from harvester.recipe_brain import _unskip_recipe
+
+    recipe_path = tmp_path / "bellaghyparish.json"
+    recipe_path.write_text(
+        json.dumps(
+            {
+                "parish_key": "bellaghyparish",
+                "skip": True,
+                "start_url": "https://bellaghyparish.com/",
+                "steps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    _unskip_recipe(
+        {"_path": str(recipe_path)},
+        site_type="permanent_redirect_document",
+        start_url="https://bellaghyparish.com/current-newsletter/",
+        note="test win",
+    )
+    data = json.loads(recipe_path.read_text(encoding="utf-8"))
+    assert data["disable_stale_rescrape_fallback"] is True
+    assert data["site_type"] == "permanent_redirect_document"
+    assert any("homepage" in line.lower() for line in data.get("do_not") or [])
 
 
 def test_unknown_host_has_no_invented_hint() -> None:
