@@ -369,7 +369,7 @@ class MemoryTests(unittest.TestCase):
         self.assertEqual(DIOCESE_ORDER[-1], "waterford_and_lismore")
         self.assertEqual(next_diocese([]), "achonry")
         self.assertEqual(next_diocese(["achonry"]), "ardagh")
-        self.assertEqual(len(LEARNED), 28)
+        self.assertEqual(len(LEARNED), 29)
         drive = next(item for item in LEARNED if item["id"] == "cloud_folder_newest")
         self.assertIn("2027", drive["how"])
         self.assertIn("1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK", drive["how"])

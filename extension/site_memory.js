@@ -40,6 +40,7 @@
         "Same URL every week. It redirects to this Sunday's PDF (Naas / Kildare / Meath / Bellaghy).",
         "Point the recipe at /current-newsletter/ only. Do not pin the dated upload name.",
         "28/10/2026 Bellaghy: when the redirect is last week, leave it stale. Homepage rescrape pulled a pope-francis jpeg.",
+        "29/10/2026 Bellaghy: /current-newsletter/ now resolves to 25-Oct-2026.pdf — reharvest; keep disable_stale_rescrape_fallback.",
         "Always set disable_stale_rescrape_fallback so the referee does not scrape the homepage.",
       ],
       do_not: [
@@ -109,11 +110,12 @@
       operator_notes: [
         "Bulletin text is on the web page — not a downloadable PDF file.",
         "Use Save page as PDF on the newsletter article page.",
-        "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs).",
+        "29/10/2026 Clonleigh: start on the homepage, not /category/newsletter/ (that listing lagged a week). Click top Strabane Pastoral Area Newsletter, then print_to_pdf. Publish day can be Sunday, not only Saturday.",
       ],
       do_not: [
         "Do not use Pick bulletin image when the page is mostly text paragraphs.",
         "Do not stop at click-only — need print_to_pdf as the final step.",
+        "Do not train only on /category/newsletter/ when the homepage already shows a newer post.",
       ],
     },
     dated_pdf_bulletin: {
@@ -160,11 +162,13 @@
       operator_notes: [
         "parishnews.htm view-source is blank. After JS, this week's newsletter is on the page.",
         "Save page as PDF with skip_listing_nav. Wait for the embed to load.",
+        "29/10/2026 Ardstraw East: Latest Parish Newsletter on parishnews.html already has this week's body; Past Newsletters list can lag. Print the page — do not click Past newest when Latest is filled.",
         "109.228.27.39/templates/?a= is a print view — do not pin that article id.",
       ],
       do_not: [
         "Do not skip because HTTP scrape is blank.",
         "Do not use the 109.228 IP as the start URL.",
+        "Do not harvest DataEntry / GDPR forms from the Past list.",
       ],
     },
     mdocs_download_list: {
