@@ -2,16 +2,16 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 352,
+    "downloaded": 356,
     "html_links": 0,
-    "skipped": 784,
-    "failed": 98,
+    "skipped": 783,
+    "failed": 95,
     "stale_rejected": 80
   },
   "action_counts": {
-    "ok": 402,
+    "ok": 406,
     "skip": 782,
-    "investigate": 87
+    "investigate": 83
   },
   "parishes": [
     {
@@ -1569,29 +1569,37 @@
       "recipe_file": "parishes/recipes/down_and_connor/parishofardkeen.json",
       "recipe": {
         "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
-        "site_type": "",
+        "site_type": "http_scrape_newest_images",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 1,
+        "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-14"
+        "operator_notes": [
+          "29/10/2026: Old recipe pinned Sept PNG download + broken click href \u2014 Recipe download step did not find a matching document URL.",
+          "Live /parish-bulletin/ lists dated Bulletin images: 1st-November-Bulletin.png (this week's download link), 25th-October-Bulletin.png, 18th-October-Bulletin.png. HEAD 200 image/png proved for 25 Oct (1557538 bytes) and 1 Nov (920981 bytes).",
+          "site_type:http_scrape_newest_images scores the filename date. Do not pin a dated Bulletin-*.png."
+        ],
+        "do_not": [
+          "Do not pin 13th-September-Bulletin.png or 23-Sunday-OT-A.png.",
+          "Do not pin this week's dated Bulletin filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "image_stack",
       "learned_pattern": "image_bulletin",
       "host_profile": {
         "total_timeout_s": 250,
         "navigation_timeout_ms": 55000
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ardlea",
@@ -28161,26 +28169,27 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/mohill.json",
       "recipe": {
-        "start_url": "https://mohillparish.ie/newsletter-27th-september-2026/",
+        "start_url": "https://mohillparish.ie/newsletter/",
         "site_type": "html_text_bulletin",
         "playbook_type": "html_text_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 0,
+        "step_count": 3,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "30/09/2026 hunt: weekly bulletin is a WordPress PAGE (not post). Newest Newsletter page via /wp-json/wp/v2/pages?search=Newsletter&orderby=date&order=desc \u2014 proved newsletter-27th-september-2026 published 28/09/2026.",
-          "Page text includes Mohill + Fenagh + Gortletteragh Mass intentions \u2014 harvest once here; fenagh and gortletteragh are aliases.",
-          "print_to_pdf with skip_listing_nav. Next week: open the newest Newsletter page from WP pages API (listing thumbnails lag)."
+          "29/10/2026: Old recipe pinned newsletter-27th-september-2026 \u2014 honest stale. WP pages API newest is newsletter-25th-october-2026 (published 27/10/2026). Listing /newsletter/ order is not newest-first \u2014 must use pick_strategy newest_dated on a[href*='newsletter-'].",
+          "Weekly bulletin is a WordPress PAGE (not post). Page text includes Mohill + Fenagh + Gortletteragh Mass intentions \u2014 harvest once here; fenagh and gortletteragh are aliases.",
+          "print_to_pdf with skip_listing_nav. Do not pin a dated newsletter slug."
         ],
         "do_not": [
           "Do not harvest Fenagh or Gortletteragh separately from this file.",
-          "Do not trust /newsletter/ thumbnail order alone \u2014 use WP pages API date order.",
+          "Do not pin newsletter-27th-september-2026 or any dated newsletter-*-YYYY slug.",
+          "Do not use first_match on /newsletter/ \u2014 thumbnails are not newest-first.",
           "Do not remove skip_listing_nav."
         ],
-        "recorded_date": "2026-09-30"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "html",
       "learned_pattern": "",
@@ -37501,16 +37510,19 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "29/09/2026: Twenty-Sixth-Sunday-in-Ordinary-Time-27-Sept-2026.pdf."
+          "29/10/2026: Old recipe kept a Sept download step that fought http_scrape and contributed to Total timeout exceeded (12 failures). Listing already has Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf and Thirty-First-Sunday-in-Ordinary-Time-1-Nov-2026.pdf.",
+          "site_type:http_scrape_newest_pdf only \u2014 no pinned download step. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin this week's dated filename."
+          "Do not pin this week's dated filename.",
+          "Do not keep a download step with a Sept or Oct dated URL.",
+          "Do not invent Twenty-Sixth for 25 Oct \u2014 live name is Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf."
         ],
-        "recorded_date": "2026-09-29"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -38894,10 +38906,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "wexford",
