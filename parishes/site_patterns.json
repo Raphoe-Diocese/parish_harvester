@@ -1189,10 +1189,10 @@
       "combined_key": "permanent_redirect_document+direct_download",
       "display_name": "Bellaghy",
       "start_url_host": "bellaghyparish.com",
-      "updated": "2026-10-28",
+      "updated": "2026-10-29",
       "step_count": 1,
       "operator_notes": [
-        "28/10/2026: start_url https://bellaghyparish.com/current-newsletter/ returns application/pdf. Today 11-October-2026.pdf (stale until they replace it).",
+        "29/10/2026: /current-newsletter/ resolves to /wp-content/uploads/2026/10/25-Oct-2026.pdf. Reharvest; recipe unchanged.",
         "disable_stale_rescrape_fallback. Homepage has pope-francis and Irish-Bishops admin files."
       ],
       "do_not": [
@@ -1302,13 +1302,26 @@
       "step_count": 3
     },
     "parishofardstraweast": {
-      "page_type": "html_click_chain",
-      "recipe_flow": "html_capture",
-      "combined_key": "html_click_chain+html_capture",
+      "page_type": "html_text_bulletin",
+      "recipe_flow": "html_text_bulletin",
+      "combined_key": "html_text_bulletin+print_to_pdf",
       "display_name": "Ardstraw East",
       "start_url_host": "parishofardstraweast.com",
-      "updated": "2026-06-15",
-      "step_count": 2
+      "updated": "2026-10-29",
+      "step_count": 2,
+      "playbook_type": "html_text_bulletin",
+      "operator_notes": [
+        "29/10/2026: Latest Parish Newsletter on parishnews.html already shows 25 Oct. Print the page. Past list can lag."
+      ],
+      "do_not": [
+        "Do not click Past Newsletters when Latest already has this week's body.",
+        "Do not harvest DataEntry or GDPR forms."
+      ],
+      "html_fingerprint": "html_text_bulletin",
+      "html_markers": [
+        "Latest Parish Newsletter",
+        "parishnews.html"
+      ]
     },
     "ardara": {
       "page_type": "iframe_viewer",
@@ -1393,28 +1406,26 @@
       }
     },
     "clonleighparish": {
-      "page_type": "wp_block_file_bulletin",
-      "recipe_flow": "direct_download",
-      "combined_key": "wp_block_file_bulletin+direct_download",
+      "page_type": "html_text_bulletin",
+      "recipe_flow": "html_text_bulletin",
+      "combined_key": "html_text_bulletin+print_to_pdf",
       "display_name": "Clonleigh (Strabane Pastoral Area)",
       "start_url_host": "clonleighparish.com",
-      "updated": "2026-06-24",
-      "step_count": 4,
-      "playbook_type": "permanent_bulletin_page",
+      "updated": "2026-10-29",
+      "step_count": 3,
+      "playbook_type": "html_text_bulletin",
       "operator_notes": [
-        "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-        "PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL.",
-        "Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
+        "29/10/2026: start on homepage. /category/newsletter/ lagged on 18 Oct while homepage had 25 Oct at /2026/10/25/.",
+        "Click top Strabane Pastoral Area Newsletter, then print_to_pdf. Publish folder can be Sunday, not only Saturday."
       ],
       "do_not": [
-        "Do not train on the homepage \u2014 use the dedicated bulletin page only.",
-        "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+        "Do not train only on /category/newsletter/.",
+        "Do not pin a dated newsletter slug."
       ],
-      "html_fingerprint": "wp_block_file_bulletin",
+      "html_fingerprint": "html_text_bulletin",
       "html_markers": [
-        "wp-block-file block",
-        "file embed/button",
-        "bulletin page"
+        "Strabane Pastoral Area Newsletter",
+        "clonleighparish.com homepage"
       ]
     },
     "culmoreparish": {
