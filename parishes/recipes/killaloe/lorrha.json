@@ -1,32 +1,31 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "lorrha",
   "display_name": "Lorrha and Dorrha",
   "diocese": "killaloe",
-  "start_url": "https://lorrhadorrha.ie/parish-newsletter/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://lorrhadorrha.ie/",
+  "site_type": "wp_json_newest_media",
   "href_patterns": [
-    ".pdf",
-    "Newsletter",
-    "October",
-    "September",
-    "uploads"
+    "Newsletter-Sunday",
+    ".pdf"
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
-  "example_url": "https://lorrhadorrha.ie/wp-content/uploads/2026/10/Newsletter-Sunday-4th-October-2026.pdf",
+  "recorded_date": "2026-10-29",
+  "example_url": "https://lorrhadorrha.ie/wp-content/uploads/2026/10/Newsletter-Sunday-25th-October.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://lorrhadorrha.ie/parish-newsletter/"
+      "url": "https://lorrhadorrha.ie/"
     }
   ],
   "operator_notes": [
-    "05/10/2026 continuous hunt: earlier skip was 25/09 media. Now Newsletter-Sunday-4th-October-2026.pdf on parish-newsletter listing. Proved GET 200 application/pdf 262136 bytes %PDF. Do not pin dated name."
+    "29/10/2026: WP media newest is Newsletter-Sunday-25th-October.pdf (and -1..-5 page splits). Old status pinned 11 Oct. Prefer the undated-suffix main file via href_patterns Newsletter-Sunday; scrape scores 25th October.",
+    "site_type:wp_json_newest_media. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not pin the dated PDF.",
+    "Do not pin Newsletter-Sunday-11th-October-2026.pdf.",
+    "Do not harvest only page-split -1..-5 files when the main Newsletter-Sunday-25th-October.pdf exists.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
