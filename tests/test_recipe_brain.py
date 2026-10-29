@@ -109,6 +109,11 @@ def test_brain_steps_hold_the_hunt_lessons() -> None:
     assert "Duilleog" in by_id["http_scrape_newest_pdf"]
     assert "Mohill" in by_id["print_html_newsletter"]
     assert "Carrigtwohill" in by_id["wp_json_newest_media"]
+    assert "Current Newsletter" in by_id["parish_messenger"]
+    assert "090820" in by_id["parish_messenger"]
+    assert "Banagher" in by_id["joomla_dropfiles"]
+    assert "disable_stale_rescrape_fallback" in by_id["permanent_bulletin_pdf"]
+    assert "max_bulletin_pages" in by_id["oneweb_docx"]
 
 
 def test_facebook_is_not_probed() -> None:

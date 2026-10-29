@@ -70,11 +70,14 @@
         "Wait for widget to load, then click CLICK HERE to load Current Newsletter.",
         "Then capture the PDF download (use_captured_url). Same as Buncrana / Carndonagh.",
         "29/10/2026 Melmount + Sion Mills: bare print_to_pdf left September stale text.",
+        "29/10/2026 Sion: a[href$=.pdf] fallback grabbed dead /pdf/090820.pdf (404). Text selectors only.",
         "Ignore Gift Aid and Data Entry PDFs in the menu.",
       ],
       do_not: [
         "Do not pick admin PDFs from the widget list.",
         "Do not print_to_pdf the listing page alone — that captures last month's text.",
+        "Do not fall back to a[href$=.pdf] on the listing — dead homepage PDFs win the click.",
+        "Do not click CatholicIreland Daily Readings links.",
       ],
     },
     weekly_bulletin_download: {
@@ -222,12 +225,15 @@
       label: "Joomla Dropfiles cloud download (.docx → PDF)",
       operator_notes: [
         "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves Word .docx.",
-        "Click the cloud on this Sunday's row — harvester converts docx → PDF automatically.",
+        "Or homepage /Newsletters/NNN/ rows — newest is usually at the top (Banagher 25 Oct id 406).",
+        "Click newest_dated at the top. Do not pin a June id at the bottom.",
+        "If the pretty /files/… URL is hotlink-blocked, replay retries task=frontfile.download.",
         "Do not record diocese GDPR/Privacy PDFs — only mod_downloadlink on the parish host.",
       ],
       do_not: [
         "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
         "Do not use Pick bulletin image — this is a file download site.",
+        "Do not set bulletin_position bottom when newest Newsletter is at the top.",
       ],
     },
     stacked_image_bulletin: {
