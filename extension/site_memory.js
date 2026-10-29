@@ -69,15 +69,16 @@
       operator_notes: [
         "Wait for widget to load, then click CLICK HERE to load Current Newsletter.",
         "Then capture the PDF download (use_captured_url). Same as Buncrana / Carndonagh.",
-        "29/10/2026 Melmount + Sion Mills: bare print_to_pdf left September stale text.",
-        "29/10/2026 Sion: a[href$=.pdf] fallback grabbed dead /pdf/090820.pdf (404). Text selectors only.",
+        "29/10/2026 Melmount parishnews.html: Messenger click gone — page IS this week's HTML. Use html_text_bulletin print_to_pdf + skip_listing_nav. Sion Mills aliases Melmount (shared collections).",
+        "29/10/2026 Sion: a[href$=.pdf] fallback grabbed dead /pdf/090820.pdf (404). Text selectors only when widget is present.",
         "Ignore Gift Aid and Data Entry PDFs in the menu.",
       ],
       do_not: [
         "Do not pick admin PDFs from the widget list.",
-        "Do not print_to_pdf the listing page alone — that captures last month's text.",
+        "Do not force Messenger click when parishnews already shows this week's HTML body.",
         "Do not fall back to a[href$=.pdf] on the listing — dead homepage PDFs win the click.",
         "Do not click CatholicIreland Daily Readings links.",
+        "Do not harvest Melmount and Sion twice — same bulletin.",
       ],
     },
     weekly_bulletin_download: {
