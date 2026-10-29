@@ -1,23 +1,46 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofardkeen",
   "display_name": "Ardkeen",
   "diocese": "down_and_connor",
   "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": [
+    "Bulletin",
+    "uploads",
+    ".png",
+    ".jpg"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-29",
+  "example_url": "https://parishofardkeen.co.uk/wp-content/uploads/2026/10/25th-October-Bulletin.png",
   "steps": [
     {
-      "action": "click",
-      "selector": "a:has-text(\"Click here to download this week’s bulletin\")",
-      "href": "https://parishofardkeen.co.uk/wp-content/uploads/2026/09/13th-September-Bulletin.png",
-      "text": "Please see this week’s bulletin below: Click here to downloa"
+      "action": "goto",
+      "url": "https://parishofardkeen.co.uk/parish-bulletin/"
     },
     {
-      "action": "download",
-      "url": "https://parishofardkeen.co.uk/wp-content/uploads/2026/09/23-Sunday-OT-A.png"
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "selector": "a[href*='Bulletin'] img, img[src*='Bulletin']",
+      "min_long_side": 700
     }
   ],
-  "observed_load_ms": 4073,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "recorded_date": "2026-09-14"
+  "operator_notes": [
+    "29/10/2026: Old recipe pinned Sept PNG download + broken click href — Recipe download step did not find a matching document URL.",
+    "Live /parish-bulletin/ lists dated Bulletin images: 1st-November-Bulletin.png (this week's download link), 25th-October-Bulletin.png, 18th-October-Bulletin.png. HEAD 200 image/png proved for 25 Oct (1557538 bytes) and 1 Nov (920981 bytes).",
+    "site_type:http_scrape_newest_images scores the filename date. Do not pin a dated Bulletin-*.png."
+  ],
+  "do_not": [
+    "Do not pin 13th-September-Bulletin.png or 23-Sunday-OT-A.png.",
+    "Do not pin this week's dated Bulletin filename.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "bulletin_format": "image_stack"
 }
