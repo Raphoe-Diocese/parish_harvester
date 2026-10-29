@@ -2,15 +2,15 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 337,
+    "downloaded": 338,
     "html_links": 0,
     "skipped": 786,
     "failed": 103,
     "stale_rejected": 87
   },
   "action_counts": {
-    "ok": 396,
-    "skip": 784,
+    "ok": 395,
+    "skip": 785,
     "investigate": 89
   },
   "parishes": [
@@ -10716,29 +10716,29 @@
     },
     {
       "parish_key": "cloghanbanagherparish",
-      "display_name": "Cloghanbanagherparish",
+      "display_name": "Cloghan-Banagher",
       "diocese": "achonry",
       "recipe_file": "parishes/recipes/achonry/cloghanbanagherparish.json",
       "recipe": {
         "start_url": "https://www.cloghanbanagherparish.ie/newsletters-2026.html",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "wix_html",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
-          "Use Save page as PDF on the newsletter article page.",
-          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+          "29/10/2026: listing newsletters-2026.html has DD.MM.YYYY.pdf at top \u2014 25.10.2026.pdf proved on page. Scrape newest. Do not pin dated name.",
+          "Old recipe pinned 04.10.2026.pdf and wrongly used html_text_bulletin."
         ],
         "do_not": [
-          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+          "Do not pin 25.10.2026.pdf or 04.10.2026.pdf.",
+          "Do not harvest Accounts 2025 PDFs.",
+          "Do not print the listing page as the bulletin."
         ],
-        "recorded_date": "2026-10-09"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "html",
       "learned_pattern": "Wix HTML bulletin",
@@ -20917,38 +20917,36 @@
     },
     {
       "parish_key": "keashparish",
-      "display_name": "Keashparish",
+      "display_name": "Keash",
       "diocese": "achonry",
       "recipe_file": "parishes/recipes/achonry/keashparish.json",
       "recipe": {
         "start_url": "https://www.keashparish.ie/newsletters/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
         "status": "",
-        "skip": false,
+        "skip": true,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 0,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "29/10/2026: alias to keash. keash already ok 25/10."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not harvest keashparish as a second parish.",
+          "Do not pin dated Twenty-*-Sunday .doc names."
         ],
-        "recorded_date": "2026-10-09"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": true,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "skip",
+      "suggested_reason": "Duplicate key of keash. Harvest once under keash (keashparish.ie newsletters)."
     },
     {
       "parish_key": "keelogues",
@@ -24395,18 +24393,17 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "27/09/2026: Newsletter page ?page_id=48 has NEWSLETTER-SEPT-27th-1.pdf (HTTP 200). Also SEPT-13TH and August files.",
-          "site_type:http_scrape_newest_pdf."
+          "29/10/2026: newsletter page lists NEWSLETTER-OCT-18th-1.pdf at top (no 25th yet). Scrape newest. Do not pin Sept file \u2014 that caused ERR_ABORTED on a dead pin."
         ],
         "do_not": [
-          "Do not pin NEWSLETTER-SEPT-27th-1.pdf for next week.",
+          "Do not pin NEWSLETTER-SEPT-27th-1.pdf or any dated NEWSLETTER-OCT name.",
           "Do not prefer .docx over newer PDF."
         ],
-        "recorded_date": "2026-09-27"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
