@@ -2,17 +2,17 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 321,
+    "downloaded": 324,
     "html_links": 0,
     "skipped": 785,
-    "failed": 109,
-    "stale_rejected": 98
+    "failed": 108,
+    "stale_rejected": 96
   },
   "action_counts": {
-    "investigate": 92,
+    "investigate": 91,
     "ok": 391,
-    "mark_inactive": 1,
-    "skip": 783
+    "skip": 784,
+    "mark_inactive": 1
   },
   "parishes": [
     {
@@ -4550,31 +4550,31 @@
     },
     {
       "parish_key": "ballygallparish",
-      "display_name": "Ballygallparish",
+      "display_name": "Ballygall",
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/ballygallparish.json",
       "recipe": {
         "start_url": "https://ballygallparish.ie/index.php/blog/",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "29/10/2026: blog lists Newsletter-for-October25th.pdf (this week). Old recipe pinned 2026-09-27-newsletter.pdf and guessed 2026-10-25-newsletter.pdf (404).",
+          "site_type:http_scrape_newest_pdf. Score Newsletter-for-MonthDDth style names."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin Newsletter-for-October25th.pdf.",
+          "Do not invent 2026-10-25-newsletter.pdf \u2014 that name 404s.",
+          "Do not pick GDPR or financial PDFs."
         ],
-        "recorded_date": "2026-10-19"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": {
         "total_timeout_s": 190,
@@ -6762,26 +6762,23 @@
       "diocese": "achonry",
       "recipe_file": "parishes/recipes/achonry/bohola.json",
       "recipe": {
-        "start_url": "https://straideparish.com/",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "direct_download",
-        "status": "shared_bulletin",
-        "skip": false,
+        "start_url": "https://www.straideparish.com/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": true,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 0,
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "27/09/2026: weekly file is Bohola-Straide-Newsletter-*.pdf on straideparish.com. Harvest once under straide. This row stays on the A-Z list as bulletin with Straide.",
-          "05/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://www.straideparish.com/wp-content/uploads/2026/10/Bohola-Straide-Newsletter-4th-October-2026.pdf."
+          "29/10/2026: alias to straide. Do not download the shared PDF twice."
         ],
         "do_not": [
-          "Do not harvest a second mega-PDF copy.",
           "Do not invent a separate Bohola PDF.",
-          "Do not pin a dated filename.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
@@ -6789,8 +6786,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "skip",
+      "suggested_reason": "Same weekly Bohola-Straide-Newsletter PDF on straideparish.com. Harvest once under straide."
     },
     {
       "parish_key": "bonnybrook",
@@ -8625,24 +8622,24 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "Listing https://www.carrickmacrossparish.ie/newsletter/ newest on 22/08/2026 is Sunday_23rd_August_2026[2026-8-23].pdf (HTTP 200, 471606 bytes).",
-          "site_type:http_scrape_newest_pdf. Do not pin or rewrite the bracketed date."
+          "29/10/2026: harvest failed Too many pages: 5 (max 4). Real newsletter can be 5 pages \u2014 raise max_bulletin_pages to 8 (Claudy/oneweb lesson).",
+          "Listing https://www.carrickmacrossparish.ie/newsletter/ \u2014 site_type:http_scrape_newest_pdf. Do not pin the bracketed date."
         ],
         "do_not": [
           "Do not pin a dated filename.",
           "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
           "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
         ],
-        "recorded_date": "2026-08-22"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Too many pages: 5 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 5 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "carrigonbannow",
@@ -36231,7 +36228,7 @@
       "diocese": "achonry",
       "recipe_file": "parishes/recipes/achonry/straide.json",
       "recipe": {
-        "start_url": "https://straideparish.com/category/all-newsletter/newsletter-2026/",
+        "start_url": "https://www.straideparish.com/category/all-newsletter/newsletter-2026/",
         "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
@@ -36239,18 +36236,18 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "27/09/2026: post newsletter-27th-september-2026-2 links Bohola-Straide-Newsletter-27th-September-2026.pdf (HTTP 200). Shared with Bohola \u2014 harvest once here.",
-          "site_type:http_scrape_newest_pdf."
+          "29/10/2026: Bohola-Straide-Newsletter-25th-October-2026.pdf HTTP 200. Shared with Bohola \u2014 harvest once under straide.",
+          "site_type:http_scrape_newest_pdf. Do not pin a dated download step (old recipe pinned September)."
         ],
         "do_not": [
           "Do not harvest a second copy under Bohola.",
-          "Do not pin 27th-September-2026.pdf for next week."
+          "Do not pin 25th-October-2026.pdf for next week."
         ],
-        "recorded_date": "2026-09-27"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
