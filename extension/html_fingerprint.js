@@ -602,8 +602,31 @@
         { re: /\d{2}\.\d{2}\.\d{2}/, weight: 10, label: "YY.MM.DD dated rows" },
       ],
       pickDownloadUrl: () => "",
-      advice: "Google Drive folder — pick this Sunday's YY.MM.DD row, then Save PDF on preview.",
-      doNot: [],
+      advice:
+        "Google Drive folder — start on the parent Parish Newsletters folder (year folder ids change every January). Open the folder named this year, pick YY.MM.DD.pdf (26.10.25 = 25/10/2026), then Save PDF on preview.",
+      doNot: [
+        "Do not pin a year-folder Drive id — 2027/2028 get new ids.",
+        "Do not pin a /file/d/ id — it dies next upload.",
+      ],
+    },
+    {
+      id: "canva_bulletin_image",
+      label: "Canva parish site — photo of printed bulletin",
+      pageType: "canva_bulletin_image",
+      captureMethod: "image_stack",
+      playbookType: "canva_site",
+      minScore: 28,
+      markers: [
+        { re: /canva\.site/i, weight: 20, label: "Canva site host" },
+        { re: /_assets\/media\//i, weight: 12, label: "Canva media asset" },
+      ],
+      pickDownloadUrl: () => "",
+      advice:
+        "Canva hosts a photo of the printed bulletin (no PDF). image_stack prefer=largest on _assets/media. Never pin the media hash or blob: URLs.",
+      doNot: [
+        "Do not pin /_assets/media/<hash>.png.",
+        "Do not pin blob: currentSrc.",
+      ],
     },
     {
       id: "iframe_google_viewer",

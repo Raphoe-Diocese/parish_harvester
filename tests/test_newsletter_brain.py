@@ -369,11 +369,19 @@ class MemoryTests(unittest.TestCase):
         self.assertEqual(DIOCESE_ORDER[-1], "waterford_and_lismore")
         self.assertEqual(next_diocese([]), "achonry")
         self.assertEqual(next_diocese(["achonry"]), "ardagh")
-        self.assertEqual(len(LEARNED), 29)
+        self.assertEqual(len(LEARNED), 30)
         drive = next(item for item in LEARNED if item["id"] == "cloud_folder_newest")
         self.assertIn("2027", drive["how"])
+        self.assertIn("2028", drive["how"])
         self.assertIn("1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK", drive["how"])
+        self.assertIn("26.10.25.pdf", drive["how"])
         self.assertNotIn("start_url", drive["how"])
+        canva = next(
+            item for item in LEARNED if item["id"] == "canva_site_bulletin_image"
+        )
+        self.assertIn("prefer=largest", canva["how"])
+        self.assertIn("_assets/media", canva["how"])
+        self.assertIn("blob:", canva["how"])
 
     def test_this_sunday_upload_names_are_guessed(self) -> None:
         sunday = date(2026, 10, 18)

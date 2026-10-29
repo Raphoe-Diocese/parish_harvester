@@ -102,7 +102,7 @@ def test_brain_steps_hold_the_hunt_lessons() -> None:
     from harvester.recipe_brain import brain_steps
 
     steps = brain_steps()
-    assert len(steps) == 29
+    assert len(steps) == 30
     by_id = {item["id"]: item["how"] for item in steps}
     assert "403" in by_id["sunday_named_upload"]
     assert "Crossmolina" in by_id["http_scrape_newest_pdf"]

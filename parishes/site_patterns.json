@@ -590,6 +590,30 @@
       ],
       "success_count": 1
     },
+    "canva_bulletin_image+image_stack": {
+      "page_type": "canva_bulletin_image",
+      "recipe_flow": "image_stack",
+      "label": "Canva parish site — photo of printed bulletin",
+      "advice": "Weekly bulletin is a photo on a canva.site page, not a PDF. image_stack prefer=largest on img[src*=\"_assets/media\"]. Never pin the media hash. Skip blob: currentSrc.",
+      "operator_notes": [
+        "29/10/2026 Ardboe: canva.site hosts the printed sheet as a photo. ardboeparish.com redirects there.",
+        "Use prefer=largest + _assets/media selector so next week's swapped photo still wins.",
+        "Skip blob: currentSrc — not re-fetchable."
+      ],
+      "do_not": [
+        "Do not pin /_assets/media/<hash>.png.",
+        "Do not pin blob: URLs.",
+        "Do not Save page as PDF of the Canva chrome."
+      ],
+      "html_markers": [
+        "canva.site",
+        "_assets/media"
+      ],
+      "example_parishes": [
+        "ardboe"
+      ],
+      "success_count": 1
+    },
     "image_bulletin+click_then_pdf": {
       "page_type": "image_bulletin",
       "recipe_flow": "click_then_pdf",
@@ -2030,6 +2054,28 @@
       "html_markers": [
         "WP uploaded images in body",
         "bulletin keywords"
+      ]
+    },
+    "ardboe": {
+      "page_type": "canva_bulletin_image",
+      "recipe_flow": "image_stack",
+      "combined_key": "canva_bulletin_image+image_stack",
+      "display_name": "Ardboe",
+      "start_url_host": "ardboeparish.my.canva.site",
+      "updated": "2026-10-29",
+      "step_count": 2,
+      "playbook_type": "canva_site",
+      "operator_notes": [
+        "Canva site hosts a photo of the printed bulletin. No PDF.",
+        "image_stack prefer=largest on _assets/media. Do not pin the media hash."
+      ],
+      "do_not": [
+        "Do not pin /_assets/media/<hash>.png.",
+        "Do not pin blob: URLs."
+      ],
+      "html_markers": [
+        "canva.site",
+        "_assets/media"
       ]
     },
     "glenavyandkilleadparish": {
