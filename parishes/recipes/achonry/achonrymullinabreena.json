@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "parish_key": "achonrymullinabreena",
+  "display_name": "Achonry-Mullinabreena",
+  "diocese": "achonry",
+  "start_url": "https://www.achonrymullinabreena.com/NEWS.aspx",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-10-29",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.achonrymullinabreena.com/NEWS.aspx"
+    },
+    {
+      "action": "click",
+      "selector": "a:has-text('Parish Newsletter')",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='ArticleDetail']",
+        "table a"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
+    }
+  ],
+  "operator_notes": [
+    "29/10/2026: weekly bulletin is HTML on achonrymullinabreena.com (ASP.NET ArticleDetail), not a PDF. NEWS.aspx top row proved Parish Newsletter 25th October 2026 (articleid=1042). Click first Parish Newsletter then print_to_pdf + skip_listing_nav. Do not pin articleid. Do not scrape achonrydiocese.org parish card (admin/wrong file)."
+  ],
+  "do_not": [
+    "Do not pin ArticleDetail.aspx?articleid=…",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest achonrydiocese.org parish card or admin PDFs.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
+}
