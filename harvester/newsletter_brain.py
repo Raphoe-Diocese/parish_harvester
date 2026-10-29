@@ -101,6 +101,11 @@ LEARNED = (
         "how": "Stack the visible page images, including an img src. NextGEN gallery is not /uploads/. Fintona's Sunday image can sit in an old month folder. The filename date is the Sunday. Clonard scans the sheet as SKM_C550iYYMMDD. That is the scan day, not the Sunday. The front-page photo can already be next Sunday. Take the newest SKM scan dated on or before the harvest Sunday. On 18/10/2026 that is the 16/10/2026 scan, the sheet for Saturday 17 and Sunday 18 October. On 25/10/2026 the newest scan on or before Sunday is the 23/10/2026 scan, the sheet for Saturday 24 and Sunday 25 October. The 21/10/2026 scan is the development-fund results, not the newsletter. Do not pin the jpeg name.",
     },
     {
+        "id": "canva_site_bulletin_image",
+        "label": "Canva parish site with a photo of the printed bulletin",
+        "how": "Ardboe 29/10/2026: https://ardboeparish.my.canva.site/website (ardboeparish.com redirects here). The weekly bulletin is a photo on the page, not a PDF. Canva paints blob: currentSrc that cannot be re-fetched — take durable http(s) img src under /_assets/media/. That media hash changes every week when they swap the photo — never pin it. Other large photos (cross, church interior) sit beside the sheet; use image_stack prefer=largest with selector img[src*=\"_assets/media\"] so next Sunday still wins. Date is on the sheet (Sunday 25th October 2026 proved). Accessibility text may miss the image — open the page and look.",
+    },
+    {
         "id": "jetpack_image",
         "label": "Jetpack i0.wp.com scan",
         "how": "Keep the i0.wp.com URL. Do not rewrite it back to the parish host.",
@@ -108,7 +113,7 @@ LEARNED = (
     {
         "id": "cloud_folder_newest",
         "label": "Google Drive or OneDrive folder",
-        "how": "Bruckless starts on the parent folder 1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK, then opens the folder named for the harvest year. In 2027 that year folder is new. Do not save the 2026 folder id 1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC. Take the newest YY.MM.DD.pdf that is not after this Sunday. 26.10.18.pdf is 18/10/2026. The Drive file id has no date, so keep the name date. An older date inside the PDF must not replace it. Do not pin a /file/d/ link.",
+        "how": "Pin the parent Parish Newsletters folder only. Year folders get new Drive ids every January (2026 → 2027 → 2028). Bruckless parent is 1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK — open it, click the folder named for the harvest year, then take YY.MM.DD.pdf. 26.10.25.pdf is 25/10/2026 (not 26 October). Do not save the 2026 year folder id 1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC or the old 2025 year folder 1RjeEY_AYy62pRNWmVmDeINfHVqkPyCsw. A pinned /file/d/ id goes stale when they upload next week. The Drive file id has no date — keep the name date. An older date inside the PDF must not replace it.",
     },
     {
         "id": "google_drive_static",

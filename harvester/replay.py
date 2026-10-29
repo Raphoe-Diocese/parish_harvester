@@ -4136,13 +4136,15 @@ async def _find_stacked_bulletin_image_urls(
     min_long_side: int = 550,
     min_short_side: int = 500,
     position: str = "first",
+    prefer: str = "",
 ) -> list[str]:
     """Return *count* large bulletin images on the page in DOM order.
 
     Defaults accept A4-ish page scans (~595×841) while still excluding small
     logos/icons. position: "first" (default) or "last" — Wix homepages often
     archive old bulletin JPEGs above the current week; use "last" to grab the
-    newest pair.
+    newest pair. prefer: "largest" picks by pixel area (Canva sites put the
+    weekly sheet beside other large photos — never pin ``_assets/media`` hashes).
     """
     if count < 1:
         return []
@@ -4152,13 +4154,26 @@ async def _find_stacked_bulletin_image_urls(
         eval_selector,
         """
         (els) => els.map((el, index) => {
-            const src =
-              el.currentSrc ||
-              el.getAttribute('src') ||
-              el.getAttribute('data-src') ||
-              el.getAttribute('data-lazy-src') ||
-              el.getAttribute('data-original') ||
-              '';
+            // Prefer durable http(s) src over Canva blob: currentSrc — blob
+            // URLs cannot be re-fetched next week.
+            const attrs = [
+              el.getAttribute('src'),
+              el.getAttribute('data-src'),
+              el.getAttribute('data-lazy-src'),
+              el.getAttribute('data-original'),
+              el.currentSrc,
+            ];
+            let src = '';
+            for (const candidate of attrs) {
+              const value = String(candidate || '').trim();
+              if (!value) continue;
+              if (value.startsWith('blob:') || value.startsWith('data:')) continue;
+              src = value;
+              break;
+            }
+            if (!src) {
+              src = String(el.currentSrc || el.getAttribute('src') || '').trim();
+            }
             // Lazy-loaded images report naturalWidth/Height as 0 until the
             // browser has decoded them. Fall back to the rendered box size or
             // explicit width/height attributes so a not-yet-loaded bulletin
@@ -4179,13 +4194,13 @@ async def _find_stacked_bulletin_image_urls(
         """,
     )
 
-    candidates: list[tuple[int, str]] = []
+    candidates: list[tuple[int, int, str]] = []
     seen: set[str] = set()
     for item in raw_images:
         if not isinstance(item, dict):
             continue
         src = str(item.get("src", "")).strip()
-        if not src or src.startswith("data:"):
+        if not src or src.startswith(("data:", "blob:")):
             continue
         resolved = urljoin(page.url, src)
         lower = resolved.lower()
@@ -4198,13 +4213,19 @@ async def _find_stacked_bulletin_image_urls(
         if long_side < min_long_side or short_side < min_short_side:
             continue
         seen.add(lower)
-        candidates.append((int(item.get("index") or 0), resolved))
+        area = max(width, 0) * max(height, 0)
+        candidates.append((int(item.get("index") or 0), area, resolved))
+
+    pick_prefer = str(prefer or "").strip().lower()
+    if pick_prefer == "largest":
+        candidates.sort(key=lambda item: (-item[1], item[0]))
+        return [url for _idx, _area, url in candidates[:count]]
 
     candidates.sort(key=lambda item: item[0])
     pick = str(position or "first").strip().lower()
     if pick == "last":
-        return [url for _idx, url in candidates[-count:]]
-    return [url for _idx, url in candidates[:count]]
+        return [url for _idx, _area, url in candidates[-count:]]
+    return [url for _idx, _area, url in candidates[:count]]
 
 
 async def _print_page_to_pdf(page: Page, dest: Path) -> None:
@@ -5674,6 +5695,11 @@ async def replay_recipe(
                     raise RecipeReplayError(
                         'Recipe image_stack position must be "first" or "last"'
                     )
+                prefer = str(step.get("prefer") or "").strip().lower()
+                if prefer and prefer not in {"largest"}:
+                    raise RecipeReplayError(
+                        'Recipe image_stack prefer must be "largest" when set'
+                    )
                 try:
                     min_long_side = int(step.get("min_long_side") or 550)
                     min_short_side = int(step.get("min_short_side") or 500)
@@ -5687,6 +5713,7 @@ async def replay_recipe(
                     min_long_side=min_long_side,
                     min_short_side=min_short_side,
                     position=position,
+                    prefer=prefer,
                 )
                 if len(image_urls) < count:
                     raise RecipeReplayError(
