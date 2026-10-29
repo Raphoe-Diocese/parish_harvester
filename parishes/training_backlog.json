@@ -2,11 +2,11 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 357,
+    "downloaded": 358,
     "html_links": 0,
     "skipped": 783,
     "failed": 95,
-    "stale_rejected": 79
+    "stale_rejected": 78
   },
   "action_counts": {
     "ok": 406,
@@ -17049,7 +17049,7 @@
       "diocese": "cork_and_ross",
       "recipe_file": "parishes/recipes/cork_and_ross/enniskeanedesertserges.json",
       "recipe": {
-        "start_url": "http://enniskeaneparish.ie/parish/index.php/category/newsletter/",
+        "start_url": "http://enniskeaneparish.ie/parish/",
         "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
@@ -17057,18 +17057,19 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "23/09/2026: newsletter category opened. Proved Newsletter-09-20-2026.pdf.",
-          "site_type:http_scrape_newest_pdf. href_patterns Newsletter-. Skip Altar-Servers and Cookies-Policy PDFs."
+          "29/10/2026: Homepage lists Newsletter-10-25-2026.pdf (HEAD 200). Filenames are US MM-DD-YYYY \u2014 10-25 is 25/10/2026. Old recipe pinned Sept download; status had misread 10-25 as 10/10.",
+          "site_type:http_scrape_newest_pdf. Date scorer picks MM-DD vs DD-MM nearer harvest Sunday for Newsletter-MM-DD-YYYY."
         ],
         "do_not": [
-          "Do not pin Newsletter-09-20-2026.pdf.",
-          "Do not download Altar-Servers or Cookies-Policy PDFs."
+          "Do not pin Newsletter-09-20-2026.pdf or Newsletter-10-25-2026.pdf.",
+          "Do not download Altar-Servers or Cookies-Policy PDFs.",
+          "Do not read Newsletter-10-04-2026 as 10 April \u2014 it is 04/10/2026."
         ],
-        "recorded_date": "2026-09-20"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -17622,10 +17623,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "fermoy",
@@ -26429,8 +26430,8 @@
       "diocese": "killaloe",
       "recipe_file": "parishes/recipes/killaloe/lorrha.json",
       "recipe": {
-        "start_url": "https://lorrhadorrha.ie/parish-newsletter/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://lorrhadorrha.ie/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -26439,13 +26440,15 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 continuous hunt: earlier skip was 25/09 media. Now Newsletter-Sunday-4th-October-2026.pdf on parish-newsletter listing. Proved GET 200 application/pdf 262136 bytes %PDF. Do not pin dated name."
+          "29/10/2026: WP media newest is Newsletter-Sunday-25th-October.pdf (and -1..-5 page splits). Old status pinned 11 Oct. Prefer the undated-suffix main file via href_patterns Newsletter-Sunday; scrape scores 25th October.",
+          "site_type:wp_json_newest_media. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin the dated PDF.",
+          "Do not pin Newsletter-Sunday-11th-October-2026.pdf.",
+          "Do not harvest only page-split -1..-5 files when the main Newsletter-Sunday-25th-October.pdf exists.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -28197,10 +28200,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: \u274c Too many pages: 6 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: \u274c Too many pages: 6 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "monagea",
