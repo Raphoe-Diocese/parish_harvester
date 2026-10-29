@@ -73,7 +73,7 @@ LEARNED = (
     {
         "id": "print_html_newsletter",
         "label": "Print the live HTML page",
-        "how": "The page is overwritten each week. Do not pin a 109.228 article id. Mohill's newsletter is a WordPress page, not a post. Fenagh and Gortletteragh are inside that Mohill page. Kiltubrid /news/ is the same kind of overwritten page. Adamstown's diocese card has no file. The Website line is saintabbans.com. The Newsletters page lists 18th October, 2026 at the top. Open that page and print it. Do not pin ?p=1605.",
+        "how": "The page is overwritten each week. Do not pin a 109.228 article id. Mohill's newsletter is a WordPress page, not a post. Fenagh and Gortletteragh are inside that Mohill page. Use site_type http_scrape_newest_html on /newsletter/ with post_slug_patterns newsletter- — listing order is not newest-first and Playwright click times out; score slugs over HTTP then print_to_pdf. Kiltubrid /news/ is the same kind of overwritten page. Adamstown's diocese card has no file. The Website line is saintabbans.com. The Newsletters page lists 18th October, 2026 at the top. Open that page and print it. Do not pin ?p=1605.",
     },
     {
         "id": "wix_link_text_date",

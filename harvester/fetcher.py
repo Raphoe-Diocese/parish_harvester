@@ -1947,6 +1947,7 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
         "waf_retry_wordpress",
         "naomhfionan_numbered_pdf",
         "http_scrape_newest_pdf",
+        "http_scrape_newest_html",
         "predicted_dated_pdf",
         "wp_json_newest_media",
         "wp_json_newest_post_images",
