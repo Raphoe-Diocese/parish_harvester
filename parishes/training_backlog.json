@@ -2,15 +2,15 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 342,
+    "downloaded": 347,
     "html_links": 0,
-    "skipped": 786,
+    "skipped": 785,
     "failed": 99,
-    "stale_rejected": 87
+    "stale_rejected": 83
   },
   "action_counts": {
-    "ok": 399,
-    "skip": 785,
+    "ok": 400,
+    "skip": 784,
     "investigate": 87
   },
   "parishes": [
@@ -4157,29 +4157,37 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/ballycastleparish.json",
       "recipe": {
-        "start_url": "https://www.ballycastleparish.com/bulletins",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://mcn.live/Camera/st-macnissis-church-armoy",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "29/10/2026 Ireland MCN dig: st-macnissis-church-armoy (Magherahoney) church_id 660 Latest Bulletin stated 2026-11-01. Armoy is alias_of this parish \u2014 harvest once here. ballycastleparish.com /bulletins listing lagged (Sept).",
+          "Do not pin CloudFront UUID."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin the CloudFront UUID PDF.",
+          "Do not pin dated /s/*.pdf on ballycastleparish.com.",
+          "Do not invent a separate Armoy harvest.",
+          "Do not screenshot the camera feed.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-07-15"
+        "recorded_date": "2026-10-29"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "navigation_timeout_ms": 90000,
+        "wait_after_load_ms": 8000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -31444,7 +31452,7 @@
           "GET /api/getChannelAbout?slug=st-patricks-church-2 \u2192 data.newsletter_url. The path token and ?cb= cache-buster change every upload \u2014 never pin them.",
           "Harvester HTTP-fetches that JSON first (no browser). Playwright click of the newsletter button is the fallback.",
           "Same week's file is also overwritten at portaferryparish.com/images/downloads/Bulletin2019A.pdf (Joomla pdf.js viewer) \u2014 last-resort HTTP fallback only when the churchmedia API/PDF fails.",
-          "Probed 21/08/2026: current file Sunday 23rd August 2026 (Twenty-First Sunday in Ordinary Time), 5 pages, Last-Modified 20/08/2026. Dead pinned token was ovt7qm?cb=1786005944 (returned HTML).",
+          "29/10/2026 Ireland dig: churchmedia slug still live (newsletter PDF present, no stated_date in API). Reharvest \u2014 do not pin d5sq6l or any token.",
           "Harvest after #70 found that 5-page churchmedia file, then failed 'Too many pages: 5 pages (max 4)'. Default cap is 4. max_bulletin_pages=8 allows the weekly newsletter only on this recipe."
         ],
         "do_not": [
@@ -31454,7 +31462,7 @@
           "Do not download the Angular SPA HTML for a dead /newsletter/<token>.pdf (returns text/html).",
           "Do not treat Bulletin2019A.pdf's 2019 as a year \u2014 it is a static overwrite filename."
         ],
-        "recorded_date": "2026-08-21"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "download",
       "learned_pattern": "churchmedia.tv latest newsletter",
@@ -33908,27 +33916,41 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/seapatrick.json",
       "recipe": {
-        "start_url": "http://www.parishseapatrick.co.uk",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://mcn.live/Camera/st-patricks-church-banbridge",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
+        "status": "",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-02"
+        "has_terminal": true,
+        "operator_notes": [
+          "29/10/2026 Ireland MCN dig: st-patricks-church-banbridge church_id 615 Latest Bulletin stated 2026-10-25. St Therese Banbridge (id 63) has the same week \u2014 harvest once under seapatrick. parishseapatrick.co.uk had no proved PDF (old skip).",
+          "Do not pin CloudFront UUID."
+        ],
+        "do_not": [
+          "Do not pin the CloudFront UUID PDF.",
+          "Do not also harvest church-of-st-therese as a second Banbridge bulletin.",
+          "Do not screenshot the camera feed.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "navigation_timeout_ms": 90000,
+        "wait_after_load_ms": 8000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
+      },
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No this-week (27/09/2026) bulletin file proved yet on 02/10/2026 \u2014 official table / kitchen-sink still open. Do not invent Facebook PDFs."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "seirkieran",
