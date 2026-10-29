@@ -192,6 +192,25 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             if iso_dash_match:
                 day = int(iso_dash_match.group(1))
                 return _safe_date(folder_year, folder_month, day)
+            # Enniskeane Newsletter-10-25-2026.pdf under /uploads/2026/10/ is
+            # US MM-DD-YYYY (25/10/2026). Must run before extract_date_from_string
+            # (UK DD-MM would invent 10/04 for Newsletter-10-04) and before
+            # slug_day (leading "10" + folder month → false 10/10/2026).
+            newsletter_mdy = re.search(
+                r"newsletter-(\d{1,2})-(\d{1,2})-(20\d{2})",
+                basename,
+                re.I,
+            )
+            if newsletter_mdy:
+                a = int(newsletter_mdy.group(1))
+                b = int(newsletter_mdy.group(2))
+                name_year = int(newsletter_mdy.group(3))
+                for day, month in ((b, a), (a, b)):
+                    if month != folder_month:
+                        continue
+                    parsed = _safe_date(name_year, month, day)
+                    if parsed:
+                        return parsed
             # Filename-first: 16.8.26-20th-Sunday.pdf, 2026-August-16-…,
             # Twentieth-Sunday-in-Ordinary-Time.pdf. Must run before the
             # day=1 folder default — that default dated Holy Family's
