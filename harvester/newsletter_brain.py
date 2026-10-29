@@ -128,12 +128,12 @@ LEARNED = (
     {
         "id": "joomla_dropfiles",
         "label": "Joomla Dropfiles docx",
-        "how": "Click the parish cloud icon. Skip diocese GDPR files.",
+        "how": "Click the parish cloud icon or the newest /Newsletters/NNN/ row at the top. Banagher 29/10/2026: homepage top id 406 is 25 Oct; a bottom/June pin left false stale. Skip diocese GDPR files. Do not pin the file id.",
     },
     {
         "id": "oneweb_docx",
         "label": "One.com Word file",
-        "how": "Download the docx. Ignore slow Google preview iframes. view.officeapps.live.com?src= is the same Word file. A misspelled month such as Octaber still counts when the day and year are in the name.",
+        "how": "Download the docx. Ignore slow Google preview iframes. view.officeapps.live.com?src= is the same Word file. A misspelled month such as Octaber still counts when the day and year are in the name. Claudy 28/10/2026: five-page Word weekly needs max_bulletin_pages 8.",
     },
     {
         "id": "sequential_bulletin_number",
@@ -143,7 +143,7 @@ LEARNED = (
     {
         "id": "parish_messenger",
         "label": "Parish Messenger widget",
-        "how": "Newest View Newsletter row. Skip Gift Aid and Data Entry.",
+        "how": "Wait for the JS widget. Click CLICK HERE to load Current Newsletter, then download use_captured_url. Same as Buncrana and Carndonagh. Do not print_to_pdf the listing alone (Melmount/Sion stayed on September). Do not fall back to a[href$=.pdf] on the page — Sion grabbed dead /pdf/090820.pdf. Skip Gift Aid, Data Entry, CatholicIreland readings.",
     },
     {
         "id": "wp_block_file",
@@ -188,7 +188,7 @@ LEARNED = (
     {
         "id": "permanent_bulletin_pdf",
         "label": "Same bulletin.pdf address every week",
-        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page. Templecrone's Drive file was last changed on 14/09/2026. The weekly file is https://templecroneparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/templecrone/bulletin.pdf and it was updated on 24/10/2026. Annagry's newsletter page dropped 251025.pdf. The weekly file is https://annagryparish.ie/wp-content/uploads/parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf and it was updated on 24/10/2026. Do not use the unassigned folder for Annagry. A /current-newsletter/ address that redirects to this week's PDF is the same idea. Kildare, Meath Athboy, Dunshaughlin, Kells, Kilbeggan, and Limerick St Joseph's. Do not pin the dated file it redirects to.",
+        "how": "Newtown Killea replaces https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf each week. Take that file. Do not date it from the HTML page. Templecrone's Drive file was last changed on 14/09/2026. The weekly file is https://templecroneparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/templecrone/bulletin.pdf and it was updated on 24/10/2026. Annagry's newsletter page dropped 251025.pdf. The weekly file is https://annagryparish.ie/wp-content/uploads/parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf and it was updated on 24/10/2026. Do not use the unassigned folder for Annagry. A /current-newsletter/ address that redirects to this week's PDF is the same idea. Kildare, Meath Athboy, Dunshaughlin, Kells, Kilbeggan, Limerick St Joseph's, and Derry Bellaghy. Always set disable_stale_rescrape_fallback. When the redirect is last week, leave it stale — never homepage-rescrape (Bellaghy pope-francis jpeg). Do not pin the dated file it redirects to.",
     },
     {
         "id": "sunday_named_upload",
