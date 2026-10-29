@@ -143,7 +143,7 @@ LEARNED = (
     {
         "id": "parish_messenger",
         "label": "Parish Messenger widget",
-        "how": "Wait for the JS widget. Click CLICK HERE to load Current Newsletter, then download use_captured_url. Same as Buncrana and Carndonagh. Do not print_to_pdf the listing alone (Melmount/Sion stayed on September). Do not fall back to a[href$=.pdf] on the page — Sion grabbed dead /pdf/090820.pdf. Skip Gift Aid, Data Entry, CatholicIreland readings.",
+        "how": "Wait for the JS widget. Click CLICK HERE to load Current Newsletter, then download use_captured_url. Same as Buncrana and Carndonagh. Do not fall back to a[href$=.pdf] on the page — Sion grabbed dead /pdf/090820.pdf. Skip Gift Aid, Data Entry, CatholicIreland readings. Melmount 29/10/2026: parishnews.html is already this week's HTML (no Messenger click) — print_to_pdf with skip_listing_nav. Sion shares that page; alias Sion to Melmount.",
     },
     {
         "id": "wp_block_file",

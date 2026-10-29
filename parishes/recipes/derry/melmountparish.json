@@ -1,14 +1,14 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "melmountparish",
   "display_name": "Melmount (& Camus)",
   "diocese": "derry",
   "start_url": "https://www.melmountparish.com/parishnews.html",
-  "site_type": "parish_messenger",
-  "playbook_type": "parish_messenger",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
   "max_bulletin_pages": 12,
   "timeout_ms": 55000,
-  "total_timeout_s": 250,
+  "total_timeout_s": 180,
   "recorded_date": "2026-10-29",
   "steps": [
     {
@@ -16,34 +16,18 @@
       "url": "https://www.melmountparish.com/parishnews.html"
     },
     {
-      "action": "click",
-      "selector": "a:has-text(\"CLICK HERE to load Current Newsletter\")",
-      "fallback_selectors": [
-        "a:has-text(\"load Current Newsletter\")",
-        "a:has-text(\"Current Newsletter\")",
-        "a:has-text(\"View Newsletter\")"
-      ]
-    },
-    {
-      "action": "download",
-      "use_captured_url": true
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "href_skip_patterns": [
-    "giftaid",
-    "gdpr",
-    "dataentry",
-    "catholicireland",
-    "readings"
-  ],
   "operator_notes": [
-    "Parish Messenger widget (theparishmessenger.com z=21) injects the Current Newsletter link after JS load.",
-    "29/10/2026: bare print_to_pdf left September text. Click Current Newsletter then download (Buncrana pattern).",
-    "Do not use a[href$='.pdf'] fallback — Sion Mills proved that grabs a dead homepage PDF."
+    "29/10/2026 browser check: parishnews.html already shows this week's HTML newsletter — 30th Sunday / 25th October 2026, Fr Sean, Melmount + Sion Mills collections.",
+    "Parish Messenger click for Current Newsletter is gone / not needed. Print the page.",
+    "Same bulletin names Sion Mills — harvest once under melmountparish; Sion is alias."
   ],
   "do_not": [
-    "Do not print_to_pdf the listing page alone — that captures last month's text.",
-    "Do not fall back to a[href$='.pdf'] on the listing page.",
-    "Do not pick admin PDFs from the widget list."
+    "Do not click Gift Aid or Standing Order Form.",
+    "Do not train a parish_messenger Current Newsletter click on this page anymore.",
+    "Do not harvest the same HTML twice for Sion Mills."
   ]
 }
