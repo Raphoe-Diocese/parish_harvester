@@ -2,11 +2,11 @@
   "generated_at": "2026-10-29",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 318,
+    "downloaded": 319,
     "html_links": 0,
     "skipped": 784,
     "failed": 109,
-    "stale_rejected": 102
+    "stale_rejected": 101
   },
   "action_counts": {
     "investigate": 92,
@@ -5566,15 +5566,17 @@
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Joomla Dropfiles on the homepage. Newest Newsletter id is at the top.",
+          "29/10/2026: homepage lists id 406 Bulletin 25th October 2026. Proved SEF URL and task=frontfile.download&catid=9&id=406 both return application/octet-stream %PDF-1.3.",
+          "ids 405=18 Oct, 404=11 Oct. Do not pin 406 \u2014 harvest picks the highest dated Newsletter link.",
+          "If the pretty /files/\u2026 URL is hotlink-blocked, replay already retries com_dropfiles frontfile.download."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pin Bulletin---\u2026-25th-October-2026 or id 406.",
+          "Do not set bulletin_position bottom \u2014 newest is at the top.",
           "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-07-01"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -11281,34 +11283,31 @@
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/clonmanyparish.json",
       "recipe": {
-        "start_url": "https://clonmanyparish.ie/newsletter/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://clonmanyparish.com/pdf/251026.pdf",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week.",
-          "28/10/2026: Playwright failed net::ERR_CERT_COMMON_NAME_INVALID on clonmanyparish.ie. ignore_https_errors lets the listing load."
+          "29/10/2026: live twin is clonmanyparish.com. Old .ie newsletter page redirects to .com/index.html and has a bad TLS cert name.",
+          "Weekly file is /pdf/DDMMYY.pdf. Proved 251026.pdf GET 200 application/pdf magic %PDF-1.7 (harvest 40791335597 ok).",
+          "Harvester rewrites DDMMYY each Sunday. Keep ignore_https_errors for the old .ie host if anything still hits it.",
+          "Do not train on clonmanyparish.ie/newsletter/ \u2014 JS showcase with no PDF hrefs."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin 251026.pdf.",
+          "Do not use clonmanyparish.ie/newsletter/ as start_url.",
+          "Do not pick GDPR or admin PDFs."
         ],
-        "recorded_date": "2026-07-02"
+        "recorded_date": "2026-10-29"
       },
       "bulletin_format": "download",
       "learned_pattern": "direct_pdf",
-      "host_profile": {
-        "total_timeout_s": 90,
-        "navigation_timeout_ms": 45000,
-        "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
-      },
+      "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
