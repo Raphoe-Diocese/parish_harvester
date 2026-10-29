@@ -45,6 +45,11 @@ _D_M_YYYY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(20\d{2})(?!\d)")
 # is not read as 16-08-20.
 _D_M_YYYY_DASH_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(20\d{2})(?!\d)")
 _ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")                     # 2025-08-31
+# Blanchardstown newsletter-2026-10-18and25_new.pdf — Sat+Sun span; take Sunday.
+_ISO_AND_DAY_RE = re.compile(
+    r"(?<!\d)(20\d{2})-(\d{1,2})-(\d{1,2})and(\d{1,2})(?!\d)",
+    re.IGNORECASE,
+)
 _ISO_NODASH_RE = re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)")  # 20250831
 # Konica scan SKM_C550i26101608340. YYMMDD is the scan day, then the clock.
 _SKM_SCAN_RE = re.compile(r"SKM_[A-Za-z0-9]*i(\d{2})(\d{2})(\d{2})\d", re.IGNORECASE)
@@ -396,6 +401,24 @@ def extract_date_from_string(text: str) -> date | None:
                 return candidate
         except ValueError:
             pass
+
+    # ISO weekend span YYYY-MM-DDandDD (Blanchardstown 2026-10-18and25).
+    # Prefer the later day so harvest Sunday wins — plain ISO would stop at 18.
+    m = _first_match_outside_hash(_ISO_AND_DAY_RE, text, spans)
+    if m:
+        year, month = int(m.group(1)), int(m.group(2))
+        span_days: list[date] = []
+        for raw_day in (m.group(3), m.group(4)):
+            try:
+                span_days.append(date(year, month, int(raw_day)))
+            except ValueError:
+                pass
+        if (
+            len(span_days) == 2
+            and 0 <= (span_days[1] - span_days[0]).days <= 7
+            and _is_plausible_bulletin_year(span_days[1].year)
+        ):
+            return max(span_days)
 
     # ISO with dashes
     m = _first_match_outside_hash(_ISO_RE, text, spans)

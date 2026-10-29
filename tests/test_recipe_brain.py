@@ -199,6 +199,21 @@ def test_ferns_parish_weekend_file_is_this_sunday_not_2018() -> None:
     assert extract_bulletin_date(current) == date(2026, 10, 25)
 
 
+def test_blanchardstown_iso_and_day_span_takes_sunday() -> None:
+    from harvester.bulletin_freshness import check_bulletin_freshness, extract_bulletin_date
+    from harvester.utils import extract_date_from_string
+
+    name = "newsletter-2026-10-18and25_new.pdf"
+    url = (
+        "https://www.blanchardstownparish.ie/wp-content/uploads/newsletters/2026/10/"
+        + name
+    )
+    assert extract_date_from_string(name) == date(2026, 10, 25)
+    assert extract_bulletin_date(url) == date(2026, 10, 25)
+    verdict = check_bulletin_freshness(url, date(2026, 10, 25))
+    assert verdict.status == "fresh"
+
+
 def test_anspideal_irish_october_name_is_25_october() -> None:
     from harvester.bulletin_freshness import extract_bulletin_date
     from harvester.utils import extract_date_from_string
