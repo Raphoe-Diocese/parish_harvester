@@ -2,16 +2,16 @@
   "generated_at": "2026-10-30",
   "target_date": "2026-10-25",
   "summary": {
-    "downloaded": 369,
+    "downloaded": 370,
     "html_links": 0,
     "skipped": 784,
-    "failed": 86,
-    "stale_rejected": 75
+    "failed": 87,
+    "stale_rejected": 73
   },
   "action_counts": {
     "ok": 414,
     "skip": 783,
-    "investigate": 74
+    "investigate": 75
   },
   "parishes": [
     {
@@ -31760,15 +31760,15 @@
         "operator_notes": [
           "mDocs table on /weekly-bulletin/ \u2014 newest bulletin is the first row (modified desc).",
           "Harvest HTTP-scrapes the newest dated ?mdocs-file= row from the listing HTML, then downloads that PDF. Playwright clicks the Download column only if the scrape misses.",
-          "Frank highlighted 23 August 2026.pdf as this week's file \u2014 do not pin that title or id; pick the newest row every Sunday.",
-          "HTTPS listing works (Let's Encrypt valid through 22/10/2026). HTTP 301s to HTTPS. Host profile ignores TLS errors if the cert lapses."
+          "30/10/2026: top row is still ?mdocs-file=9607 but listing text is 25th October 2026 (they reuse the id). Status was stuck on 27/09 \u2014 re-harvest. Do not pin mdocs-file ids.",
+          "HTTPS listing. Host profile ignores TLS errors if the cert lapses."
         ],
         "do_not": [
           "Do not pin a dated title, filename, or mdocs-file id (e.g. 23rd August 2026 / ?mdocs-file=9538) \u2014 it breaks next week.",
           "Do not click the title dropdown (href='#') \u2014 that is not the PDF. Use the Download column / ?mdocs-file= link.",
           "Do not use Save page as PDF \u2014 bulletins are real PDF files behind mDocs download links."
         ],
-        "recorded_date": "2026-08-21"
+        "recorded_date": "2026-10-30"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -39074,6 +39074,39 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+    },
+    {
+      "parish_key": "wilton",
+      "display_name": "Wilton",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/wilton.json",
+      "recipe": {
+        "start_url": "https://www.smawilton.ie/news-letter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "30/10/2026: No recipe file existed \u2014 status stale on Sept from listing URL only. Live /news-letter/ and WP media list nl-01.11.26.pdf (All Saints week, HEAD 200, 2 pages) and nl-25.10.26.pdf. Filenames are nl-DD.MM.YY.pdf. Do not pin the dated name."
+        ],
+        "do_not": [
+          "Do not pin nl-01.11.26.pdf or nl-25.10.26.pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-30"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "windgap",
