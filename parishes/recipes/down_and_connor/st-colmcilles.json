@@ -1,29 +1,38 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "st-colmcilles",
   "display_name": "St Colmcilles",
   "diocese": "down_and_connor",
   "start_url": "https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "Bulletin",
+    "Oct",
+    "Nov",
+    "uploads",
+    ".pdf"
+  ],
+  "max_bulletin_pages": 12,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-29",
+  "example_url": "https://st-colmcilles.net/wp-content/uploads/2026/10/Parish-Bulletin-25th-October-2026.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://st-colmcilles.net/wp-content/uploads/2026/09/Parish-Bulletin-30082026-3.pdf"
+      "action": "goto",
+      "url": "https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/"
     }
   ],
-  "observed_load_ms": 45060,
-  "timeout_ms": 300000,
-  "total_timeout_s": 600,
-  "navigation_wait_until": "commit",
-  "playbook_type": "permanent_bulletin_page",
-  "site_type": "wp_block_file_bulletin",
   "operator_notes": [
-    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-    "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
-    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+    "29/10/2026: Old recipe pinned Parish-Bulletin-30082026-3.pdf and used wp_block_file_bulletin. Listing has Parish-Bulletin-25th-October-2026.pdf. Harvest also failed Too many pages 8 (max 4) — set max_bulletin_pages 12. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not train on the homepage — use the dedicated bulletin page only.",
-    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+    "Do not pin Parish-Bulletin-30082026 or any dated bulletin filename.",
+    "Do not keep the default 4-page cap — this week is 8 pages.",
+    "Do not harvest Facebook."
   ],
-  "recorded_date": "2026-09-14"
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
