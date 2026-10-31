@@ -235,14 +235,47 @@ def hint_for_url(url: str) -> HubHint | None:
             label="Kerry diocese card PDF named YYYY-MM-DD.pdf",
             confidence="high",
             notes=(
-                "The parish card on dioceseofkerry.ie links /wp-content/uploads/YYYY/MM/YYYY-MM-DD.pdf.",
+                "The parish card on dioceseofkerry.ie links this week's PDF. Do not pin it.",
                 "31/10/2026 Baile an Fheirtearaigh card proved 2026-11-01.pdf (application/pdf, 01/11/2026).",
+                "31/10/2026 Boherbue's card first page still showed August files. That one stays stale.",
             ),
             do_not=(
                 "Do not pin the dated PDF.",
                 "Do not use the diocese Facebook page as the parish link.",
             ),
             pattern_key="kerry_card_yyyymmdd_pdf+direct_download",
+        )
+
+    if host == "bree.ie":
+        return HubHint(
+            key="wp_json_weekend_range_pdf",
+            site_type="wp_json_newest_media",
+            label="Bree weekend PDF in the media library",
+            confidence="high",
+            notes=(
+                "31/10/2026 media library has 3744-Oct-31st-Nov-1st.pdf.",
+                "Proved application/pdf, 558567 bytes. The filename has no single date the parser reads.",
+                "wp-json uses the media date 30/10/2026. That is inside the week window. Do not pin the name.",
+            ),
+            do_not=(
+                "Do not pin 3744-Oct-31st-Nov-1st.pdf.",
+                "Do not take the older Oct 24th-25th JPEG while this PDF is in the library.",
+            ),
+            pattern_key="wp_json_weekend_range_pdf+direct_download",
+        )
+
+    if host == "booterstownparish.ie":
+        return HubHint(
+            key="booterstown_sunday_pdf",
+            site_type="wp_json_newest_media",
+            label="Booterstown Sun-D-Month-YYYY PDF in wp-json",
+            confidence="high",
+            notes=(
+                "31/10/2026 wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026).",
+                "Also proved the 25/10/2026 PDF. Skip the front.png preview.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."),
+            pattern_key="booterstown_sunday_pdf+direct_download",
         )
 
     if host == "saintabbans.com":

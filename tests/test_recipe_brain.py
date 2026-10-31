@@ -77,6 +77,14 @@ def test_birr_bodyke_and_kerry_listings() -> None:
     assert any("Facebook" in line for line in kerry.do_not)
 
 
+def test_bree_and_booterstown_use_the_media_library() -> None:
+    bree = hint_for_url("https://www.bree.ie/")
+    assert bree is not None and bree.site_type == "wp_json_newest_media"
+    assert any("pin" in line.lower() for line in bree.do_not)
+    boot = hint_for_url("https://booterstownparish.ie/")
+    assert boot is not None and boot.key == "booterstown_sunday_pdf"
+
+
 def test_churchmedia_is_api_newsletter() -> None:
     hint = hint_for_url("https://churchmedia.tv/st-patricks-church-2")
     assert hint is not None

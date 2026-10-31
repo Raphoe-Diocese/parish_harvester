@@ -420,6 +420,28 @@
         "Do not use the diocese Facebook page as the parish link.",
       ],
     },
+    wp_json_weekend_range_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "wp_json_newest_media",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Bree weekend PDF in the media library",
+      operator_notes: [
+        "31/10/2026 media library has 3744-Oct-31st-Nov-1st.pdf. Proved application/pdf. Media date 30/10/2026.",
+      ],
+      do_not: ["Do not pin 3744-Oct-31st-Nov-1st.pdf."],
+    },
+    booterstown_sunday_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "wp_json_newest_media",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Booterstown Sun-D-Month-YYYY PDF in wp-json",
+      operator_notes: [
+        "31/10/2026 wp-json proved Sun-1-November-2026 and Sun-25-October-2026 PDFs.",
+      ],
+      do_not: ["Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."],
+    },
     mayo_ie_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -611,6 +633,12 @@
     }
     if (start.includes("dioceseofkerry.ie")) {
       return CATALOG.kerry_card_yyyymmdd_pdf;
+    }
+    if (start.includes("bree.ie")) {
+      return CATALOG.wp_json_weekend_range_pdf;
+    }
+    if (start.includes("booterstownparish.ie")) {
+      return CATALOG.booterstown_sunday_pdf;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;
