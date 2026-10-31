@@ -234,6 +234,38 @@ class InventTests(unittest.TestCase):
                 "https://achonrydiocese.org/parishes/sligo/achonry-mullinabreena/"
             )
         )
+        self.assertTrue(
+            _is_non_bulletin_url("https://www.killaloediocese.ie/parish/birr/")
+        )
+        self.assertFalse(
+            _is_non_bulletin_url(
+                "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-11-01.pdf"
+            )
+        )
+
+    def test_ahead_file_is_kept_when_this_sunday_is_missing(self) -> None:
+        scored = [
+            (date(2026, 10, 18), "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-10-18.pdf"),
+            (date(2026, 11, 1), "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-11-01.pdf"),
+        ]
+        kept = same_sunday_urls(scored, date(2026, 10, 25))
+        self.assertEqual(
+            kept,
+            ["https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-11-01.pdf"],
+        )
+        only_next = same_sunday_urls(
+            [(date(2026, 11, 1), "https://www.arklowparish.ie/newsletter_1st_November_2026.pdf")],
+            date(2026, 10, 25),
+        )
+        self.assertEqual(len(only_next), 1)
+        both = same_sunday_urls(
+            [
+                (date(2026, 10, 25), "https://example.ie/25.pdf"),
+                (date(2026, 11, 1), "https://example.ie/01.pdf"),
+            ],
+            date(2026, 10, 25),
+        )
+        self.assertEqual(both, ["https://example.ie/25.pdf"])
 
     def test_termonmaguirc_picks_twenty_ninth_sunday(self) -> None:
         html = """
