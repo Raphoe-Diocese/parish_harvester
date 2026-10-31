@@ -5,7 +5,7 @@
 - Arklow: failed. The homepage file is 01/11/2026, so the same picker found nothing on 25/10.
 - Birr and Bodyke: the run saved the Killaloe /parish/ card and no date. That is not the bulletin.
 - Bree: timed out. Booterstown: GitHub saved a security page, not the PDF.
-- Fix: if this Sunday is missing, take the nearest file up to 8 days ahead. A diocese /parish/ card is not a bulletin. This Sunday still wins when it is listed.
+- Fix: if this Sunday is missing, take the nearest file up to 8 days ahead. A diocese /parish/ card is not a bulletin. This Sunday still wins when it is listed. Merged PR 436. Re-sent: Arklow 41222578645, Baile an Fheirtearaigh 41222582124, Birr 41222585616, Bodyke 41222588634. Not ok until those runs say so.
 
 ## 31/10/2026 — A–Z gold links, first proved batch
 
