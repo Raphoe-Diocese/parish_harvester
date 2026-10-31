@@ -365,6 +365,24 @@
         "Do not pin /newsletter/<token>.….pdf — the token dies next week.",
       ],
     },
+    joomla_images_newsletter: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Joomla /images/newsletter/YY-MM-DD.pdf",
+      operator_notes: [
+        "theparishioner.ie and onefaith.ie list /images/newsletter/YY-MM-DD.pdf.",
+        "31/10/2026 theparishioner proved 26-10-25.pdf and 26-11-01.pdf. Scrape the listing.",
+        "The HTML article link is not the PDF.",
+        "31/10/2026 onefaith newest proved file was 26-10-12.pdf. That is behind the 25/10 target.",
+      ],
+      do_not: [
+        "Do not pin YY-MM-DD.pdf.",
+        "Do not print the HTML article as the bulletin.",
+        "Do not call onefaith fresh while its newest PDF is 12/10/2026.",
+      ],
+    },
     mayo_ie_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -540,6 +558,13 @@
     }
     if (start.includes("mayo.ie")) {
       return CATALOG.mayo_ie_newsletters;
+    }
+    if (
+      start.includes("theparishioner.ie") ||
+      start.includes("onefaith.ie") ||
+      start.includes("/images/newsletter/")
+    ) {
+      return CATALOG.joomla_images_newsletter;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;

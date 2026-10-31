@@ -147,6 +147,73 @@ def hint_for_url(url: str) -> HubHint | None:
             pattern_key="churchservices_tv+pointer",
         )
 
+    if host in {"theparishioner.ie", "onefaith.ie"} or "/images/newsletter/" in path:
+        return HubHint(
+            key="joomla_images_newsletter",
+            site_type="http_scrape_newest_pdf",
+            label="Joomla /images/newsletter/YY-MM-DD.pdf listing",
+            confidence="high",
+            notes=(
+                "Listing HTML links /images/newsletter/YY-MM-DD.pdf. That file is the bulletin.",
+                "31/10/2026 theparishioner.ie proved 26-10-25.pdf (25/10/2026) and 26-11-01.pdf (01/11/2026).",
+                "The HTML article /newsletter/the-parishioner-… is not the PDF.",
+                "Same shape on onefaith.ie. 31/10/2026 newest proved file was 26-10-12.pdf (12/10/2026), behind target.",
+            ),
+            do_not=(
+                "Do not pin YY-MM-DD.pdf.",
+                "Do not print the HTML article as the bulletin.",
+                "Do not call onefaith fresh while its newest PDF is 12/10/2026.",
+            ),
+            pattern_key="joomla_images_newsletter+direct_download",
+        )
+
+    if host == "arklowparish.ie":
+        return HubHint(
+            key="homepage_bracket_date",
+            site_type="http_scrape_newest_pdf",
+            label="Homepage PDF with [YYYY-MM-DD] in the filename",
+            confidence="high",
+            notes=(
+                "31/10/2026 the Arklow homepage linked newsletter_1st_November_2026[2026-11-01].pdf.",
+                "Proved application/pdf, %PDF-1.7, date 01/11/2026. The date in square brackets is the bulletin date.",
+                "The recipe already scrapes the homepage. The 25/10 harvest failed because that file was not there yet.",
+            ),
+            do_not=("Do not pin the dated homepage PDF.",),
+            pattern_key="homepage_bracket_date+direct_download",
+        )
+
+    if host == "armaghparish.net":
+        return HubHint(
+            key="yearless_month_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Yearless Month PDF under /YYYY/MM/",
+            confidence="high",
+            notes=(
+                "31/10/2026 the Armagh listing newest file was 18th-October.pdf under /2026/10/.",
+                "The filename has no year. The folder year is 2026. That file is behind the 25/10 target.",
+                "Leave it stale. Do not pin 27 September and do not pin 18 October.",
+            ),
+            do_not=(
+                "Do not pin 18th-October.pdf.",
+                "Do not pin the older 27 September file.",
+            ),
+            pattern_key="yearless_month_pdf+direct_download",
+        )
+
+    if host == "saintabbans.com":
+        return HubHint(
+            key="html_listing_still_stale",
+            site_type="html_text_bulletin",
+            label="Adamstown HTML listing, still 18 October",
+            confidence="high",
+            notes=(
+                "31/10/2026 http://saintabbans.com/?page_id=21 top post is still 18th October 2026.",
+                "No PDF on that listing. Leave the parish stale.",
+            ),
+            do_not=("Do not pin ?p=1605.",),
+            pattern_key="html_listing_still_stale+direct_download",
+        )
+
     if path.rstrip("/").endswith("current-newsletter"):
         return HubHint(
             key="current_newsletter_redirect",
@@ -176,6 +243,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "Ashbourne: listing had no calendar date in the PDF href. wp-json scored the file.",
                 "Askea: /newsletters/ lists dated PDFs. Do not pin the dated name.",
+                "31/10/2026 urllib GET of ashbourneparish.ie/newsletters/ returned HTTP 403. That is not proof the file is missing. Use the browser or wp-json.",
             ),
             do_not=("Do not pin a dated filename.", "Do not harvest Facebook."),
             pattern_key="wp_json+direct_download",

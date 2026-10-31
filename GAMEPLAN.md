@@ -1,4 +1,11 @@
-﻿## 09/10/2026 — Send & test diocese not in choices (NOW)
+﻿## 31/10/2026 — A–Z gold links, first proved batch
+
+- Target week is still 25/10/2026. A file dated 01/11/2026 is inside the 8-day grace. A file dated 18/10/2026 is stale.
+- theparishioner.ie/newsletter is Joomla `/images/newsletter/YY-MM-DD.pdf`. Proved 26-10-25.pdf (25/10/2026) and 26-11-01.pdf (01/11/2026). Ballincollig steps no longer pin 20/09. Ballinora and Kilmurry now scrape that listing. Ovens stays on its own site. onefaith.ie is the same shape but newest proved file is 26-10-12.pdf. Not this week.
+- Arklow homepage PDF proved for 01/11/2026. Recipe already scrapes the homepage. Needs a harvest test. Not marked ok until Actions says so.
+- Rechecked and left stale: Beechwood still 18/10. Adamstown still 18/10. Armagh listing newest 18/10 (filename has no year). Ashbourne urllib 403. Brain notes written. OCR PR 433 stays open.
+
+## 09/10/2026 — Send & test diocese not in choices (NOW)
 
 - Frank Emly/Tubbercurry screenshots: recipe saved, GitHub test refused — `Provided value 'cashel_and_emly'/'achonry' for input 'diocese' not in the list of choices`. Cause: Trainer sent recipe folder slug; harvest.yml wants `*_diocese` (except cork_and_ross / down_and_connor). Harvest-list gate also built wrong evidence path for those two.
 - Fix Trainer 1.61.45: map every recipes/ folder to harvest.yml choice; evidenceBulletinPath for cork/D&C; expand DIOCESE_FOLDERS + dioceses.json + pickers. Test locks harvest.yml options = recipe folders. Not live until merge + Reload.
