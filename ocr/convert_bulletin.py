@@ -7,6 +7,7 @@ import json
 import re
 import html as html_utils
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -469,17 +470,33 @@ def _groq_api_key() -> str:
     return "".join(raw.split())
 
 
+# Free plan: 1000 output tokens a minute. One column must stay under that.
+_GROQ_MAX_COMPLETION_TOKENS = 800
+_GROQ_RETRY_AFTER = re.compile(r"try again in ([0-9.]+)s", re.IGNORECASE)
+
+
+def _groq_rate_limit_wait(detail: str) -> float | None:
+    """Seconds to wait, or None when waiting will not help."""
+    lowered = detail.lower()
+    if "request too large" in lowered or "reduce max_tokens" in lowered:
+        return None
+    match = _GROQ_RETRY_AFTER.search(detail)
+    if not match:
+        return None
+    return min(float(match.group(1)) + 1.0, 70.0)
+
+
 def groq_transcribe_image(image) -> list[str]:
     """Read one column with Groq. Secret name on GitHub is GROQNOV2026."""
     api_key = _groq_api_key()
     if not api_key:
         print("    GROQNOV2026 not set, skipping this column.", flush=True)
         return []
-    print("    Sending this column to Groq ...", flush=True)
     payload = {
         "model": "qwen/qwen3.8-27b",
         "temperature": 0,
-        "max_completion_tokens": 4096,
+        "max_completion_tokens": _GROQ_MAX_COMPLETION_TOKENS,
+        "reasoning_effort": "none",
         "messages": [
             {
                 "role": "user",
@@ -495,39 +512,54 @@ def groq_transcribe_image(image) -> list[str]:
             }
         ],
     }
-    request = urllib.request.Request(
-        "https://api.groq.com/openai/v1/chat/completions",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-            # Cloudflare rejects Python's default urllib signature (error 1010).
-            "User-Agent": "parish-harvester-ocr",
-        },
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            body = json.loads(response.read().decode("utf-8"))
-    except Exception as exc:
-        detail = ""
-        if isinstance(exc, urllib.error.HTTPError):
-            try:
-                detail = exc.read().decode("utf-8", errors="replace")[:300]
-            except Exception:
-                detail = ""
-        print(f"    Groq column failed ({type(exc).__name__}: {exc} {detail}).", flush=True)
-        return []
-    try:
-        content = body["choices"][0]["message"]["content"] or ""
-    except (KeyError, IndexError, TypeError) as exc:
-        print(f"    Groq column returned no text ({exc}).", flush=True)
-        return []
-    if isinstance(content, list):
-        content = "\n".join(
-            part.get("text", "") for part in content if isinstance(part, dict)
+    encoded = json.dumps(payload).encode("utf-8")
+    for attempt in range(2):
+        print("    Sending this column to Groq ...", flush=True)
+        request = urllib.request.Request(
+            "https://api.groq.com/openai/v1/chat/completions",
+            data=encoded,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+                # Cloudflare rejects Python's default urllib signature (error 1010).
+                "User-Agent": "parish-harvester-ocr",
+            },
+            method="POST",
         )
-    return _lines_from_gemini_text(str(content))
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                body = json.loads(response.read().decode("utf-8"))
+        except Exception as exc:
+            detail = ""
+            if isinstance(exc, urllib.error.HTTPError):
+                try:
+                    detail = exc.read().decode("utf-8", errors="replace")[:400]
+                except Exception:
+                    detail = ""
+            wait = _groq_rate_limit_wait(detail) if attempt == 0 else None
+            if wait is None:
+                print(
+                    f"    Groq column failed ({type(exc).__name__}: {exc} {detail}).",
+                    flush=True,
+                )
+                return []
+            print(
+                f"    Groq free limit. Waiting {wait:.0f}s, then one more try.",
+                flush=True,
+            )
+            time.sleep(wait)
+            continue
+        try:
+            content = body["choices"][0]["message"]["content"] or ""
+        except (KeyError, IndexError, TypeError) as exc:
+            print(f"    Groq column returned no text ({exc}).", flush=True)
+            return []
+        if isinstance(content, list):
+            content = "\n".join(
+                part.get("text", "") for part in content if isinstance(part, dict)
+            )
+        return _lines_from_gemini_text(str(content))
+    return []
 
 
 def ocr_images_with_gemini(images):
