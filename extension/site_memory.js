@@ -453,6 +453,28 @@
       ],
       do_not: ["Do not pin the dated filename.", "Do not keep calling wp-json when it returns 404."],
     },
+    link_text_undated_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Undated PDF, date in the link text",
+      operator_notes: [
+        "31/10/2026 Doora-Barefield doora-Barefield.pdf has no date in the name. The link says 1st November.",
+      ],
+      do_not: ["Do not pin doora-Barefield.pdf.", "Do not take 18th-Oct.pdf while the 1 November link is listed."],
+    },
+    category_week_jpg: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_images",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Newsletter JPG on the category page",
+      operator_notes: [
+        "31/10/2026 Durrow category has newsletter-25-oct-2026.jpg. Skip the resized copy.",
+      ],
+      do_not: ["Do not pin the dated filename.", "Do not take the 300px resized copy."],
+    },
     prefix_ddmmyy_pdf: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -704,6 +726,12 @@
     }
     if (start.includes("castleconnellparish.ie") || start.includes("clarecastleballyeaparish.ie") || start.includes("imeallboirne.ie")) {
       return CATALOG.spelled_month_listing_pdf;
+    }
+    if (start.includes("doorabarefieldparish.ie")) {
+      return CATALOG.link_text_undated_pdf;
+    }
+    if (start.includes("durrow.ie")) {
+      return CATALOG.category_week_jpg;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;

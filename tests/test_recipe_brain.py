@@ -106,6 +106,13 @@ def test_listing_pdfs_proved_31_october() -> None:
     assert clare is not None and clare.key == "spelled_month_listing_pdf"
     corofin = hint_for_url("https://imeallboirne.ie/newsletter/")
     assert corofin is not None and any("25th-October-2026" in line for line in corofin.notes)
+    doora = hint_for_url("https://www.doorabarefieldparish.ie/newsletter/")
+    assert doora is not None and doora.key == "link_text_undated_pdf"
+    assert any("1st November" in line for line in doora.notes)
+    durrow = hint_for_url("https://www.durrow.ie/category/newsletter/")
+    assert durrow is not None and durrow.site_type == "http_scrape_newest_images"
+    doonbeg = hint_for_url("https://doonbegparish.com/newsletter")
+    assert doonbeg is not None and any("card" in line.lower() for line in doonbeg.do_not)
 
 
 def test_churchmedia_is_api_newsletter() -> None:

@@ -1,4 +1,13 @@
-﻿## 31/10/2026 22:30 — Six listings harvested, two timed out
+﻿## 31/10/2026 22:55 — Clarecastle and Corofin harvested 25/10/2026
+
+- Clarecastle run 41248893099 ok. File 25th-October-2026.pdf. Date 25/10/2026.
+- Corofin run 41248896002 ok. File 25th-October-2026-Newsletter.pdf. Date 25/10/2026.
+- Doora-Barefield: the file doora-Barefield.pdf has no date. The link says 1st November. Proved application/pdf, 3109933 bytes. Sent 41251538752. Not ok until that run says so.
+- Durrow: the category page has newsletter-25-oct-2026.jpg. Proved image/jpeg, 163613 bytes, date 25/10/2026. Sent 41251541444. Not ok until that run says so.
+- Doonbeg parish site https://doonbegparish.com/newsletter had no PDF. Left it. The diocese card is not the bulletin.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 22:30 — Six listings harvested, two timed out
 
 - Castleconnell run 41244083938 ok. File Newsletter-25th-October-2026.pdf. Date 25/10/2026.
 - Carraig na bhFear run 41244089626 ok. File Carraig-25-10-26.pdf. Date 25/10/2026.
