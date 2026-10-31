@@ -344,6 +344,30 @@ def _vision_column_strips(image):
     return strips if strips else [image]
 
 
+def _gemini_safety_settings(genai):
+    """Parish pages include photos and safeguarding text. Do not drop the page."""
+    from google.generativeai.types import HarmBlockThreshold, HarmCategory
+
+    categories = [
+        HarmCategory.HARM_CATEGORY_HARASSMENT,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    ]
+    return [
+        {"category": category, "threshold": HarmBlockThreshold.BLOCK_NONE}
+        for category in categories
+    ]
+
+
+def _gemini_response_text(response) -> str:
+    try:
+        return getattr(response, "text", "") or ""
+    except Exception as exc:
+        print(f"    Gemini returned no text ({type(exc).__name__}: {exc}).", flush=True)
+        return ""
+
+
 def ocr_images_with_gemini(images):
     """Run Gemini OCR across images and return (pages_text, provider_summary)."""
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -354,6 +378,7 @@ def ocr_images_with_gemini(images):
 
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.5-flash")
+    safety = _gemini_safety_settings(genai)
     pages_text = []
     for i, image in enumerate(images, start=1):
         strips = _vision_column_strips(image)
@@ -366,18 +391,28 @@ def ocr_images_with_gemini(images):
         else:
             print(f"  OCR on page {i}/{len(images)} via Gemini ...", flush=True)
         page_lines: list[str] = []
-        for si, strip in enumerate(strips):
-            response = model.generate_content(
-                [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(strip)}]
-            )
-            text = getattr(response, "text", "") or ""
+        got_any = False
+        for strip in strips:
+            try:
+                response = model.generate_content(
+                    [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(strip)}],
+                    safety_settings=safety,
+                )
+            except Exception as exc:
+                print(f"    Gemini column failed ({type(exc).__name__}: {exc}).", flush=True)
+                continue
             lines = [
-                line for line in text.splitlines()
+                line for line in _gemini_response_text(response).splitlines()
                 if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
             ]
-            if page_lines and lines:
+            if not lines:
+                continue
+            got_any = True
+            if page_lines:
                 page_lines.append("")
             page_lines.extend(lines)
+        if not got_any:
+            raise RuntimeError(f"Gemini returned no text for page {i}.")
         pages_text.append(page_lines)
     return pages_text, "Gemini fallback"
 
