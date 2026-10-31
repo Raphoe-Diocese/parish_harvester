@@ -475,6 +475,17 @@
       ],
       do_not: ["Do not pin the dated filename.", "Do not take the 300px resized copy."],
     },
+    yy_mm_d_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "YY-MM-D.pdf with the day unpadded",
+      operator_notes: [
+        "31/10/2026 Kilbrittain 26-11-1.pdf is 01/11/2026. The link text does not carry the date.",
+      ],
+      do_not: ["Do not pin 26-11-1.pdf.", "Do not read 26-11-1 as 26 November."],
+    },
     prefix_ddmmyy_pdf: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -732,6 +743,9 @@
     }
     if (start.includes("durrow.ie")) {
       return CATALOG.category_week_jpg;
+    }
+    if (start.includes("kilbrittainparish.ie")) {
+      return CATALOG.yy_mm_d_pdf;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;

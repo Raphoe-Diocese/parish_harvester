@@ -481,6 +481,10 @@ class BulletinFreshnessTests(unittest.TestCase):
         )
         self.assertEqual(extract_bulletin_date(old), date(2026, 8, 16))
         self.assertEqual(check_bulletin_freshness(old, target).status, "stale")
+        kilbrittain = "https://kilbrittainparish.ie/images/bulletin/26-11-1.pdf"
+        self.assertEqual(extract_bulletin_date(kilbrittain), date(2026, 11, 1))
+        october = "https://kilbrittainparish.ie/images/bulletin/26-10-18.pdf"
+        self.assertEqual(extract_bulletin_date(october), date(2026, 10, 18))
         self.assertNotEqual(
             check_bulletin_freshness(old, target).reason, "within_grace_days"
         )

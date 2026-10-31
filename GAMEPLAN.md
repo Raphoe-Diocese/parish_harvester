@@ -1,4 +1,13 @@
-﻿## 31/10/2026 23:20 — Durrow harvested 25/10/2026. Doora saved a file with no date
+﻿## 31/10/2026 23:35 — Ennis and Inagh harvested 25/10/2026
+
+- Ennis run 41252519900 ok. File 25th-October.pdf. Date 25/10/2026.
+- Inagh run 41252523450 ok. File Newsletter-25th-October-2026.pdf. Date 25/10/2026.
+- Kilkee proved Newsletter-Sunday-25th-October-2026.pdf (application/pdf, 1862940 bytes). Sent 41252945730. Not ok until that run says so.
+- Kildare proved Kildare-Parish-Newsletter-25th-October-2026.pdf (application/pdf, 1159659 bytes). Sent 41252949103. Not ok until that run says so.
+- Kilbrittain's file is 26-11-1.pdf (application/pdf, 170128 bytes). The date reader missed the unpadded day. The fix reads it as 01/11/2026. Not sent until that fix is on main.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 23:20 — Durrow harvested 25/10/2026. Doora saved a file with no date
 
 - Durrow run 41251541444 ok. File newsletter-25-oct-2026.jpg. Date 25/10/2026.
 - Doora-Barefield run 41251538752 saved doora-Barefield.pdf and marked it ok. The stored date is empty. The link on the page says 1st November. Do not call that run 01/11/2026. Do not send it again.
