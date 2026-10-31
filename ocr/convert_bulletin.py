@@ -3,9 +3,12 @@
 import os
 import base64
 import io
+import json
 import re
 import html as html_utils
 import sys
+import urllib.error
+import urllib.request
 
 from ocr.bulletin_layout import split_heading_prefix
 from ocr.sparse_page_ocr import choose_vision_page_indexes, merge_vision_into_pages
@@ -461,6 +464,70 @@ def _text_band_below_photo(image):
     return image.crop((0, top, width, height))
 
 
+def _groq_api_key() -> str:
+    raw = os.environ.get("GROQNOV2026") or os.environ.get("GROQ_API_KEY") or ""
+    return "".join(raw.split())
+
+
+def groq_transcribe_image(image) -> list[str]:
+    """Read one column with Groq. Secret name on GitHub is GROQNOV2026."""
+    api_key = _groq_api_key()
+    if not api_key:
+        print("    GROQNOV2026 not set, skipping this column.", flush=True)
+        return []
+    print("    Sending this column to Groq ...", flush=True)
+    payload = {
+        "model": "qwen/qwen3.8-27b",
+        "temperature": 0,
+        "max_completion_tokens": 4096,
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": OCR_PROMPT},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{_image_to_base64_png(image)}",
+                        },
+                    },
+                ],
+            }
+        ],
+    }
+    request = urllib.request.Request(
+        "https://api.groq.com/openai/v1/chat/completions",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=120) as response:
+            body = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        detail = ""
+        if isinstance(exc, urllib.error.HTTPError):
+            try:
+                detail = exc.read().decode("utf-8", errors="replace")[:300]
+            except Exception:
+                detail = ""
+        print(f"    Groq column failed ({type(exc).__name__}: {exc} {detail}).", flush=True)
+        return []
+    try:
+        content = body["choices"][0]["message"]["content"] or ""
+    except (KeyError, IndexError, TypeError) as exc:
+        print(f"    Groq column returned no text ({exc}).", flush=True)
+        return []
+    if isinstance(content, list):
+        content = "\n".join(
+            part.get("text", "") for part in content if isinstance(part, dict)
+        )
+    return _lines_from_gemini_text(str(content))
+
+
 def ocr_images_with_gemini(images):
     """Run Gemini OCR across images and return (pages_text, provider_summary)."""
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -474,6 +541,7 @@ def ocr_images_with_gemini(images):
     safety = _gemini_safety_settings(genai)
     pages_text = []
     used_mistral = False
+    used_groq = False
     for i, image in enumerate(images, start=1):
         strips = _vision_column_strips(image)
         if len(strips) > 1:
@@ -490,16 +558,24 @@ def ocr_images_with_gemini(images):
             lines = _gemini_transcribe(model, strip, OCR_PROMPT, safety)
             if not lines:
                 print("    Gemini refused this column.", flush=True)
+                lines = groq_transcribe_image(strip)
+                if lines:
+                    used_groq = True
+            if not lines:
                 lines = mistral_transcribe_image(strip)
                 if lines:
                     used_mistral = True
             if not lines:
                 band = _text_band_below_photo(strip)
                 if band is not None:
-                    print("    Sending the text under the photo to Mistral.", flush=True)
-                    lines = mistral_transcribe_image(band)
+                    print("    Sending the text under the photo to Groq.", flush=True)
+                    lines = groq_transcribe_image(band)
                     if lines:
-                        used_mistral = True
+                        used_groq = True
+                    if not lines:
+                        lines = mistral_transcribe_image(band)
+                        if lines:
+                            used_mistral = True
             if not lines:
                 continue
             got_any = True
@@ -509,7 +585,12 @@ def ocr_images_with_gemini(images):
         if not got_any:
             raise RuntimeError(f"Gemini returned no text for page {i}.")
         pages_text.append(page_lines)
-    provider = "Gemini+Mistral" if used_mistral else "Gemini fallback"
+    extras = []
+    if used_groq:
+        extras.append("Groq")
+    if used_mistral:
+        extras.append("Mistral")
+    provider = "Gemini+" + "+".join(extras) if extras else "Gemini fallback"
     return pages_text, provider
 
 
