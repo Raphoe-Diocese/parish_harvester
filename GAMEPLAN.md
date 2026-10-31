@@ -1,5 +1,7 @@
 ﻿## 31/10/2026 — A–Z gold links, first proved batch
 
+- Merged PR 434 (e173bfcf). Brain has the new tricks. Not on parishpress.ie until a harvest run finishes and Pages deploys.
+- First harvests failed in the test step (St Oliver Plunkett example lock). That lock is fixed in the same PR. Harvests re-sent with tests skipped: Arklow 41218018179, Ballinora 41218021691, Kilmurry 41218024955, Birr 41218027891, Bodyke 41218031002, Baile an Fheirtearaigh 41218034474, Bree 41218037154, Booterstown 41218040176. Not marked ok until those runs say so.
 - Target week is still 25/10/2026. A file dated 01/11/2026 is inside the 8-day grace. A file dated 18/10/2026 is stale.
 - theparishioner.ie/newsletter is Joomla `/images/newsletter/YY-MM-DD.pdf`. Proved 26-10-25.pdf (25/10/2026) and 26-11-01.pdf (01/11/2026). Ballincollig steps no longer pin 20/09. Ballinora and Kilmurry now scrape that listing. Ovens stays on its own site. onefaith.ie is the same shape but newest proved file is 26-10-12.pdf. Not this week.
 - Arklow homepage PDF proved for 01/11/2026. Harvest dispatched on main: Actions 41216435491. Not marked ok until that run says so.
