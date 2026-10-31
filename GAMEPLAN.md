@@ -1,4 +1,18 @@
-﻿## 31/10/2026 21:20 — Birr and Bodyke harvested 25/10/2026
+﻿## 31/10/2026 22:30 — Six listings harvested, two timed out
+
+- Castleconnell run 41244083938 ok. File Newsletter-25th-October-2026.pdf. Date 25/10/2026.
+- Carraig na bhFear run 41244089626 ok. File Carraig-25-10-26.pdf. Date 25/10/2026.
+- Glanmire run 41244092792 ok. File Glanmire-25-10-26.pdf. Date 25/10/2026.
+- Glounthaune run 41244096765 ok. File Glounthaune-25-10-26.pdf. Date 25/10/2026.
+- Watergrasshill run 41244100197 ok. File Wgh-25-10-26.pdf. Date 25/10/2026.
+- Borrisokane run 41244475049 ok. File 1st-Nov.-2026-newsletter.pdf. Date 01/11/2026.
+- Churchtown run 41244086775 timed out three times. The local file newsletter-2026-11-01.pdf is real. Do not send the same scrape again.
+- Booterstown run 41244478540 asked for Sun-25-October-2026-Booterstown-Weekly-Newsletter.pdf. The browser said miss, then it timed out three times. Do not send Booterstown again.
+- Clarecastle and Corofin listings proved the 25/10/2026 PDFs. Sent Clarecastle 41248893099 and Corofin 41248896002. Not ok until those runs say so.
+- Left: Clonduff's bulletin page came back 404 after the certificate failed. Courceys returned 403. Carlingford's links say View and the hash has no date. Last saved file is 27/09/2026.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 21:20 — Birr and Bodyke harvested 25/10/2026
 
 - Birr run 41227670229 ok. File 25102026.pdf. Date 25/10/2026.
 - Bodyke run 41227674612 ok. File October-25th-2026-30th-Sunday-in-Ordinary-Time-NEW.pdf. Date 25/10/2026.

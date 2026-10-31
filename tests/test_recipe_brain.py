@@ -102,6 +102,10 @@ def test_listing_pdfs_proved_31_october() -> None:
     church = hint_for_url("https://churchtownparish.com/newsletter/")
     assert church is not None and church.key == "iso_newsletter_pdf"
     assert any("01/11/2026" in line or "2026-11-01" in line for line in church.notes)
+    clare = hint_for_url("https://www.clarecastleballyeaparish.ie/newsletter/")
+    assert clare is not None and clare.key == "spelled_month_listing_pdf"
+    corofin = hint_for_url("https://imeallboirne.ie/newsletter/")
+    assert corofin is not None and any("25th-October-2026" in line for line in corofin.notes)
 
 
 def test_churchmedia_is_api_newsletter() -> None:

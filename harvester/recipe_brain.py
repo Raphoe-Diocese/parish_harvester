@@ -277,11 +277,13 @@ def hint_for_url(url: str) -> HubHint | None:
                 "31/10/2026 local wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026) and Sun-25-October-2026-Booterstown-Weekly-Newsletter.pdf (25/10/2026).",
                 "GitHub run 41227678445 guessed Newsletter-25th-October-2026-30th-Sunday-in-Ordinary-Time.pdf and missed. wp-json then scored nothing.",
                 "The homepage HTML has no PDF link. Ask for Sun-D-Month-YYYY-Booterstown-Weekly-Newsletter.pdf before wp-json. Do not pin that name.",
+                "Harvest 41244478540 asked for that exact Sun-25-October name. The browser said miss, then the parish timed out three times. Do not send it again.",
             ),
             do_not=(
                 "Do not pin the dated filename.",
                 "Do not harvest the front.png as the bulletin.",
                 "Do not send the same wp-json-only harvest again.",
+                "Do not send Booterstown again.",
             ),
             pattern_key="booterstown_sunday_pdf+direct_download",
         )
@@ -296,6 +298,7 @@ def hint_for_url(url: str) -> HubHint | None:
                 "31/10/2026 /wp-json/wp/v2/media returned HTTP 404.",
                 "The homepage links 1st-Nov.-2026-newsletter.pdf. Proved application/pdf, 349130 bytes, date 01/11/2026.",
                 "Scrape the homepage. Do not pin the filename.",
+                "Harvest 41244475049 ok. Saved 1st-Nov.-2026-newsletter.pdf. Date 01/11/2026.",
             ),
             do_not=("Do not pin the dated filename.", "Do not keep calling wp-json when it returns 404."),
             pattern_key="homepage_pdf_when_wpjson_404+direct_download",
@@ -310,6 +313,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 the newsletters list proved Carraig-25-10-26.pdf, Glanmire-25-10-26.pdf, Glounthaune-25-10-26.pdf, and Wgh-25-10-26.pdf.",
                 "Each prefix is one parish. The date in the filename is DD-MM-YY. Do not pin it.",
+                "Harvests ok on 25/10/2026: Carraig 41244089626, Glanmire 41244092792, Glounthaune 41244096765, Watergrasshill 41244100197.",
             ),
             do_not=(
                 "Do not pin the dated filename.",
@@ -345,6 +349,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 /newsletter/ proved Newsletter-25th-October-2026.pdf (application/pdf, 205363 bytes).",
                 "A 1 November file on the same page is a Word document. Keep the PDF.",
+                "Harvest 41244083938 ok. Saved Newsletter-25th-October-2026.pdf. Date 25/10/2026.",
             ),
             do_not=("Do not pin the dated filename.", "Do not save the Word file as the bulletin."),
             pattern_key="spelled_month_listing_pdf+direct_download",
@@ -359,9 +364,38 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 /newsletter/ proved newsletter-2026-11-01.pdf (application/pdf, 1400380 bytes).",
                 "This Sunday was not on the page. The 01/11/2026 file is inside the 8-day window.",
+                "Harvest 41244086775 timed out three times. The file was proved locally. Do not send the same scrape again.",
             ),
             do_not=("Do not pin the dated filename.",),
             pattern_key="iso_newsletter_pdf+direct_download",
+        )
+
+    if host == "clarecastleballyeaparish.ie":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Clarecastle Dth-Month-YYYY.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 /newsletter/ proved 25th-October-2026.pdf (application/pdf, 234789 bytes) and 1st-November-2026.pdf.",
+                "This Sunday's PDF wins. Harvest 41248893099 is sent. Not ok until that run says so.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not take the community lotto page."),
+            pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "imeallboirne.ie":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Corofin Dth-Month-YYYY Newsletter PDF",
+            confidence="high",
+            notes=(
+                "31/10/2026 /newsletter/ proved 25th-October-2026-Newsletter.pdf (application/pdf, 311256 bytes) and 1st-November-2026-Newsletter-1.pdf.",
+                "This Sunday's PDF wins. Harvest 41248896002 is sent. Not ok until that run says so.",
+            ),
+            do_not=("Do not pin the dated filename.",),
+            pattern_key="spelled_month_listing_pdf+direct_download",
         )
 
     if host == "saintabbans.com":

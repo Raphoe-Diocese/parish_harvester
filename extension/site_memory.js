@@ -438,7 +438,7 @@
       recipe_flow: "direct_download",
       label: "Booterstown Sun-D-Month-YYYY PDF in wp-json",
       operator_notes: [
-        "31/10/2026 wp-json proved Sun-1-November-2026 and Sun-25-October-2026 PDFs.",
+        "31/10/2026 wp-json proved Sun-1-November-2026 and Sun-25-October-2026 PDFs. Harvest 41244478540 asked for Sun-25-October and the browser said miss, then timed out. Do not send it again.",
       ],
       do_not: ["Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."],
     },
@@ -702,7 +702,7 @@
     if (start.includes("churchtownparish.com")) {
       return CATALOG.iso_newsletter_pdf;
     }
-    if (start.includes("castleconnellparish.ie")) {
+    if (start.includes("castleconnellparish.ie") || start.includes("clarecastleballyeaparish.ie") || start.includes("imeallboirne.ie")) {
       return CATALOG.spelled_month_listing_pdf;
     }
     if (start.includes("churchservices.tv")) {
