@@ -56,7 +56,7 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **NOW · doing** · 2026-10-31 · **Groq key wired, not proved.** GitHub secret `GROQNOV2026` is set. A refused column now goes to Groq (`qwen/qwen3.8-27b`) before Mistral. The key value is not in the repo. Annagry is not read yet. **Not live.** Do not call Annagry fixed. · `ocr/convert_bulletin.py`, `.github/workflows/ocr-reading-probe.yml`
+- [ ] **NOW · doing** · 2026-10-31 · **Groq key works. Annagry still fails.** Secret `GROQNOV2026` is on GitHub. Run [41209803840](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/41209803840). Groq read the contacts column: 30th Sunday of Ordinary Time, 074 9548902, Míle buíochas. The Mass column was not read: free plan allows 1000 output tokens a minute and the request asked for more (HTTP 429). Gortahork PASS. Newtown PASS. **Not live.** Do not call Annagry fixed. · `ocr/convert_bulletin.py`
 
 - [ ] **NOW · doing** · 2026-10-31 · **Mistral contacts column did not read.** Actions [41203769152](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/41203769152). The call reached Mistral. Response: **401 Invalid API Key**. Gemini free tier is also used up (20 requests, retry about 18 hours), so this run could not repeat the earlier Mass-column read. Gortahork failed on this run only because Gemini quota is gone, not because the earlier pass was undone. Newtown still passes on typed text. **Not live.** Needs a valid `MISTRAL_API_KEY` secret, then another probe after Gemini resets. Do not call Annagry fixed. · `ocr/convert_bulletin.py`, `requirements.txt`
 
