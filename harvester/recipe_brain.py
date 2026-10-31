@@ -200,6 +200,51 @@ def hint_for_url(url: str) -> HubHint | None:
             pattern_key="yearless_month_pdf+direct_download",
         )
 
+    if host == "stbrendansbirr.ie":
+        return HubHint(
+            key="ddmmyyyy_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Listing PDF named DDMMYYYY.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 Birr /newsletter/ linked 01112026.pdf and 25102026.pdf.",
+                "Proved both application/pdf. The filename is DDMMYYYY. Do not pin it.",
+            ),
+            do_not=("Do not pin the DDMMYYYY.pdf name.",),
+            pattern_key="ddmmyyyy_listing_pdf+direct_download",
+        )
+
+    if host == "bodyketuamgraneyparish.ie":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Listing PDF named Month-Dth-YYYY",
+            confidence="high",
+            notes=(
+                "31/10/2026 Bodyke /newsletter/ linked November-1st-2026 and October-25th-2026 PDFs.",
+                "Proved both application/pdf. /parish-newsletter/ was a 404. Use /newsletter/.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not use the 404 /parish-newsletter/ path."),
+            pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "dioceseofkerry.ie":
+        return HubHint(
+            key="kerry_card_yyyymmdd_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Kerry diocese card PDF named YYYY-MM-DD.pdf",
+            confidence="high",
+            notes=(
+                "The parish card on dioceseofkerry.ie links /wp-content/uploads/YYYY/MM/YYYY-MM-DD.pdf.",
+                "31/10/2026 Baile an Fheirtearaigh card proved 2026-11-01.pdf (application/pdf, 01/11/2026).",
+            ),
+            do_not=(
+                "Do not pin the dated PDF.",
+                "Do not use the diocese Facebook page as the parish link.",
+            ),
+            pattern_key="kerry_card_yyyymmdd_pdf+direct_download",
+        )
+
     if host == "saintabbans.com":
         return HubHint(
             key="html_listing_still_stale",

@@ -67,6 +67,16 @@ def test_ashbourne_403_is_not_a_missing_file() -> None:
     assert any("403" in line for line in hint.notes)
 
 
+def test_birr_bodyke_and_kerry_listings() -> None:
+    birr = hint_for_url("https://www.stbrendansbirr.ie/newsletter/")
+    assert birr is not None and birr.key == "ddmmyyyy_listing_pdf"
+    bodyke = hint_for_url("https://www.bodyketuamgraneyparish.ie/newsletter/")
+    assert bodyke is not None and bodyke.key == "spelled_month_listing_pdf"
+    kerry = hint_for_url("https://www.dioceseofkerry.ie/parish/baile-an-fheirtearaigh/")
+    assert kerry is not None and kerry.key == "kerry_card_yyyymmdd_pdf"
+    assert any("Facebook" in line for line in kerry.do_not)
+
+
 def test_churchmedia_is_api_newsletter() -> None:
     hint = hint_for_url("https://churchmedia.tv/st-patricks-church-2")
     assert hint is not None

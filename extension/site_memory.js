@@ -383,6 +383,43 @@
         "Do not call onefaith fresh while its newest PDF is 12/10/2026.",
       ],
     },
+    ddmmyyyy_listing_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Listing PDF named DDMMYYYY.pdf",
+      operator_notes: [
+        "31/10/2026 Birr /newsletter/ linked 01112026.pdf and 25102026.pdf. Both application/pdf.",
+      ],
+      do_not: ["Do not pin the DDMMYYYY.pdf name."],
+    },
+    spelled_month_listing_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Listing PDF named Month-Dth-YYYY",
+      operator_notes: [
+        "31/10/2026 Bodyke /newsletter/ linked November-1st-2026 and October-25th-2026 PDFs.",
+        "/parish-newsletter/ was a 404. Use /newsletter/.",
+      ],
+      do_not: ["Do not pin the dated filename."],
+    },
+    kerry_card_yyyymmdd_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Kerry diocese card PDF named YYYY-MM-DD.pdf",
+      operator_notes: [
+        "31/10/2026 Baile an Fheirtearaigh card proved 2026-11-01.pdf (application/pdf, 01/11/2026).",
+      ],
+      do_not: [
+        "Do not pin the dated PDF.",
+        "Do not use the diocese Facebook page as the parish link.",
+      ],
+    },
     mayo_ie_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -565,6 +602,15 @@
       start.includes("/images/newsletter/")
     ) {
       return CATALOG.joomla_images_newsletter;
+    }
+    if (start.includes("stbrendansbirr.ie")) {
+      return CATALOG.ddmmyyyy_listing_pdf;
+    }
+    if (start.includes("bodyketuamgraneyparish.ie")) {
+      return CATALOG.spelled_month_listing_pdf;
+    }
+    if (start.includes("dioceseofkerry.ie")) {
+      return CATALOG.kerry_card_yyyymmdd_pdf;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;

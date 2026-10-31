@@ -29,6 +29,8 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 |---|---|---|
 | `http_scrape_newest_pdf` | Dated `.pdf` in listing HTML | Score **filename** not `/uploads/YYYY/MM/` folder |
 | Joomla `/images/newsletter/YY-MM-DD.pdf` | theparishioner.ie and onefaith.ie. 31/10/2026 theparishioner proved `26-10-25.pdf` (25/10/2026) and `26-11-01.pdf` (01/11/2026). onefaith newest proved file was `26-10-12.pdf` (12/10/2026). | Scrape the listing. Do not pin the date. The HTML article is not the PDF. Do not call onefaith fresh while the file is 12/10. |
+| `DDMMYYYY.pdf` on a listing | Birr `/newsletter/` on 31/10/2026: `01112026.pdf` and `25102026.pdf`, both application/pdf. | Scrape the listing. Do not pin the filename. |
+| Kerry parish card | dioceseofkerry.ie card links `/wp-content/uploads/YYYY/MM/YYYY-MM-DD.pdf`. 31/10/2026 Baile an Fheirtearaigh proved `2026-11-01.pdf`. | Scrape the card. Do not pin. Do not use the diocese Facebook page. |
 | `wp_json_newest_media` | WordPress media library | `href_patterns` for bulletin words; harvest UA |
 | 403 page, file is still there | Cloyne 24/10/2026. urllib gets a page titled 403 - Forbidden | Ask the browser for this Sunday's uploads name. Cloyne is Newsletter-18th-October-2026-29th-Sunday-in-Ordinary-Time.pdf. Harvest 40095219846 ok, 18/10/2026. Another parish with that same page is the same trick. Do not pin the dated name. Do not retry urllib until the time limit. |
 | `predicted_dated_pdf` / `js_dated_pdf_list` | `/pdf/DDMMYY.pdf` (Tempo, Enniskillen, Derry Pattern A) | Listing may be **JavaScript**. HTTP scrape of `news.html` looks empty. Fetch the rewritten PDF. Prefer HTTP if TLS fails. |
