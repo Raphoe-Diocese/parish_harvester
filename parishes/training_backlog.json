@@ -9,9 +9,10 @@
     "stale_rejected": 69
   },
   "action_counts": {
-    "ok": 415,
+    "ok": 417,
     "skip": 783,
-    "investigate": 73
+    "investigate": 73,
+    "mark_inactive": 1
   },
   "parishes": [
     {
@@ -1828,10 +1829,10 @@
       "learned_pattern": "homepage_bracket_date+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.arklowparish.ie/ \u2014 no dated bulletin PDF matching ['newsletter', 'october', '.pdf'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.arklowparish.ie/ \u2014 no dated bulletin PDF matching ['newsletter', 'october', '.pdf'] (not a selector proble"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "arles",
@@ -6407,6 +6408,42 @@
       "suggested_reason": "Website found (https://www.lowerkilleavy.com) but no this-week PDF proved on 29/09/2026 kitchen-sink \u2014 link only until bulletin URL proved."
     },
     {
+      "parish_key": "birr",
+      "display_name": "Birr",
+      "diocese": "killaloe",
+      "recipe_file": "parishes/recipes/killaloe/birr.json",
+      "recipe": {
+        "start_url": "https://www.stbrendansbirr.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "02/10/2026 hunt. Listing /newsletter/. Proved 04102026.pdf GET 200 application/pdf 861997 bytes. Filename date 04/10/2026. PDF text lists Sun 4th masses.",
+          "31/10/2026: same listing. Proved 01112026.pdf (application/pdf, %PDF, 01/11/2026, 1002401 bytes) and 25102026.pdf (application/pdf, %PDF, 25/10/2026, 870867 bytes). Filename is DDMMYYYY.",
+          "site_type http_scrape_newest_pdf. example_url records the proved file. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin the dated filename.",
+          "Do not harvest Facebook.",
+          "Do not store the Killaloe diocese Facebook page as this parish."
+        ],
+        "recorded_date": "2026-10-31"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "ddmmyyyy_listing_pdf+direct_download",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "blackrockdublin",
       "display_name": "Blackrock",
       "diocese": "dublin",
@@ -6690,6 +6727,42 @@
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
     {
+      "parish_key": "bodyke",
+      "display_name": "Bodyke (Kilnoe and Tuamgraney)",
+      "diocese": "killaloe",
+      "recipe_file": "parishes/recipes/killaloe/bodyke.json",
+      "recipe": {
+        "start_url": "https://www.bodyketuamgraneyparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "02/10/2026 hunt. Official card linked /parish-newsletter/ (404). Live listing is /newsletter/. Proved October-4th-2026 PDF GET 200 application/pdf 506398 bytes. Text: 4th October 2026.",
+          "31/10/2026: same /newsletter/ listing. Proved November-1st-2026 PDF (application/pdf, %PDF, 01/11/2026, 525261 bytes) and October-25th-2026 PDF (application/pdf, %PDF, 25/10/2026, 788531 bytes).",
+          "site_type http_scrape_newest_pdf. example_url records the proved file. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin the dated filename.",
+          "Do not harvest Facebook.",
+          "Do not store the Killaloe diocese Facebook page as this parish."
+        ],
+        "recorded_date": "2026-10-31"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "spelled_month_listing_pdf+direct_download",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.killaloediocese.ie/parish/bodyke-kilnoe-and-tuamgraney/",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
+    },
+    {
       "parish_key": "boherbue",
       "display_name": "Boherbue",
       "diocese": "kerry",
@@ -6902,6 +6975,42 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+    },
+    {
+      "parish_key": "booterstown",
+      "display_name": "Booterstown",
+      "diocese": "dublin",
+      "recipe_file": "parishes/recipes/dublin/booterstown.json",
+      "recipe": {
+        "start_url": "https://booterstownparish.ie/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "05/10/2026 Dublin leftover hunt: weekly PDF is in wp-json media. Listing /newsletter/ is a webp, not the file.",
+          "Proved Sun-4-October-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1675137 bytes magic %PDF. Date 04/10/2026.",
+          "31/10/2026: wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026, 1134965 bytes) and Sun-25-October-2026 (application/pdf, 25/10/2026, 1218254 bytes).",
+          "Skip JPEG previews of the same PDF. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename or Wix hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-10-05"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "booterstown_sunday_pdf+direct_download",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
+      "suggested_action": "investigate",
+      "suggested_reason": "Downloaded file looks like a website error/security page, not a bulletin PDF"
     },
     {
       "parish_key": "bornacoola",
