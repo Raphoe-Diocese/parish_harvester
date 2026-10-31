@@ -504,6 +504,15 @@ def _groq_rate_limit_wait(detail: str) -> float | None:
     return min(float(match.group(1)) + 1.0, 70.0)
 
 
+# Keep the bulletin prompt, and tell Groq not to add or drop a letter.
+_GROQ_PROMPT = (
+    OCR_PROMPT
+    + "\n\nCopy the print letter by letter. "
+    "Do not add a letter and do not drop a letter. "
+    "Keep short lines and amounts."
+)
+
+
 def groq_transcribe_image(image) -> list[str]:
     """Read one column with Groq. Secret name on GitHub is GROQNOV2026."""
     api_key = _groq_api_key()
@@ -519,7 +528,7 @@ def groq_transcribe_image(image) -> list[str]:
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": OCR_PROMPT},
+                    {"type": "text", "text": _GROQ_PROMPT},
                     {
                         "type": "image_url",
                         "image_url": {

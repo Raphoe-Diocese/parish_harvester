@@ -92,7 +92,7 @@ def main() -> int:
         if score.banned_hits:
             lines.append("  banned: " + "; ".join(score.banned_hits))
         if not score.ok:
-            lines.append("  read: " + fold_reading(text)[:700])
+            lines.append("  read: " + fold_reading(text)[:1800])
     report = "\n".join(lines)
     print(report)
     out = ROOT / "ocr-reading-probe.txt"
