@@ -378,7 +378,7 @@ def hint_for_url(url: str) -> HubHint | None:
             confidence="high",
             notes=(
                 "31/10/2026 /newsletter/ proved 25th-October-2026.pdf (application/pdf, 234789 bytes) and 1st-November-2026.pdf.",
-                "This Sunday's PDF wins. Harvest 41248893099 is sent. Not ok until that run says so.",
+                "This Sunday's PDF wins. Harvest 41248893099 ok. Saved 25th-October-2026.pdf. Date 25/10/2026.",
             ),
             do_not=("Do not pin the dated filename.", "Do not take the community lotto page."),
             pattern_key="spelled_month_listing_pdf+direct_download",
@@ -392,10 +392,54 @@ def hint_for_url(url: str) -> HubHint | None:
             confidence="high",
             notes=(
                 "31/10/2026 /newsletter/ proved 25th-October-2026-Newsletter.pdf (application/pdf, 311256 bytes) and 1st-November-2026-Newsletter-1.pdf.",
-                "This Sunday's PDF wins. Harvest 41248896002 is sent. Not ok until that run says so.",
+                "This Sunday's PDF wins. Harvest 41248896002 ok. Saved 25th-October-2026-Newsletter.pdf. Date 25/10/2026.",
             ),
             do_not=("Do not pin the dated filename.",),
             pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "doorabarefieldparish.ie":
+        return HubHint(
+            key="link_text_undated_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Undated PDF, date in the link text",
+            confidence="high",
+            notes=(
+                "31/10/2026 the file doora-Barefield.pdf has no date in the name.",
+                "The link text says 1st November. That scores as 01/11/2026. Proved application/pdf, 3109933 bytes.",
+                "18th-Oct.pdf is still listed. The 1 November link wins. Harvest 41251538752 is sent. Not ok until that run says so.",
+            ),
+            do_not=("Do not pin doora-Barefield.pdf.", "Do not take 18th-Oct.pdf while the 1 November link is listed."),
+            pattern_key="link_text_undated_pdf+direct_download",
+        )
+
+    if host == "durrow.ie":
+        return HubHint(
+            key="category_week_jpg",
+            site_type="http_scrape_newest_images",
+            label="Durrow newsletter JPG on the category page",
+            confidence="high",
+            notes=(
+                "31/10/2026 the category page has newsletter-25-oct-2026.jpg.",
+                "Proved image/jpeg, 163613 bytes, date 25/10/2026. Skip the resized copies.",
+                "Harvest 41251541444 is sent. Not ok until that run says so.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not take the 300px resized copy."),
+            pattern_key="category_week_jpg+direct_download",
+        )
+
+    if host == "doonbegparish.com":
+        return HubHint(
+            key="parish_site_no_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Doonbeg parish site has no PDF yet",
+            confidence="high",
+            notes=(
+                "31/10/2026 https://doonbegparish.com/newsletter returned a page with no PDF.",
+                "The Killaloe /parish/ card is not the bulletin. Leave Doonbeg until a file is on the parish site.",
+            ),
+            do_not=("Do not save the diocese /parish/ card.", "Do not pin a dated filename."),
+            pattern_key="parish_site_no_pdf+direct_download",
         )
 
     if host == "saintabbans.com":
