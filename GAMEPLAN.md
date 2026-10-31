@@ -2,8 +2,8 @@
 
 - Arklow run 41222578645 ok. File newsletter_1st_November_2026[2026-11-01].pdf. Date 01/11/2026.
 - Baile an Fheirtearaigh run 41222582124 ok. File 2026-11-01.pdf. Date 01/11/2026.
-- Birr and Bodyke failed because the recipe JSON was missing a comma. The harvest then saved the Killaloe /parish/ card and rejected it. Comma put back. Not ok until the next run.
-- Booterstown recipe had the same missing comma. The run itself saved a security page. Not ok.
+- Birr and Bodyke failed because the recipe JSON was missing a comma. The harvest then saved the Killaloe /parish/ card and rejected it. Comma put back. Re-sent: Birr 41227670229, Bodyke 41227674612. Not ok until those runs say so.
+- Booterstown recipe had the same missing comma. The run itself saved a security page. Re-sent 41227678445. Not ok until that run says so.
 - Not checked on parishpress.ie.
 
 ## 31/10/2026 16:50 — Harvest results, then the ahead-file fix
