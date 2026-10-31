@@ -113,6 +113,11 @@ def test_listing_pdfs_proved_31_october() -> None:
     assert durrow is not None and durrow.site_type == "http_scrape_newest_images"
     doonbeg = hint_for_url("https://doonbegparish.com/newsletter")
     assert doonbeg is not None and any("card" in line.lower() for line in doonbeg.do_not)
+    ennis = hint_for_url("https://www.ennisparish.com/newsletter/")
+    assert ennis is not None and any("25th-October.pdf" in line for line in ennis.notes)
+    assert any("1stB-November" in line for line in ennis.do_not)
+    inagh = hint_for_url("https://inaghkilnamonaparish.ie/newsletter/")
+    assert inagh is not None and any("25th-October-2026" in line for line in inagh.notes)
 
 
 def test_churchmedia_is_api_newsletter() -> None:

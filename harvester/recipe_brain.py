@@ -407,7 +407,8 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 the file doora-Barefield.pdf has no date in the name.",
                 "The link text says 1st November. That scores as 01/11/2026. Proved application/pdf, 3109933 bytes.",
-                "18th-Oct.pdf is still listed. The 1 November link wins. Harvest 41251538752 is sent. Not ok until that run says so.",
+                "18th-Oct.pdf is still listed. The 1 November link wins.",
+                "Harvest 41251538752 saved doora-Barefield.pdf and marked it ok. The stored date is empty. Do not call that run 01/11/2026. Do not send it again.",
             ),
             do_not=("Do not pin doora-Barefield.pdf.", "Do not take 18th-Oct.pdf while the 1 November link is listed."),
             pattern_key="link_text_undated_pdf+direct_download",
@@ -422,7 +423,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 the category page has newsletter-25-oct-2026.jpg.",
                 "Proved image/jpeg, 163613 bytes, date 25/10/2026. Skip the resized copies.",
-                "Harvest 41251541444 is sent. Not ok until that run says so.",
+                "Harvest 41251541444 ok. Saved newsletter-25-oct-2026.jpg. Date 25/10/2026.",
             ),
             do_not=("Do not pin the dated filename.", "Do not take the 300px resized copy."),
             pattern_key="category_week_jpg+direct_download",
@@ -440,6 +441,36 @@ def hint_for_url(url: str) -> HubHint | None:
             ),
             do_not=("Do not save the diocese /parish/ card.", "Do not pin a dated filename."),
             pattern_key="parish_site_no_pdf+direct_download",
+        )
+
+    if host == "ennisparish.com":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Ennis Dth-Month.pdf on the newsletter list",
+            confidence="high",
+            notes=(
+                "31/10/2026 /newsletter/ proved 25th-October.pdf (application/pdf, 536563 bytes). The link says Sunday 25th October 2026.",
+                "1stB-November.pdf is also listed. The date reader scored that name as 01/10/2026. This Sunday's file is listed, so keep 25th-October.pdf.",
+                "Harvest 41252519900 is sent. Not ok until that run says so.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not take 1stB-November.pdf while 25th-October.pdf is listed."),
+            pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "inaghkilnamonaparish.ie":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Inagh Newsletter-Dth-Month-YYYY.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 /newsletter/ proved Newsletter-25th-October-2026.pdf (application/pdf, 217963 bytes).",
+                "Newsletter-1st-November-2026.pdf is also listed. This Sunday's file wins.",
+                "Harvest 41252523450 is sent. Not ok until that run says so.",
+            ),
+            do_not=("Do not pin the dated filename.",),
+            pattern_key="spelled_month_listing_pdf+direct_download",
         )
 
     if host == "saintabbans.com":
