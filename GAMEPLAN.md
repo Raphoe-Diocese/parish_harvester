@@ -1,4 +1,12 @@
-﻿## 31/10/2026 16:50 — Harvest results, then the ahead-file fix
+﻿## 31/10/2026 18:00 — Arklow and Baile an Fheirtearaigh harvested 01/11/2026
+
+- Arklow run 41222578645 ok. File newsletter_1st_November_2026[2026-11-01].pdf. Date 01/11/2026.
+- Baile an Fheirtearaigh run 41222582124 ok. File 2026-11-01.pdf. Date 01/11/2026.
+- Birr and Bodyke failed because the recipe JSON was missing a comma. The harvest then saved the Killaloe /parish/ card and rejected it. Comma put back. Not ok until the next run.
+- Booterstown recipe had the same missing comma. The run itself saved a security page. Not ok.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 16:50 — Harvest results, then the ahead-file fix
 
 - Ballinora and Kilmurry: harvest ok, date 25/10/2026, file 25-10-26.pdf. Runs 41218021691 and 41218024955. Not checked on parishpress.ie.
 - Baile an Fheirtearaigh: stale 18/10/2026. The card also has 01/11/2026. The picker dropped that file because it is after 25/10.
