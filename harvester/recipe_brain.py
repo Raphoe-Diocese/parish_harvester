@@ -209,6 +209,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 Birr /newsletter/ linked 01112026.pdf and 25102026.pdf.",
                 "Proved both application/pdf. The filename is DDMMYYYY. Do not pin it.",
+                "Harvest 41227670229 ok. Saved 25102026.pdf. Date 25/10/2026. This Sunday won.",
             ),
             do_not=("Do not pin the DDMMYYYY.pdf name.",),
             pattern_key="ddmmyyyy_listing_pdf+direct_download",
@@ -223,6 +224,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 Bodyke /newsletter/ linked November-1st-2026 and October-25th-2026 PDFs.",
                 "Proved both application/pdf. /parish-newsletter/ was a 404. Use /newsletter/.",
+                "Harvest 41227674612 ok. Saved the October-25th-2026 PDF. Date 25/10/2026.",
             ),
             do_not=("Do not pin the dated filename.", "Do not use the 404 /parish-newsletter/ path."),
             pattern_key="spelled_month_listing_pdf+direct_download",
@@ -272,11 +274,94 @@ def hint_for_url(url: str) -> HubHint | None:
             label="Booterstown Sun-D-Month-YYYY PDF in wp-json",
             confidence="high",
             notes=(
-                "31/10/2026 wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026).",
-                "Also proved the 25/10/2026 PDF. Skip the front.png preview.",
+                "31/10/2026 local wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026) and Sun-25-October-2026-Booterstown-Weekly-Newsletter.pdf (25/10/2026).",
+                "GitHub run 41227678445 guessed Newsletter-25th-October-2026-30th-Sunday-in-Ordinary-Time.pdf and missed. wp-json then scored nothing.",
+                "The homepage HTML has no PDF link. Ask for Sun-D-Month-YYYY-Booterstown-Weekly-Newsletter.pdf before wp-json. Do not pin that name.",
             ),
-            do_not=("Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."),
+            do_not=(
+                "Do not pin the dated filename.",
+                "Do not harvest the front.png as the bulletin.",
+                "Do not send the same wp-json-only harvest again.",
+            ),
             pattern_key="booterstown_sunday_pdf+direct_download",
+        )
+
+    if host == "borrisokaneparish.ie":
+        return HubHint(
+            key="homepage_pdf_when_wpjson_404",
+            site_type="http_scrape_newest_pdf",
+            label="Homepage PDF when wp-json media is 404",
+            confidence="high",
+            notes=(
+                "31/10/2026 /wp-json/wp/v2/media returned HTTP 404.",
+                "The homepage links 1st-Nov.-2026-newsletter.pdf. Proved application/pdf, 349130 bytes, date 01/11/2026.",
+                "Scrape the homepage. Do not pin the filename.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not keep calling wp-json when it returns 404."),
+            pattern_key="homepage_pdf_when_wpjson_404+direct_download",
+        )
+
+    if host == "parishestogether.ie":
+        return HubHint(
+            key="prefix_ddmmyy_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Parishes Together prefix-DD-MM-YY.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 the newsletters list proved Carraig-25-10-26.pdf, Glanmire-25-10-26.pdf, Glounthaune-25-10-26.pdf, and Wgh-25-10-26.pdf.",
+                "Each prefix is one parish. The date in the filename is DD-MM-YY. Do not pin it.",
+            ),
+            do_not=(
+                "Do not pin the dated filename.",
+                "Do not scrape another parish prefix into this recipe.",
+            ),
+            pattern_key="prefix_ddmmyy_pdf+direct_download",
+        )
+
+    if host == "bantryfamilyofparishes.ie":
+        return HubHint(
+            key="bantry_family_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Bantry family weekly PDF, harvest once",
+            confidence="high",
+            notes=(
+                "One weekly PDF covers Bantry, Caheragh, Goleen, Muintir Bhaire, and Schull.",
+                "31/10/2026 proved 25th_October_2026.2.pdf (25/10/2026) and 1st_November_2026.pdf.",
+                "Harvest once under bantry. The .2 is a site suffix. This Sunday's file wins when both are listed.",
+            ),
+            do_not=(
+                "Do not pin the dated filename.",
+                "Do not add recipes for caheragh, goleen, muintirbhaire, or schull.",
+            ),
+            pattern_key="bantry_family_pdf+direct_download",
+        )
+
+    if host == "castleconnellparish.ie":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Castleconnell Newsletter-Dth-Month-YYYY.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 /newsletter/ proved Newsletter-25th-October-2026.pdf (application/pdf, 205363 bytes).",
+                "A 1 November file on the same page is a Word document. Keep the PDF.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not save the Word file as the bulletin."),
+            pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "churchtownparish.com":
+        return HubHint(
+            key="iso_newsletter_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Churchtown newsletter-YYYY-MM-DD.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 /newsletter/ proved newsletter-2026-11-01.pdf (application/pdf, 1400380 bytes).",
+                "This Sunday was not on the page. The 01/11/2026 file is inside the 8-day window.",
+            ),
+            do_not=("Do not pin the dated filename.",),
+            pattern_key="iso_newsletter_pdf+direct_download",
         )
 
     if host == "saintabbans.com":

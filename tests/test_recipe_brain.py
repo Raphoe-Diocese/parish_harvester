@@ -83,6 +83,25 @@ def test_bree_and_booterstown_use_the_media_library() -> None:
     assert any("pin" in line.lower() for line in bree.do_not)
     boot = hint_for_url("https://booterstownparish.ie/")
     assert boot is not None and boot.key == "booterstown_sunday_pdf"
+    assert any("wp-json-only" in line for line in boot.do_not)
+    assert any("Sun-25-October" in line for line in boot.notes)
+
+
+def test_listing_pdfs_proved_31_october() -> None:
+    borris = hint_for_url("https://borrisokaneparish.ie/")
+    assert borris is not None and borris.site_type == "http_scrape_newest_pdf"
+    assert any("404" in line for line in borris.notes)
+    together = hint_for_url("https://parishestogether.ie/notices/newsletters")
+    assert together is not None and together.key == "prefix_ddmmyy_pdf"
+    assert any("prefix" in line.lower() for line in together.do_not)
+    bantry = hint_for_url("https://bantryfamilyofparishes.ie/notices")
+    assert bantry is not None and bantry.key == "bantry_family_pdf"
+    assert any("schull" in line for line in bantry.do_not)
+    castle = hint_for_url("https://www.castleconnellparish.ie/newsletter/")
+    assert castle is not None and castle.key == "spelled_month_listing_pdf"
+    church = hint_for_url("https://churchtownparish.com/newsletter/")
+    assert church is not None and church.key == "iso_newsletter_pdf"
+    assert any("01/11/2026" in line or "2026-11-01" in line for line in church.notes)
 
 
 def test_churchmedia_is_api_newsletter() -> None:

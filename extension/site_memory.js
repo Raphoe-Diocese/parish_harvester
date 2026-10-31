@@ -442,6 +442,56 @@
       ],
       do_not: ["Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."],
     },
+    homepage_pdf_when_wpjson_404: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Homepage PDF when wp-json media is 404",
+      operator_notes: [
+        "31/10/2026 Borrisokane /wp-json/wp/v2/media returned HTTP 404. The homepage links the PDF. Scrape that page.",
+      ],
+      do_not: ["Do not pin the dated filename.", "Do not keep calling wp-json when it returns 404."],
+    },
+    prefix_ddmmyy_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Parishes Together prefix-DD-MM-YY.pdf",
+      operator_notes: [
+        "31/10/2026 proved Carraig, Glanmire, Glounthaune, and Wgh files named Prefix-25-10-26.pdf. Each prefix is one parish.",
+      ],
+      do_not: [
+        "Do not pin the dated filename.",
+        "Do not scrape another parish prefix into this recipe.",
+      ],
+    },
+    bantry_family_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Bantry family weekly PDF, harvest once",
+      operator_notes: [
+        "One PDF covers Bantry, Caheragh, Goleen, Muintir Bhaire, and Schull. Harvest once under bantry.",
+      ],
+      do_not: [
+        "Do not pin the dated filename.",
+        "Do not add recipes for caheragh, goleen, muintirbhaire, or schull.",
+      ],
+    },
+    iso_newsletter_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "newsletter-YYYY-MM-DD.pdf",
+      operator_notes: [
+        "31/10/2026 Churchtown proved newsletter-2026-11-01.pdf. Date is in the filename.",
+      ],
+      do_not: ["Do not pin the dated filename."],
+    },
     mayo_ie_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -639,6 +689,21 @@
     }
     if (start.includes("booterstownparish.ie")) {
       return CATALOG.booterstown_sunday_pdf;
+    }
+    if (start.includes("borrisokaneparish.ie")) {
+      return CATALOG.homepage_pdf_when_wpjson_404;
+    }
+    if (start.includes("parishestogether.ie")) {
+      return CATALOG.prefix_ddmmyy_pdf;
+    }
+    if (start.includes("bantryfamilyofparishes.ie")) {
+      return CATALOG.bantry_family_pdf;
+    }
+    if (start.includes("churchtownparish.com")) {
+      return CATALOG.iso_newsletter_pdf;
+    }
+    if (start.includes("castleconnellparish.ie")) {
+      return CATALOG.spelled_month_listing_pdf;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;

@@ -374,6 +374,25 @@ def filename_shapes(target: date) -> list[str]:
     return names
 
 
+def extra_sunday_names(host: str, target: date) -> list[str]:
+    """Host-specific Sunday filenames already proved. Not a pinned URL."""
+    host = (host or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    full_month = (
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+    )[target.month - 1]
+    if host == "booterstownparish.ie":
+        # 31/10/2026 proved Sun-25-October-2026 and Sun-1-November-2026.
+        # The day has no ordinal. The Cloyne Newsletter-Dth-Month name missed.
+        return [
+            f"Sun-{target.day}-{full_month}-{target.year}-"
+            "Booterstown-Weekly-Newsletter.pdf"
+        ]
+    return []
+
+
 def predicted_urls(page_url: str, target: date) -> list[Candidate]:
     origin = _origin(page_url)
     if not origin:
