@@ -472,7 +472,25 @@ def _groq_api_key() -> str:
 
 # Free plan: 1000 output tokens a minute. One column must stay under that.
 _GROQ_MAX_COMPLETION_TOKENS = 800
+_GROQ_GAP_SECONDS = 65
+_groq_not_before = 0.0
 _GROQ_RETRY_AFTER = re.compile(r"try again in ([0-9.]+)s", re.IGNORECASE)
+
+
+def _groq_wait_for_free_minute() -> None:
+    """One column at a time. The free plan cannot take two in the same minute."""
+    delay = _groq_not_before - time.monotonic()
+    if delay > 0:
+        print(
+            f"    Waiting {delay:.0f}s so the next column gets a free Groq minute.",
+            flush=True,
+        )
+        time.sleep(delay)
+
+
+def _groq_reserve_minute() -> None:
+    global _groq_not_before
+    _groq_not_before = time.monotonic() + _GROQ_GAP_SECONDS
 
 
 def _groq_rate_limit_wait(detail: str) -> float | None:
@@ -514,6 +532,8 @@ def groq_transcribe_image(image) -> list[str]:
     }
     encoded = json.dumps(payload).encode("utf-8")
     for attempt in range(2):
+        _groq_wait_for_free_minute()
+        _groq_reserve_minute()
         print("    Sending this column to Groq ...", flush=True)
         request = urllib.request.Request(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -544,10 +564,9 @@ def groq_transcribe_image(image) -> list[str]:
                 )
                 return []
             print(
-                f"    Groq free limit. Waiting {wait:.0f}s, then one more try.",
+                f"    Groq free limit. One more try after the minute resets.",
                 flush=True,
             )
-            time.sleep(wait)
             continue
         try:
             content = body["choices"][0]["message"]["content"] or ""
