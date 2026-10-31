@@ -57,7 +57,7 @@
       "operator_notes": [
         "Belmullet proved GET 200 application/pdf on 04/10/2026.",
         "05/10/2026 Tuam leftovers: Burrishoole, Kilvine, Ballyhaunis, Balla-Belcarra, Islandeady-Glenisland, Partry-Tourmakeady (27/09) on mayo.ie. Same listing index as Killala.",
-        "29/10/2026 Frank hub https://www.mayo.ie/parish-newsletter: many cards already 25-10-2026 (Attymass, Belmullet, Bonniconlon, Charlestown, Kilmovee, Knock, Westport, …). Check hub before inventing."
+        "29/10/2026 Frank hub https://www.mayo.ie/parish-newsletter: many cards already 25-10-2026 (Attymass, Belmullet, Bonniconlon, Charlestown, Kilmovee, Knock, Westport, \u2026). Check hub before inventing."
       ],
       "do_not": [
         "Do not pin the getmedia GUID.",
@@ -593,12 +593,12 @@
     "canva_bulletin_image+image_stack": {
       "page_type": "canva_bulletin_image",
       "recipe_flow": "image_stack",
-      "label": "Canva parish site — photo of printed bulletin",
+      "label": "Canva parish site \u2014 photo of printed bulletin",
       "advice": "Weekly bulletin is a photo on a canva.site page, not a PDF. image_stack prefer=largest on img[src*=\"_assets/media\"]. Never pin the media hash. Skip blob: currentSrc.",
       "operator_notes": [
         "29/10/2026 Ardboe: canva.site hosts the printed sheet as a photo. ardboeparish.com redirects there.",
         "Use prefer=largest + _assets/media selector so next week's swapped photo still wins.",
-        "Skip blob: currentSrc — not re-fetchable."
+        "Skip blob: currentSrc \u2014 not re-fetchable."
       ],
       "do_not": [
         "Do not pin /_assets/media/<hash>.png.",
@@ -701,7 +701,7 @@
       "page_type": "permanent_redirect_document",
       "recipe_flow": "direct_download",
       "label": "Kandle /current-newsletter/ permanent redirect",
-      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Set disable_stale_rescrape_fallback. Do not pin the dated uploads path. When the file is last week, leave it stale — never homepage-rescrape.",
+      "advice": "GET /current-newsletter/. If it 200s as %PDF, use site_type permanent_redirect_document. Set disable_stale_rescrape_fallback. Do not pin the dated uploads path. When the file is last week, leave it stale \u2014 never homepage-rescrape.",
       "operator_notes": [
         "03/10/2026 cloud hunt leftover: Bagenalstown, Borris, Mountmellick /current-newsletter/ redirected to 27/09/2026 PDFs (accepted weekend files).",
         "Prove GET 200 application/pdf and %PDF. Point the recipe at /current-newsletter/ only.",
@@ -1195,7 +1195,8 @@
       "advice": "Same as permanent_redirect_document. Point at /current-newsletter/ only. disable_stale_rescrape_fallback. Stale file stays stale.",
       "operator_notes": [
         "23/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 18/10/2026. Do not pin https://beechwoodparish.com/wp-content/uploads/2026/10/Newsletter-18th-October-2026.pdf.",
-        "28/10/2026 Bellaghy proved the referee rule: last-week redirect must not trigger homepage rescrape."
+        "28/10/2026 Bellaghy proved the referee rule: last-week redirect must not trigger homepage rescrape.",
+        "31/10/2026 recheck: https://beechwoodparish.com/current-newsletter/ still redirects to Newsletter-18th-October-2026.pdf. Leave stale. Do not homepage-rescrape."
       ],
       "do_not": [
         "Do not pin a dated filename.",
@@ -1209,7 +1210,186 @@
         "beechwoodavenue",
         "bellaghyparish"
       ],
+      "success_count": 3
+    },
+    "joomla_images_newsletter+direct_download": {
+      "page_type": "joomla_images_newsletter",
+      "recipe_flow": "direct_download",
+      "label": "joomla_images_newsletter+direct_download",
+      "advice": "31/10/2026 theparishioner.ie/newsletter lists /images/newsletter/YY-MM-DD.pdf. Proved 26-10-25.pdf (application/pdf, 25/10/2026) and 26-11-01.pdf (application/pdf, 01/11/2026). Scrape the listing. The HTML article is not the PDF.",
+      "operator_notes": [
+        "31/10/2026 theparishioner.ie/newsletter lists /images/newsletter/YY-MM-DD.pdf. Proved 26-10-25.pdf (application/pdf, 25/10/2026) and 26-11-01.pdf (application/pdf, 01/11/2026). Scrape the listing. The HTML article is not the PDF.",
+        "Ballinora uses the same theparishioner listing so its page can show the family PDF.",
+        "Kilmurry uses the same theparishioner listing so its page can show the family PDF.",
+        "31/10/2026 onefaith.ie/newsletter is the same /images/newsletter/ shape. Newest proved file 26-10-12.pdf (12/10/2026), behind the 25/10 target. Do not pretend it is this week."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "ballincollig",
+        "ballinora",
+        "kilmurry"
+      ],
+      "success_count": 3
+    },
+    "yearless_month_pdf+direct_download": {
+      "page_type": "yearless_month_pdf",
+      "recipe_flow": "direct_download",
+      "label": "yearless_month_pdf+direct_download",
+      "advice": "31/10/2026 armaghparish.net/parish-bulletin newest file is 18th-October.pdf under /2026/10/. Filename has no year. It is behind the 25/10 target. The recipe had been pinned to 27 September. Do not pin either file.",
+      "operator_notes": [
+        "31/10/2026 armaghparish.net/parish-bulletin newest file is 18th-October.pdf under /2026/10/. Filename has no year. It is behind the 25/10 target. The recipe had been pinned to 27 September. Do not pin either file."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "armaghparish"
+      ],
+      "success_count": 0
+    },
+    "homepage_bracket_date+direct_download": {
+      "page_type": "homepage_bracket_date",
+      "recipe_flow": "direct_download",
+      "label": "homepage_bracket_date+direct_download",
+      "advice": "31/10/2026 arklowparish.ie homepage links newsletter_1st_November_2026[2026-11-01].pdf. Proved GET application/pdf, %PDF-1.7, date 01/11/2026. Recipe already scrapes the homepage. Do not pin. The 25/10 harvest failed because that file was not there yet.",
+      "operator_notes": [
+        "31/10/2026 arklowparish.ie homepage links newsletter_1st_November_2026[2026-11-01].pdf. Proved GET application/pdf, %PDF-1.7, date 01/11/2026. Recipe already scrapes the homepage. Do not pin. The 25/10 harvest failed because that file was not there yet."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "arklow"
+      ],
+      "success_count": 0
+    },
+    "urllib_403_listing+direct_download": {
+      "page_type": "urllib_403_listing",
+      "recipe_flow": "direct_download",
+      "label": "urllib_403_listing+direct_download",
+      "advice": "31/10/2026 urllib GET https://ashbourneparish.ie/newsletters/ returned HTTP 403. Same class as the Cloyne forbidden page. Do not treat 403 as missing. Next look is the browser or wp-json, not another urllib retry. Do not pin a dated filename.",
+      "operator_notes": [
+        "31/10/2026 urllib GET https://ashbourneparish.ie/newsletters/ returned HTTP 403. Same class as the Cloyne forbidden page. Do not treat 403 as missing. Next look is the browser or wp-json, not another urllib retry. Do not pin a dated filename."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "ashbourne"
+      ],
+      "success_count": 0
+    },
+    "html_listing_still_stale+direct_download": {
+      "page_type": "html_listing_still_stale",
+      "recipe_flow": "direct_download",
+      "label": "html_listing_still_stale+direct_download",
+      "advice": "31/10/2026 http://saintabbans.com/?page_id=21 top post is still 18th October 2026. No PDF. Leave stale. Do not pin ?p=1605.",
+      "operator_notes": [
+        "31/10/2026 http://saintabbans.com/?page_id=21 top post is still 18th October 2026. No PDF. Leave stale. Do not pin ?p=1605.",
+        "31/10/2026 magheneparish.ie/newsletter/ newest file is still Parish_Newsletter_09.02.2025.pdf. Leave stale."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "adamstown",
+        "bundoran"
+      ],
+      "success_count": 0
+    },
+    "ddmmyyyy_listing_pdf+direct_download": {
+      "page_type": "ddmmyyyy_listing_pdf",
+      "recipe_flow": "direct_download",
+      "label": "ddmmyyyy_listing_pdf+direct_download",
+      "advice": "31/10/2026 Birr /newsletter/ proved 01112026.pdf (application/pdf, 01/11/2026, 1002401 bytes) and 25102026.pdf (application/pdf, 25/10/2026, 870867 bytes). Filename is DDMMYYYY. Do not pin.",
+      "operator_notes": [
+        "31/10/2026 Birr /newsletter/ proved 01112026.pdf (application/pdf, 01/11/2026, 1002401 bytes) and 25102026.pdf (application/pdf, 25/10/2026, 870867 bytes). Filename is DDMMYYYY. Do not pin."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "birr"
+      ],
+      "success_count": 1
+    },
+    "spelled_month_listing_pdf+direct_download": {
+      "page_type": "spelled_month_listing_pdf",
+      "recipe_flow": "direct_download",
+      "label": "spelled_month_listing_pdf+direct_download",
+      "advice": "31/10/2026 Bodyke /newsletter/ proved November-1st-2026 PDF (application/pdf, 01/11/2026, 525261 bytes) and October-25th-2026 PDF (application/pdf, 25/10/2026, 788531 bytes). /parish-newsletter/ was a 404.",
+      "operator_notes": [
+        "31/10/2026 Bodyke /newsletter/ proved November-1st-2026 PDF (application/pdf, 01/11/2026, 525261 bytes) and October-25th-2026 PDF (application/pdf, 25/10/2026, 788531 bytes). /parish-newsletter/ was a 404."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "bodyke"
+      ],
+      "success_count": 1
+    },
+    "kerry_card_yyyymmdd_pdf+direct_download": {
+      "page_type": "kerry_card_yyyymmdd_pdf",
+      "recipe_flow": "direct_download",
+      "label": "kerry_card_yyyymmdd_pdf+direct_download",
+      "advice": "31/10/2026 Kerry card proved https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-11-01.pdf (application/pdf, 01/11/2026, 164714 bytes). Do not pin. Do not use Facebook.",
+      "operator_notes": [
+        "31/10/2026 Kerry card proved https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/2026-11-01.pdf (application/pdf, 01/11/2026, 164714 bytes). Do not pin. Do not use Facebook.",
+        "31/10/2026 Boherbue Kerry card first page still showed August Sun-Dth-Month PDFs. No file dated 19/10 or later in that first page. Leave stale."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "baileanfheirtearaigh",
+        "boherbue"
+      ],
       "success_count": 2
+    },
+    "wp_json_weekend_range_pdf+direct_download": {
+      "page_type": "wp_json_weekend_range_pdf",
+      "recipe_flow": "direct_download",
+      "label": "wp_json_weekend_range_pdf+direct_download",
+      "advice": "31/10/2026 bree.ie media library proved 3744-Oct-31st-Nov-1st.pdf (application/pdf, 558567 bytes). Filename has no single parsed date. Media date 30/10/2026. Do not pin.",
+      "operator_notes": [
+        "31/10/2026 bree.ie media library proved 3744-Oct-31st-Nov-1st.pdf (application/pdf, 558567 bytes). Filename has no single parsed date. Media date 30/10/2026. Do not pin."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "bree"
+      ],
+      "success_count": 1
+    },
+    "booterstown_sunday_pdf+direct_download": {
+      "page_type": "booterstown_sunday_pdf",
+      "recipe_flow": "direct_download",
+      "label": "booterstown_sunday_pdf+direct_download",
+      "advice": "31/10/2026 booterstownparish.ie wp-json proved Sun-1-November-2026 PDF (application/pdf, 01/11/2026, 1134965 bytes) and Sun-25-October-2026 PDF (application/pdf, 25/10/2026, 1218254 bytes). Skip the front.png.",
+      "operator_notes": [
+        "31/10/2026 booterstownparish.ie wp-json proved Sun-1-November-2026 PDF (application/pdf, 01/11/2026, 1134965 bytes) and Sun-25-October-2026 PDF (application/pdf, 25/10/2026, 1218254 bytes). Skip the front.png."
+      ],
+      "do_not": [
+        "Do not pin a dated filename.",
+        "Do not harvest Facebook."
+      ],
+      "example_parishes": [
+        "booterstown"
+      ],
+      "success_count": 1
     }
   },
   "parishes": {
@@ -1792,7 +1972,7 @@
       "operator_notes": [
         "29/10/2026: parishnews.html is the weekly HTML (Fr Sean; Melmount + Sion collections). print_to_pdf + skip_listing_nav.",
         "Parish Messenger Current Newsletter click is obsolete on this URL.",
-        "Sion Mills aliases this parish — same bulletin."
+        "Sion Mills aliases this parish \u2014 same bulletin."
       ],
       "do_not": [
         "Do not click Gift Aid or Standing Order Form.",

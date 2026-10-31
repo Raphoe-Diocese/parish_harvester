@@ -147,6 +147,151 @@ def hint_for_url(url: str) -> HubHint | None:
             pattern_key="churchservices_tv+pointer",
         )
 
+    if host in {"theparishioner.ie", "onefaith.ie"} or "/images/newsletter/" in path:
+        return HubHint(
+            key="joomla_images_newsletter",
+            site_type="http_scrape_newest_pdf",
+            label="Joomla /images/newsletter/YY-MM-DD.pdf listing",
+            confidence="high",
+            notes=(
+                "Listing HTML links /images/newsletter/YY-MM-DD.pdf. That file is the bulletin.",
+                "31/10/2026 theparishioner.ie proved 26-10-25.pdf (25/10/2026) and 26-11-01.pdf (01/11/2026).",
+                "The HTML article /newsletter/the-parishioner-… is not the PDF.",
+                "Same shape on onefaith.ie. 31/10/2026 newest proved file was 26-10-12.pdf (12/10/2026), behind target.",
+            ),
+            do_not=(
+                "Do not pin YY-MM-DD.pdf.",
+                "Do not print the HTML article as the bulletin.",
+                "Do not call onefaith fresh while its newest PDF is 12/10/2026.",
+            ),
+            pattern_key="joomla_images_newsletter+direct_download",
+        )
+
+    if host == "arklowparish.ie":
+        return HubHint(
+            key="homepage_bracket_date",
+            site_type="http_scrape_newest_pdf",
+            label="Homepage PDF with [YYYY-MM-DD] in the filename",
+            confidence="high",
+            notes=(
+                "31/10/2026 the Arklow homepage linked newsletter_1st_November_2026[2026-11-01].pdf.",
+                "Proved application/pdf, %PDF-1.7, date 01/11/2026. The date in square brackets is the bulletin date.",
+                "The recipe already scrapes the homepage. The 25/10 harvest failed because that file was not there yet.",
+            ),
+            do_not=("Do not pin the dated homepage PDF.",),
+            pattern_key="homepage_bracket_date+direct_download",
+        )
+
+    if host == "armaghparish.net":
+        return HubHint(
+            key="yearless_month_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Yearless Month PDF under /YYYY/MM/",
+            confidence="high",
+            notes=(
+                "31/10/2026 the Armagh listing newest file was 18th-October.pdf under /2026/10/.",
+                "The filename has no year. The folder year is 2026. That file is behind the 25/10 target.",
+                "Leave it stale. Do not pin 27 September and do not pin 18 October.",
+            ),
+            do_not=(
+                "Do not pin 18th-October.pdf.",
+                "Do not pin the older 27 September file.",
+            ),
+            pattern_key="yearless_month_pdf+direct_download",
+        )
+
+    if host == "stbrendansbirr.ie":
+        return HubHint(
+            key="ddmmyyyy_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Listing PDF named DDMMYYYY.pdf",
+            confidence="high",
+            notes=(
+                "31/10/2026 Birr /newsletter/ linked 01112026.pdf and 25102026.pdf.",
+                "Proved both application/pdf. The filename is DDMMYYYY. Do not pin it.",
+            ),
+            do_not=("Do not pin the DDMMYYYY.pdf name.",),
+            pattern_key="ddmmyyyy_listing_pdf+direct_download",
+        )
+
+    if host == "bodyketuamgraneyparish.ie":
+        return HubHint(
+            key="spelled_month_listing_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Listing PDF named Month-Dth-YYYY",
+            confidence="high",
+            notes=(
+                "31/10/2026 Bodyke /newsletter/ linked November-1st-2026 and October-25th-2026 PDFs.",
+                "Proved both application/pdf. /parish-newsletter/ was a 404. Use /newsletter/.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not use the 404 /parish-newsletter/ path."),
+            pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "dioceseofkerry.ie":
+        return HubHint(
+            key="kerry_card_yyyymmdd_pdf",
+            site_type="http_scrape_newest_pdf",
+            label="Kerry diocese card PDF named YYYY-MM-DD.pdf",
+            confidence="high",
+            notes=(
+                "The parish card on dioceseofkerry.ie links this week's PDF. Do not pin it.",
+                "31/10/2026 Baile an Fheirtearaigh card proved 2026-11-01.pdf (application/pdf, 01/11/2026).",
+                "31/10/2026 Boherbue's card first page still showed August files. That one stays stale.",
+            ),
+            do_not=(
+                "Do not pin the dated PDF.",
+                "Do not use the diocese Facebook page as the parish link.",
+            ),
+            pattern_key="kerry_card_yyyymmdd_pdf+direct_download",
+        )
+
+    if host == "bree.ie":
+        return HubHint(
+            key="wp_json_weekend_range_pdf",
+            site_type="wp_json_newest_media",
+            label="Bree weekend PDF in the media library",
+            confidence="high",
+            notes=(
+                "31/10/2026 media library has 3744-Oct-31st-Nov-1st.pdf.",
+                "Proved application/pdf, 558567 bytes. The filename has no single date the parser reads.",
+                "wp-json uses the media date 30/10/2026. That is inside the week window. Do not pin the name.",
+            ),
+            do_not=(
+                "Do not pin 3744-Oct-31st-Nov-1st.pdf.",
+                "Do not take the older Oct 24th-25th JPEG while this PDF is in the library.",
+            ),
+            pattern_key="wp_json_weekend_range_pdf+direct_download",
+        )
+
+    if host == "booterstownparish.ie":
+        return HubHint(
+            key="booterstown_sunday_pdf",
+            site_type="wp_json_newest_media",
+            label="Booterstown Sun-D-Month-YYYY PDF in wp-json",
+            confidence="high",
+            notes=(
+                "31/10/2026 wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026).",
+                "Also proved the 25/10/2026 PDF. Skip the front.png preview.",
+            ),
+            do_not=("Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."),
+            pattern_key="booterstown_sunday_pdf+direct_download",
+        )
+
+    if host == "saintabbans.com":
+        return HubHint(
+            key="html_listing_still_stale",
+            site_type="html_text_bulletin",
+            label="Adamstown HTML listing, still 18 October",
+            confidence="high",
+            notes=(
+                "31/10/2026 http://saintabbans.com/?page_id=21 top post is still 18th October 2026.",
+                "No PDF on that listing. Leave the parish stale.",
+            ),
+            do_not=("Do not pin ?p=1605.",),
+            pattern_key="html_listing_still_stale+direct_download",
+        )
+
     if path.rstrip("/").endswith("current-newsletter"):
         return HubHint(
             key="current_newsletter_redirect",
@@ -176,6 +321,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "Ashbourne: listing had no calendar date in the PDF href. wp-json scored the file.",
                 "Askea: /newsletters/ lists dated PDFs. Do not pin the dated name.",
+                "31/10/2026 urllib GET of ashbourneparish.ie/newsletters/ returned HTTP 403. That is not proof the file is missing. Use the browser or wp-json.",
             ),
             do_not=("Do not pin a dated filename.", "Do not harvest Facebook."),
             pattern_key="wp_json+direct_download",

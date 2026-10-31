@@ -28,6 +28,63 @@ def test_mayo_listing_is_scrape_not_guid_pin() -> None:
     assert any("GUID" in line for line in hint.do_not)
 
 
+def test_theparishioner_listing_is_joomla_pdf() -> None:
+    hint = hint_for_url("https://theparishioner.ie/newsletter")
+    assert hint is not None
+    assert hint.site_type == "http_scrape_newest_pdf"
+    assert hint.pattern_key == "joomla_images_newsletter+direct_download"
+    assert any("pin" in line.lower() for line in hint.do_not)
+    onefaith = hint_for_url("https://onefaith.ie/newsletter")
+    assert onefaith is not None
+    assert onefaith.key == "joomla_images_newsletter"
+
+
+def test_arklow_homepage_date_is_in_brackets() -> None:
+    hint = hint_for_url("https://www.arklowparish.ie/")
+    assert hint is not None
+    assert hint.key == "homepage_bracket_date"
+    assert hint.site_type == "http_scrape_newest_pdf"
+
+
+def test_armagh_yearless_filename_stays_a_listing() -> None:
+    hint = hint_for_url("https://armaghparish.net/parish-bulletin/")
+    assert hint is not None
+    assert hint.key == "yearless_month_pdf"
+    assert any("September" in line for line in hint.do_not)
+
+
+def test_adamstown_listing_stays_stale() -> None:
+    hint = hint_for_url("http://saintabbans.com/?page_id=21")
+    assert hint is not None
+    assert hint.key == "html_listing_still_stale"
+    assert any("pin" in line.lower() for line in hint.do_not)
+
+
+def test_ashbourne_403_is_not_a_missing_file() -> None:
+    hint = hint_for_url("https://ashbourneparish.ie/newsletters/")
+    assert hint is not None
+    assert hint.site_type == "wp_json_newest_media"
+    assert any("403" in line for line in hint.notes)
+
+
+def test_birr_bodyke_and_kerry_listings() -> None:
+    birr = hint_for_url("https://www.stbrendansbirr.ie/newsletter/")
+    assert birr is not None and birr.key == "ddmmyyyy_listing_pdf"
+    bodyke = hint_for_url("https://www.bodyketuamgraneyparish.ie/newsletter/")
+    assert bodyke is not None and bodyke.key == "spelled_month_listing_pdf"
+    kerry = hint_for_url("https://www.dioceseofkerry.ie/parish/baile-an-fheirtearaigh/")
+    assert kerry is not None and kerry.key == "kerry_card_yyyymmdd_pdf"
+    assert any("Facebook" in line for line in kerry.do_not)
+
+
+def test_bree_and_booterstown_use_the_media_library() -> None:
+    bree = hint_for_url("https://www.bree.ie/")
+    assert bree is not None and bree.site_type == "wp_json_newest_media"
+    assert any("pin" in line.lower() for line in bree.do_not)
+    boot = hint_for_url("https://booterstownparish.ie/")
+    assert boot is not None and boot.key == "booterstown_sunday_pdf"
+
+
 def test_churchmedia_is_api_newsletter() -> None:
     hint = hint_for_url("https://churchmedia.tv/st-patricks-church-2")
     assert hint is not None

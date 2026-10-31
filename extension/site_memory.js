@@ -365,6 +365,83 @@
         "Do not pin /newsletter/<token>.….pdf — the token dies next week.",
       ],
     },
+    joomla_images_newsletter: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Joomla /images/newsletter/YY-MM-DD.pdf",
+      operator_notes: [
+        "theparishioner.ie and onefaith.ie list /images/newsletter/YY-MM-DD.pdf.",
+        "31/10/2026 theparishioner proved 26-10-25.pdf and 26-11-01.pdf. Scrape the listing.",
+        "The HTML article link is not the PDF.",
+        "31/10/2026 onefaith newest proved file was 26-10-12.pdf. That is behind the 25/10 target.",
+      ],
+      do_not: [
+        "Do not pin YY-MM-DD.pdf.",
+        "Do not print the HTML article as the bulletin.",
+        "Do not call onefaith fresh while its newest PDF is 12/10/2026.",
+      ],
+    },
+    ddmmyyyy_listing_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Listing PDF named DDMMYYYY.pdf",
+      operator_notes: [
+        "31/10/2026 Birr /newsletter/ linked 01112026.pdf and 25102026.pdf. Both application/pdf.",
+      ],
+      do_not: ["Do not pin the DDMMYYYY.pdf name."],
+    },
+    spelled_month_listing_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Listing PDF named Month-Dth-YYYY",
+      operator_notes: [
+        "31/10/2026 Bodyke /newsletter/ linked November-1st-2026 and October-25th-2026 PDFs.",
+        "/parish-newsletter/ was a 404. Use /newsletter/.",
+      ],
+      do_not: ["Do not pin the dated filename."],
+    },
+    kerry_card_yyyymmdd_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Kerry diocese card PDF named YYYY-MM-DD.pdf",
+      operator_notes: [
+        "31/10/2026 Baile an Fheirtearaigh card proved 2026-11-01.pdf (application/pdf, 01/11/2026).",
+      ],
+      do_not: [
+        "Do not pin the dated PDF.",
+        "Do not use the diocese Facebook page as the parish link.",
+      ],
+    },
+    wp_json_weekend_range_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "wp_json_newest_media",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Bree weekend PDF in the media library",
+      operator_notes: [
+        "31/10/2026 media library has 3744-Oct-31st-Nov-1st.pdf. Proved application/pdf. Media date 30/10/2026.",
+      ],
+      do_not: ["Do not pin 3744-Oct-31st-Nov-1st.pdf."],
+    },
+    booterstown_sunday_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "wp_json_newest_media",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Booterstown Sun-D-Month-YYYY PDF in wp-json",
+      operator_notes: [
+        "31/10/2026 wp-json proved Sun-1-November-2026 and Sun-25-October-2026 PDFs.",
+      ],
+      do_not: ["Do not pin the dated filename.", "Do not harvest the front.png as the bulletin."],
+    },
     mayo_ie_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
@@ -540,6 +617,28 @@
     }
     if (start.includes("mayo.ie")) {
       return CATALOG.mayo_ie_newsletters;
+    }
+    if (
+      start.includes("theparishioner.ie") ||
+      start.includes("onefaith.ie") ||
+      start.includes("/images/newsletter/")
+    ) {
+      return CATALOG.joomla_images_newsletter;
+    }
+    if (start.includes("stbrendansbirr.ie")) {
+      return CATALOG.ddmmyyyy_listing_pdf;
+    }
+    if (start.includes("bodyketuamgraneyparish.ie")) {
+      return CATALOG.spelled_month_listing_pdf;
+    }
+    if (start.includes("dioceseofkerry.ie")) {
+      return CATALOG.kerry_card_yyyymmdd_pdf;
+    }
+    if (start.includes("bree.ie")) {
+      return CATALOG.wp_json_weekend_range_pdf;
+    }
+    if (start.includes("booterstownparish.ie")) {
+      return CATALOG.booterstown_sunday_pdf;
     }
     if (start.includes("churchservices.tv")) {
       return CATALOG.churchservices_tv_pointer;
