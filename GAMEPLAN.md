@@ -1,4 +1,13 @@
-﻿## 31/10/2026 18:00 — Arklow and Baile an Fheirtearaigh harvested 01/11/2026
+﻿## 31/10/2026 21:20 — Birr and Bodyke harvested 25/10/2026
+
+- Birr run 41227670229 ok. File 25102026.pdf. Date 25/10/2026.
+- Bodyke run 41227674612 ok. File October-25th-2026-30th-Sunday-in-Ordinary-Time-NEW.pdf. Date 25/10/2026.
+- Booterstown run 41227678445 failed. The Sunday guess asked for Newsletter-25th-October-2026-30th-Sunday-in-Ordinary-Time.pdf and missed. wp-json then scored nothing. The real names are Sun-25-October-2026-Booterstown-Weekly-Newsletter.pdf and Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf. Homepage has no PDF link. Not sent again yet.
+- Next listings proved as PDFs: Borrisokane 1st-Nov.-2026-newsletter.pdf (01/11/2026, wp-json was 404). Castleconnell Newsletter-25th-October-2026.pdf. Carraig, Glanmire, Glounthaune, and Wgh Prefix-25-10-26.pdf. Churchtown newsletter-2026-11-01.pdf. Bantry family already has 25th_October_2026.2.pdf. Caheragh stays on the Bantry harvest. Broadford's diocese card PDF was a synod paper. Left it.
+- Sent on the current recipes: Castleconnell 41244083938, Churchtown 41244086775, Carraig na bhFear 41244089626, Glanmire 41244092792, Glounthaune 41244096765, Watergrasshill 41244100197. Not ok until those runs say so. Borrisokane and Booterstown wait for the recipe change.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 18:00 — Arklow and Baile an Fheirtearaigh harvested 01/11/2026
 
 - Arklow run 41222578645 ok. File newsletter_1st_November_2026[2026-11-01].pdf. Date 01/11/2026.
 - Baile an Fheirtearaigh run 41222582124 ok. File 2026-11-01.pdf. Date 01/11/2026.

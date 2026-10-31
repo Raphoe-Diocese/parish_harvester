@@ -14,6 +14,7 @@ from harvester.newsletter_brain import (
     candidate_verdict,
     choose,
     filename_shapes,
+    extra_sunday_names,
     invent_candidates,
     neighbour_month_urls,
     next_diocese,
@@ -29,6 +30,14 @@ from harvester.newsletter_brain import (
 
 
 TARGET = date(2026, 10, 11)
+
+
+def test_booterstown_sunday_name() -> None:
+    october = extra_sunday_names("booterstownparish.ie", date(2026, 10, 25))
+    assert october == ["Sun-25-October-2026-Booterstown-Weekly-Newsletter.pdf"]
+    november = extra_sunday_names("www.booterstownparish.ie", date(2026, 11, 1))
+    assert november == ["Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf"]
+    assert extra_sunday_names("bree.ie", date(2026, 10, 25)) == []
 
 
 class RefereeTests(unittest.TestCase):

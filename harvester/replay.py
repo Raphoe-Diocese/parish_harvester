@@ -1380,7 +1380,7 @@ async def _try_sunday_upload_pdf(
     The browser's own network stack is asked first. urllib's long token
     gets a 403 page from this site. A 404 is a miss.
     """
-    from .newsletter_brain import filename_shapes
+    from .newsletter_brain import extra_sunday_names, filename_shapes
 
     parsed = urlparse(start_url)
     if not parsed.scheme or not parsed.netloc:
@@ -1390,14 +1390,19 @@ async def _try_sunday_upload_pdf(
         f"{origin}/wp-content/uploads/{target_date.year}/"
         f"{target_date.month:02d}/"
     )
-    names = [
+    host_names = extra_sunday_names(parsed.netloc, target_date)
+    names = host_names + [
         name for name in filename_shapes(target_date) if name.lower().endswith(".pdf")
     ]
     names.sort(
-        key=lambda name: (0 if name.lower().startswith("newsletter-") else 1, name)
+        key=lambda name: (
+            0 if name in host_names else 1,
+            0 if name.lower().startswith("newsletter-") else 1,
+            name,
+        )
     )
     if browser is not None and names:
-        first = next(
+        first = host_names[0] if host_names else next(
             (name for name in names if name.lower().startswith("newsletter-")),
             names[0],
         )
