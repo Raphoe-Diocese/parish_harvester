@@ -322,9 +322,11 @@ def ocr_with_mistral(pdf_path):
 
 
 def _mistral_client():
-    api_key = os.environ.get("MISTRAL_API_KEY")
+    # A pasted secret often has a trailing line break. HTTP rejects that header.
+    api_key = "".join((os.environ.get("MISTRAL_API_KEY") or "").split())
     if not api_key:
         return None
+    os.environ["MISTRAL_API_KEY"] = api_key
     try:
         from mistralai import Mistral
     except ImportError:
