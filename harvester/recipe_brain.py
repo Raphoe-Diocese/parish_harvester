@@ -452,7 +452,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 /newsletter/ proved 25th-October.pdf (application/pdf, 536563 bytes). The link says Sunday 25th October 2026.",
                 "1stB-November.pdf is also listed. The date reader scored that name as 01/10/2026. This Sunday's file is listed, so keep 25th-October.pdf.",
-                "GitHub did not take the harvest send. Not dispatched.",
+                "Harvest 41252519900 is sent. Not ok until that run says so.",
             ),
             do_not=("Do not pin the dated filename.", "Do not take 1stB-November.pdf while 25th-October.pdf is listed."),
             pattern_key="spelled_month_listing_pdf+direct_download",
@@ -467,7 +467,7 @@ def hint_for_url(url: str) -> HubHint | None:
             notes=(
                 "31/10/2026 /newsletter/ proved Newsletter-25th-October-2026.pdf (application/pdf, 217963 bytes).",
                 "Newsletter-1st-November-2026.pdf is also listed. This Sunday's file wins.",
-                "GitHub did not take the harvest send. Not dispatched.",
+                "Harvest 41252523450 is sent. Not ok until that run says so.",
             ),
             do_not=("Do not pin the dated filename.",),
             pattern_key="spelled_month_listing_pdf+direct_download",

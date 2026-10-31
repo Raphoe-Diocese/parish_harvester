@@ -2,7 +2,7 @@
 
 - Durrow run 41251541444 ok. File newsletter-25-oct-2026.jpg. Date 25/10/2026.
 - Doora-Barefield run 41251538752 saved doora-Barefield.pdf and marked it ok. The stored date is empty. The link on the page says 1st November. Do not call that run 01/11/2026. Do not send it again.
-- Ennis listing proved 25th-October.pdf (application/pdf, 536563 bytes). Inagh proved Newsletter-25th-October-2026.pdf (application/pdf, 217963 bytes). GitHub did not take the send. Not dispatched.
+- Ennis listing proved 25th-October.pdf (application/pdf, 536563 bytes). Inagh proved Newsletter-25th-October-2026.pdf (application/pdf, 217963 bytes). Sent Ennis 41252519900 and Inagh 41252523450. Not ok until those runs say so.
 - Ennis also lists 1stB-November.pdf. The date reader scored that name as 01/10/2026. This Sunday's file is on the list, so keep 25th-October.pdf.
 - Not checked on parishpress.ie.
 
