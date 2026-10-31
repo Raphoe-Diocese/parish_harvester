@@ -321,6 +321,46 @@ def ocr_with_mistral(pdf_path):
     return pages
 
 
+def _mistral_client():
+    api_key = os.environ.get("MISTRAL_API_KEY")
+    if not api_key:
+        return None
+    try:
+        from mistralai import Mistral
+    except ImportError:
+        from mistralai.client import Mistral
+    return Mistral(api_key=api_key)
+
+
+def mistral_transcribe_image(image) -> list[str]:
+    """OCR one column image. Used when Gemini refuses that column."""
+    client = _mistral_client()
+    if client is None:
+        print("    MISTRAL_API_KEY not set, skipping this column.", flush=True)
+        return []
+    print("    Sending this column to Mistral OCR ...", flush=True)
+    try:
+        ocr_response = client.ocr.process(
+            model="mistral-ocr-latest",
+            document={
+                "type": "image_url",
+                "image_url": f"data:image/png;base64,{_image_to_base64_png(image)}",
+            },
+        )
+    except Exception as exc:
+        print(f"    Mistral column failed ({type(exc).__name__}: {exc}).", flush=True)
+        return []
+    lines: list[str] = []
+    for page in getattr(ocr_response, "pages", None) or []:
+        text = getattr(page, "markdown", None) or ""
+        lines.extend(
+            line
+            for line in text.splitlines()
+            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+        )
+    return lines
+
+
 def _image_png_bytes(image) -> bytes:
     """pdf2image often yields PPM. Gemini rejects image/x-portable-pixmap."""
     buffer = io.BytesIO()
@@ -342,13 +382,6 @@ def _vision_column_strips(image):
 
     strips = column_images_for_page(image, crop_top=False)
     return strips if strips else [image]
-
-
-_COLUMN_RETRY_PROMPT = (
-    "Transcribe all printed text in this image, top to bottom. "
-    "Keep Irish (Gaeilge) as Irish. Do not translate or summarise. "
-    "Do not skip headings, phone numbers, or short lines."
-)
 
 
 def _gemini_safety_settings(genai):
@@ -438,6 +471,7 @@ def ocr_images_with_gemini(images):
     model = genai.GenerativeModel("gemini-2.5-flash")
     safety = _gemini_safety_settings(genai)
     pages_text = []
+    used_mistral = False
     for i, image in enumerate(images, start=1):
         strips = _vision_column_strips(image)
         if len(strips) > 1:
@@ -453,13 +487,17 @@ def ocr_images_with_gemini(images):
         for strip in strips:
             lines = _gemini_transcribe(model, strip, OCR_PROMPT, safety)
             if not lines:
-                print("    Retrying column with a plain transcribe.", flush=True)
-                lines = _gemini_transcribe(model, strip, _COLUMN_RETRY_PROMPT, safety)
+                print("    Gemini refused this column.", flush=True)
+                lines = mistral_transcribe_image(strip)
+                if lines:
+                    used_mistral = True
             if not lines:
                 band = _text_band_below_photo(strip)
                 if band is not None:
-                    print("    Retrying the text under the photo.", flush=True)
-                    lines = _gemini_transcribe(model, band, _COLUMN_RETRY_PROMPT, safety)
+                    print("    Sending the text under the photo to Mistral.", flush=True)
+                    lines = mistral_transcribe_image(band)
+                    if lines:
+                        used_mistral = True
             if not lines:
                 continue
             got_any = True
@@ -469,7 +507,8 @@ def ocr_images_with_gemini(images):
         if not got_any:
             raise RuntimeError(f"Gemini returned no text for page {i}.")
         pages_text.append(page_lines)
-    return pages_text, "Gemini fallback"
+    provider = "Gemini+Mistral" if used_mistral else "Gemini fallback"
+    return pages_text, provider
 
 
 def _ocr_openai_compatible_page(client, model: str, image, label: str) -> list[str]:
