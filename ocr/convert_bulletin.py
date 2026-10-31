@@ -3,9 +3,13 @@
 import os
 import base64
 import io
+import json
 import re
 import html as html_utils
 import sys
+import time
+import urllib.error
+import urllib.request
 
 from ocr.bulletin_layout import split_heading_prefix
 from ocr.sparse_page_ocr import choose_vision_page_indexes, merge_vision_into_pages
@@ -321,6 +325,48 @@ def ocr_with_mistral(pdf_path):
     return pages
 
 
+def _mistral_client():
+    # A pasted secret often has a trailing line break. HTTP rejects that header.
+    api_key = "".join((os.environ.get("MISTRAL_API_KEY") or "").split())
+    if not api_key:
+        return None
+    os.environ["MISTRAL_API_KEY"] = api_key
+    try:
+        from mistralai import Mistral
+    except ImportError:
+        from mistralai.client import Mistral
+    return Mistral(api_key=api_key)
+
+
+def mistral_transcribe_image(image) -> list[str]:
+    """OCR one column image. Used when Gemini refuses that column."""
+    client = _mistral_client()
+    if client is None:
+        print("    MISTRAL_API_KEY not set, skipping this column.", flush=True)
+        return []
+    print("    Sending this column to Mistral OCR ...", flush=True)
+    try:
+        ocr_response = client.ocr.process(
+            model="mistral-ocr-latest",
+            document={
+                "type": "image_url",
+                "image_url": f"data:image/png;base64,{_image_to_base64_png(image)}",
+            },
+        )
+    except Exception as exc:
+        print(f"    Mistral column failed ({type(exc).__name__}: {exc}).", flush=True)
+        return []
+    lines: list[str] = []
+    for page in getattr(ocr_response, "pages", None) or []:
+        text = getattr(page, "markdown", None) or ""
+        lines.extend(
+            line
+            for line in text.splitlines()
+            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+        )
+    return lines
+
+
 def _image_png_bytes(image) -> bytes:
     """pdf2image often yields PPM. Gemini rejects image/x-portable-pixmap."""
     buffer = io.BytesIO()
@@ -336,6 +382,214 @@ def _image_to_base64_png(image):
     return base64.b64encode(_image_png_bytes(image)).decode("utf-8")
 
 
+def _vision_column_strips(image):
+    """Split multi-column bulletin pages so vision does not smash sidebars."""
+    from ocr.sparse_page_ocr import column_images_for_page
+
+    strips = column_images_for_page(image, crop_top=False)
+    return strips if strips else [image]
+
+
+def _gemini_safety_settings(genai):
+    """Parish pages include photos and safeguarding text. Do not drop the page."""
+    from google.generativeai.types import HarmBlockThreshold, HarmCategory
+
+    categories = [
+        HarmCategory.HARM_CATEGORY_HARASSMENT,
+        HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    ]
+    return [
+        {"category": category, "threshold": HarmBlockThreshold.BLOCK_NONE}
+        for category in categories
+    ]
+
+
+def _gemini_response_text(response) -> str:
+    try:
+        text = getattr(response, "text", "") or ""
+        if text.strip():
+            return text
+    except Exception as exc:
+        print(f"    Gemini returned no text ({type(exc).__name__}: {exc}).", flush=True)
+    chunks: list[str] = []
+    for cand in getattr(response, "candidates", None) or []:
+        content = getattr(cand, "content", None)
+        for part in getattr(content, "parts", None) or []:
+            part_text = getattr(part, "text", None)
+            if part_text and str(part_text).strip():
+                chunks.append(str(part_text))
+        if not chunks:
+            print(
+                f"    Gemini finish_reason={getattr(cand, 'finish_reason', None)}",
+                flush=True,
+            )
+    if chunks:
+        return "\n".join(chunks)
+    feedback = getattr(response, "prompt_feedback", None)
+    if feedback:
+        print(f"    Gemini prompt_feedback={feedback}", flush=True)
+    return ""
+
+
+def _lines_from_gemini_text(text: str) -> list[str]:
+    return [
+        line
+        for line in (text or "").splitlines()
+        if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+    ]
+
+
+def _gemini_transcribe(model, image, prompt: str, safety) -> list[str]:
+    try:
+        response = model.generate_content(
+            [prompt, {"mime_type": "image/png", "data": _image_png_bytes(image)}],
+            safety_settings=safety,
+        )
+    except Exception as exc:
+        print(f"    Gemini column failed ({type(exc).__name__}: {exc}).", flush=True)
+        return []
+    return _lines_from_gemini_text(_gemini_response_text(response))
+
+
+def _text_band_below_photo(image):
+    """Lower part of a column, under a masthead photo."""
+    try:
+        width, height = image.size
+    except Exception:
+        return None
+    top = int(height * 0.34)
+    if height - top < 80:
+        return None
+    return image.crop((0, top, width, height))
+
+
+def _groq_api_key() -> str:
+    raw = os.environ.get("GROQNOV2026") or os.environ.get("GROQ_API_KEY") or ""
+    return "".join(raw.split())
+
+
+# Free plan: 1000 output tokens a minute. One column must stay under that.
+_GROQ_MAX_COMPLETION_TOKENS = 800
+_GROQ_GAP_SECONDS = 65
+_groq_not_before = 0.0
+_GROQ_RETRY_AFTER = re.compile(r"try again in ([0-9.]+)s", re.IGNORECASE)
+
+
+def _groq_wait_for_free_minute() -> None:
+    """One column at a time. The free plan cannot take two in the same minute."""
+    delay = _groq_not_before - time.monotonic()
+    if delay > 0:
+        print(
+            f"    Waiting {delay:.0f}s so the next column gets a free Groq minute.",
+            flush=True,
+        )
+        time.sleep(delay)
+
+
+def _groq_reserve_minute() -> None:
+    global _groq_not_before
+    _groq_not_before = time.monotonic() + _GROQ_GAP_SECONDS
+
+
+def _groq_rate_limit_wait(detail: str) -> float | None:
+    """Seconds to wait, or None when waiting will not help."""
+    lowered = detail.lower()
+    if "request too large" in lowered or "reduce max_tokens" in lowered:
+        return None
+    match = _GROQ_RETRY_AFTER.search(detail)
+    if not match:
+        return None
+    return min(float(match.group(1)) + 1.0, 70.0)
+
+
+# Keep the bulletin prompt, and tell Groq not to add or drop a letter.
+_GROQ_PROMPT = (
+    OCR_PROMPT
+    + "\n\nCopy the print letter by letter. "
+    "Do not add a letter and do not drop a letter. "
+    "Keep short lines and amounts."
+)
+
+
+def groq_transcribe_image(image) -> list[str]:
+    """Read one column with Groq. Secret name on GitHub is GROQNOV2026."""
+    api_key = _groq_api_key()
+    if not api_key:
+        print("    GROQNOV2026 not set, skipping this column.", flush=True)
+        return []
+    payload = {
+        "model": "qwen/qwen3.8-27b",
+        "temperature": 0,
+        "max_completion_tokens": _GROQ_MAX_COMPLETION_TOKENS,
+        "reasoning_effort": "none",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": _GROQ_PROMPT},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/png;base64,{_image_to_base64_png(image)}",
+                        },
+                    },
+                ],
+            }
+        ],
+    }
+    encoded = json.dumps(payload).encode("utf-8")
+    for attempt in range(2):
+        _groq_wait_for_free_minute()
+        _groq_reserve_minute()
+        print("    Sending this column to Groq ...", flush=True)
+        request = urllib.request.Request(
+            "https://api.groq.com/openai/v1/chat/completions",
+            data=encoded,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+                # Cloudflare rejects Python's default urllib signature (error 1010).
+                "User-Agent": "parish-harvester-ocr",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                body = json.loads(response.read().decode("utf-8"))
+        except Exception as exc:
+            detail = ""
+            if isinstance(exc, urllib.error.HTTPError):
+                try:
+                    detail = exc.read().decode("utf-8", errors="replace")[:400]
+                except Exception:
+                    detail = ""
+            wait = _groq_rate_limit_wait(detail) if attempt == 0 else None
+            if wait is None:
+                print(
+                    f"    Groq column failed ({type(exc).__name__}: {exc} {detail}).",
+                    flush=True,
+                )
+                return []
+            print(
+                f"    Groq free limit. One more try after the minute resets.",
+                flush=True,
+            )
+            continue
+        try:
+            content = body["choices"][0]["message"]["content"] or ""
+        except (KeyError, IndexError, TypeError) as exc:
+            print(f"    Groq column returned no text ({exc}).", flush=True)
+            return []
+        if isinstance(content, list):
+            content = "\n".join(
+                part.get("text", "") for part in content if isinstance(part, dict)
+            )
+        return _lines_from_gemini_text(str(content))
+    return []
+
+
 def ocr_images_with_gemini(images):
     """Run Gemini OCR across images and return (pages_text, provider_summary)."""
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -346,19 +600,85 @@ def ocr_images_with_gemini(images):
 
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.5-flash")
+    safety = _gemini_safety_settings(genai)
     pages_text = []
+    used_mistral = False
+    used_groq = False
     for i, image in enumerate(images, start=1):
-        print(f"  OCR on page {i}/{len(images)} via Gemini ...", flush=True)
-        response = model.generate_content(
-            [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(image)}]
-        )
-        text = getattr(response, "text", "") or ""
-        lines = [
-            line for line in text.splitlines()
-            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-        ]
-        pages_text.append(lines)
-    return pages_text, "Gemini fallback"
+        strips = _vision_column_strips(image)
+        if len(strips) > 1:
+            print(
+                f"  OCR on page {i}/{len(images)} via Gemini "
+                f"({len(strips)} columns) ...",
+                flush=True,
+            )
+        else:
+            print(f"  OCR on page {i}/{len(images)} via Gemini ...", flush=True)
+        page_lines: list[str] = []
+        got_any = False
+        for strip in strips:
+            lines = _gemini_transcribe(model, strip, OCR_PROMPT, safety)
+            if not lines:
+                print("    Gemini refused this column.", flush=True)
+                lines = groq_transcribe_image(strip)
+                if lines:
+                    used_groq = True
+            if not lines:
+                lines = mistral_transcribe_image(strip)
+                if lines:
+                    used_mistral = True
+            if not lines:
+                band = _text_band_below_photo(strip)
+                if band is not None:
+                    print("    Sending the text under the photo to Groq.", flush=True)
+                    lines = groq_transcribe_image(band)
+                    if lines:
+                        used_groq = True
+                    if not lines:
+                        lines = mistral_transcribe_image(band)
+                        if lines:
+                            used_mistral = True
+            if not lines:
+                continue
+            got_any = True
+            if page_lines:
+                page_lines.append("")
+            page_lines.extend(lines)
+        if not got_any:
+            raise RuntimeError(f"Gemini returned no text for page {i}.")
+        pages_text.append(page_lines)
+    extras = []
+    if used_groq:
+        extras.append("Groq")
+    if used_mistral:
+        extras.append("Mistral")
+    provider = "Gemini+" + "+".join(extras) if extras else "Gemini fallback"
+    return pages_text, provider
+
+
+def _ocr_openai_compatible_page(client, model: str, image, label: str) -> list[str]:
+    print(f"  OCR on {label} ...", flush=True)
+    b64 = _image_to_base64_png(image)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": OCR_PROMPT},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{b64}"},
+                    },
+                ],
+            }
+        ],
+    )
+    text = response.choices[0].message.content or ""
+    return [
+        line for line in text.splitlines()
+        if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+    ]
 
 
 def ocr_images_with_github_models(images):
@@ -375,29 +695,17 @@ def ocr_images_with_github_models(images):
     )
     pages_text = []
     for i, image in enumerate(images, start=1):
-        print(f"  OCR on page {i}/{len(images)} via GitHub Models ...", flush=True)
-        b64 = _image_to_base64_png(image)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": OCR_PROMPT},
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/png;base64,{b64}"},
-                        },
-                    ],
-                }
-            ],
-        )
-        text = response.choices[0].message.content or ""
-        lines = [
-            line for line in text.splitlines()
-            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-        ]
-        pages_text.append(lines)
+        strips = _vision_column_strips(image)
+        page_lines: list[str] = []
+        for si, strip in enumerate(strips):
+            label = f"page {i}/{len(images)} via GitHub Models"
+            if len(strips) > 1:
+                label += f" col {si + 1}/{len(strips)}"
+            lines = _ocr_openai_compatible_page(client, "gpt-4o-mini", strip, label)
+            if page_lines and lines:
+                page_lines.append("")
+            page_lines.extend(lines)
+        pages_text.append(page_lines)
     return pages_text, "GitHub Models fallback"
 
 
@@ -412,29 +720,17 @@ def ocr_images_with_openai(images):
     client = OpenAI(api_key=openai_api_key)
     pages_text = []
     for i, image in enumerate(images, start=1):
-        print(f"  OCR on page {i}/{len(images)} via OpenAI ...", flush=True)
-        b64 = _image_to_base64_png(image)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": OCR_PROMPT},
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/png;base64,{b64}"},
-                        },
-                    ],
-                }
-            ],
-        )
-        text = response.choices[0].message.content or ""
-        lines = [
-            line for line in text.splitlines()
-            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-        ]
-        pages_text.append(lines)
+        strips = _vision_column_strips(image)
+        page_lines: list[str] = []
+        for si, strip in enumerate(strips):
+            label = f"page {i}/{len(images)} via OpenAI"
+            if len(strips) > 1:
+                label += f" col {si + 1}/{len(strips)}"
+            lines = _ocr_openai_compatible_page(client, "gpt-4o-mini", strip, label)
+            if page_lines and lines:
+                page_lines.append("")
+            page_lines.extend(lines)
+        pages_text.append(page_lines)
     return pages_text, "OpenAI fallback"
 
 
@@ -1474,11 +1770,29 @@ def main():
 
     if pages_text is not None and vision_indexes and has_vision_keys:
         try:
-            sparse_images = pdf_images_for_pages(pdf_file, vision_indexes)
-            vision_pages, sparse_provider = ocr_selected_images_with_fallbacks(sparse_images)
-            if vision_pages:
-                pages_text = merge_vision_into_pages(pages_text, vision_indexes, vision_pages)
-                provider_used = f"Tier0+{sparse_provider}"
+            from ocr.sparse_page_ocr import MAX_VISION_PAGES_PER_PDF
+
+            # Never drop pages above the batch size — that skipped bulletin body.
+            for start in range(0, len(vision_indexes), MAX_VISION_PAGES_PER_PDF):
+                batch = vision_indexes[start : start + MAX_VISION_PAGES_PER_PDF]
+                print(
+                    f"  Vision batch {start // MAX_VISION_PAGES_PER_PDF + 1}: "
+                    f"{len(batch)} page(s) {[i + 1 for i in batch]}"
+                )
+                sparse_images = pdf_images_for_pages(pdf_file, batch)
+                vision_pages, sparse_provider = ocr_selected_images_with_fallbacks(
+                    sparse_images
+                )
+                if vision_pages:
+                    pages_text = merge_vision_into_pages(
+                        pages_text, batch, vision_pages
+                    )
+                    provider_used = f"Tier0+{sparse_provider}"
+                else:
+                    print(
+                        f"  Vision batch failed for pages {[i + 1 for i in batch]}; "
+                        "leaving native text for those pages."
+                    )
         except Exception as e:
             print(f"  Sparse-page vision failed ({type(e).__name__}: {e}).")
     elif pages_text is None and native_all:

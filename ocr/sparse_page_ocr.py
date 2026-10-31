@@ -464,14 +464,39 @@ def _is_scan_speckle(line: str) -> bool:
     return not _WORDISH_RE.search(text)
 
 
+def column_images_for_page(image, crop_top: bool = True):
+    """Return left-to-right column strips for vision OCR, or ``[image]`` if one column.
+
+    Annagry / Dunfanaghy-style bulletins put contacts in a narrow left column
+    and Mass times on the right. Sending the whole page to vision smashes them
+    together; strips keep each column readable.
+
+    *crop_top* drops a thin stitcher band for local tesseract. Vision keeps the
+    top so a title such as Teach Pobail Mhuire is not cut off.
+    """
+    if image is None:
+        return []
+    try:
+        width, height = image.size
+    except Exception:
+        return [image]
+    if crop_top:
+        top = int(height * 0.035)
+        body = image.crop((0, top, width, height))
+    else:
+        body = image
+    gutters = column_gutter_xs(body) or column_rule_xs(body)
+    if not gutters:
+        return [image]
+    strips = _column_strips(body, gutters)
+    return strips or [image]
+
+
 def ocr_page_image_columns(image) -> list[str]:
     """OCR a bulletin page left-to-right by detected columns, then top-to-bottom."""
     if image is None:
         return []
-    width, height = image.size
-    top = int(height * 0.035)
-    body = image.crop((0, top, width, height))
-    strips = _column_strips(body, column_gutter_xs(body))
+    strips = column_images_for_page(image)
     texts = [_tesseract_image(strip, psm=6) for strip in strips]
     combined = "\n\n".join((text or "").rstrip() for text in texts)
     lines = [ln.rstrip() for ln in combined.splitlines()]
@@ -641,8 +666,9 @@ def polish_ocr_html_from_pdf(fragment: str, pdf_path: str | Path) -> str:
     return repair_image_pages_in_ocr_html(polished, pdf_path)
 
 
-# Cap vision calls per mega PDF — Gemini free tier is tiny (Frank 26/09/2026 OCR
-# burned quota on Cork's false-positive smash hits and Dunfanaghy never got a pass).
+# Batch size for vision API calls per mega PDF. Frank 26/09/2026: Gemini free
+# tier burned when Cork sent dozens at once; Dunfanaghy then never got a pass.
+# Do **not** silently drop pages above this — convert_bulletin batches them.
 MAX_VISION_PAGES_PER_PDF = 10
 
 
@@ -650,8 +676,8 @@ def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int
     """Which 0-based pages need vision.
 
     ``[]`` — every page has usable embedded text; send none.
-    A list — mixed mega; send sparse pages first, then worst smashed pages,
-    capped at :data:`MAX_VISION_PAGES_PER_PDF`.
+    A list — mixed mega; sparse first, then garbage, then worst smashed.
+    Callers must OCR **every** index (batch by :data:`MAX_VISION_PAGES_PER_PDF`).
     ``None`` — no usable native text (or every page needs vision); send the whole PDF.
     """
     pages = list(native_pages or [])
@@ -675,10 +701,10 @@ def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int
     if len(need) == len(pages) and len(pages) <= MAX_VISION_PAGES_PER_PDF:
         return None
     if len(need) > MAX_VISION_PAGES_PER_PDF:
-        need = need[:MAX_VISION_PAGES_PER_PDF]
         print(
-            f"  Vision page cap: sending {len(need)}/{len(sparse) + len(garbage) + len(smashed)} "
-            f"worst pages (sparse first, then photo junk, then smash score)."
+            f"  Vision: {len(need)} pages need OCR "
+            f"(sparse {len(sparse)}, junk {len(garbage)}, smash {len(smashed)}); "
+            f"will batch in groups of {MAX_VISION_PAGES_PER_PDF}."
         )
     return need
 

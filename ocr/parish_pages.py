@@ -510,8 +510,21 @@ def write_parish_pages_for_diocese(
                 ocr_fragment = chunk.html
             else:
                 fallback_text = (text_chunks.get(parish.key) or "").strip()
-                if fallback_text:
-                    lines = [html.escape(ln) for ln in fallback_text.splitlines() if ln.strip()]
+                # Name-only hits are often a footer/webcam scrap (Dunfanaghy live
+                # 31/10) — do not publish that as the bulletin body.
+                from ocr.sparse_page_ocr import _ALREADY_HAS_BODY_RE
+                from ocr.text_extract import page_is_sparse
+
+                fallback_lines = [
+                    ln for ln in fallback_text.splitlines() if ln.strip()
+                ]
+                fallback_ok = (
+                    bool(fallback_text)
+                    and not page_is_sparse(fallback_lines)
+                    and bool(_ALREADY_HAS_BODY_RE.search(fallback_text))
+                )
+                if fallback_ok:
+                    lines = [html.escape(ln) for ln in fallback_lines]
                     ocr_fragment = (
                         '<div class="ocr-failed-banner" role="status">'
                         "ℹ️ Matched by parish name only (not exact PDF pages) this week — check the "
@@ -526,6 +539,13 @@ def write_parish_pages_for_diocese(
                         '<div class="ocr-failed-banner" role="status">'
                         f"⚠️ {html.escape(why)}</div>"
                     )
+
+            # Image bulletins (Annagry): re-read the parish PDF by columns when
+            # the mega OCR chunk is smashed, so Mass times are not skipped.
+            if slice_pdf.exists() and not fail_reason and ocr_fragment:
+                from ocr.sparse_page_ocr import polish_ocr_html_from_pdf
+
+                ocr_fragment = polish_ocr_html_from_pdf(ocr_fragment, slice_pdf)
 
             from ocr.bulletin_layout import structure_ocr_html
 

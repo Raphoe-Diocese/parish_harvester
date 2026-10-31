@@ -172,7 +172,8 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
         ]
         self.assertEqual(choose_vision_page_indexes([irish, smashed]), [1])
 
-    def test_vision_page_cap_keeps_sparse_first(self) -> None:
+    def test_vision_returns_all_sparse_and_smashed_sparse_first(self) -> None:
+        """Do not silently drop pages above the batch size (Frank 31/10 skip bug)."""
         from ocr.sparse_page_ocr import MAX_VISION_PAGES_PER_PDF, choose_vision_page_indexes
 
         banner = ["Parish of Example", "https://example.com/bulletin.pdf"]
@@ -193,11 +194,31 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
             "Killygordan ‘dla |‘ Fr. John Joe Duffy | Creeslough | id & saiw",
             "Masses for the Coming Weeki | eg EWMon - No Mass ) & 3 . _ Tue",
         ]
-        pages = [irish] * 3 + [banner] + [smashed] * (MAX_VISION_PAGES_PER_PDF + 5)
+        smash_n = MAX_VISION_PAGES_PER_PDF + 5
+        pages = [irish] * 3 + [banner] + [smashed] * smash_n
         chosen = choose_vision_page_indexes(pages)
         self.assertIsNotNone(chosen)
-        self.assertLessEqual(len(chosen), MAX_VISION_PAGES_PER_PDF)
-        self.assertIn(3, chosen)  # sparse banner kept
+        assert chosen is not None
+        self.assertEqual(len(chosen), 1 + smash_n)
+        self.assertEqual(chosen[0], 3)  # sparse banner first
+        self.assertEqual(set(chosen), set(range(3, 3 + 1 + smash_n)))
+
+    def test_annagry_pdf_splits_into_two_vision_columns(self) -> None:
+        """Live Annagry failure: whole-page vision smashed the sidebar into Mass times."""
+        from pathlib import Path
+
+        from ocr.sparse_page_ocr import column_images_for_page, render_pdf_page_image
+
+        pdf = Path("docs/parishes/raphoe/annagryparish.pdf")
+        if not pdf.is_file():
+            self.skipTest("annagryparish.pdf not in workspace")
+        image = render_pdf_page_image(pdf, 0, dpi=120)
+        self.assertIsNotNone(image)
+        strips = column_images_for_page(image)
+        self.assertGreaterEqual(len(strips), 2)
+        self.assertLess(strips[0].size[0], strips[1].size[0])
+        full = column_images_for_page(image, crop_top=False)
+        self.assertEqual(full[0].size[1], image.size[1])
 
     def test_column_gutter_finds_sidebar_not_midpage(self) -> None:
         from PIL import Image, ImageDraw
