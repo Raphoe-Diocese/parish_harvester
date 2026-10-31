@@ -217,6 +217,8 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
         strips = column_images_for_page(image)
         self.assertGreaterEqual(len(strips), 2)
         self.assertLess(strips[0].size[0], strips[1].size[0])
+        full = column_images_for_page(image, crop_top=False)
+        self.assertEqual(full[0].size[1], image.size[1])
 
     def test_column_gutter_finds_sidebar_not_midpage(self) -> None:
         from PIL import Image, ImageDraw

@@ -23,6 +23,7 @@ from ocr.reading_check import (  # noqa: E402
     ANNAGRY_MUST,
     GORT_MUST,
     NEWTOWN_MUST,
+    fold_reading,
     score_reading,
 )
 from ocr.sparse_page_ocr import (  # noqa: E402
@@ -90,6 +91,8 @@ def main() -> int:
             lines.append("  missing: " + "; ".join(score.missing))
         if score.banned_hits:
             lines.append("  banned: " + "; ".join(score.banned_hits))
+        if not score.ok:
+            lines.append("  read: " + fold_reading(text)[:700])
     report = "\n".join(lines)
     print(report)
     out = ROOT / "ocr-reading-probe.txt"

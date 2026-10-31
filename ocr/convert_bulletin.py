@@ -340,8 +340,15 @@ def _vision_column_strips(image):
     """Split multi-column bulletin pages so vision does not smash sidebars."""
     from ocr.sparse_page_ocr import column_images_for_page
 
-    strips = column_images_for_page(image)
+    strips = column_images_for_page(image, crop_top=False)
     return strips if strips else [image]
+
+
+_COLUMN_RETRY_PROMPT = (
+    "Transcribe all printed text in this image, top to bottom. "
+    "Keep Irish (Gaeilge) as Irish. Do not translate or summarise. "
+    "Do not skip headings, phone numbers, or short lines."
+)
 
 
 def _gemini_safety_settings(genai):
@@ -362,10 +369,61 @@ def _gemini_safety_settings(genai):
 
 def _gemini_response_text(response) -> str:
     try:
-        return getattr(response, "text", "") or ""
+        text = getattr(response, "text", "") or ""
+        if text.strip():
+            return text
     except Exception as exc:
         print(f"    Gemini returned no text ({type(exc).__name__}: {exc}).", flush=True)
-        return ""
+    chunks: list[str] = []
+    for cand in getattr(response, "candidates", None) or []:
+        content = getattr(cand, "content", None)
+        for part in getattr(content, "parts", None) or []:
+            part_text = getattr(part, "text", None)
+            if part_text and str(part_text).strip():
+                chunks.append(str(part_text))
+        if not chunks:
+            print(
+                f"    Gemini finish_reason={getattr(cand, 'finish_reason', None)}",
+                flush=True,
+            )
+    if chunks:
+        return "\n".join(chunks)
+    feedback = getattr(response, "prompt_feedback", None)
+    if feedback:
+        print(f"    Gemini prompt_feedback={feedback}", flush=True)
+    return ""
+
+
+def _lines_from_gemini_text(text: str) -> list[str]:
+    return [
+        line
+        for line in (text or "").splitlines()
+        if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+    ]
+
+
+def _gemini_transcribe(model, image, prompt: str, safety) -> list[str]:
+    try:
+        response = model.generate_content(
+            [prompt, {"mime_type": "image/png", "data": _image_png_bytes(image)}],
+            safety_settings=safety,
+        )
+    except Exception as exc:
+        print(f"    Gemini column failed ({type(exc).__name__}: {exc}).", flush=True)
+        return []
+    return _lines_from_gemini_text(_gemini_response_text(response))
+
+
+def _text_band_below_photo(image):
+    """Lower part of a column, under a masthead photo."""
+    try:
+        width, height = image.size
+    except Exception:
+        return None
+    top = int(height * 0.34)
+    if height - top < 80:
+        return None
+    return image.crop((0, top, width, height))
 
 
 def ocr_images_with_gemini(images):
@@ -393,18 +451,15 @@ def ocr_images_with_gemini(images):
         page_lines: list[str] = []
         got_any = False
         for strip in strips:
-            try:
-                response = model.generate_content(
-                    [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(strip)}],
-                    safety_settings=safety,
-                )
-            except Exception as exc:
-                print(f"    Gemini column failed ({type(exc).__name__}: {exc}).", flush=True)
-                continue
-            lines = [
-                line for line in _gemini_response_text(response).splitlines()
-                if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-            ]
+            lines = _gemini_transcribe(model, strip, OCR_PROMPT, safety)
+            if not lines:
+                print("    Retrying column with a plain transcribe.", flush=True)
+                lines = _gemini_transcribe(model, strip, _COLUMN_RETRY_PROMPT, safety)
+            if not lines:
+                band = _text_band_below_photo(strip)
+                if band is not None:
+                    print("    Retrying the text under the photo.", flush=True)
+                    lines = _gemini_transcribe(model, band, _COLUMN_RETRY_PROMPT, safety)
             if not lines:
                 continue
             got_any = True

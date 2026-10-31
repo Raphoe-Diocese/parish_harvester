@@ -464,12 +464,15 @@ def _is_scan_speckle(line: str) -> bool:
     return not _WORDISH_RE.search(text)
 
 
-def column_images_for_page(image):
+def column_images_for_page(image, crop_top: bool = True):
     """Return left-to-right column strips for vision OCR, or ``[image]`` if one column.
 
     Annagry / Dunfanaghy-style bulletins put contacts in a narrow left column
     and Mass times on the right. Sending the whole page to vision smashes them
     together; strips keep each column readable.
+
+    *crop_top* drops a thin stitcher band for local tesseract. Vision keeps the
+    top so a title such as Teach Pobail Mhuire is not cut off.
     """
     if image is None:
         return []
@@ -477,8 +480,11 @@ def column_images_for_page(image):
         width, height = image.size
     except Exception:
         return [image]
-    top = int(height * 0.035)
-    body = image.crop((0, top, width, height))
+    if crop_top:
+        top = int(height * 0.035)
+        body = image.crop((0, top, width, height))
+    else:
+        body = image
     gutters = column_gutter_xs(body) or column_rule_xs(body)
     if not gutters:
         return [image]
