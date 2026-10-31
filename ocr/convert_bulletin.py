@@ -501,6 +501,8 @@ def groq_transcribe_image(image) -> list[str]:
         headers={
             "Content-Type": "application/json",
             "Authorization": f"Bearer {api_key}",
+            # Cloudflare rejects Python's default urllib signature (error 1010).
+            "User-Agent": "parish-harvester-ocr",
         },
         method="POST",
     )
