@@ -336,6 +336,14 @@ def _image_to_base64_png(image):
     return base64.b64encode(_image_png_bytes(image)).decode("utf-8")
 
 
+def _vision_column_strips(image):
+    """Split multi-column bulletin pages so vision does not smash sidebars."""
+    from ocr.sparse_page_ocr import column_images_for_page
+
+    strips = column_images_for_page(image)
+    return strips if strips else [image]
+
+
 def ocr_images_with_gemini(images):
     """Run Gemini OCR across images and return (pages_text, provider_summary)."""
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -348,17 +356,55 @@ def ocr_images_with_gemini(images):
     model = genai.GenerativeModel("gemini-2.5-flash")
     pages_text = []
     for i, image in enumerate(images, start=1):
-        print(f"  OCR on page {i}/{len(images)} via Gemini ...", flush=True)
-        response = model.generate_content(
-            [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(image)}]
-        )
-        text = getattr(response, "text", "") or ""
-        lines = [
-            line for line in text.splitlines()
-            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-        ]
-        pages_text.append(lines)
+        strips = _vision_column_strips(image)
+        if len(strips) > 1:
+            print(
+                f"  OCR on page {i}/{len(images)} via Gemini "
+                f"({len(strips)} columns) ...",
+                flush=True,
+            )
+        else:
+            print(f"  OCR on page {i}/{len(images)} via Gemini ...", flush=True)
+        page_lines: list[str] = []
+        for si, strip in enumerate(strips):
+            response = model.generate_content(
+                [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(strip)}]
+            )
+            text = getattr(response, "text", "") or ""
+            lines = [
+                line for line in text.splitlines()
+                if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+            ]
+            if page_lines and lines:
+                page_lines.append("")
+            page_lines.extend(lines)
+        pages_text.append(page_lines)
     return pages_text, "Gemini fallback"
+
+
+def _ocr_openai_compatible_page(client, model: str, image, label: str) -> list[str]:
+    print(f"  OCR on {label} ...", flush=True)
+    b64 = _image_to_base64_png(image)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": OCR_PROMPT},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{b64}"},
+                    },
+                ],
+            }
+        ],
+    )
+    text = response.choices[0].message.content or ""
+    return [
+        line for line in text.splitlines()
+        if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
+    ]
 
 
 def ocr_images_with_github_models(images):
@@ -375,29 +421,17 @@ def ocr_images_with_github_models(images):
     )
     pages_text = []
     for i, image in enumerate(images, start=1):
-        print(f"  OCR on page {i}/{len(images)} via GitHub Models ...", flush=True)
-        b64 = _image_to_base64_png(image)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": OCR_PROMPT},
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/png;base64,{b64}"},
-                        },
-                    ],
-                }
-            ],
-        )
-        text = response.choices[0].message.content or ""
-        lines = [
-            line for line in text.splitlines()
-            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-        ]
-        pages_text.append(lines)
+        strips = _vision_column_strips(image)
+        page_lines: list[str] = []
+        for si, strip in enumerate(strips):
+            label = f"page {i}/{len(images)} via GitHub Models"
+            if len(strips) > 1:
+                label += f" col {si + 1}/{len(strips)}"
+            lines = _ocr_openai_compatible_page(client, "gpt-4o-mini", strip, label)
+            if page_lines and lines:
+                page_lines.append("")
+            page_lines.extend(lines)
+        pages_text.append(page_lines)
     return pages_text, "GitHub Models fallback"
 
 
@@ -412,29 +446,17 @@ def ocr_images_with_openai(images):
     client = OpenAI(api_key=openai_api_key)
     pages_text = []
     for i, image in enumerate(images, start=1):
-        print(f"  OCR on page {i}/{len(images)} via OpenAI ...", flush=True)
-        b64 = _image_to_base64_png(image)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": OCR_PROMPT},
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/png;base64,{b64}"},
-                        },
-                    ],
-                }
-            ],
-        )
-        text = response.choices[0].message.content or ""
-        lines = [
-            line for line in text.splitlines()
-            if line.strip() and not MARKDOWN_FENCE_PATTERN.match(line)
-        ]
-        pages_text.append(lines)
+        strips = _vision_column_strips(image)
+        page_lines: list[str] = []
+        for si, strip in enumerate(strips):
+            label = f"page {i}/{len(images)} via OpenAI"
+            if len(strips) > 1:
+                label += f" col {si + 1}/{len(strips)}"
+            lines = _ocr_openai_compatible_page(client, "gpt-4o-mini", strip, label)
+            if page_lines and lines:
+                page_lines.append("")
+            page_lines.extend(lines)
+        pages_text.append(page_lines)
     return pages_text, "OpenAI fallback"
 
 
@@ -1474,11 +1496,29 @@ def main():
 
     if pages_text is not None and vision_indexes and has_vision_keys:
         try:
-            sparse_images = pdf_images_for_pages(pdf_file, vision_indexes)
-            vision_pages, sparse_provider = ocr_selected_images_with_fallbacks(sparse_images)
-            if vision_pages:
-                pages_text = merge_vision_into_pages(pages_text, vision_indexes, vision_pages)
-                provider_used = f"Tier0+{sparse_provider}"
+            from ocr.sparse_page_ocr import MAX_VISION_PAGES_PER_PDF
+
+            # Never drop pages above the batch size — that skipped bulletin body.
+            for start in range(0, len(vision_indexes), MAX_VISION_PAGES_PER_PDF):
+                batch = vision_indexes[start : start + MAX_VISION_PAGES_PER_PDF]
+                print(
+                    f"  Vision batch {start // MAX_VISION_PAGES_PER_PDF + 1}: "
+                    f"{len(batch)} page(s) {[i + 1 for i in batch]}"
+                )
+                sparse_images = pdf_images_for_pages(pdf_file, batch)
+                vision_pages, sparse_provider = ocr_selected_images_with_fallbacks(
+                    sparse_images
+                )
+                if vision_pages:
+                    pages_text = merge_vision_into_pages(
+                        pages_text, batch, vision_pages
+                    )
+                    provider_used = f"Tier0+{sparse_provider}"
+                else:
+                    print(
+                        f"  Vision batch failed for pages {[i + 1 for i in batch]}; "
+                        "leaving native text for those pages."
+                    )
         except Exception as e:
             print(f"  Sparse-page vision failed ({type(e).__name__}: {e}).")
     elif pages_text is None and native_all:

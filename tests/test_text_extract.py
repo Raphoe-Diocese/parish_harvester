@@ -79,6 +79,35 @@ class PreferEmbeddedTextTests(unittest.TestCase):
             self.assertIn("Church Car Park", joined)
             self.assertIn("vision OCR", joined)
 
+    def test_smashed_native_keeps_vision(self) -> None:
+        """Dunfanaghy-style junk text layer must not overwrite good vision OCR."""
+        smashed = (
+            "It Isour privilege and OUPae Ventere (0 GIscover IESSSourown "
+            "special light. The Candle of Remembrance STSSisa SS0a— — "
+            "Mary Dunbar for the coming week will beorfi lit in loving "
+            "memory of Ar. uii, i Holy Cross Church, Dunfanaghy ) i ~ yal "
+            "Fr. Martin Doohan | Parish Priest | Margaret | Patrick | Patsy "
+            "Charlie McConnell | j f 4 aya Tel: 074-91-36163 | Mobile | 087 "
+            "Killygordan dla Fr. John Joe Duffy Creeslough id saiw "
+            "Masses for the Coming Weeki | eg EWMon - No Mass ) & 3 . _ Tue"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            pdf_path = Path(tmpdir) / "dunfanaghy.pdf"
+            pdf_path.write_bytes(_text_pdf([smashed]))
+            vision = [
+                [
+                    "MASS TIMES for Holy Cross Church, Dunfanaghy this week.",
+                    "Vigil Mass on Saturday 25th October at 6.30pm.",
+                    "Recently deceased: please keep the family in your prayers.",
+                    "Community notices and anniversary list continue on this page.",
+                ]
+            ]
+            preferred = prefer_embedded_page_text(pdf_path, vision)
+            joined = "\n".join(preferred[0])
+            self.assertIn("MASS TIMES for Holy Cross", joined)
+            self.assertIn("25th October", joined)
+            self.assertNotIn("OUPae", joined)
+
     def test_extract_all_keeps_mixed_pages(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             pdf_path = Path(tmpdir) / "mixed.pdf"
