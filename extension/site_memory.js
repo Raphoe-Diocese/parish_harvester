@@ -724,7 +724,7 @@
     if (start.includes("churchtownparish.com")) {
       return CATALOG.iso_newsletter_pdf;
     }
-    if (start.includes("castleconnellparish.ie") || start.includes("clarecastleballyeaparish.ie") || start.includes("imeallboirne.ie")) {
+    if (start.includes("castleconnellparish.ie") || start.includes("clarecastleballyeaparish.ie") || start.includes("imeallboirne.ie") || start.includes("ennisparish.com") || start.includes("inaghkilnamonaparish.ie")) {
       return CATALOG.spelled_month_listing_pdf;
     }
     if (start.includes("doorabarefieldparish.ie")) {

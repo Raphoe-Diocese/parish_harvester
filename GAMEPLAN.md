@@ -1,4 +1,12 @@
-﻿## 31/10/2026 22:55 — Clarecastle and Corofin harvested 25/10/2026
+﻿## 31/10/2026 23:20 — Durrow harvested 25/10/2026. Doora saved a file with no date
+
+- Durrow run 41251541444 ok. File newsletter-25-oct-2026.jpg. Date 25/10/2026.
+- Doora-Barefield run 41251538752 saved doora-Barefield.pdf and marked it ok. The stored date is empty. The link on the page says 1st November. Do not call that run 01/11/2026. Do not send it again.
+- Ennis listing proved 25th-October.pdf (application/pdf, 536563 bytes). Inagh proved Newsletter-25th-October-2026.pdf (application/pdf, 217963 bytes). GitHub did not take the send. Not dispatched.
+- Ennis also lists 1stB-November.pdf. The date reader scored that name as 01/10/2026. This Sunday's file is on the list, so keep 25th-October.pdf.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 22:55 — Clarecastle and Corofin harvested 25/10/2026
 
 - Clarecastle run 41248893099 ok. File 25th-October-2026.pdf. Date 25/10/2026.
 - Corofin run 41248896002 ok. File 25th-October-2026-Newsletter.pdf. Date 25/10/2026.
