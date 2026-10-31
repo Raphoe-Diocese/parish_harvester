@@ -69,9 +69,12 @@ _WP_DATE_POST_RE = re.compile(r"/(\d{4})/(\d{2})/(\d{2})/[^/]+/")
 # Used by _find_dated_bulletin_link() to extract publish dates from WP post URLs.
 _WP_DATE_PATH_RE = re.compile(r"/(\d{4})/(\d{2})/(\d{2})/")
 
-# Pattern B: D-M-YY (1–2 digit day/month, 2-digit year, dash-separated)
+# Pattern B: D-M-YY (1–2 digit day/month/year). Ambiguous between UK
+# DD-MM-YY (limavady 16-8-26.pdf, claudy NEWSLETTER 9-8-26.docx) and
+# YY-MM-DD (ballymoneyparish 26-08-23pdf.pdf → 23/08/2026).
+# Kilbrittain 26-11-1.pdf is the same YY-MM-DD shape with the day unpadded.
 # e.g. 5-4-26, 12-4-26, 15-3-26  (Limavady parish pattern)
-_D_M_YY_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{2})(?!\d)")
+_D_M_YY_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{1,2})(?!\d)")
 
 # Pattern B-dot: D.M.YY with optional unpadded month/day — Ballymena
 # 16.8.26-20th-Sunday.pdf / 9.8.26-19th-Sunday.pdf. The 2-digit-only

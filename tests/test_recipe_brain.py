@@ -118,6 +118,9 @@ def test_listing_pdfs_proved_31_october() -> None:
     assert any("1stB-November" in line for line in ennis.do_not)
     inagh = hint_for_url("https://inaghkilnamonaparish.ie/newsletter/")
     assert inagh is not None and any("25th-October-2026" in line for line in inagh.notes)
+    kilb = hint_for_url("https://kilbrittainparish.ie/bulletin")
+    assert kilb is not None and kilb.key == "yy_mm_d_pdf"
+    assert any("26-11-1" in line for line in kilb.notes)
 
 
 def test_churchmedia_is_api_newsletter() -> None:
