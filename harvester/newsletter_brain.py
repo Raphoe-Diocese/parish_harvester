@@ -17,6 +17,7 @@ from urllib.parse import unquote, urljoin, urlparse, urlunparse
 
 from .bulletin_freshness import (
     FreshnessVerdict,
+    MAX_STALE_DAYS_FROM_TARGET,
     check_bulletin_freshness,
     extract_bulletin_date_from_text,
     verdict_for_extracted_date,
@@ -413,10 +414,15 @@ def predicted_urls(page_url: str, target: date) -> list[Candidate]:
 
 
 def is_diocese_profile(url: str) -> bool:
-    """A diocese /parishes/ card is the parish's address, not its newsletter."""
+    """A diocese parish card is the parish's address, not its newsletter."""
     parsed = urlparse(url or "")
     host = parsed.netloc.lower()
-    return "/parishes/" in parsed.path.lower() and "diocese" in host
+    path = parsed.path.lower()
+    if "diocese" not in host:
+        return False
+    if re.search(r"\.(pdf|docx|jpe?g|png|rtf)$", path):
+        return False
+    return "/parishes/" in path or "/parish/" in path
 
 
 def parish_slug_from_profile(url: str) -> str:
@@ -771,11 +777,24 @@ def pick_same_day_file(urls: list[str], patterns: list[str] | None = None) -> st
 
 
 def same_sunday_urls(scored: list[tuple[date, str]], target: date) -> list[str]:
-    """Next Sunday's file is not this Sunday's bulletin.
+    """This Sunday's file wins. A file up to 8 days ahead is used when it is missing.
 
     Castleisland lists 4 Oct, 18 Oct and 25 Oct. For harvest Sunday 18/10/2026
-    the file is 18th-October2026.pdf.
+    the file is 18th-October2026.pdf, not the 25 Oct file.
+    On 31/10/2026 the target is still 25/10/2026. Arklow and Baile an
+    Fheirtearaigh had only 01/11/2026. That is 7 days ahead and still fresh.
     """
+    on_target = [url for found, url in scored if found == target]
+    if on_target:
+        return on_target
+    ahead = [
+        (found, url)
+        for found, url in scored
+        if 0 < (found - target).days <= MAX_STALE_DAYS_FROM_TARGET
+    ]
+    if ahead:
+        best = min(found for found, _url in ahead)
+        return [url for found, url in ahead if found == best]
     on_or_before = [(found, url) for found, url in scored if found <= target]
     if not on_or_before:
         return []

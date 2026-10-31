@@ -1,4 +1,13 @@
-﻿## 31/10/2026 — A–Z gold links, first proved batch
+﻿## 31/10/2026 16:50 — Harvest results, then the ahead-file fix
+
+- Ballinora and Kilmurry: harvest ok, date 25/10/2026, file 25-10-26.pdf. Runs 41218021691 and 41218024955. Not checked on parishpress.ie.
+- Baile an Fheirtearaigh: stale 18/10/2026. The card also has 01/11/2026. The picker dropped that file because it is after 25/10.
+- Arklow: failed. The homepage file is 01/11/2026, so the same picker found nothing on 25/10.
+- Birr and Bodyke: the run saved the Killaloe /parish/ card and no date. That is not the bulletin.
+- Bree: timed out. Booterstown: GitHub saved a security page, not the PDF.
+- Fix: if this Sunday is missing, take the nearest file up to 8 days ahead. A diocese /parish/ card is not a bulletin. This Sunday still wins when it is listed.
+
+## 31/10/2026 — A–Z gold links, first proved batch
 
 - Merged PR 434 (e173bfcf). Brain has the new tricks. Not on parishpress.ie until a harvest run finishes and Pages deploys.
 - First harvests failed in the test step (St Oliver Plunkett example lock). That lock is fixed in the same PR. Harvests re-sent with tests skipped: Arklow 41218018179, Ballinora 41218021691, Kilmurry 41218024955, Birr 41218027891, Bodyke 41218031002, Baile an Fheirtearaigh 41218034474, Bree 41218037154, Booterstown 41218040176. Not marked ok until those runs say so.

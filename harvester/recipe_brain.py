@@ -242,6 +242,7 @@ def hint_for_url(url: str) -> HubHint | None:
             do_not=(
                 "Do not pin the dated PDF.",
                 "Do not use the diocese Facebook page as the parish link.",
+                "Do not save the /parish/ card as the bulletin.",
             ),
             pattern_key="kerry_card_yyyymmdd_pdf+direct_download",
         )
