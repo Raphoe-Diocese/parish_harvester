@@ -483,6 +483,7 @@ def hint_for_url(url: str) -> HubHint | None:
                 "31/10/2026 /images/bulletin/26-11-1.pdf is application/pdf, 170128 bytes.",
                 "The day is not padded. Read it as 01/11/2026. The link text only says View the Newsletter.",
                 "26-10-18.pdf stays 18/10/2026. Do not pin the filename.",
+                "Harvest 41253689732 ok. Saved 26-11-1.pdf. Date 01/11/2026.",
             ),
             do_not=("Do not pin 26-11-1.pdf.", "Do not read 26-11-1 as 26 November."),
             pattern_key="yy_mm_d_pdf+direct_download",
@@ -496,7 +497,7 @@ def hint_for_url(url: str) -> HubHint | None:
             confidence="high",
             notes=(
                 "31/10/2026 /newsletter/ proved Newsletter-Sunday-25th-October-2026.pdf (application/pdf, 1862940 bytes).",
-                "Harvest 41252945730 is sent. Not ok until that run says so.",
+                "Harvest 41252945730 ok. Saved that file. Date 25/10/2026.",
             ),
             do_not=("Do not pin the dated filename.",),
             pattern_key="spelled_month_listing_pdf+direct_download",
@@ -509,11 +510,27 @@ def hint_for_url(url: str) -> HubHint | None:
             label="Kildare Parish Newsletter Dth-Month-YYYY.pdf",
             confidence="high",
             notes=(
-                "31/10/2026 /newsletter/ proved Kildare-Parish-Newsletter-25th-October-2026.pdf (application/pdf, 1159659 bytes).",
-                "Harvest 41252949103 is sent. Not ok until that run says so.",
+                "31/10/2026 /newsletter/ proved Kildare-Parish-Newsletter-25th-October-2026.pdf (application/pdf, 1159659 bytes, %PDF).",
+                "Harvest 41252949103 downloaded that file and rejected it: 24 pages, max 4.",
+                "The newsletter covers Kildare Town, Nurney and Kildangan. max_bulletin_pages is 28. Do not pin the filename.",
             ),
-            do_not=("Do not pin the dated filename.",),
+            do_not=("Do not pin the dated filename.", "Do not leave max_bulletin_pages at 4."),
             pattern_key="spelled_month_listing_pdf+direct_download",
+        )
+
+    if host == "kilbroneyparish.com":
+        return HubHint(
+            key="wp_json_newest_media",
+            site_type="wp_json_newest_media",
+            label="Kilbroney bulletin still 16 October",
+            confidence="high",
+            notes=(
+                "31/10/2026 the media library's newest bulletin is Bulletin-16.10.26-.pdf.",
+                "That file is 16/10/2026. It was uploaded 23/10/2026. No 25/10/2026 file is in the library.",
+                "Leave it. Do not send the same wp-json harvest again.",
+            ),
+            do_not=("Do not pin Bulletin-16.10.26-.pdf.", "Do not invent a 25 October file."),
+            pattern_key="wp_json_newest_media+direct_download",
         )
 
     if host == "saintabbans.com":
