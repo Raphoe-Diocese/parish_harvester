@@ -201,10 +201,31 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.reason, "in_bulletin_week")
-        # Last Sunday is outside week_window — behind grace is gone.
+        # Last Sunday is outside week_window. It stays fresh only when the
+        # harvest day is the new Sunday. A later Monday drops it.
         later = check_bulletin_freshness(url, date(2026, 8, 16))
         self.assertEqual(later.status, "stale")
         self.assertEqual(later.reason, "date_behind_of_target")
+        sunday = verdict_for_extracted_date(
+            date(2026, 10, 25),
+            date(2026, 11, 1),
+            today=date(2026, 11, 1),
+        )
+        self.assertEqual(sunday.status, "fresh")
+        self.assertEqual(sunday.reason, "previous_sunday_still_current")
+        monday = verdict_for_extracted_date(
+            date(2026, 10, 25),
+            date(2026, 11, 1),
+            today=date(2026, 11, 2),
+        )
+        self.assertEqual(monday.status, "stale")
+        self.assertEqual(monday.reason, "date_behind_of_target")
+        two_weeks = verdict_for_extracted_date(
+            date(2026, 10, 18),
+            date(2026, 11, 1),
+            today=date(2026, 11, 1),
+        )
+        self.assertEqual(two_weeks.status, "stale")
 
     def test_page_scan_basename_is_not_day_of_month(self) -> None:
         # Ballymote Page-01-3.jpg / page-04-3.jpg under /uploads/2026/09/ —
