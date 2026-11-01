@@ -126,6 +126,7 @@ def test_listing_pdfs_proved_31_october() -> None:
     assert kilkee is not None and any("41252945730 ok" in line for line in kilkee.notes)
     kildare = hint_for_url("https://kildareparish.ie/newsletter/")
     assert kildare is not None and any("24 pages" in line for line in kildare.notes)
+    assert any("41313748997 ok" in line for line in kildare.notes)
     kilbroney = hint_for_url("https://kilbroneyparish.com")
     assert kilbroney is not None and any("16/10/2026" in line for line in kilbroney.notes)
 

@@ -2,7 +2,7 @@
 
 - Run 41291706897 finished. Target moved to 01/11/2026. Ok went from 392 on Saturday to 295.
 - 101 parishes that were ok still had the 25/10/2026 file. The harvest called them stale and left them out.
-- Fix: on Sunday only, last Sunday's file still counts. From Monday it is stale again. Two weeks behind stays stale. Not live. Needs another harvest after this is on main.
+- Fix is on main (PR 447). Rerun 41313748997 finished. Ok is 344. 43 of those are still the 25/10/2026 file, which is what Sunday is supposed to keep. Kildare is one of them. Not checked on parishpress.ie.
 - Kildare run 41269598472 saved the 25/10/2026 file (the 24-page cap worked) and then marked it stale. There is no 1 November file on that listing.
 - Not checked on parishpress.ie.
 
