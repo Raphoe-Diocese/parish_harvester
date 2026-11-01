@@ -1,4 +1,12 @@
-﻿## 31/10/2026 23:55 — Kilbrittain and Kilkee harvested. Kildare is 24 pages
+﻿## 01/11/2026 — Sunday harvest found fewer bulletins
+
+- Run 41291706897 finished. Target moved to 01/11/2026. Ok went from 392 on Saturday to 295.
+- 101 parishes that were ok still had the 25/10/2026 file. The harvest called them stale and left them out.
+- Fix: on Sunday only, last Sunday's file still counts. From Monday it is stale again. Two weeks behind stays stale. Not live. Needs another harvest after this is on main.
+- Kildare run 41269598472 saved the 25/10/2026 file (the 24-page cap worked) and then marked it stale. There is no 1 November file on that listing.
+- Not checked on parishpress.ie.
+
+## 31/10/2026 23:55 — Kilbrittain and Kilkee harvested. Kildare is 24 pages
 
 - Kilbrittain run 41253689732 ok. File 26-11-1.pdf. Date 01/11/2026.
 - Kilkee run 41252945730 ok. File Newsletter-Sunday-25th-October-2026.pdf. Date 25/10/2026.

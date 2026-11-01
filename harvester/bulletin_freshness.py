@@ -26,7 +26,10 @@ from .utils import (
 if TYPE_CHECKING:
     from .fetcher import FetchResult, ParishEntry
 
-# Ahead-only grace: up to 8 calendar days after harvest target is still fresh.
+# Ahead grace: up to 8 calendar days after harvest target is still fresh.
+# On the harvest Sunday itself, the previous Sunday (exactly 7 days behind)
+# stays fresh. Parishes often have not uploaded the new file by the 09:00 run.
+# From Monday that previous Sunday is stale again. Two weeks behind stays stale.
 MAX_STALE_DAYS_FROM_TARGET = 8
 # Bulletin week window used by fetcher candidate scoring (Sun − 6 … target Sun).
 WEEK_LOOKBACK_DAYS = 6
@@ -460,7 +463,12 @@ def heading_dates_in_text(text: str) -> list[date]:
     return found
 
 
-def verdict_for_extracted_date(extracted: date, target: date) -> FreshnessVerdict:
+def verdict_for_extracted_date(
+    extracted: date,
+    target: date,
+    *,
+    today: date | None = None,
+) -> FreshnessVerdict:
     """Compare an already-parsed bulletin date with the harvest Sunday."""
     week_start, week_end = week_window(target)
     if week_start <= extracted <= week_end:
@@ -477,6 +485,18 @@ def verdict_for_extracted_date(extracted: date, target: date) -> FreshnessVerdic
             status="fresh",
             extracted_date=extracted,
             reason="within_grace_days",
+            days_from_target=days_from_target,
+        )
+
+    # 01/11/2026 Sunday harvest 41291706897 moved the target to today and
+    # rejected 101 bulletins that were still the 25/10/2026 file. Keep that
+    # previous Sunday only while the harvest day is that Sunday.
+    as_of = today or date.today()
+    if days_from_target == -7 and as_of == target and as_of.weekday() == 6:
+        return FreshnessVerdict(
+            status="fresh",
+            extracted_date=extracted,
+            reason="previous_sunday_still_current",
             days_from_target=days_from_target,
         )
 
