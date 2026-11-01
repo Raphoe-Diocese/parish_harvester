@@ -141,10 +141,23 @@ def extract_text_pages(pdf_path: str | Path) -> list[list[str]] | None:
 
 
 def all_pages_have_embedded_text(pages: list[list[str]] | None) -> bool:
-    """True iff *pages* is non-empty and no page looks sparse/banner-only."""
+    """True iff every page has usable born-digital text (not sparse/junk/smash).
+
+    Image bulletins often embed *lots* of column-smashed scraps. Those must
+    not count as "born-digital" or parish pages skip vision and publish junk.
+    """
     if not pages:
         return False
-    return all(not page_is_sparse(lines) for lines in pages)
+    from ocr.sparse_page_ocr import ocr_lines_look_smashed
+
+    for lines in pages:
+        if page_is_sparse(lines):
+            return False
+        if page_text_is_garbage(lines):
+            return False
+        if ocr_lines_look_smashed(lines):
+            return False
+    return True
 
 
 # Words that are real in a bulletin. A photo page is mostly other scraps.
@@ -378,7 +391,13 @@ def prefer_embedded_page_text(
     pdf_path: str | Path,
     pages_text: list[list[str]] | None,
 ) -> list[list[str]]:
-    """Replace vision OCR with native PDF text on pages that are not sparse."""
+    """Replace vision OCR with native PDF text on clean born-digital pages.
+
+    Sparse, garbage, and column-smashed native layers keep vision (or stay
+    empty) so image bulletins are not overwritten with junk after a good OCR.
+    """
+    from ocr.sparse_page_ocr import ocr_lines_look_smashed
+
     native = extract_all_page_lines(pdf_path) or []
     vision = [list(lines or []) for lines in (pages_text or [])]
     n = max(len(native), len(vision))
@@ -386,7 +405,13 @@ def prefer_embedded_page_text(
     for i in range(n):
         nat = native[i] if i < len(native) else []
         vis = vision[i] if i < len(vision) else []
-        if nat and not page_is_sparse(nat) and not page_text_is_garbage(nat):
+        native_ok = (
+            bool(nat)
+            and not page_is_sparse(nat)
+            and not page_text_is_garbage(nat)
+            and not ocr_lines_look_smashed(nat)
+        )
+        if native_ok:
             out.append(nat)
         elif vis:
             out.append(vis)
