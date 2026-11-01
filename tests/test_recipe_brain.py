@@ -121,6 +121,13 @@ def test_listing_pdfs_proved_31_october() -> None:
     kilb = hint_for_url("https://kilbrittainparish.ie/bulletin")
     assert kilb is not None and kilb.key == "yy_mm_d_pdf"
     assert any("26-11-1" in line for line in kilb.notes)
+    assert any("41253689732" in line for line in kilb.notes)
+    kilkee = hint_for_url("https://www.kilkeeparish.com/newsletter/")
+    assert kilkee is not None and any("41252945730 ok" in line for line in kilkee.notes)
+    kildare = hint_for_url("https://kildareparish.ie/newsletter/")
+    assert kildare is not None and any("24 pages" in line for line in kildare.notes)
+    kilbroney = hint_for_url("https://kilbroneyparish.com")
+    assert kilbroney is not None and any("16/10/2026" in line for line in kilbroney.notes)
 
 
 def test_churchmedia_is_api_newsletter() -> None:

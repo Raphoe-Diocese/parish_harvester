@@ -1,10 +1,10 @@
-﻿## 31/10/2026 23:35 — Ennis and Inagh harvested 25/10/2026
+﻿## 31/10/2026 23:55 — Kilbrittain and Kilkee harvested. Kildare is 24 pages
 
-- Ennis run 41252519900 ok. File 25th-October.pdf. Date 25/10/2026.
-- Inagh run 41252523450 ok. File Newsletter-25th-October-2026.pdf. Date 25/10/2026.
-- Kilkee proved Newsletter-Sunday-25th-October-2026.pdf (application/pdf, 1862940 bytes). Sent 41252945730. Not ok until that run says so.
-- Kildare proved Kildare-Parish-Newsletter-25th-October-2026.pdf (application/pdf, 1159659 bytes). Sent 41252949103. Not ok until that run says so.
-- Kilbrittain's file is 26-11-1.pdf (application/pdf, 170128 bytes). The date reader missed the unpadded day. The fix reads it as 01/11/2026. Not sent until that fix is on main.
+- Kilbrittain run 41253689732 ok. File 26-11-1.pdf. Date 01/11/2026.
+- Kilkee run 41252945730 ok. File Newsletter-Sunday-25th-October-2026.pdf. Date 25/10/2026.
+- Kildare run 41252949103 failed. It downloaded Kildare-Parish-Newsletter-25th-October-2026.pdf (application/pdf, 1159659 bytes) and rejected 24 pages (max 4). The page cap on that recipe is now 28. Not sent again until that is on main.
+- Kilbroney's newest library file is still Bulletin-16.10.26-.pdf, dated 16/10/2026. Leave it.
+- Ennis run 41252519900 ok, 25/10/2026. Inagh run 41252523450 ok, 25/10/2026.
 - Not checked on parishpress.ie.
 
 ## 31/10/2026 23:20 — Durrow harvested 25/10/2026. Doora saved a file with no date
