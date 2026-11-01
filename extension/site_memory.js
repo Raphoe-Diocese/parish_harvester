@@ -603,7 +603,7 @@
         "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
         "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
         "29/10/2026 Baldoyle/Ballinteer: pinned 18 Oct downloads went stale while 25 Oct files were already listed — prefer http_scrape_newest_pdf; never pin the download URL.",
-        "01/11/2026 Sunday harvest: if this Sunday's PDF is not listed yet, keep last Sunday's file. Do not throw it out on Sunday morning. From Monday it is stale.",
+        "01/11/2026 Sunday harvest: if this Sunday's PDF is not listed yet, keep last Sunday's file. Rerun 41313748997 kept 43 of those 25/10/2026 files. From Monday that file is stale.",
       ],
       do_not: [
         "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) — it breaks next week.",
