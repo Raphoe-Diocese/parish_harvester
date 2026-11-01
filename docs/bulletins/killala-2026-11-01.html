@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Killala Diocese Bulletin Viewer — 01/11/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="../mega_pdf/killala_mega_bulletin_p1.jpg?d=2026-11-01&amp;h=20261101T1006" as="image">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #f4f6f6;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a6b6b;
+    }
+
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
+    .section-heading {
+      margin: 34px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .viewer-block {
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .ocr-open-text {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 8px;
+      padding: 8px 14px;
+      background: #14524f;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .ocr-open-text:hover { background: #0e3b39; color: #fff; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
+
+    .pdf-frame-wrap {
+      position: relative;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      max-width: 100%;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px !important;
+      min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+
+
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .search-clear {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 4px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
+    .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
+    .diocese-intro {
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }
+    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
+    .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
+    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
+    .diocese-intro h3 {
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: #14524f;
+    }
+    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
+    .diocese-intro .intro-names {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+    .diocese-intro .intro-names li { margin: 0 0 4px; }
+    
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .ocr-zoom-bar button {
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
+    }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
+    .ocr-zoom-pct {
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    
+    #ocr-panel {
+      background: #f3f5f4;
+      color: #141918;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.7;
+      max-width: min(68ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h2.b-title, #ocr-panel .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    #ocr-panel h3.b-head, #ocr-panel .b-head {
+      font-size: 1.2em;
+      color: #0a3333;
+      margin: 1.5em 0 0.5em;
+      padding: 0.35em 0.55em 0.35em 0.65em;
+      border-left: 4px solid #1a6b6b;
+      border-bottom: 1px solid #cfd8d4;
+      background: #e7ecea;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+      letter-spacing: 0.01em;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.08em;
+      color: #145a3d;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.2em 0 0.4em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.95em;
+    }
+    #ocr-panel h3.ocr-page-heading,
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    #ocr-panel hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    #ocr-panel strong { color: #0f2b5b; }
+    #ocr-panel a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    #ocr-panel mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    #ocr-panel mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+      max-width: 100%;
+      height: auto;
+    }
+    #ocr-panel > :first-child {
+      margin-top: 0;
+    }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      border: 1px solid #d4ddd9;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .note-box {
+      margin-top: 12px;
+      color: #8a3b3b;
+      font-weight: 400;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 4px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .empty-state[hidden],
+    #parish-empty[hidden] { display: none !important; }
+    .parish-section {
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
+    }
+    .parish-section h2.section-heading {
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+    .parish-filter {
+      width: 100%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
+    }
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: #1a6b6b;
+      font-weight: 700;
+    }
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
+    }
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
+    footer {
+      margin-top: 40px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
+      }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
+      /* Tap targets big enough for a thumb. */
+      .az-letter,
+      .ocr-zoom-bar button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
+      .download-link-top { display: none; }
+      .ocr-open-text { margin-left: 0; width: 100%; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
+      #ocr-panel {
+        padding: 16px 14px 28px;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      .ocr-search-tools button {
+        min-height: 44px;
+        width: 100%;
+      }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="/assets/pdf-inpage-viewer.js?v=20261018a" defer></script>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html" target="_blank" rel="noopener noreferrer">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">KILLALA</p>
+      <h1>Killala Collated Bulletin</h1>
+      
+      <p class="meta">Generated for 01/11/2026.</p>
+      <a class="download-link-top pdf-force-download" href="../mega_pdf/killala_mega_bulletin.pdf?d=2026-11-01&amp;h=20261101T1006" download="killala_mega_bulletin.pdf">Download PDF</a>
+    </header>
+    
+
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+    </div>
+
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Addergoole|Ardagh" title="Addergoole, Ardagh" aria-label="Jump to Addergoole">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Backs|Ballycastle (Armoy &amp; Ballintoy)|Ballycroy|Ballysokeary|Belmullet" title="Backs, Ballycastle (Armoy &amp; Ballintoy), Ballycroy, Ballysokeary, Belmullet" aria-label="Jump to Backs">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Castleconnor|Crossmolina" title="Castleconnor, Crossmolina" aria-label="Jump to Castleconnor">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Dromore West" title="Dromore West" aria-label="Jump to Dromore West">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Easkey" title="Easkey" aria-label="Jump to Easkey">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilcommon Erris|Kilfian|Kilglass|Killala|Kilmore Erris|Kilmoremoy|Kiltane" title="Kilcommon Erris, Kilfian, Kilglass, Killala, Kilmore Erris, Kilmoremoy, Kiltane" aria-label="Jump to Kilcommon Erris">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lacken" title="Lacken" aria-label="Jump to Lacken">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Moygownagh" title="Moygownagh" aria-label="Jump to Moygownagh">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Skreen &amp; Dromard" title="Skreen &amp; Dromard" aria-label="Jump to Skreen &amp; Dromard">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Templeboy" title="Templeboy" aria-label="Jump to Templeboy">T</button></nav>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe data-pdf-url="../mega_pdf/killala_mega_bulletin.pdf?d=2026-11-01&amp;h=20261101T1006" title="Killala Diocese bulletin PDF"></iframe>
+        
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../mega_pdf/killala_mega_bulletin.pdf?d=2026-11-01&amp;h=20261101T1006" data-pdf-preview="../mega_pdf/killala_mega_bulletin_p1.jpg?d=2026-11-01&amp;h=20261101T1006">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a class="pdf-open-newtab" href="../mega_pdf/killala_mega_bulletin.pdf?d=2026-11-01&amp;h=20261101T1006" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="../mega_pdf/killala_mega_bulletin.pdf?d=2026-11-01&amp;h=20261101T1006" download="killala_mega_bulletin.pdf">Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="../mega_pdf/killala_mega_bulletin_p1.jpg?d=2026-11-01&amp;h=20261101T1006" alt="" style="display:block;width:100%;height:auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="ocr-sticky-chrome">
+      <div class="ocr-search-bar">
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+        </div>
+      </div>
+      </div>
+      <div class="ocr-controls-row">
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Addergoole|Ardagh" title="Addergoole, Ardagh" aria-label="Jump to Addergoole">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Backs|Ballycastle (Armoy &amp; Ballintoy)|Ballycroy|Ballysokeary|Belmullet" title="Backs, Ballycastle (Armoy &amp; Ballintoy), Ballycroy, Ballysokeary, Belmullet" aria-label="Jump to Backs">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Castleconnor|Crossmolina" title="Castleconnor, Crossmolina" aria-label="Jump to Castleconnor">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Dromore West" title="Dromore West" aria-label="Jump to Dromore West">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Easkey" title="Easkey" aria-label="Jump to Easkey">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilcommon Erris|Kilfian|Kilglass|Killala|Kilmore Erris|Kilmoremoy|Kiltane" title="Kilcommon Erris, Kilfian, Kilglass, Killala, Kilmore Erris, Kilmoremoy, Kiltane" aria-label="Jump to Kilcommon Erris">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lacken" title="Lacken" aria-label="Jump to Lacken">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Moygownagh" title="Moygownagh" aria-label="Jump to Moygownagh">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Skreen &amp; Dromard" title="Skreen &amp; Dromard" aria-label="Jump to Skreen &amp; Dromard">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Templeboy" title="Templeboy" aria-label="Jump to Templeboy">T</button></nav>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+        <a class="ocr-open-text" href="killala-2026-11-01-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-belmullet" data-parish-name="Belmullet"><h2 class="ocr-parish-name">Belmullet</h2><p class="ocr-parish-date">01/11/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>CHURCH OF THE SACRED HEART, BELMULLET</p>
+<p>Sunday 10.30am, Monday to</p>
+<p>Thursday 9.30 a.m,</p>
+<p>Friday 11.00am, Saturday Vigil 8.00pm CHURCH OF OUR LADY OF LOURDES, GLENCASTLE</p>
+<p>Sunday 12.00 noon, and</p>
+<p>Saturday 10.00am Fr. Eddie Rogan <a href="tel:+3539781426" style="color:#1d4ed8;font-weight:600;">097 81426</a> or <a href="tel:+353862329151" style="color:#1d4ed8;font-weight:600;">086 2329151</a></p>
+<p>Fr. Tommy Doherty <a href="tel:+353873488742" style="color:#1d4ed8;font-weight:600;">087 3488742</a></p>
+<p>Parish Office, Chapel Street, Belmullet, Co. Mayo <a href="tel:+3539720777" style="color:#1d4ed8;font-weight:600;">097-20777</a></p>
+<p>E-mail <a href="mailto:belmulletparish@gmail.com" target="_blank" rel="noopener noreferrer">belmulletparish@gmail.com</a> A new CCTV system has been installed in the Sacred Heart Church, Belmullet and also c overing the church grounds</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>BELMULLET Sat Oct 10th 8.00 p.m Mary &amp; Johnny Murray Sun Oct 11th 10.30 a.m Michael Gaughan - Birthday Remembrance -- Paddy McManamon - 10th Anniv.</p>
+<p>Mon Oct 12th 9.30 a.m Intention Tues Oct 13th 9.30 a.m Patrick &amp; Mary Geoghegan &amp; Kathleen Barrett, Eric Reilly &amp; Deceased Geoghegan &amp; Togher Families Wed Oct 14th 9.30 a.m Intention Thurs Oct 15th 9.30 a.m Nora &amp; Anthony McIntyre &amp; Deceased Family Fri Oct 16th 11.00 a.m Sunday Mass for Senior Citizens -- Mammie McDonnell - Birthday Remembrance Sat Oct 17th 8.00 p.m Anthony McDonnell - Anniv., Barrack St -- Eddie &amp; Martin Lally &amp; Breege Sheeran -- Frank McGuire - 11th Anniv. -- Peggy, John &amp; Katherine Munnelly &amp; John &amp; Tommy Gaughan -- Catherine Lally, Church Rd., Michael, Joe, Phil &amp; Patrick Lally &amp; Granddaughters Lisa &amp; Danielle Sun Oct 18th 10.30 a.m Michael McNulty - 43rd Anniv.</p>
+<h3 class="b-head">MASS TIMES</h3>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Eucharistic Glencastle 12.00 a.m Alan Gaughan Ministers Reflection During the current liturgical year our gospel readings are from St. Matthew each Sunday Calling a tax collector to be a disciple and apostle was not only a counter cultural action on Jesus’ part but a direct challenge to established practice and a radical statement about the nature of the kingdom.</p>
+<p>Significantly the c alling of Matthew to be a disciple is followed immediately by the account of Jesus’ eating and drinking in the company of tax collectors and sinners, an action that draws serious criticism from the Pharisees to which Jesus responds with the quotation from Hosea: ‘what I want is mercy not sacrifice’ and with the radical description of his ministry: ‘ It is not the healthy who need the doctor but the sick’ and I have come to call sinners not the virtuous’(Hos 6:6; Mt 9:12-13).</p>
+<p>Date for Confirmation Belmullet 8th May 2027 @11.00 a.m in The Church of the Sacred Heart, Belmullet.</p>
+<p>Glencastle 8th May 2027 @2.00 p.m in Our Lady’s of Lourdes Church, Glencastle Date for First Communion - Belmullet Sat. 24th April 2027 12.00 p.m &amp; Glencastle Sat. 22nd May 12.00 p.m Eucharist Adorers needed to do one hour of Eucharist Adoration in Glencaslte Church every Wednesday between 7.00 a.m and 7.00 p.m.</p>
+<p>Please give your name to Breege McDermott in Bunnahowen Post office or the Belmullet Parish Office on 0967-20777</p>
+<p>ALTAR SOCIETIES Group 4 Sharon Murphy, Maura Murphy &amp; Kirstie Lavelle GLENCASTLE Bunnahowen Brid McDermott, Catherine Barrett &amp; Marcella Stich &amp; Marian Gaughan ALTAR SERVERS for</p>
+<p>Sun 18th For Glencastle Church 12.00noon Group A Larry McDonnell, Darragh Howard, Alex Donoghue, Lorcan Barrett ALTAR SERVERS for</p>
+<p>Sat 17th/Sun 18th BELMULLET 8.00 p.m. Team B Farrah Healy, Lily O’Boyle &amp; Megan O’Boyle un 10.30 a.m Team C Natalie McGuire, Abbey Curley, Michelle Cuffe &amp; Sarah Healy Offertory Collection Belmullet €1135.00 Glencastle € 307.55 Many thanks for your continued support</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>PIONEER ASSOCIATION If anyone is interested in restarting the Pioneer Association please contact Fr. Eddie Rogan on <a href="tel:+353862329151" style="color:#1d4ed8;font-weight:600;">086 2329151</a> or Parish Office on <a href="tel:+3539720777" style="color:#1d4ed8;font-weight:600;">097 20777</a></p>
+<p>Volunteers wanted for Church Cleaning of Belmullet Church.</p>
+<p>If interested please ring <a href="tel:+3539720777" style="color:#1d4ed8;font-weight:600;">097-20777</a> or drop in to Parish Office.</p>
+<p>Morning Prayer God of my life, I welcome this new day.</p>
+<p>It is your gift to me, a new creation, A promise of resurrection.</p>
+<p>I thank you for the grace of being alive this morning.</p>
+<p>I thank you for the sleep that has refreshed me.</p>
+<p>I thank you for this chance to make a new beginning.</p>
+<p>This day, Lord, is full of promise and opportunity: let me waste none of it.</p>
+<p>This day is full of mystery and the unknown: help me to face it without fear or anxiety.</p>
+<p>This day is blessed with beauty and adventure: make me fully alive to it all.</p>
+<p>During this day keep me thoughtful, prayerful and kind.</p>
+<p>May I be courteous and helpful to others, and not turned in on myself.</p>
+<p>Keep me from any word or deed that would hurt, or belittle, or destroy; and may the thoughts of my mind be pleasing in your sight.</p>
+<p>When night comes again, may I look back on this day with no grievance or bitterness in my heart; and may nobody be unhappy because of anything I have failed to do.</p>
+<p>Lord, bless this day for me and for everyone.</p>
+<p>Make it a day in which we grow to have the mind of Christ, your Son.</p>
+<p>Lord Jesus Christ, friend and brother; may we know you more clearly, love you more dearly, and follow you more nearly, day by day.</p>
+<p>Amen Prayer Loving God, We pray for the people of Ukraine, for all those suffering or afraid, that you will be close to them and protect them.</p>
+<p>We pray for world leaders, for compassion, strength and wisdom to guide their choices.</p>
+<p>We pray for the world that in this moment of crisis, we may reach out in solidarity to our brothers and sisters in need.</p>
+<p>May we walk in your ways so that peace and justice become a reality for the people of Ukraine, and for all the world.</p>
+<p>Amen The Memorare REMEMBER, Omost gracious Virgin Mary, that never was it known that anyone who fled to thy protection, implored thy help, or sought thy intercession was left unaided.</p>
+<p>Inspired with this confidence, I fly to thee, O Virgin of virgins, my Mother; to thee do I come; before thee I stand, sinful and sorrowful.</p>
+<p>O Mother of the Word Incarnate, despise not my petitions, but in thy mercy hear and answer me.</p>
+<p>Amen.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>By appearing in the Grotto of Lourdes, you were pleased to make it a privileged sanctuary, whence you dispense your favours; and already many sufferers have obtained the cure of their infirmities, both spiritual and corporal.</p>
+<p>I come, therefore, with complete confidence to implore your maternal intercession.</p>
+<p>Obtain, Oloving Mother, the grant of my requests. (mention your petition) Through gratitude for your favours, I will endeavour to imitate your virtues, that I may one day share your glory.</p>
+<p>Amen. Peace Prayer of Saint Francis Lord, make me an instrument of your peace: where there is hatred, let me sow love; where there is injury, pardon; where there is doubt, faith; where there is despair, hope; where there is darkness, light; where there is sadness, joy.</p>
+<p>Odivine Master, grant that I may not so much seek to be consoled as to console, to be understood as to understand, to be loved as to love.</p>
+<p>For it is in giving that we receive, it is in pardoning that we are pardoned, and it is in dying that we are born to eternal life.</p>
+<p>Amen. A PRAYER FOR EVERYDAY I need you Lord, But this day especially, I need some extra strength, To face whatever is to be.</p>
+<p>This day more than any day, I need to feel you near, To fortify my courage, And to overcome my fear.</p>
+<p>By myself, I cannot meet, The challenge of the hour, There are times when humans help, But we need a higher power.</p>
+<p>To assist us bear what must be borne, And so dear Lord, I pray, Hold on to my trembling hand, And be near me today.</p>
+<p>Amen</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>Helplines Available: HSE 1850 24 1850 Alone 0818 222 024</p>
+<p>Samaritans 116 123 Childline 1800 66 Farm &amp; Rural Stress 1800 742 645</p>
+<p>Pieta House (24HR) 1800 247 Shine 1890 621 631 Alcoholics Anonymous helpline no. <a href="tel:+353892109824" style="color:#1d4ed8;font-weight:600;">089 2109824</a> 12noon-10pm daily Other Services: Mayo University Hospital <a href="tel:+353949021733" style="color:#1d4ed8;font-weight:600;">094 9021733</a></p>
+<p>Community Response Team <a href="tel:+353949064660" style="color:#1d4ed8;font-weight:600;">094 9064660</a></p>
+<p>Mayo Mental Health Association <a href="tel:+353949038148" style="color:#1d4ed8;font-weight:600;">094 9038148</a></p>
+<p>Mindspace Mayo <a href="tel:+353949067001" style="color:#1d4ed8;font-weight:600;">094 9067001</a></p>
+<p>Mayo Recovery College <a href="tel:+353868255441" style="color:#1d4ed8;font-weight:600;">086 8255441</a></p>
+<p>CROÍ <a href="tel:+35391544310" style="color:#1d4ed8;font-weight:600;">091 544310</a></p>
+<p>First Prayer O Mary, You shine continuously on our journey as a sign of salvation and hope.</p>
+<p>We entrust ourselves to you, Health of the Sick, who, at the foot of the cross, were united with Jesus’ suffering, and persevered in your faith. “Protectress of the Roman people”, you know our needs, and we know that you will provide, so that, as at Cana in Galilee, joy and celebration may return after this time of trial.</p>
+<p>Help us, Mother of Divine Love, to conform ourselves to the will of the Father and to do what Jesus tells us.</p>
+<p>For he took upon himself our suffering, and burdened himself with our sorrows to bring us, through the cross, to the joy of the Resurrection.</p>
+<p>Amen. We fly to your protection, O Holy Mother of God; Do not despise our petitions in our necessities, but deliver us always from every danger, O Glorious and Blessed Virgin.</p>
+<p>Second Prayer “Wefly to your protection, O Holy Mother of God”. In the present tragic situation, when the whole world is prey to suffering and anxiety, we fly to you, Mother of God and our Mother, and seek refuge under your protection.</p>
+<p>Prayer to Saint Roch (St. Roch is patron saint of people suffering from infectious diseases) O Blessed Saint Roch, Patron of the sick, Have pity on those Who lie upon a bed of suffering.</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>Your power was so great When you were in this world, That by the sign of the Cross, Many were healed of their diseases.</p>
+<p>Now that you are in heaven, Your power is not less.</p>
+<p>Offer, then, to God Our sighs and tears And obtain for us that health we seek Through Christ our Lord.</p>
+<p>Amen. (Repeat the following 3 times) Saint Roch, Pray for us, That we may be preserved from all diseases of body and soul.</p>
+<p>Extract from Saint Patrick’s Breastplate Christ with me, Christ before me, Christ behind me, Christ in me, Christ beneath me, Christ above me, Christ on my right, Christ on my left, Christ when I lie down, Christ when I sit down, Christ when I arise, Christ in the heart of everyone who thinks of me, Christ in the mouth of everyone who speaks of me, Christ in every eye that sees me, Christ in every ear that hears me.</p>
+<p>Opening Prayer O Jesus Christ, my Lord, with what great love did you pass over the painful road which led you to death; and I, how often have I abandoned you!</p>
+<p>But now I love you with my whole soul, and because I love you I am sincerely sorry for having offended you.</p>
+<p>My Jesus, pardon me and permit me to accompany you in this journey.</p>
+<p>You are going to die for love of me, and it is my wish also, my dearest Redeemer, to die for love of you.</p>
+<p>My Jesus, in your love I wish to live. In your love I wish to die. 1st Station: Jesus is condemned to death 2nd Station: Jesus carries His cross 3rd Station: Jesus falls the first time 4th Station: Jesus meets His Mother 5th Station: Simon of Cyrene helps Jesus to carry his cross 6th Station: Veronica wipes the face of Jesus 7th Station: Jesus falls the second time 8th Station: Jesus meets the women of Jerusalem 9th Station: Jesus falls a third time 10th Station: Jesus clothes are taken away 11th Station: Jesus is nailed to the cross 12th Station: Jesus dies on the cross 13th Station: The body of Jesus is taken down from the cross 14th Station: Jesus is laid in the tomb</p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>KEEPING CHILDREN SAFE - The Diocese of Killala is fully committed to keeping children safe.</p>
+<p>If you have any concerns around their safety in any circumstance please contact Confidential line <a href="tel:+353871003554" style="color:#1d4ed8;font-weight:600;">087 1003554</a> . <a href="https://www.killaladioceseorgsafeguarding" target="_blank" rel="noopener noreferrer">www.killaladioceseorgsafeguarding</a> . NOTIFICATION OF SICKNESS Please inform the priest if a family member outside this parish is sick or has died.</p>
+<p>Thank you. Religious Bookshop in Belmullet beside the Church Monday-Friday 10.00 a.m.to 2.30 p.m.</p>
+<p>All notices for the bulletin must be handed into the bookshop or by</p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:belmulletparish@gmail.com" target="_blank" rel="noopener noreferrer">belmulletparish@gmail.com</a> before noon on Thursdays.</p>
+<p>A Prayer O God, who in your unfathomable providence are pleased to send your holy Angels to guard us, hear our supplication as we cry to you, that we may always be defended by their protection and rejoice eternally in their company.</p>
+<p>Through our Lord Jesus Christ, your Son, who lives and reigns with you in the unity of the Holy Spirit, God, for ever and ever.</p>
+<p>Amen .</p>
+<h3 class="b-head">PARISH NOTICE</h3>
+<p>Iron Sharpens Iron is a two day retreat for men of all ages taking place on Sat October 24th and Sat Nov. 21st near Abbeyknockmoy, Co. Galway.</p>
+<p>Through gripping lectures, workshops, prayer and discussions, this retreat seeks to enable catholic men to become free and noble actors, leaders, protectors and builders of Irish society.</p>
+<p>For more detailed information and to register please visit <a href="https://www.theirishforge.com" target="_blank" rel="noopener noreferrer">www.theirishforge.com</a> A Friends of Carmel gathering will take place at Holy Hill Hermitage, Skreen, County Sligo, on</p>
+<p>Saturday 17th October 2026, 10 to 4pm. The day offers a special opportunity to enjoy the hospitality of the Monks in the place where they live, work, pray and play everyday.</p>
+<p>There will be times for sharing and space to be silent and still in the company of God.</p>
+<p>Most importantly we invite you to use the day in the way that best meets your needs.</p>
+<p>Holy Hill is a&#x27;thin place&#x27;, where heaven touches earth in a way that cannot be put into words, only experienced.</p>
+<p>On a practical note, please bring your own lunch, tea/coffee will be provided.</p>
+<p>There is no charge for the day but donations are very much appreciated.</p>
+<p>Peatland Restoration Event - Learn about community led nature restoration happening in North Mayo, includes a visit to a rewetted bog.</p>
+<p>All welcome, particularly farmers &amp; landowners managing designated land.</p>
+<p>Refreshments provided.</p>
+<p>Saturday 17th Oct, 10.30am to 1.30pm, Bangor Erris Parish Hall.</p>
+<p>Free event, booking required, contact Amanda <a href="tel:+353894831224" style="color:#1d4ed8;font-weight:600;">089 4831224</a> . One Day Rosary Retreat Saturday October 17th Fr Peyton Centre, Attymass The Rosary: A Gift that keeps on Giving.</p>
+<p>Beginning at 11am, and concluding at 4.30pm, the day includes: spiritual talks, reflection, quiet time, rosary and Mass.</p>
+<p>The cost is €25, which includes tea, coffee on arrival &amp; light lunch.</p>
+<p>Booking is essential. For enquiries and booking contact Fina <a href="tel:+3539645374" style="color:#1d4ed8;font-weight:600;">096 45374</a> / <a href="tel:+353876816821" style="color:#1d4ed8;font-weight:600;">087 681 6821</a></p>
+<p>Bereavement Support Group in Ballina A Bereavement Support Group meeting will be held at the Newman Institute, Ballina on the second Wednesday of each month (October-May), starting on 14th October at 8pm. Trained facilitators conduct the meetings, which provide guidance and support to all who find loss difficult.</p>
+<p>All are welcome. Further information from Monica Morley, Knock Shrine on <a href="tel:+353949375320" style="color:#1d4ed8;font-weight:600;">094-9375320</a></p>
+<p>Notice for Parish Newsletter from Knock Shrine Vivaldi Recomposed Join the RTE Concert Orchestra and renowned Norwegian violinist Mari Samuelsen for an unforgettable evening in Knock Basilica on Saturday, November 7th.</p>
+<p>See <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> for booking details.</p>
+<p>Be United in Mind and Purpose. An evening for parish councilswith David Wells takes place in the Prayer Centre at Knock Shrine on Wednesday, October 14th from 7.30pm to 9.30pm. See <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> fordetails.</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:faithrenewal@knockshrine.ie" target="_blank" rel="noopener noreferrer">faithrenewal@knockshrine.ie</a> Whisper of God Silent Day Retreat takes place in the Prayer Centre at Knock Shrine on Saturday, October 17th from 10am to 5pm. See <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> for more details.</p>
+<p>Email <a href="mailto:prayerguidance@knockshrine.ie" target="_blank" rel="noopener noreferrer">prayerguidance@knockshrine.ie</a></p>
+<hr>
+<p class="page-label">Page 8</p>
+<p>Studio to Stall with Erris Workability Studio to Stall is a wonderful initiative with Erris Workability, supporting people to develop their creativity, skills and confidence.</p>
+<p>Participants turn their ideas and crea tions from the studio into finished products, learning along the way about teamwork, communication, presentation and selling.</p>
+<p>The journey from studio to stall provides a valuable opportunity to share their talents with the wider community.</p>
+<p>The programme takes place in both Ballina and Belmullet, offering a welcoming space to get creative, learn new skills and connect With others.</p>
+<p>Eligibility criteria apply. If you would like to take part, contact Siobhan on <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> to book your place.</p>
+<p>Come along and be part of the journey from studio to stall!</p>
+<p>Glencastle National School would like to sincerely thank Michael and Catherine Gaughan and family for choosing our school to benefit from the raffle and auction at the Michelle Gaughan Memorial Darts Competition 2026. A fantastic €4,600 was raised.</p>
+<p>Our sincere thanks to everyone who supported the fundraiser and to all the businesses and individuals who generously donated money, prizes and auction items. We also thank Erris Darts and the Broadhaven Bay Hote l for their involvement and support.</p>
+<p>We are very grateful to everyone for their kindness and generosity to our school through this special event held in Michelle’s memory.</p>
+<p>Bangor Hall Bingo</p>
+<p>Thursday 15th October at 8pm. Jackpot €1,650 in 52 calls or less F26 AE80. Sound &amp; Singing Workshop that focuses on natural resonance, body awareness, and simple melodies.</p>
+<p>Holy Hill, Skreen, Co Sligo F91 CA24. October 5th - 9th from 10 am to 12 noon.</p>
+<p>Welcome to attend 1 or all 4 mornings&#x27;.</p>
+<p>Contact Petra: <a href="mailto:info@klankcoaching.nl" target="_blank" rel="noopener noreferrer">info@klankcoaching.nl</a> or by Whats App phone 31 623501184 Journeying Through Grief from Loss to Hope A place to find solace and support through sharing with others who are on the same journey.</p>
+<p>You are welcome to: Share your story, if you wish.</p>
+<p>Listen to others who understand. Find comfort and support.</p>
+<p>Explore ways to carry your loss with hope and renewed strength.</p>
+<p>Every second Wednesday of each month at 8.00pm in The Newman Institute – 14th Oct. 11th Nov. 9th Dec. 13th Jan. 10th Feb. 10th Mar. 14th April and 12th May.</p>
+<p>Medjugorje Weekend Retreat led by Fr Jason Lewis (Medjugorje Chaplain) in St John&#x27;s Day Care Centre, Knock Shrine, from</p>
+<p>Friday 23 October to</p>
+<p>Sunday 25th October, Booking is essential, for more info contact Nicola <a href="tel:+353879622800" style="color:#1d4ed8;font-weight:600;">087 9622800</a> . Money, Advice and Budgeting Service (MABS) will hold a free drop-in clinic at Belmullet Civic Offices (Áras Inis Gluaire) from 11am–1pm on: 30th September, 28th October, 25th November, 16th December.</p>
+<p>Drop in for free, impartial advice and support with budgeting, bills or debt.</p>
+<p>For more information, contact 0818 07 2660 or <a href="mailto:ballina@mabs.ie" target="_blank" rel="noopener noreferrer">ballina@mabs.ie</a> . Erris Workability is offering a Weekly Work SPACE Initiative, providing participants with opportunities to try different roles, develop skills and confidence, meet new people and gain valuable community experience.</p>
+<p>New opport unities are available each week, with eligibility criteria applying.</p>
+<p>For further information, contact Siobhan on <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> . Looking for a fresh start , new opportunities, or support on your journey towards work?</p>
+<p>Erris Workability offers a range of supports tailored to you, including Weekly Workspace, Life Lab, Studio to Stall and one-to-one support to help build confidence, develop skills, explore employment or self-employment, and achieve your goals.</p>
+<p>The programme is available to people who meet the eligibility criteria, and if you’re unsure whether you qualify, we’re happy to have a chat and talk you through it.</p>
+<p>Take the first step and find out what’s possible with Erris Workability.</p>
+<p>Contact Siobhan on <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> . Family Carers Ireland’s Ballina Carer Support Group is meeting on Friday September 11th in the Talbot Hotel from 10- 11.30am and will take place on the second Friday of each month going forward.</p>
+<p>We would be very grateful if you could share this in your parish newsletters, bulletins, or community notes.</p>
+<p>Family Carers Ireland’s Erris Carer Support Group meets Friday September 11th from 10-11.30am in the Talbot Hotel, Belmullet, F26 HY84. The meeting takes place on the second Friday of every month.</p>
+<p>This is a great opportunity to sit and have a cuppa and chat with other carers and also meet Supports Manager for Mayo, Michelle Moriarty.</p>
+<p>No need to register, just turn up on the morning! ‘Would you be willing to provide companionship to an older person locally?</p>
+<p>ALONE are seeking volunteers in your area.</p>
+<p>Full training and support provided. If interested, please apply via the ALONE website at <a href="https://www.alone.ie" target="_blank" rel="noopener noreferrer">www.alone.ie</a> or for further information please contact us on <a href="mailto:volunteer@alone.ie" target="_blank" rel="noopener noreferrer">volunteer@alone.ie</a> or call 0818 222 024. If you are over 60 and would like to know more about the services ALONE can offer you, please call 0818 222 024.’ Your support will be much appreciated.</p>
+<p>If you would like to chat things through a little more, please feel free to contact me, on <a href="tel:+353860135043" style="color:#1d4ed8;font-weight:600;">086 0135043</a> .</p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>Knock Shrine Is your anger hurting you or others? Knock Counselling Centre will run an Anger Management Programme on</p>
+<p>Fri 9th &amp;</p>
+<p>Sat 10th October.</p>
+<p>Contact: Peter Devers, <a href="tel:+353949375032" style="color:#1d4ed8;font-weight:600;">094 93 75032</a> or log onto <a href="https://www.knockshrine.ie/counselling" target="_blank" rel="noopener noreferrer">www.knockshrine.ie/counselling</a> Knock Shrine Come away to a quiet place’. This 4-day directed residential retreat takes place in t he retreat village at Knock Shrine from 14th to 18th September.</p>
+<p>For more information, visit <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> or contact John Farrelly, by email at <a href="mailto:retreatvillage@knockshrine.ie" target="_blank" rel="noopener noreferrer">retreatvillage@knockshrine.ie</a> or phone (086) 0108623. Faith Through Film with Brendan O’Regan takes place in the Prayer Centre on</p>
+<p>Saturday 19th September from 10am to 3pm. This reflective, practical day is designed for RE teachers who want to bring faith to life i n the classroom, while also taking time to nourish their own spiritual journey.</p>
+<p>See <a href="https://www.knockshrine.ie" target="_blank" rel="noopener noreferrer">www.knockshrine.ie</a> for contact Nicola Mitchell at <a href="mailto:faithrenewal@knockshrine.ie" target="_blank" rel="noopener noreferrer">faithrenewal@knockshrine.ie</a> or telephone (094) 93 88100. Women&#x27;s Health Seminar Wednesday, 23rd Sept 2026, Healy&#x27;s Hall, Glenamoy 7 - 9.30pm Speakers: Paul Gillen, Dr Carol Duffy, Ogechi Nsoedo, Dee Ruddy &amp; Beata Cierzniewska.</p>
+<p>Topics covered include osteoporosis, perimenopause, menopause, gynaecological issues, life coaching and combatting stress.</p>
+<p>All welcome. Book your free place by texting <a href="tel:+353874325909" style="color:#1d4ed8;font-weight:600;">087 - 432 5909</a></p>
+<p>Coffee Morning for Hospice Mayo Roscommon Hospice are looking for community groups, individuals, schools or workplace etc to host a coffee morning/evening on National Coffee morning for Hospice</p>
+<p>Thursday 24th September or any date that suits. Coffee &amp; posters will be provided.</p>
+<p>Contact <a href="tel:+353949388666" style="color:#1d4ed8;font-weight:600;">0949388666</a> or email <a href="mailto:info@hospice.ie" target="_blank" rel="noopener noreferrer">info@hospice.ie</a> . or register online at <a href="https://www.hospice.ie/fundraising/coffee-morning/TraditionalIrishmusicclasses" target="_blank" rel="noopener noreferrer">https://www.hospice.ie/fundraising/coffee-morning/TraditionalIrishmusicclasses</a> for adults Due to the unprecedented demand for traditional Irish music classes for adults, the Moy Valley branch of “Comhaltas Ceoltóirí Eireann” have commenced a new term in the “Merry Monk” Killala Road, Ballina every Tuesday night.</p>
+<p>Classes are offered in almost all instruments including accordi on, fiddle, banjo, tin whistle, Flute, bodhrán, keyboards and guitar.</p>
+<p>Limited places are still available. Classes for beginners take place from 7pm – 8pm and advanced classes from 8pm – 9pm. For further information please contact <a href="tel:+353872775317" style="color:#1d4ed8;font-weight:600;">087-2775317</a></p>
+<p>Ante - natal Classes Autumn 2026 -</p>
+<p>Wednesday 23rd September – 11.30 a.m – 1.30 p.m.</p>
+<p>Wednesday 30th September – 11.30-1.30 p.m .</p>
+<p>Wednesday 7th October – 11.30 a.m – 1.30 p.m</p>
+<p>Wednesday 14th October – 11.30 a.m – 1.30 p.m. Classes will be held in the Broadhaven Bay Hotel. To register contact Alannah <a href="tel:+3539727418" style="color:#1d4ed8;font-weight:600;">097-27418</a></p>
+<p>Travel Independence Workshops Erris Workability (Mayo North East) are excited to join forces with TFI Local Link Mayo and Sláintecare Healthy Communities to deliver new weekly workshops on travel independence and tra nsport empowerment, starting</p>
+<p>Mon 14 Sept. Eligibility criteria applies.</p>
+<p>Booking is essential. Ní mór áirithint a dhéanamh roimh ré! Please email <a href="mailto:siobhanscanlon@mayonortheastldc.com" target="_blank" rel="noopener noreferrer">siobhanscanlon@mayonortheastldc.com</a> or call / text <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> to find out more!</p>
+<p>Erris Rainbows Groups Erris Family &amp; Community Support Centre will be setting up Rainbows peer support groups this autumn/ winter.</p>
+<p>The groups are for children and young people 7 years and up who have experienced loss or separation.</p>
+<p>Groups are free, confidential, and provide a safe and compassionate space to help cope with difficult feeli ngs and connect with others who have had similar experiences.</p>
+<p>Expressions of Interest are now open; groups will be formed based on demand.</p>
+<p>Registering your interest places you under no obligation.</p>
+<p>To request an Expression of Interest form or for more information please contact Leanne on <a href="tel:+353870670989" style="color:#1d4ed8;font-weight:600;">0870670989</a> or email <a href="mailto:coordinator@errisfcsc.ie" target="_blank" rel="noopener noreferrer">coordinator@errisfcsc.ie</a> . FLU VACCINE NOW AVAILABLE AT DR RUANE&#x27;S - Walk in clinics every Monday and Tuesday starting the 28th of September and for the month of October from 2.30 - 3.30 or during normal surgery hours.</p>
+<p>Recommended for all over 65 and those with underlying medical conditions.</p>
+<p>Western Alzheimers urgently need Volunteer Befrienders in your area.</p>
+<p>Do you have one to two hours per week to spare ?</p>
+<p>Contact Lucy at <a href="tel:+353949364900" style="color:#1d4ed8;font-weight:600;">094-9364900</a> or <a href="tel:+353873694477" style="color:#1d4ed8;font-weight:600;">087-3694477</a> .</p>
+<hr>
+<p class="page-label">Page 10</p>
+<p>A Bereavement Support Group meets at the Family Centre, Knock Shrine each Wednesday morning at 11am. Trained facilitators conduct the meetings, which provide guidance and support to all who find loss difficult.</p>
+<p>All are welcome. Further information from Monica Morley on <a href="tel:+353949375320" style="color:#1d4ed8;font-weight:600;">094-9375320</a> . Mayo Recovery College begin their Autumn Winter 2026 suite of mental health &amp; wellbeing education modules on the following dates throughout September in the Atlantic Technological University in Castlebar (online option also).</p>
+<p>Everyone welcome. Tuesdays 15th &amp; 22rd at 10am ‘Recovery, Let’s talk’. Thursdays 17th &amp; 24th ‘All about Stress’ at 5pm. Call/Text Karen McHale <a href="tel:+353860294901" style="color:#1d4ed8;font-weight:600;">0860294901</a> or email <a href="mailto:karen@mentalhealthireland.ie" target="_blank" rel="noopener noreferrer">karen@mentalhealthireland.ie</a> to register.</p>
+<p>New participants are warmly invited to begin at any time throughout the semester.</p>
+<p>Family Carers Ireland’s Erris Carer Support Group meets Friday September 11th from 10-11.30am in the Talbot Hotel, Belmullet, F26 HY84. The meeting takes place on the second Friday of every month.</p>
+<p>This is a great opportunity to sit and have a cuppa and chat with other carers and also meet Supports Manager for Mayo, Michelle Moriarty.</p>
+<p>No need to register, just turn up on the morning!</p>
+<p>Atlantic Care Is Hiring Looking for a rewarding place to work?</p>
+<p>Atlantic Care is a fantastic company to work for!</p>
+<p>Consider joining a team that values people, compassion, and making a difference in our community.</p>
+<p>Check out t heir current job opportunities today! <a href="tel:+353949014028" style="color:#1d4ed8;font-weight:600;">0949014028</a> or email <a href="mailto:nollag.mchale@atlanticcare.ie" target="_blank" rel="noopener noreferrer">nollag.mchale@atlanticcare.ie</a> Samaritans are currently recruiting Volunteers from all over Mayo to support the work of the Castlebar Branch of Samaritans.</p>
+<p>Information sessions take place at the Branch, 21 Thomas St, Castlebar on Sat.</p>
+<p>August 29, 11–3pm and on Thur. Sep 3, 5-7pm. For more information please call <a href="tel:+353862468203" style="color:#1d4ed8;font-weight:600;">086 2468203</a> .” Free Training : Wondering what to do next?</p>
+<p>Interested in expanding your skills? National Learning Network Castleba r can help you gain QQI Certification and assist with finding employment.</p>
+<p>Your Social Welfare payme nt will remain protected.</p>
+<p>Ring/Message Sharon on <a href="tel:+353872909064" style="color:#1d4ed8;font-weight:600;">087 290 9064</a> to discuss Call for Nominations - Be Your Community Voice!</p>
+<p>Nominations are now being sought from Mayo Public Participation Network (PPN) member groups for Representatives to the Mayo PPN Secretariat Committee, Mayo County Council Strategic Policy Committees, and the Western Region Drug &amp; Alcohol Task Force (WRDATF) Committee.</p>
+<p>The closing date for receipt of completed nomination forms is</p>
+<p>Friday 4th of September 2026 at 4pm. Follow the link for more information and to download nomination forms: <a href="https://mayoppn.ie/be-your-community-voice/SpecsaversHearingcentre" target="_blank" rel="noopener noreferrer">https://mayoppn.ie/be-your-community-voice/SpecsaversHearingcentre</a> are now in Swanick Family practice every Friday from 11am until 5pm. Providing Hearing tests, ear examinations, wax removal and hearing aid fittings.</p>
+<p>To book contact (096) 75446. Sláintecare-Please find below link to our Q2 Sláintecare Healthy Communities Newsletter <a href="https://publuu.com/flip-book/708759/2529387Arts" target="_blank" rel="noopener noreferrer">https://publuu.com/flip-book/708759/2529387Arts</a> and Crafts Club . At Sports Complex on Wednesdays at 5 p.m – 6.30 p.m Aimed at children aged 6-10years.</p>
+<p>For bookings and info. to CREATORCLUB.IE The is intended as a guide, message Jo on Whats App on <a href="tel:+353830295813" style="color:#1d4ed8;font-weight:600;">0830295813</a> if you would like more information about the activities and see if they might be enjoyed by your child.</p>
+<p>No Name Club are looking for volunteers interested in helping create a safe social space for young people, 15 – 18 years of age.</p>
+<p>You can find out more detail about No Name Club on our website, <a href="https://www.nonameclub.ie" target="_blank" rel="noopener noreferrer">www.nonameclub.ie</a> , or feel free to contact Ethan at <a href="mailto:ejordan@nonameclub.ie" target="_blank" rel="noopener noreferrer">ejordan@nonameclub.ie</a> or <a href="tel:+353872172490" style="color:#1d4ed8;font-weight:600;">087 217 2490</a> . Free Training Wondering what to do next?</p>
+<p>Interested in expanding your skills? Looking to retrain or gain employment?</p>
+<p>Would you like to obtain QQI Training and Certification?</p>
+<p>Please contact us to talk about what c hoices we can offer you on <a href="tel:+353872909064" style="color:#1d4ed8;font-weight:600;">087 2909064</a> or <a href="tel:+353867701996" style="color:#1d4ed8;font-weight:600;">086 7701996</a></p>
+<p>Home Sharers Required Would you be interested in sharing your home and supporting an individual with a disability for a few hours per day or a couple of hours/days per month, or longer term?</p>
+<p>Western Care Home Share Service are looking for people, single/couples/families, to provide short respite breaks to children and adults across County Mayo, in your own home.</p>
+<hr>
+<p class="page-label">Page 11</p>
+<p>Training and support is provided and a non-taxable allowance is payable for each home share arrangement.</p>
+<p>If you are interested and/or would like further information about Home Sharing, please contact Ruth Kneafsey, Home share Co-ordinator, <a href="tel:+353949029148" style="color:#1d4ed8;font-weight:600;">0949029148</a> or <a href="tel:+353876811261" style="color:#1d4ed8;font-weight:600;">0876811261</a> . The Killala and Tuam Diocesan Pilgrimages to Lourdes led by Archbishop Francis Duffy, will take place from 28th August to 3rd September, 2026. Cost 1049euro.</p>
+<p>Enquiries and Booking 01-2410800. Applications to the Invalid Section, please apply to Eileen O&#x27;Brien ( <a href="tel:+353864013897" style="color:#1d4ed8;font-weight:600;">086-4013897</a> ) and Ciara Deane ( <a href="tel:+353838383310" style="color:#1d4ed8;font-weight:600;">083-8383310</a> ) . Job opportunities available at TFI Local Link Mayo.</p>
+<p>All information about the available positions, including job descriptions, can be found here: <a href="https://locallinkmayo.ie/exciting-career-opportunities-with-local-link-mayo/" target="_blank" rel="noopener noreferrer">https://locallinkmayo.ie/exciting-career-opportunities-with-local-link-mayo/</a> (Sarah Togher, Manager Tel <a href="tel:+353949005150" style="color:#1d4ed8;font-weight:600;">094 9005150</a> , Mobile <a href="tel:+353857174471" style="color:#1d4ed8;font-weight:600;">085 7174471</a> ) <a href="https://www.locallinkmayo.ie" target="_blank" rel="noopener noreferrer">www.locallinkmayo.ie</a> Alone Would you be willing to provide companionship to an older person locally?</p>
+<p>ALONE are seeking volunteers in your area.</p>
+<p>Full training and support provided. If interested, please apply via the ALONE website at <a href="https://www.alone.ie" target="_blank" rel="noopener noreferrer">www.alone.ie</a> or for further information please contact us on <a href="mailto:volunteer@alone.ie" target="_blank" rel="noopener noreferrer">volunteer@alone.ie</a> or call 0818 222 024. If you are over 60 and would like to learn more about the services ALONE can offer, please call 0818 222 024.” Dovida PA We are looking for Caregivers across Mayo.</p>
+<p>Help us provide care to those most in need.</p>
+<p>Competitive Pay Mileage Payment. Full Training provided.</p>
+<p>Full Support from the office. No experience required as we provide full training Check out our website: <a href="https://www.dovida.ie" target="_blank" rel="noopener noreferrer">www.dovida.ie</a> or</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:hr.mayo@dovida.ie" target="_blank" rel="noopener noreferrer">hr.mayo@dovida.ie</a> Shine has recently started up two groups for the Ballina area; (1) A Relatives and Supporters group for those supporting a loved one living with mental health difficulties and (2) A Peer Support group for individuals with lived experience of mental health difficulties.</p>
+<p>If you are interested in joining either of these groups, please contact Shine by phone at 01 860 1610 or <a href="tel:+353860407701" style="color:#1d4ed8;font-weight:600;">086 040 7701</a> , or by email at <a href="mailto:support@shine.ie" target="_blank" rel="noopener noreferrer">support@shine.ie</a> . Targeting areas such as Erris, the Sláintecare Healthy Communities Programme is delighted to announce the launch of the Once-Off Transport Grant Scheme for 2026, in partnership with TFI Local Link Mayo.</p>
+<p>This unique funding scheme of €25,000 is designed to break down transport barriers and improve access to vital health and wellbeing services for communities experiencing higher levels of deprivation and social isolation across Mayo.</p>
+<p>For Information and an application form: Sláintecare &amp; LLM once off grant scheme guidelines and Sláintecare &amp; LLM once off grant appl ication form Le meas, Sarah Togher (Mobile <a href="tel:+353857174471" style="color:#1d4ed8;font-weight:600;">085 7174471</a> ).</p>
+<p>Erris Workability Create a more inclusive environment by attending a Disability Awareness Training workshop delivered by expert facilitators.</p>
+<p>This practical and engaging training is designed for anyone who wants to bette r understand disability, break down barriers, and create an accessible work or community environment.</p>
+<p>Whether you&#x27;re an employer, employee or community volunteer, this training offers valuable insights you can apply every day.</p>
+<p>Previous attendees have said the workshops “exceeded my expectations” and it was “an eye-opener”. Oiliúint fheabhas do gach duine is é! Erris Workability will be running a number of these workshops in various locations between May and November 2026. Please contact us NOW to register your interest. Email <a href="mailto:siobhanscanlon@mayonortheastldc.com" target="_blank" rel="noopener noreferrer">siobhanscanlon@mayonortheastldc.com</a> or text / call <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> . TRIP TO MEDJUGORJE Fully Escorted Trip to Medjugorje with Marian Pilgrimages-Led by Sharon O Leary Direct flights from Knock to Mostar.</p>
+<p>October 21st- 28th. Spiritual Director Fr Séan Sheehy (native of Listowel) and accompanied by Fr Nelson Joseph (Louisburgh, Co Mayo) Contact Sharon <a href="tel:+353860523014" style="color:#1d4ed8;font-weight:600;">086 0523014</a> . Leaving Rubbish at Graveyards We have been requested to ask everyone to please do not leave any rubbish, either along the walls or anywhere else, in any of our graveyards.</p>
+<p>Everyone is kindly requested to please bring all rubbish home with them and dispose of it responsibly.</p>
+<p>Thank you. Would you like more confidence using Irish with your children?</p>
+<p>Join us every Tuesday at 5.30pm in Áras Inis Gluaire for Comhrá Teaghlaigh – a relaxed, welcoming space to practise conversational Irish for begi nners and learners.</p>
+<p>The whole family is welcome – parents, grandparents, guardians and children.</p>
+<p>For further information and to register, contact Siobhán at Tuismitheoirí na Gaeltachta on <a href="tel:+353858339491" style="color:#1d4ed8;font-weight:600;">085 833 9491</a> . For Sale in the Parish Office - New Book by Fr. Brendan Hoban, titled “For The Record: Killala Diocese 1111a.d. -2026a.d.” has just been published.</p>
+<p>This book traces nine centuries of history and tradition, marking the installation of Archbishop</p>
+<hr>
+<p class="page-label">Page 12</p>
+<p>Francis Duffy as Bishop of Killala and anticipating the impending merger of the Diocese of Killala with the Archdiocese of Tuam Would you be willing to provide companionship to an older person locally?</p>
+<p>ALONE are seeking volunteers in your area.</p>
+<p>Full training and support provided. If interested, please apply via the ALONE website at <a href="https://www.alone.ie" target="_blank" rel="noopener noreferrer">www.alone.ie</a> or for further information please contact us on <a href="mailto:volunteer@alone.ie" target="_blank" rel="noopener noreferrer">volunteer@alone.ie</a> or call 0818 222 024. If you are over 60 and would like to know more about the services ALONE can offer you, please call 0818 222 024.’ The Year Ahead Do you have a medical condition, difficulty or disability?</p>
+<p>Are you looking for work, or wanting to improve your employment prospects?</p>
+<p>Do you want to make plans for the rest of 2026? Not sure where to start?</p>
+<p>Contact the Mayo North East Workability programme now to find out how we can assist you.</p>
+<p>Email <a href="mailto:rosemariemangan@mayonortheastldc.com" target="_blank" rel="noopener noreferrer">rosemariemangan@mayonortheastldc.com</a> or call Siobhán <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> for more info.</p>
+<p>Labhair linn i módh ruin. All confidential.</p>
+<p>The North Mayo Heritage Centre has been helping people research their family history for over 40 years.</p>
+<p>The service has helped thousands of local people to learn more about their ancestors.</p>
+<p>You will be very welcome to c ontact us with your enquiries.</p>
+<p>Phone <a href="tel:+3539631809" style="color:#1d4ed8;font-weight:600;">096 31809</a> or email <a href="mailto:northmayo@gmail.com" target="_blank" rel="noopener noreferrer">northmayo@gmail.com</a> . HSE North West Office for Suicide Prevention and The Mayo Suicide Bereavement Liaison Service.</p>
+<p>This event is a space for the Erris community to gather together and support one another following a period of great loss in the area.</p>
+<p>This event may not be suitable for everyone, and we encourage people to protect themselves and their wellbeing.</p>
+<p>We hold all who are grieving in our thoughts and prayers.</p>
+<p>We encourage community groups, services, schools, clergy, sports clubs, health care professionals, frontline workers and community members to engage and ensure they are represented at this important briefing.</p>
+<p>This is an open event, everyone is welcome.</p>
+<p>We ask that you please arrive a few minutes early to sign-in, get a cuppa and be ready to begin at 6.30pm SHARP. We hope this meeting will be a first step in looking at a coordinated suicide intervention plan for the Erris community.</p>
+<p>Strengthen your skills for gaining employment . Join our Computer &amp; Office Skills course.</p>
+<p>QQI Level 4/5. If you or someone you know has an additional support need and are registered with the Department of Social Protection you are entitled to free upskilling.</p>
+<p>Contact: Centre Manager Mary Hanlon ( <a href="tel:+353873611096" style="color:#1d4ed8;font-weight:600;">087 361 1096</a> ) or <a href="mailto:Castlebar@nln.ie" target="_blank" rel="noopener noreferrer">Castlebar@nln.ie</a> . NLN, Breaffy Road, Castlebar.</p>
+<p>The Year Ahead Do you have a medical condition, difficulty or disability?</p>
+<p>Are you looking for work, or wanting to improve your employment prospects?</p>
+<p>Do you want to make plans for the rest of 2026? Not sure where to start?</p>
+<p>Contact the Mayo North East Workability programme now to find out how we can assist you.</p>
+<p>Email <a href="mailto:rosemariemangan@mayonortheastldc.com" target="_blank" rel="noopener noreferrer">rosemariemangan@mayonortheastldc.com</a> or call Siobhán <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> for more info.</p>
+<p>Labhair linn i módh ruin. All confidential.</p>
+<p>My name is Bernie Heneghan . I am a Gambling Therapist supporting both the problem Gambler and their families . I am based in Tacu Family Resource Centre in Ballinrobe but I cover all of Mayo.</p>
+<p>It’s a free support Service and open to anyone in need.</p>
+<p>Bernie Heneghan. Psychotherapist.</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:gawarenesstacufrc@gmail.com" target="_blank" rel="noopener noreferrer">gawarenesstacufrc@gmail.com</a> Phone: <a href="tel:+353877005811" style="color:#1d4ed8;font-weight:600;">0877005811</a></p>
+<p>Details of the Cathaoirleach Awards, including the Information Booklet and Nomination Form, are avai lable at <a href="https://www.mayo.ie/cathaoirleachsawards2025MonthlyBereavementSupportMeeting.EverysecondWednesday" target="_blank" rel="noopener noreferrer">https://www.mayo.ie/cathaoirleachsawards2025MonthlyBereavementSupportMeeting.EverysecondWednesday</a> of each month at 8.00 p.m in The Newman Institute, Ballina.</p>
+<p>Dates October 8th, November 12th, December 10th, January 14th, 2026, February 11th, 2026, March 11th 2026, April 8th 2026, May 13th 2026. A place to find solace and support through sharing with others who are on the same journey.</p>
+<p>Exciting role to become a Family support worker/PA for Children with a disability.</p>
+<p>Enable Ireland Mayo Services require Family support workers/PA in all areas of County Mayo to work with Children with a disability.</p>
+<p>Our staff usually work one-to-one with a child within their home but also within their community or at centres throughout Mayo.</p>
+<p>Hours required are usually afternoon/evenings and Saturdays.</p>
+<p>Training is also provided. If you are interested please email <a href="mailto:shehir@enableireland.ie" target="_blank" rel="noopener noreferrer">shehir@enableireland.ie</a> for further information.</p>
+<p>This is a very rewarding role and our Staff are very positive about their experience.</p>
+<p>The Adoration Chapel at St. Muredach&#x27;s Cathedral, Ballina is open.</p>
+<p>Mon -</p>
+<p>Fri 2 - 8 pm. Sat -</p>
+<p>Sun 2 - 7pm All welcome. Come to me, all you who labour and are overburdened, and I will give you rest.</p>
+<hr>
+<p class="page-label">Page 13</p>
+<p>ALONE Would you be willing to provide companionship to an older person locally?</p>
+<p>ALONE are seeking volunteers in your area.</p>
+<p>Full training and support provided. If interested, please apply via the ALONE website at <a href="https://www.alone.ie" target="_blank" rel="noopener noreferrer">www.alone.ie</a> or for further information please contact Oliwia on <a href="tel:+353860135043" style="color:#1d4ed8;font-weight:600;">086-013 5043</a> or via email <a href="mailto:oliwia.kolska@alone.ie" target="_blank" rel="noopener noreferrer">oliwia.kolska@alone.ie</a> If you are over 60 and would like to know more about the services ALONE can offer you, please call 0818 222 024.’ Atlantic Care are urgently recruiting compassionate Caregivers to provide quality support, companionship, and assistance for seniors, ensuring comfort within their own homes.</p>
+<p>Competitive rates of pay and support network.</p>
+<p>If you are interested contact Nollag <a href="tel:+353949014028" style="color:#1d4ed8;font-weight:600;">0949014028</a> . Community Inclusion Spotlight - Welcoming New Communities Into Your Organisations Would your organisation like to be featured on the Mayo PPN website and across our social media platforms?</p>
+<p>Mayo PPN are running a new series called Community Inclusion Spotlight.</p>
+<p>It’s a weekly feature on a Community Group highlighting how the group is welcoming New Communities into their area.</p>
+<p>All we need is a short brief about your group and how you have welcomed ‘New Communities’ on board.</p>
+<p>Send us a short description of your group –150/250 words by email to : <a href="mailto:mayoppn@mayococo.ie" target="_blank" rel="noopener noreferrer">mayoppn@mayococo.ie</a> . Include 3-4 photographs.</p>
+<p>Irish Wheelchair Association volunteers drivers needed.</p>
+<p>If interested contact Rosaleen <a href="tel:+353870571393" style="color:#1d4ed8;font-weight:600;">087 057 1393</a></p>
+<p>Are you caring for a loved one at home with additional needs?</p>
+<p>A spouse, partner, child, close relative or neighbour?</p>
+<p>Then you are a family carer! Become a member of Family Carers Ireland, the national charity supporting Ireland’s 500,000+ family carers nationwide.</p>
+<p>Contact <a href="tel:+353579370221" style="color:#1d4ed8;font-weight:600;">057 93 70221</a> and hear how we can support you or for more info visit <a href="https://www.familycarers.ie" target="_blank" rel="noopener noreferrer">www.familycarers.ie</a> . Family Carers Ireland Are you caring for a loved one at home with additional needs?</p>
+<p>A spouse, partner, child, close relative or neighbour?</p>
+<p>Then you are a family carer! Become a member of Family Carers Ireland, the national c harity supporting Ireland’s 500,000+ family carers nationwide.</p>
+<p>Contact <a href="tel:+353579370221" style="color:#1d4ed8;font-weight:600;">057 93 70221</a> and hear how we can support you or for more info visit <a href="https://www.familycarers.ie" target="_blank" rel="noopener noreferrer">www.familycarers.ie</a> . Advice and support for male victims of domestic abuse . If you or someone you know is experiencing any form of domestic abuse, confidential support is available.</p>
+<p>The Male Advice Line provides a safe space to talk about this difficult subject and receive guidance.</p>
+<p>Call the freephone number 1800 816 588 or visit mensnetwork.ie/mal.</p>
+<p>The Alzheimer’s Society of Ireland is seeking volunteers to support our Dementia social group in Mulranny.</p>
+<p>They need compassionate individuals to help run the group, it will be for 3 hours weekly/alternate weeks.</p>
+<p>Your time and kindness can make a significant difference in the lives of those affected by dementia.</p>
+<p>For further details plea se email <a href="mailto:marie.philbin@alzheimer.ie" target="_blank" rel="noopener noreferrer">marie.philbin@alzheimer.ie</a> or phone <a href="tel:+353871708706" style="color:#1d4ed8;font-weight:600;">087 170 8706</a> . Narcotics Anonymous meeting in Irish Wheelchair Association, F26 VY42 every Friday night at 8pm. This is a closed meeting.</p>
+<p>Home Instead Mayo We are urgently looking for Care Assistants across all areas of Co. Mayo.</p>
+<p>Help us provide Care to someone in need, in a town near you today!</p>
+<p>Training and Support provided. Cal <a href="tel:+353949044785" style="color:#1d4ed8;font-weight:600;">094 9044785</a> <a href="mailto:siobhan.brennan@homeinstead.ie" target="_blank" rel="noopener noreferrer">siobhan.brennan@homeinstead.ie</a> Don’t know where to start?</p>
+<p>Are you over 16 years of age? Do you have physical, mental or emotional challenges?</p>
+<p>Would you like to further your education, or find work?</p>
+<p>Erris Workability is an innovative and inclusive pathways to employment programme.</p>
+<p>Our team can help you to get started! Má tá ceist ar bith agat, déan teagmháil linn go luath!</p>
+<p>To find out call Carolyn <a href="tel:+353873980575" style="color:#1d4ed8;font-weight:600;">087 398 0575</a> or Siobhán <a href="tel:+353874996605" style="color:#1d4ed8;font-weight:600;">087 499 6605</a> or email <a href="mailto:rosemariemangan@mayonortheastldc.com" target="_blank" rel="noopener noreferrer">rosemariemangan@mayonortheastldc.com</a> Clár I. Ballyhaunis Rd, Claremorris , Co Mayo delivers the Free Energy Scheme funded by The Sustainable Energy Authority of Ireland (SEAI) provides free home energy upgrades to homeowners who get certain social welfare payments.</p>
+<p>These upgrades help improve the energy efficiency and warmth of your home and are also known as the Warmer Homes Scheme.</p>
+<p>Contact us on <a href="tel:+353949371830" style="color:#1d4ed8;font-weight:600;">094-9371830</a> for more information or an application form.</p>
+<hr>
+<p class="page-label">Page 14</p>
+<p>Defective Concrete Blocks Facilitator : Mayo North East Partnership hold clinics in North Mayo, Castlebar and Westport by appointment to assist homeowners with the DCB Grant scheme and application.</p>
+<p>All enquiries/appointme nt please contact : Caroline on <a href="tel:+353874828261" style="color:#1d4ed8;font-weight:600;">087 482 8261</a> /</p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:carolinewilson@mayonortheast.com" target="_blank" rel="noopener noreferrer">carolinewilson@mayonortheast.com</a> My Mind Brings its Not-for-Profit Counselling Services to Ballina My Mind provide professional, affordable, and accessible therapy without waiting lists or need for referral, with free appointments for homeowners affected by Defective Concrete Blocks and €30 appointments for full-time third level students, the unemployed, retirees, and anyone earning under €25,000 per year.</p>
+<p>New location in Mayo North East Office, Kevin St, Ballina opening January 6th.</p>
+<p>Register and book at <a href="https://www.mymind.org" target="_blank" rel="noopener noreferrer">www.mymind.org</a> or call 0818 500 800. The Complete Guide to Belmullet now includes Inishkea Island.</p>
+<p>Great gift idea only €10. Inexpensive and invaluable.</p>
+<p>Available locally in Careys, Solas &amp; Tourist Office or at Alchemy Tours.ie/shop RHS Home Care are recruiting for care staff to provide Home Care in clients house in your area If you are interested or require more details, please email <a href="mailto:jobs@rhshomecare.ie" target="_blank" rel="noopener noreferrer">jobs@rhshomecare.ie</a> or phone our Head office on 090 6625988m Home Instead Mayo Change career.</p>
+<p>Change lives. Take the path to your new caring career with Home Instead Mayo.</p>
+<p>We are urgently looking for Care Assistants across all areas of Co. Mayo.</p>
+<p>Help Training and Support provided. Cal <a href="tel:+353949044785" style="color:#1d4ed8;font-weight:600;">094 9044785</a> . Email <a href="mailto:siobhan.brennan@homeinstead.ie" target="_blank" rel="noopener noreferrer">siobhan.brennan@homeinstead.ie</a> Interested in having the Spotlight on your Community Organisation?</p>
+<p>Mayo PPN are currently running a series called ‘Community Spotlight’. It involves a weekly feature highlighting PPN groups’ events and activities and is showcased on the PPN website and social media platforms for one week.</p>
+<p>Send us a short description of your group –150/250 words. 3-4 photographs.</p>
+<p>By email to : <a href="mailto:mayoppn@mayococo.ie" target="_blank" rel="noopener noreferrer">mayoppn@mayococo.ie</a> If you would like to find out more about this project have a look at some of the groups that have featured so far, go to: Community Spotlight - Mayo PPN Seeking Adult Mentors for Young People in the Belmullet Area Do you have an hour to spare in the week?</p>
+<p>Adult Mentors required for Foróige&#x27;s Big Brother Big Sister Programme in the Belmullet Area.</p>
+<p>If you are interested in supporting a young person, this is an enjoyable way to spend your time and have a positive impact in a young person’s life!</p>
+<p>We have many young people waiting to be matched to a Big Brother/Sister and would be delighted to hear from you!</p>
+<p>Call <a href="tel:+353860471420" style="color:#1d4ed8;font-weight:600;">086 047 1420</a> for more information or use this link <a href="https://foroige.tfaforms.net/f/bbbsvoleoi?tfa_459=a0T5J000000cOmS" target="_blank" rel="noopener noreferrer">https://foroige.tfaforms.net/f/bbbsvoleoi?tfa_459=a0T5J000000cOmS</a> to express your interest in volunteering.</p>
+<p>Mindspace Outreach service in Belmullet Mindspace Mayo offers a support service to young people (12-25yrs) in Co. Mayo, presenting with anything from common concerns dealing with break-up, exam stress, bullying) to emerging mental health difficulties like mild depression and anxiety.</p>
+<p>Mindspace is located in Market Square , Castlebar and an outreach service runs on Tuesdays in the Irish Wheelchair Association office in Belmullet.</p>
+<p>Anyone can make a referra l. Visit <a href="https://www.mindspacemayo.ie" target="_blank" rel="noopener noreferrer">www.mindspacemayo.ie</a> or call <a href="tel:+353949067001" style="color:#1d4ed8;font-weight:600;">094-9067001</a> . Family Support Drop-in Erris Community Based Family Support Service will have an open door, drop-in every Wednesday morning 9.30am - 1pm. The Family Support Service is a project of Erris Family &amp; Community Support Centre funded by Tusla, and located at I. W. A centre, Logmore</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:l.owens@mayofamilysupport.ie" target="_blank" rel="noopener noreferrer">l.owens@mayofamilysupport.ie</a> .</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353877059705" style="color:#1d4ed8;font-weight:600;">0877059705</a> . Family Carers Ireland Are you caring for a loved one at home with additional needs?</p>
+<p>A spouse, partner, child, close relative or neighbour?</p>
+<p>Then you are a family carer! Become a member of Family Carers Ireland, the national c harity supporting Ireland’s 500,000+ family carers nationwide.</p>
+<p>Contact <a href="tel:+353579370221" style="color:#1d4ed8;font-weight:600;">057 93 70221</a> and hear how we can support you or for more info visit <a href="https://www.familycarers.ie" target="_blank" rel="noopener noreferrer">www.familycarers.ie</a> . Enable Ireland Mayo Services require Volunteers in all areas of County Mayo to work with Children with a disability.</p>
+<p>Our Volunteers usually work one-to-one with a child within their home but also within their community.</p>
+<p>No more than three hours are required per week.</p>
+<p>We work around your availability to make this exciting opportunity suit your lifestyle.</p>
+<p>Training is also provided. Separately there are also some paid roles available as Family support workers.</p>
+<p>If you are interested please email Fiona: <a href="mailto:fscully@enableireland.ie" target="_blank" rel="noopener noreferrer">fscully@enableireland.ie</a> for further information.</p>
+<p>This is a very rewarding role and our Volunteers are very positive about their experience.</p>
+<p>Are you caring for a loved one at home with additional needs?</p>
+<p>A spouse, partner, child, close relative or neighbour?</p>
+<p>Then you are a family carer! Become a member of Family Carers Ireland, the national charity supporting Ireland’s 500,000+ family carers nationwide.</p>
+<p>Contact <a href="tel:+353579370221" style="color:#1d4ed8;font-weight:600;">057 93 70221</a> and hear how we can support you or for more info visit <a href="https://www.familycarers.ie" target="_blank" rel="noopener noreferrer">www.familycarers.ie</a> .</p>
+<hr>
+<p class="page-label">Page 15</p>
+<p>Information and Support for Birth Mothers - whose babies were placed for adoption may be found at <a href="https://www.birthinfo.ie" target="_blank" rel="noopener noreferrer">www.birthinfo.ie</a> or by calling the relevant section of TUSLA at +353 818 445 500</p>
+<p>TFI Local Link Mayo - 803 Ballyglass to Belmullet, operated by Malachy Gaughan (on behalf of Local Link Mayo) has extended its route taking in Shore Rd, Seaside Rd, and Church St. (Friday Weekly) 802 Blacksod to Belmullet, operated by Kevin Gaughan (on behalf of Local Link Mayo) has extended its route taking in Church St, Logmore, Toorglass, Attycunnane, and Barrack St. (Thursday Weekly) Check out our website <a href="https://www.locallinkmayo.ie" target="_blank" rel="noopener noreferrer">www.locallinkmayo.ie</a> call our main office <a href="tel:+353949005150" style="color:#1d4ed8;font-weight:600;">094 9005150</a> or drop in to our local office in Belmullet Civic Centre for more information.</p>
+<p>Citizens Information Opening Hours The Citizens Information Office on Main Street, Belmullet is open every Monday for general queries from 10am to 1pm and 2pm to 4.45pm an additional Information Officer from our Ballina office attends every Wednesday.</p>
+<p>On Friday the office provides a phone service from 10am to 1pm. The office is contactable on 0818 07 6030 while the National citizens Information Phone Service is available on <a href="tel:+353818074000" style="color:#1d4ed8;font-weight:600;">081807 4000</a> . Alternatively you can access Citizens Information online at <a href="https://www.citizensinformation.ie" target="_blank" rel="noopener noreferrer">www.citizensinformation.ie</a> Affordable Live-in Homecare provides live-in carers for the elderly in your area.</p>
+<p>If you are looking for a live-in carer for your relative, please call Eileen or Tom today on <a href="tel:+353879916791" style="color:#1d4ed8;font-weight:600;">087 991 6791</a> or <a href="tel:+353877440729" style="color:#1d4ed8;font-weight:600;">087 744 0729</a> . Our website is <a href="https://www.alhomecare.ie" target="_blank" rel="noopener noreferrer">www.alhomecare.ie</a> Mayo Cancer Support - Mayo Cancer Support provides FREE support services to those affected by cancer.</p>
+<p>Call (094) 9038407. Pieta House provides counselling, therapy and support to individuals, couples, families and children who have been bereaved by suicide or feeling suicidal.</p>
+<p>Pieta House operate an outreach service from the Ballina Family Resource Centre on Tuesdays from 1pm to 5pm &amp; on Wednesdays 9.00am to 1.00pm by apt only Contact: <a href="tel:+3539325586" style="color:#1d4ed8;font-weight:600;">09325586</a> to make an Appointment Employabilty Service (Belmullet Office) &amp; Local Employment Service (Belmullet Office) We wish to advise that whilst our doors remain closed to the public, we are working in the offices and continue to offer the same service via phone, text, zoom or messenger.</p>
+<p>If you need information on Employment or Courses, or need a CV done to apply for a position, please call :- Colette Corless : Employability Service : <a href="tel:+353863418643" style="color:#1d4ed8;font-weight:600;">0863418643</a></p>
+<p>Marie O’Donnell : Local Employment Service: <a href="tel:+3539781722" style="color:#1d4ed8;font-weight:600;">09781722</a> Ann Conroy : Local Employment Service: <a href="tel:+353872156660" style="color:#1d4ed8;font-weight:600;">0872156660</a></p>
+<p>Remember the service continues to be free and confidential.</p>
+<p>Instructions will be given over the phone re: collecting CV, etc.</p>
+<p>MAYO COUNTY COUNCIL BELMULLET AREA OFFICE WISHES TO ADVISE THAT THE NEW CONTACT NUMBER DIRECT TO THE OFFICE is <a href="tel:+353949064900" style="color:#1d4ed8;font-weight:600;">094-9064900</a> and the old 097 number is no longer operational.</p>
+<p>Supporting parents drop in service, offering one to one informal support, information and advice for any parenting concerns, free and confidential service for parents of children of all ages.</p>
+<p>Irish Wheelchair Association Belmullet, every Friday 9am-3pm, contact Elaine <a href="tel:+353877214511" style="color:#1d4ed8;font-weight:600;">087-7214511</a> . Tune on your television to the ‘EWTN’ catholic station on (sky channel 588 or on Saorview free to air) where you will be able to view daily Masses, the rosary, the divine mercy chaplet; also news and interesting talks about the catholic faith.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilmoremoy" data-parish-name="Kilmoremoy"><h2 class="ocr-parish-name">Kilmoremoy</h2></header>
+<p class="page-label">Page 16</p>
+<p>DO YOU REQUIRE FIRST AID COVER FOR AN EVENT? DO YOU WANT FIRST AID TRAINING?</p>
+<p>CONTACT THE ORDER OF MALTA ON (087) 7011 540. First aid saves lives.</p>
+<p>GETTING MARRIED? BOOK YOUR APPOINTMENT WITH THE LOCAL REGISTRAR online at <a href="https://www.crsappoint0" target="_blank" rel="noopener noreferrer">www.crsappoint0</a> PREGNANT? NEED TO TALK?If you are concerned about an unplanned pregnancy and would you like to talk to someone in confidence contact CURA Lo-Call 1850 622626. See <a href="https://www.cura.ie" target="_blank" rel="noopener noreferrer">www.cura.ie</a> for local Centre details.</p>
+<p>All Cura services are free and confidential.</p>
+<p>Our support service is available to women, men and all family members.</p>
+<p>ST. VINCENT DE PAUL Tel. Helpline St. Vincent de Paul Helpline <a href="tel:+3539672905" style="color:#1d4ed8;font-weight:600;">096 72905</a></p>
+<p>You are not alone in your need for help.</p>
+<p>Signed Mass cards. All Mass Cards Signed in our parish office are sent regularly to the missions, to Fr. Innocent Abonyi, Fr. Keveny, Brazil, Missionaries of Africa &amp; Aid to the Church in Need.</p>
+<p>All names are recorded by our staff and Masses individually celebrated according to the intention of the donor.</p>
+<p>This provides a major support and basic need to the priests working in the foreign missions.</p>
+<p>Erris Sustainable Energy Community awarded €20k from SEAI for Energy Master Plan for Erris.</p>
+<p>If you would like to get involved or would like more information, please contact Dr Orla Nic Suibhne at <a href="mailto:orlanicsuibhne@gmail.com" target="_blank" rel="noopener noreferrer">orlanicsuibhne@gmail.com</a> or <a href="tel:+353863625057" style="color:#1d4ed8;font-weight:600;">086-3625057</a></p>
+<p>Western Care Association’s Annual Tour of Lough Conn Charity Cycle (virtual) this year from the 5th – 7th of June, complete the 45km or 85km distance in a day or over the bank holiday weekend.</p>
+<p>Registration is €20 and our online registration site can be found here at <a href="https://www.njuko.net/tour-of-lough-" target="_blank" rel="noopener noreferrer">www.njuko.net/tour-of-lough-</a> conn/register/66160, for more information contact Michael by emailing <a href="mailto:mflanagan@westerncare.com" target="_blank" rel="noopener noreferrer">mflanagan@westerncare.com</a> or see our Facebook page</p></div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
+    </div>
+
+    <section class="parish-section">
+      <h2 class="section-heading">KILLALA Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="addergoole"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=1" target="_blank" rel="noopener noreferrer">Addergoole</a></li><li class="parish-item" data-name="ardagh"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=2" target="_blank" rel="noopener noreferrer">Ardagh</a></li><li class="parish-item" data-name="backs"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=3" target="_blank" rel="noopener noreferrer">Backs</a></li><li class="parish-item" data-name="ballycastle (armoy &amp; ballintoy)"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=4" target="_blank" rel="noopener noreferrer">Ballycastle (Armoy &amp; Ballintoy)</a></li><li class="parish-item" data-name="ballycroy"><a class="parish-link" href="https://www.mayo.ie/en-ie/parish-newsletters/ballycroy-parish-newsletter" target="_blank" rel="noopener noreferrer">Ballycroy</a></li><li class="parish-item" data-name="ballysokeary"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=6" target="_blank" rel="noopener noreferrer">Ballysokeary</a></li><li class="parish-item" data-name="belmullet"><a class="parish-link" href="https://www.mayo.ie/en-ie/parish-newsletters/belmullet-parish-newsletters" target="_blank" rel="noopener noreferrer">Belmullet</a></li><li class="parish-item" data-name="castleconnor"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=8" target="_blank" rel="noopener noreferrer">Castleconnor</a></li><li class="parish-item" data-name="crossmolina"><a class="parish-link" href="https://www.churchtv.ie/crossmolina/" target="_blank" rel="noopener noreferrer">Crossmolina</a></li><li class="parish-item" data-name="dromore west"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=10" target="_blank" rel="noopener noreferrer">Dromore West</a></li><li class="parish-item" data-name="easkey"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=11" target="_blank" rel="noopener noreferrer">Easkey</a></li><li class="parish-item" data-name="kilcommon erris"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=14" target="_blank" rel="noopener noreferrer">Kilcommon Erris</a></li><li class="parish-item" data-name="kilfian"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=12" target="_blank" rel="noopener noreferrer">Kilfian</a></li><li class="parish-item" data-name="kilglass"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=13" target="_blank" rel="noopener noreferrer">Kilglass</a></li><li class="parish-item" data-name="killala"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=15" target="_blank" rel="noopener noreferrer">Killala</a></li><li class="parish-item" data-name="kilmore erris"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=16" target="_blank" rel="noopener noreferrer">Kilmore Erris</a></li><li class="parish-item" data-name="kilmoremoy"><a class="parish-link" href="https://ballinaparish.org/bulletin/" target="_blank" rel="noopener noreferrer">Kilmoremoy</a></li><li class="parish-item" data-name="kiltane"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=18" target="_blank" rel="noopener noreferrer">Kiltane</a></li><li class="parish-item" data-name="lacken"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=19" target="_blank" rel="noopener noreferrer">Lacken</a></li><li class="parish-item" data-name="moygownagh"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=20" target="_blank" rel="noopener noreferrer">Moygownagh</a></li><li class="parish-item" data-name="skreen &amp; dromard"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=21" target="_blank" rel="noopener noreferrer">Skreen &amp; Dromard</a></li><li class="parish-item" data-name="templeboy"><a class="parish-link" href="https://www.killaladiocese.org/parishes-ministries/parish-details/?parishID=22" target="_blank" rel="noopener noreferrer">Templeboy</a></li></ul>
+    </section>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
+      });
+    })();
+
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20261018a"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js?v=20261018a';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      if (parishFilter) {
+        parishFilter.addEventListener('input', function (event) {
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {
+              visibleCount += 1;
+            }
+          });
+          if (parishEmpty) {
+            parishEmpty.hidden = visibleCount !== 0;
+          }
+        });
+      }
+      if (parishEmpty) {
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+    
+    (function () {
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
+      }
+      function pageFor(name) {
+        var map = pageIndex();
+        if (map[name]) return map[name];
+        var n = norm(name);
+        var keys = Object.keys(map);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = map[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
+        }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          landInBox(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      document.addEventListener('click', function (ev) {
+        if (!ev.target || !ev.target.closest) return;
+        var btn = ev.target.closest('.az-letter');
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
+      });
+    })();
+    
+  </script>
+  <script type="application/json" id="parish-page-index">{}</script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
