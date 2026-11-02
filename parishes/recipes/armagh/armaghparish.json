@@ -1,29 +1,32 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "armaghparish",
   "display_name": "Armagh",
   "diocese": "armagh",
   "start_url": "https://armaghparish.net/parish-bulletin/",
-  "site_type": "http_scrape_newest_pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
-    "uploads/",
+    "November",
+    "October",
     ".pdf"
   ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-09-29",
-  "example_url": "https://armaghparish.net/wp-content/uploads/2026/09/27th-September.pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "recorded_date": "2026-11-02",
+  "example_url": "https://armaghparish.net/wp-content/uploads/2026/09/1st-November.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://armaghparish.net/wp-content/uploads/2026/09/27th-September.pdf"
+      "action": "goto",
+      "url": "https://armaghparish.net/parish-bulletin/"
     }
   ],
   "operator_notes": [
-    "29/09/2026: 27th-September.pdf on parish-bulletin listing (this week)."
+    "02/11/2026: http_scrape + Playwright hung past total timeout after finding 1st-November.pdf under the September upload folder. Prefer predicted_dated_pdf from that working example; keep total_timeout_s 90 so a miss fails fast."
   ],
   "do_not": [
-    "Do not pin this week's dated filename."
+    "Do not pin 1st-November.pdf.",
+    "Do not force the WordPress folder month to November — upload folder can stay /2026/09/.",
+    "Do not open a long Playwright scrape on this host."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

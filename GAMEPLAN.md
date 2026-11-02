@@ -1,4 +1,15 @@
-﻿## 02/11/2026 — Ok 405. Caherdavin HTML + Corofin newsletter.pdf
+﻿## 02/11/2026 — Armagh + Termon predicted fast-fail
+
+- Ok 408. Armagh/Termon already found Nov 1 PDFs then hung. Switch both to predicted_dated_pdf + total_timeout_s 90.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Ok 408. Kilbroney 30/10
+
+- Christ the King + Cummer ok. Ok 407 then Kilbroney re-harvest took Bulletin-30.10.26-.pdf (wp-json already correct). Ok 408.
+- Parked hangs: Mohill print, Armagh/Termon timeouts. Honest stale: Sallynoggin 11/10, Dungarvan monthly Oct, Headford no Nov yet.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Ok 405. Caherdavin HTML + Corofin newsletter.pdf
 
 - Clonmel St Marys ok 01/11. Ok count 405.
 - Christ the King / Caherdavin: /news/newsletter-01112026 HTML posts — switch off dead Mura PDF scrape to http_scrape_newest_html + print_to_pdf.
