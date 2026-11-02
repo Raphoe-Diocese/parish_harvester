@@ -3,32 +3,47 @@
   "parish_key": "balally",
   "display_name": "Balally",
   "diocese": "dublin",
-  "start_url": "https://www.balallyparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "October",
-    "Sunday",
-    ".pdf"
-  ],
+  "recorded_date": "2026-11-02",
+  "start_url": "https://www.balallyparish.ie/category/parish-newsletters/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "timeout_ms": 90000,
+  "total_timeout_s": 250,
+  "example_url": "https://www.balallyparish.ie/wp-content/uploads/2020/06/Newsletter-31st-October-1st-November.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.balallyparish.ie/"
+      "url": "https://www.balallyparish.ie/category/parish-newsletters/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='balally-parish-newsletter']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='parish-newsletter']",
+        "article a"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 1355384 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename. Folder /2020/06/ is not the bulletin date. Date is in the filename."
+    "02/11/2026: homepage http_scrape missed — PDFs sit on dated posts, not the home page.",
+    "Category /category/parish-newsletters/ top post is balally-parish-newsletter-31st-october-1st-november-2026. PDF Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Proved application/pdf 2551493 bytes %PDF-1.4.",
+    "Date is the later day in the weekend name (1 November). Folder 2020 is not the bulletin year. Do not pin the filename."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin Newsletter-31st-October-1st-November.pdf.",
+    "Do not scrape only the homepage — open the newest balally-parish-newsletter post.",
+    "Do not treat /uploads/2020/06/ as the bulletin date.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
-    "strategy": "newest_dated",
+    "strategy": "first_match",
     "position": "top"
   }
 }

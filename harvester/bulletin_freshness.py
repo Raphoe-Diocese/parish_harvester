@@ -233,8 +233,10 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             # — month name is November, not the upload folder. Without this,
             # slug_day below takes the "1" from "1st" and returns 2026-10-01
             # (found 02/11/2026, dromod harvest 41460617752).
+            # Do not trust an ancient folder year (Balally keeps recycling
+            # /uploads/2020/06/Newsletter-31st-October-1st-November.pdf).
             yearless = yearless_slug_date(basename, folder_year)
-            if yearless:
+            if yearless and folder_year >= date.today().year - 1:
                 return yearless
             # UUID/hash scans (Iskaheen) have no day-of-month. Do not let
             # slug_day pick a hex digit out of the hash; freshness then

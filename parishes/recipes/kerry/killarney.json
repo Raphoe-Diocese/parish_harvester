@@ -3,33 +3,32 @@
   "parish_key": "killarney",
   "display_name": "Killarney",
   "diocese": "kerry",
-  "start_url": "https://www.dioceseofkerry.ie/parish/killarney/",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://www.killarneyparish.com/parish-newsletter/",
   "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
+  "ignore_https_errors": true,
   "href_patterns": [
-    ".pdf",
-    "Newsletter",
-    "October",
-    "September",
-    "Sunday",
-    "uploads"
+    "Newsletter-",
+    ".pdf"
   ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-02",
-  "example_url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Newsletter-5th-October-2026-1.pdf",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "example_url": "https://www.killarneyparish.com/app/uploads/2026/11/Newsletter-November-2nd-2026.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/Newsletter-5th-October-2026-1.pdf"
+      "action": "goto",
+      "url": "https://www.killarneyparish.com/parish-newsletter/"
     }
   ],
   "operator_notes": [
-    "02/10/2026: newsletter PDF is on the Kerry diocese parish card. Proved GET 200 application/pdf. Do not pin the dated filename."
+    "02/11/2026: directory site is killarneyparish.com. Old recipe pinned a Kerry diocese October file (status was 26/10/2026).",
+    "Weekly list is /parish-newsletter/. Newest is Newsletter-November-2nd-2026.pdf. Proved application/pdf 472585 bytes %PDF-1.7. Certificate verify can fail — ignore_https_errors. Do not pin the dated name."
   ],
   "do_not": [
-    "Do not pin the dated PDF.",
-    "Do not use the diocese Facebook page as this parish link.",
-    "Do not harvest Facebook."
+    "Do not pin Newsletter-November-2nd-2026.pdf.",
+    "Do not use the Kerry diocese card while killarneyparish.com has a newer newsletter.",
+    "Do not drop ignore_https_errors while the host certificate fails verify."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

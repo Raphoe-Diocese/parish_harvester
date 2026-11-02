@@ -490,6 +490,19 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
 
+    def test_balally_weekend_span_in_ancient_upload_folder(self) -> None:
+        # Balally recycles /uploads/2020/06/Newsletter-31st-October-1st-November.pdf.
+        # Later day (1 Nov) wins; folder year 2020 must not stick.
+        url = (
+            "https://www.balallyparish.ie/wp-content/uploads/2020/06/"
+            "Newsletter-31st-October-1st-November.pdf"
+        )
+        target = date(2026, 11, 1)
+        self.assertIsNone(extract_bulletin_date(url))
+        verdict = check_bulletin_freshness(url, target)
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+
     def test_d_m_yy_oneweb_filenames_are_dated(self) -> None:
         target = date(2026, 8, 16)
         limavady = "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf"
