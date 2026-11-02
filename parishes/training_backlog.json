@@ -2,16 +2,16 @@
   "generated_at": "2026-11-02",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 396,
+    "downloaded": 399,
     "html_links": 0,
     "skipped": 770,
-    "failed": 93,
-    "stale_rejected": 56
+    "failed": 92,
+    "stale_rejected": 54
   },
   "action_counts": {
-    "ok": 421,
+    "ok": 422,
     "skip": 778,
-    "investigate": 75
+    "investigate": 74
   },
   "parishes": [
     {
@@ -19293,7 +19293,7 @@
       "recipe_file": "parishes/recipes/ferns/gorey.json",
       "recipe": {
         "start_url": "https://www.stmichaelsgorey.ie/about-our-parish/st-michaels-newsletter",
-        "site_type": "http_scrape_newest_images",
+        "site_type": "image_stack",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -19302,23 +19302,24 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "02/10/2026 hunt: stmichaelsgorey.ie newsletter page shows Newsletter_DDMMYY.jpg (proved Newsletter_270926.jpg GET 200 image/jpeg 1324354 bytes).",
-          "Do not pin 270926. Prefer http_scrape_newest_images / image_stack of Newsletter_*.jpg."
+          "02/11/2026: http_scrape_newest_images only scores wp-content/uploads and Squarespace CDN images. Gorey hosts /images/Newsletter_DDMMYY-ParishOffice.jpg so HTTP scrape always missed and never opened the browser.",
+          "site_type:image_stack so Playwright stacks Newsletter_*.jpg. Proved Newsletter_251026-ParishOffice.jpg GET 200 image/jpeg 1223159 bytes (previous Sunday keep). Do not pin the dated name."
         ],
         "do_not": [
-          "Do not pin Newsletter_270926.jpg.",
+          "Do not use site_type http_scrape_newest_images for this host \u2014 /images/ is invisible to that scraper.",
+          "Do not pin Newsletter_251026-ParishOffice.jpg.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-11-02"
       },
       "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape images https://www.stmichaelsgorey.ie/about-our-parish/st-michaels-newsletter \u2014 no bulletin page images matching ['newsletter_', 'images/newsletter', '.jpg'] (browser was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://www.stmichaelsgorey.ie/about-our-parish/st-michaels-newsletter \u2014 no bulletin page images matching ['newsletter_"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "gort",
@@ -32361,9 +32362,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "Recipe replay failed: HTTP-scrape images https://www.rathdrumparish.ie/ \u2014 no bulletin page images matching ['newsletter', 'october', '.jpg'] (browser was not opened)",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://www.rathdrumparish.ie/ \u2014 no bulletin page images matching ['newsletter', 'october', '.jpg'] (browser was not op"
     },
     {
       "parish_key": "rathfarnham",
@@ -38285,26 +38286,26 @@
       "recipe_file": "parishes/recipes/achonry/tubbercurrycloonacool.json",
       "recipe": {
         "start_url": "https://tubbercurrycloonacool.com/newsletter/",
-        "site_type": "pdf_link_list",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "02/11/2026: Nov 1 PDF lives in the October upload folder (.../2026/10/1st-November-2026.pdf), not /2026/11/. Old recipe predicted /2026/11/ and 404'd.",
+          "site_type:predicted_dated_pdf from that working example. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pin 1st-November-2026.pdf.",
+          "Do not force the WordPress folder month to match the bulletin month \u2014 upload month can lag.",
           "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-10-09"
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": {
         "total_timeout_s": 190,
