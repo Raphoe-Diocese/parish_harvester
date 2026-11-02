@@ -1,4 +1,12 @@
-﻿## 02/11/2026 — City Quay failed page cap. Fix then next host
+﻿## 02/11/2026 — City Quay ok. Dromod next
+
+- City Quay re-harvest 41456809571 ok after max_bulletin_pages 12. Ok count on main is 388. Saturday was 392.
+- Milltown/Listry directory host is a twin of milltownkerry (already ok 25/10/2026). Rathmore twin of MCN. Killarney parish site has Newsletter-November-2nd-2026.pdf while status is still 26/10 via diocese — park unless Frank wants a retarget.
+- Dromod was stale on a pinned 4 October diocese PDF. Real list https://dromodparish.ie/churches/parish-newsletter/. Proved Dromod-1st-November-Newsletter.pdf application/pdf 1154131 bytes. Certificate expired — ignore_https_errors.
+- Not checked on parishpress.ie.
+- Reload the extension after the Dromod merge.
+
+## 02/11/2026 — City Quay failed page cap. Fix then next host
 
 - City Quay harvest 41455376833 failed: Too many pages 8 (max 4). print_to_pdf worked. max_bulletin_pages 12 on the fix branch.
 - Cherry Orchard still ok. Ok count 387. Saturday was 392.
