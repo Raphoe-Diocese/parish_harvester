@@ -3,31 +3,44 @@
   "parish_key": "skerries",
   "display_name": "Skerries",
   "diocese": "dublin",
-  "start_url": "https://www.stpatricksskerries.ie/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Bulletin",
-    ".pdf"
-  ],
+  "recorded_date": "2026-11-02",
+  "start_url": "https://stpatricksskerries.ie/parish-bulletin/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "timeout_ms": 90000,
+  "total_timeout_s": 250,
+  "example_url": "https://stpatricksskerries.ie/bfd_download/the-greatest-commandment/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stpatricksskerries.ie/"
+      "url": "https://stpatricksskerries.ie/parish-bulletin/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='bfd_download']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='/bfd_download/']"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 215472 bytes magic %PDF. File date 27/09/2026. Do not pin the dated filename."
+    "02/11/2026: homepage scrape failed. Real list is /parish-bulletin/. Top row The Greatest Commandment, Published October 25, 2026.",
+    "PDF is /bfd_download/<slug>/ not a .pdf href. Proved GET application/pdf 259753 bytes %PDF-1.3. Do not pin the slug."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin /bfd_download/the-greatest-commandment/.",
+    "Do not scrape only the homepage.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
-    "strategy": "newest_dated",
+    "strategy": "first_match",
     "position": "top"
   }
 }
