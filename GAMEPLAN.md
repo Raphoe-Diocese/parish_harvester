@@ -1,4 +1,11 @@
-﻿## 02/11/2026 — Clonmel St Marys Nov PDF
+﻿## 02/11/2026 — Ok 405. Caherdavin HTML + Corofin newsletter.pdf
+
+- Clonmel St Marys ok 01/11. Ok count 405.
+- Christ the King / Caherdavin: /news/newsletter-01112026 HTML posts — switch off dead Mura PDF scrape to http_scrape_newest_html + print_to_pdf.
+- Cummer/Kilmoylan: /newsletter.pdf overwritten 31/10 CreationDate — permanent_redirect_document.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Clonmel St Marys Nov PDF
 
 - Ok still 404 after Rathowen. Mohill wp-json harvest hung on print — cancelled; park.
 - Clonmel St Marys: /images/1st%20november%202026.pdf on newsletter list. Old recipe patterns only october/sept + NoneType.group crash. predicted_dated_pdf + ignore_https_errors.
