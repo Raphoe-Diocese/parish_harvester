@@ -2,16 +2,16 @@
   "generated_at": "2026-11-02",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 406,
+    "downloaded": 407,
     "html_links": 0,
     "skipped": 770,
-    "failed": 85,
+    "failed": 84,
     "stale_rejected": 54
   },
   "action_counts": {
-    "ok": 429,
+    "ok": 430,
     "skip": 778,
-    "investigate": 67
+    "investigate": 66
   },
   "parishes": [
     {
@@ -10195,26 +10195,25 @@
       "recipe_file": "parishes/recipes/limerick/christtheking.json",
       "recipe": {
         "start_url": "https://www.caherdavinparish.com/parish-information/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "mura_hashed_dated_link_text",
+        "site_type": "http_scrape_newest_html",
+        "playbook_type": "html_text_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "05/10/2026 leftover skip hunt: caherdavinparish.com newsletter listing. Link text Newsletter 270926. Proved hashed file GET 200 application/pdf 860033 bytes %PDF. PDF text Christ the King Caherdavin, Masses Sat 26 / Sun 27. CreationDate 26/09/2026. Accepted weekend file 27/09/2026.",
-          "Score the dated link text. Do not pin the hashed fileID."
+          "02/11/2026: listing is HTML news posts /news/newsletter-DDMMYY (01112026 = 01/11/2026). Old Mura hashed-PDF scrape found none. Prefer http_scrape_newest_html then print_to_pdf. Do not pin the weekly slug."
         ],
         "do_not": [
-          "Do not pin index.cfm/_api/render/file/?method=inline&fileID=\u2026 \u2014 the id changes every week.",
-          "Do not use facebook.com/dioceseoflimerick.",
+          "Do not pin /news/newsletter-01112026.",
+          "Do not pin index.cfm/_api/render/file/?method=inline&fileID=\u2026",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -13411,32 +13410,33 @@
       "diocese": "tuam",
       "recipe_file": "parishes/recipes/tuam/cummerkilmoylan.json",
       "recipe": {
-        "start_url": "https://www.corofinbelclare.ie/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
+        "start_url": "https://www.corofinbelclare.ie/newsletter.pdf",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "05/10/2026 cloud leftover hunt: proved GET 200 pdf 129924 bytes magic %PDF on https://www.corofinbelclare.ie/newsletter.pdf. PDF text Twenty Seventh Sunday in Ordinary Time - 4th October 2026. Path /newsletter.pdf is overwritten weekly (not a dated pin). Official card was corofinbelclare.ie."
+          "02/11/2026: /newsletter.pdf still the weekly overwrite path. Proved GET 200 application/pdf 134790 bytes; CreationDate 31/10/2026 (weekend keep for 01/11). permanent_redirect_document + disable_stale_rescrape_fallback."
         ],
         "do_not": [
           "Do not pin a dated filename.",
+          "Do not rescrape the homepage for other PDFs.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "Corofin Belclare overwritten /newsletter.pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.corofinbelclare.ie/ \u2014 no dated bulletin PDF matching ['newsletter.pdf', '.pdf'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.corofinbelclare.ie/ \u2014 no dated bulletin PDF matching ['newsletter.pdf', '.pdf'] (not a selector problem; p"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "curraghcamp",
