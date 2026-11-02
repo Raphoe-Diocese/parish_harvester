@@ -1,33 +1,35 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "christtheking",
   "display_name": "Christ the King",
   "diocese": "limerick",
   "start_url": "https://www.caherdavinparish.com/parish-information/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "playbook_type": "mura_hashed_dated_link_text",
-  "href_patterns": [
-    "Newsletter",
-    "fileID",
-    "render/file"
+  "site_type": "http_scrape_newest_html",
+  "playbook_type": "html_text_bulletin",
+  "post_slug_patterns": [
+    "newsletter-"
   ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
-  "example_url": "https://www.caherdavinparish.com/parish-information/newsletter/",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-02",
+  "example_url": "https://www.caherdavinparish.com/news/newsletter-01112026",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.caherdavinparish.com/parish-information/newsletter/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
-    "05/10/2026 leftover skip hunt: caherdavinparish.com newsletter listing. Link text Newsletter 270926. Proved hashed file GET 200 application/pdf 860033 bytes %PDF. PDF text Christ the King Caherdavin, Masses Sat 26 / Sun 27. CreationDate 26/09/2026. Accepted weekend file 27/09/2026.",
-    "Score the dated link text. Do not pin the hashed fileID."
+    "02/11/2026: listing is HTML news posts /news/newsletter-DDMMYY (01112026 = 01/11/2026). Old Mura hashed-PDF scrape found none. Prefer http_scrape_newest_html then print_to_pdf. Do not pin the weekly slug."
   ],
   "do_not": [
-    "Do not pin index.cfm/_api/render/file/?method=inline&fileID=… — the id changes every week.",
-    "Do not use facebook.com/dioceseoflimerick.",
+    "Do not pin /news/newsletter-01112026.",
+    "Do not pin index.cfm/_api/render/file/?method=inline&fileID=…",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
