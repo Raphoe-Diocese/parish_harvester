@@ -2,16 +2,16 @@
   "generated_at": "2026-11-02",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 399,
+    "downloaded": 401,
     "html_links": 0,
     "skipped": 770,
-    "failed": 92,
+    "failed": 90,
     "stale_rejected": 54
   },
   "action_counts": {
-    "ok": 422,
+    "ok": 424,
     "skip": 778,
-    "investigate": 74
+    "investigate": 72
   },
   "parishes": [
     {
@@ -23173,7 +23173,7 @@
       "recipe_file": "parishes/recipes/cashel_and_emly/killenaulemoyglass.json",
       "recipe": {
         "start_url": "https://killenaule.net/category/newsletter/",
-        "site_type": "wp_json_newest_post_images",
+        "site_type": "http_scrape_newest_images",
         "playbook_type": "stacked_image_bulletin",
         "status": "",
         "skip": false,
@@ -23182,16 +23182,16 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "07/10/2026: diocese card has no website. Live host killenaule.net category/newsletter posts parish-newsletter-sunday-DD-month-YYYY.",
-          "This week's post has Sunday-4th-October.jpg GET 200 image/jpeg 400120 bytes (Focus on Sunday, 4th October 2026 Year A) and Newsletter-4th-october.jpg GET 200 image/jpeg 390301 bytes (Killenaule & Moyglass Parish Newsletter, 4th October 2026).",
-          "The post also embeds background_blue.jpg and lotto ads. href_patterns keep Sunday- and Newsletter- only. Do not pin the dated post or filenames."
+          "02/11/2026: posts renamed parish-newsletter-1st-november-2026 (no -sunday-). Category shows Newsletter-1st-November-540x304.jpg thumbs; full file Newsletter-1st-November.jpg GET 200 image/jpeg 526514 bytes.",
+          "TLS cert expired \u2014 ignore_https_errors. Prefer http_scrape_newest_images (skips -540x304). Do not pin the dated post or filename."
         ],
         "do_not": [
-          "Do not pin parish-newsletter-sunday-4th-october-2026.",
+          "Do not pin parish-newsletter-1st-november-2026.",
+          "Do not require parish-newsletter-sunday- in the slug \u2014 November 2026 dropped sunday.",
           "Do not harvest background_blue.jpg, the lotto button, or the course posters.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-07"
+        "recorded_date": "2026-11-02"
       },
       "bulletin_format": "image_stack",
       "learned_pattern": "",
@@ -32348,11 +32348,13 @@
         "has_terminal": true,
         "operator_notes": [
           "02/11/2026: homepage image_stack failed. Real page is /newsletter/. Lists Newsletter-Sunday-25-Oct-2026 Page-1 and Page-2 JPEGs (previous Sunday keep).",
+          "Files live flat under /wp-content/uploads/ (no /YYYY/MM/). HTTP scrape must score flat uploads or Playwright hangs past total_timeout.",
           "Stack the two Newsletter images. Do not pin the dated jpg names."
         ],
         "do_not": [
           "Do not pin Newsletter-Sunday-25-Oct-2026-Page-1.jpg.",
           "Do not scrape only the homepage \u2014 use /newsletter/.",
+          "Do not assume WordPress year/month upload folders \u2014 Rathdrum is flat.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-02"
@@ -32361,10 +32363,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape images https://www.rathdrumparish.ie/ \u2014 no bulletin page images matching ['newsletter', 'october', '.jpg'] (browser was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://www.rathdrumparish.ie/ \u2014 no bulletin page images matching ['newsletter', 'october', '.jpg'] (browser was not op"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "rathfarnham",
