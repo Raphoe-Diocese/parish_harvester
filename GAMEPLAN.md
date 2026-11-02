@@ -1,4 +1,11 @@
-﻿## 01/11/2026 — Sunday harvest found fewer bulletins
+﻿## 01/11/2026 — 42 Dublin and Tuam bulletins were still thrown out
+
+- Saturday had 392 ok. The rerun 41313748997 finished at 344.
+- 43 files dated 25/10/2026 were kept. 42 more, all Dublin or Tuam, were still rejected with that same date.
+- The clock check was the hole. Last Sunday's file now stays for the whole target week. Two weeks behind stays stale.
+- Not checked on parishpress.ie. Dublin and Tuam are not sent again until this is on main.
+
+## 01/11/2026 — Sunday harvest found fewer bulletins
 
 - Run 41291706897 finished. Target moved to 01/11/2026. Ok went from 392 on Saturday to 295.
 - 101 parishes that were ok still had the 25/10/2026 file. The harvest called them stale and left them out.

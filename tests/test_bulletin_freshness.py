@@ -201,11 +201,12 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.reason, "in_bulletin_week")
-        # Last Sunday is outside week_window. It stays fresh only when the
-        # harvest day is the new Sunday. A later Monday drops it.
+        # Previous Sunday stays fresh for the whole target week.
+        # 01/11/2026 a Sunday-only clock check still dropped 42 Dublin
+        # and Tuam files dated 25/10/2026. Two weeks behind stays stale.
         later = check_bulletin_freshness(url, date(2026, 8, 16))
-        self.assertEqual(later.status, "stale")
-        self.assertEqual(later.reason, "date_behind_of_target")
+        self.assertEqual(later.status, "fresh")
+        self.assertEqual(later.reason, "previous_sunday_still_current")
         sunday = verdict_for_extracted_date(
             date(2026, 10, 25),
             date(2026, 11, 1),
@@ -218,8 +219,8 @@ class BulletinFreshnessTests(unittest.TestCase):
             date(2026, 11, 1),
             today=date(2026, 11, 2),
         )
-        self.assertEqual(monday.status, "stale")
-        self.assertEqual(monday.reason, "date_behind_of_target")
+        self.assertEqual(monday.status, "fresh")
+        self.assertEqual(monday.reason, "previous_sunday_still_current")
         two_weeks = verdict_for_extracted_date(
             date(2026, 10, 18),
             date(2026, 11, 1),
