@@ -1444,6 +1444,31 @@ class PortstewartMdocsRecipeTests(unittest.TestCase):
         self.assertEqual(urls[0], self.LISTING)
         self.assertIn("http://portstewartparish.website/weekly-bulletin/", urls)
 
+    def test_november_2020_archive_pipe_title_does_not_beat_this_week(self) -> None:
+        """Live miss 01/11/2026: year-hinted '8 November.pdf' beat 1 Nov 2026."""
+        this_week = "https://portstewartparish.website/?mdocs-file=9609"
+        archive_2020 = "https://portstewartparish.website/?mdocs-file=5185"
+        html = f"""
+        <table id="mdocs-list-table"><tbody>
+        <tr>
+          <td>1st November 2026 - 1st November 2026.pdf</td>
+          <td class="mdocs-download"><a href="{this_week}">Download</a></td>
+        </tr>
+        <tr>
+          <td>8 |November 2020 - 8 November.pdf</td>
+          <td class="mdocs-download"><a href="{archive_2020}">Download</a></td>
+        </tr>
+        </tbody></table>
+        """
+        scored = _extract_mdocs_dated_downloads(
+            html, self.LISTING, year_hint=2026, target_date=date(2026, 11, 1)
+        )
+        by_url = {url: found for found, url in scored}
+        self.assertEqual(by_url.get(this_week), date(2026, 11, 1))
+        self.assertEqual(by_url.get(archive_2020), date(2020, 11, 8))
+        picked = _pick_newest_mdocs_download(scored, date(2026, 11, 1))
+        self.assertEqual(picked, this_week)
+
 
 class CastleblayneyListingTests(unittest.TestCase):
     LISTING = "https://mucknoparish.ie/category/weekly-bulletin/"

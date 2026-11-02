@@ -1787,11 +1787,35 @@ async def _try_churchmedia_newsletter(
     return None
 
 
+def _mdocs_align_date_to_row_year(text: str, found: date | None) -> date | None:
+    """Keep the year written on the mDocs row. Do not harvest-year a 2020 archive.
+
+    Portstewart titles are ``8 |November 2020`` with filename ``8 November.pdf``.
+    The pipe hides ``8 November 2020`` from the dated-slug parser, then
+    ``yearless_slug_date(..., year_hint=2026)`` turns that file into 08/11/2026.
+    On harvest Sunday 01/11/2026 that sits inside the 7-day ahead window and
+    beats ``1st November 2026.pdf`` (live miss: ``?mdocs-file=5185`` dated
+    08/11/2020).
+    """
+    if found is None:
+        return None
+    years = [int(year) for year in re.findall(r"(?<!\d)(20\d{2})(?!\d)", text or "")]
+    if not years or found.year in years:
+        return found
+    for year in years:
+        try:
+            return found.replace(year=year)
+        except ValueError:
+            continue
+    return None
+
+
 def _extract_mdocs_dated_downloads(
     html: str,
     base_url: str,
     *,
     year_hint: int,
+    target_date: date | None = None,
 ) -> list[tuple[date, str]]:
     """Pair each mDocs ?mdocs-file= download with the date on its table row."""
     from .bulletin_freshness import extract_bulletin_date
@@ -1806,11 +1830,13 @@ def _extract_mdocs_dated_downloads(
         if not url or url in seen or _is_non_bulletin_url(url):
             continue
         text = unquote(re.sub(r"<[^>]+>", " ", row))
+        text = re.sub(r"\s*\|\s*", " ", text)
         found = (
             extract_date_from_string(text)
             or extract_bulletin_date(text)
-            or yearless_slug_date(text, year_hint)
+            or yearless_slug_date(text, year_hint, near=target_date)
         )
+        found = _mdocs_align_date_to_row_year(text, found)
         if found is None:
             continue
         seen.add(url)
@@ -1878,7 +1904,10 @@ async def _try_http_scrape_mdocs(
             continue
         listing_html = listing_body.decode("utf-8", errors="ignore")
         scored = _extract_mdocs_dated_downloads(
-            listing_html, url, year_hint=target_date.year
+            listing_html,
+            url,
+            year_hint=target_date.year,
+            target_date=target_date,
         )
         pdf_url = _pick_newest_mdocs_download(scored, target_date)
         if not pdf_url:
