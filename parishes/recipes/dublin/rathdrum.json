@@ -3,40 +3,44 @@
   "parish_key": "rathdrum",
   "display_name": "Rathdrum",
   "diocese": "dublin",
-  "start_url": "https://www.rathdrumparish.ie/",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://www.rathdrumparish.ie/newsletter/",
   "site_type": "http_scrape_newest_images",
   "href_patterns": [
+    "Newsletter-Sunday",
     "Newsletter",
-    "October",
     ".jpg"
   ],
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "example_url": "https://rathdrumparish.ie/wp-content/uploads/Newsletter-Sunday-25-Oct-2026-Page-1-726x1024-1.jpg",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.rathdrumparish.ie/"
+      "url": "https://www.rathdrumparish.ie/newsletter/"
     },
     {
       "action": "image_stack",
       "count": 2,
       "position": "first",
+      "prefer": "largest",
       "selector": "img[src*='Newsletter']",
       "min_long_side": 400
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 jpeg 407502 bytes magic image/jpeg. File date 04/10/2026. Do not pin the dated filename.",
-    "Also page-2 JPEG GET 200 image/jpeg 444615 bytes. Stack listing images. Do not pin dated jpg names."
+    "02/11/2026: homepage image_stack failed. Real page is /newsletter/. Lists Newsletter-Sunday-25-Oct-2026 Page-1 and Page-2 JPEGs (previous Sunday keep).",
+    "Stack the two Newsletter images. Do not pin the dated jpg names."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin Newsletter-Sunday-25-Oct-2026-Page-1.jpg.",
+    "Do not scrape only the homepage — use /newsletter/.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "bulletin_format": "image_stack"
 }
