@@ -2,16 +2,16 @@
   "parish_key": "naomhfionan",
   "display_name": "Falcarragh",
   "diocese": "raphoe",
-  "recorded_date": "2026-08-10",
-  "start_url": "https://naomhfionan.com/wp-content/uploads/",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://naomhfionan.com/nuachtlitir/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://naomhfionan.com/wp-content/uploads/"
+      "action": "download",
+      "url": "https://naomhfionan.com/wp-content/uploads/2026/10/Parish-Newsletter-44-for-Sun-A-01112026.pdf"
     }
   ],
-  "site_type": "naomhfionan_numbered_pdf",
-  "version": 2,
+  "site_type": "pdf_link_list",
+  "version": 1,
   "operator_notes_2026_08_10": [
     "NOT a genuine dead-end — the earlier 'confirmed Cloudflare block, no fix",
     "available' verdict is superseded. /nuachtlitir/ (the trained listing",
@@ -48,12 +48,16 @@
     "it — links that exact same file for today's date)."
   ],
   "do_not": [
-    "Do not point this recipe back at /nuachtlitir/ or any other HTML page —",
-    "it is a genuine Cloudflare Managed Challenge that blocks every browser,",
-    "headless and headful alike; there is nothing to click there.",
-    "Do not assume the newsletter number is a simple date substitution — it",
-    "is a separate weeks-since-January counter, see harvester/utils.py.",
-    "Do not hardcode a specific year's number/letter — always derive both",
-    "from the target date via naomhfionan_bulletin_url()."
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "observed_load_ms": 12760.5,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "playbook_type": "pdf_download_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ]
 }
