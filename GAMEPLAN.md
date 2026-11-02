@@ -1,4 +1,10 @@
-﻿## 02/11/2026 — Keep going: Balally + Killarney + Dromod date
+﻿## 02/11/2026 — Dromod ok 389. Crumlin + Donore next
+
+- Dromod ok 01/11/2026 after date fix. Ok count 389. Saturday was 392.
+- Balally + Killarney PR 460 merged. Harvests running.
+- Crumlin /newsletter/ has 2026-11-01-Newsletter.pdf. Donore /parish-news/newsletter/ has 25/10 (keep last Sunday). Homepage scrapes failed for both.
+- Not checked on parishpress.ie.
+## 02/11/2026 — Keep going: Balally + Killarney + Dromod date
 
 - Standing order: do not stop between harvests. Permission only for merge/dispatch walls.
 - Balally failed: homepage scrape missed. Category post has Newsletter-31st-October-1st-November.pdf (2551493 bytes). Weekend name → 01/11. Folder /2020/06/ is junk year.
