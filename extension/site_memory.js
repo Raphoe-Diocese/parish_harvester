@@ -142,6 +142,7 @@
         "29/10/2026 Ballybrack-Killiney: start on news.html, click top Newsletter title (24th & 25th October), print_to_pdf. Do not pin last week's article URL.",
         "29/10/2026 Achonry-Mullinabreena: NEWS.aspx ASP.NET list → click top Parish Newsletter (ArticleDetail) → print_to_pdf. Do not pin articleid. Do not scrape achonrydiocese.org parish card (admin/wrong file).",
         "02/11/2026 City Quay: cityquayparish.com/newsletter (Squarespace). Click the top title that starts with Newsletter (All Saints 01/11/2026 proved). Skip Remembering and Reflection. print_to_pdf + skip_listing_nav. Do not pin the random post slug.",
+        "02/11/2026 City Quay harvest 41455376833 printed 8 pages and failed max 4 — set max_bulletin_pages 12 on Squarespace print_to_pdf.",
       ],
       do_not: [
         "Do not use Pick bulletin image when the page is mostly text paragraphs.",
@@ -150,6 +151,7 @@
         "Do not pin a dated /news/newsletter-… URL.",
         "Do not pin ArticleDetail.aspx?articleid=… on ASP.NET parish news lists.",
         "Do not print City Quay Remembering or Reflection posts as the weekly newsletter.",
+        "Do not leave City Quay max_bulletin_pages at 4.",
       ],
     },
     dated_pdf_bulletin: {
