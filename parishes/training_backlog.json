@@ -2,16 +2,16 @@
   "generated_at": "2026-11-02",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 368,
+    "downloaded": 384,
     "html_links": 0,
     "skipped": 774,
-    "failed": 99,
-    "stale_rejected": 73
+    "failed": 98,
+    "stale_rejected": 58
   },
   "action_counts": {
-    "ok": 410,
+    "ok": 411,
     "skip": 783,
-    "investigate": 81
+    "investigate": 80
   },
   "parishes": [
     {
@@ -13393,9 +13393,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.corofinbelclare.ie/ \u2014 no dated bulletin PDF matching ['newsletter.pdf', '.pdf'] (not a selector problem; parish may not have posted)",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.corofinbelclare.ie/ \u2014 no dated bulletin PDF matching ['newsletter.pdf', '.pdf'] (not a selector problem; p"
     },
     {
       "parish_key": "curraghcamp",
@@ -17475,35 +17475,34 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/naomhfionan.json",
       "recipe": {
-        "start_url": "https://naomhfionan.com/wp-content/uploads/",
-        "site_type": "naomhfionan_numbered_pdf",
-        "playbook_type": "",
+        "start_url": "https://naomhfionan.com/nuachtlitir/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [
-          "Do not point this recipe back at /nuachtlitir/ or any other HTML page \u2014",
-          "it is a genuine Cloudflare Managed Challenge that blocks every browser,",
-          "headless and headful alike; there is nothing to click there.",
-          "Do not assume the newsletter number is a simple date substitution \u2014 it",
-          "is a separate weeks-since-January counter, see harvester/utils.py.",
-          "Do not hardcode a specific year's number/letter \u2014 always derive both",
-          "from the target date via naomhfionan_bulletin_url()."
+        "has_terminal": true,
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
-        "recorded_date": "2026-08-10"
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: naomhfionan.com predicted PDF URL(s) for 2026-11-01 did not resolve to a real PDF (not the listing-page block; retry later or re-check the number/letter prediction)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: naomhfionan.com predicted PDF URL(s) for 2026-11-01 did not resolve to a real PDF (not the listing-page block; retry later or re-check the"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "faughart",
@@ -29654,7 +29653,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-11-02"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -34702,7 +34701,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-11-02"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
