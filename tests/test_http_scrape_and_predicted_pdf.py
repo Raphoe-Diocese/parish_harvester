@@ -934,6 +934,47 @@ class IskaheenJetpackImageTests(unittest.TestCase):
         self.assertEqual(best, date(2026, 9, 1))
 
 
+class RathdrumFlatUploadImageTests(unittest.TestCase):
+    """Rathdrum puts Newsletter-Sunday-*.jpg directly under /uploads/ (no YYYY/MM)."""
+
+    LISTING = "https://www.rathdrumparish.ie/newsletter/"
+    PAGE1_THUMB = (
+        "https://rathdrumparish.ie/wp-content/uploads/"
+        "Newsletter-Sunday-25-Oct-2026-Page-1-726x1024-1.jpg"
+    )
+    PAGE1 = (
+        "https://rathdrumparish.ie/wp-content/uploads/"
+        "Newsletter-Sunday-25-Oct-2026-Page-1-scaled.jpg"
+    )
+    PAGE2_THUMB = (
+        "https://rathdrumparish.ie/wp-content/uploads/"
+        "Newsletter-Sunday-25-Oct-2026-Page-2-711x1024.jpg"
+    )
+    PAGE2 = (
+        "https://rathdrumparish.ie/wp-content/uploads/"
+        "Newsletter-Sunday-25-Oct-2026-Page-2-scaled.jpg"
+    )
+
+    def test_scores_flat_uploads_without_year_month_folder(self) -> None:
+        html = f"""
+        <img src="{self.PAGE1_THUMB}" />
+        <img src="{self.PAGE1}" />
+        <img src="{self.PAGE2_THUMB}" />
+        <img src="{self.PAGE2}" />
+        <img src="/wp-content/uploads/fbrfg/favicon-32x32.png" />
+        """
+        scored = _extract_scored_upload_images(
+            html,
+            self.LISTING,
+            href_patterns=["Newsletter-Sunday", "Newsletter", ".jpg"],
+            target_date=date(2026, 11, 1),
+        )
+        urls = [url for _found, url in scored]
+        self.assertEqual(urls, [self.PAGE1, self.PAGE2])
+        best = max(item[0] for item in scored)
+        self.assertEqual(best, date(2026, 10, 25))
+
+
 class ArdkeenLiturgicalImageTests(unittest.TestCase):
     LISTING = "https://parishofardkeen.co.uk/parish-bulletin/"
     THIS_WEEK = (
