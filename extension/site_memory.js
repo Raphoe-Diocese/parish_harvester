@@ -481,11 +481,13 @@
       operator_notes: [
         "31/10/2026 Durrow category has newsletter-25-oct-2026.jpg. Skip the resized copy.",
         "02/11/2026 Gorey: /images/Newsletter_DDMMYY-ParishOffice.jpg is not wp-content/uploads. http_scrape_newest_images misses it — use site_type image_stack + Playwright selector img[src*='Newsletter_'].",
+        "02/11/2026 Rathdrum: flat /wp-content/uploads/Newsletter-Sunday-…jpg (no /YYYY/MM/). Harvester now scores flat dated uploads and skips -726x1024-1 thumbs; keep -scaled.",
       ],
       do_not: [
         "Do not pin the dated filename.",
         "Do not take the 300px resized copy.",
         "Do not leave Gorey on http_scrape_newest_images — that path never opens the browser for /images/ hosts.",
+        "Do not assume every WordPress bulletin image sits under /uploads/YYYY/MM/.",
       ],
     },
     yy_mm_d_pdf: {

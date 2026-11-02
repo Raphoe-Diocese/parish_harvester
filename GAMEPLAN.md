@@ -1,4 +1,11 @@
-﻿## 02/11/2026 — Ok 395. Tubbercurry + Gorey + Baldoyle/Ballinteer Nov
+﻿## 02/11/2026 — Ok 399. Rathdrum flat uploads + Killenaule Nov
+
+- Tubbercurry + Gorey + Baldoyle + Ballinteer ok. Ok count 399.
+- Rathdrum timed out: HTTP image scrape only saw /YYYY/MM/ uploads. Real files are flat /uploads/Newsletter-Sunday-*.jpg. Fix scrape + skip -NxN-1 thumbs; keep -scaled.
+- Killenaule: slug dropped -sunday-; full Newsletter-1st-November.jpg; TLS expired — http_scrape_newest_images + ignore_https_errors.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Ok 395. Tubbercurry + Gorey + Baldoyle/Ballinteer Nov
 
 - Howth + Terenure ok. Ok count 395. Rathdrum recipe on main (/newsletter/ Oct 25 images) — re-harvest 41471047331 running after hung cancel.
 - Baldoyle listing now has Newsletter-1st-November.pdf. Ballinteer Sunday_Message_20261101.pdf on Sunday-Message.htm. Re-harvests dispatched (recipes already http_scrape).

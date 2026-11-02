@@ -4,21 +4,24 @@
   "display_name": "Killenaule & Moyglass",
   "diocese": "cashel_and_emly",
   "start_url": "https://killenaule.net/category/newsletter/",
-  "site_type": "wp_json_newest_post_images",
+  "site_type": "http_scrape_newest_images",
   "playbook_type": "stacked_image_bulletin",
+  "ignore_https_errors": true,
   "post_slug_patterns": [
+    "parish-newsletter-",
     "parish-newsletter-sunday"
   ],
   "href_patterns": [
-    "Sunday-",
-    "Newsletter-"
+    "Newsletter-",
+    "Sunday-"
   ],
-  "example_post_url": "https://killenaule.net/parish-newsletter-sunday-4th-october-2026/",
-  "image_count": 2,
-  "weeks_back": 3,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-07",
+  "example_url": "https://killenaule.net/wp-content/uploads/2026/10/Newsletter-1st-November.jpg",
+  "example_post_url": "https://killenaule.net/parish-newsletter-1st-november-2026/",
+  "image_count": 1,
+  "weeks_back": 4,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-11-02",
   "steps": [
     {
       "action": "goto",
@@ -26,22 +29,25 @@
     },
     {
       "action": "image_stack",
-      "count": 2,
-      "selector": "img[src*='Newsletter-'], img[src*='Sunday-']"
+      "count": 1,
+      "prefer": "largest",
+      "selector": "img[src*='Newsletter-'], img[src*='Sunday-']",
+      "min_long_side": 400
     }
   ],
   "operator_notes": [
-    "07/10/2026: diocese card has no website. Live host killenaule.net category/newsletter posts parish-newsletter-sunday-DD-month-YYYY.",
-    "This week's post has Sunday-4th-October.jpg GET 200 image/jpeg 400120 bytes (Focus on Sunday, 4th October 2026 Year A) and Newsletter-4th-october.jpg GET 200 image/jpeg 390301 bytes (Killenaule & Moyglass Parish Newsletter, 4th October 2026).",
-    "The post also embeds background_blue.jpg and lotto ads. href_patterns keep Sunday- and Newsletter- only. Do not pin the dated post or filenames."
+    "02/11/2026: posts renamed parish-newsletter-1st-november-2026 (no -sunday-). Category shows Newsletter-1st-November-540x304.jpg thumbs; full file Newsletter-1st-November.jpg GET 200 image/jpeg 526514 bytes.",
+    "TLS cert expired — ignore_https_errors. Prefer http_scrape_newest_images (skips -540x304). Do not pin the dated post or filename."
   ],
   "do_not": [
-    "Do not pin parish-newsletter-sunday-4th-october-2026.",
+    "Do not pin parish-newsletter-1st-november-2026.",
+    "Do not require parish-newsletter-sunday- in the slug — November 2026 dropped sunday.",
     "Do not harvest background_blue.jpg, the lotto button, or the course posters.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "bulletin_format": "image_stack"
 }

@@ -2116,6 +2116,14 @@ _WP_UPLOAD_IMAGE_RE = re.compile(
     r"(?P<name>[A-Za-z0-9_.%\-]+\.(?:png|jpe?g))",
     re.IGNORECASE,
 )
+# Flat wp-content/uploads/Name-25-Oct-2026.jpg (no /YYYY/MM/ folder).
+# Rathdrum proved 02/11/2026: Newsletter-Sunday-25-Oct-2026-Page-1….jpg.
+# Require a digit in the basename so logos/icons without dates stay out.
+_WP_FLAT_UPLOAD_IMAGE_RE = re.compile(
+    r"(?:(?P<origin>https?://[^\s\"'<>]+?)/)?wp-content/uploads/"
+    r"(?P<name>[A-Za-z0-9_.%\-]*\d[A-Za-z0-9_.%\-]*\.(?:png|jpe?g))",
+    re.IGNORECASE,
+)
 # Squarespace Church Newsletter PNGs (Newtowncashel): absolute CDN URLs with
 # Newsletter_YYYYMMDD in the basename. Query/srcset tails are stripped.
 _SQUARESPACE_DATED_NEWSLETTER_IMAGE_RE = re.compile(
@@ -2124,7 +2132,10 @@ _SQUARESPACE_DATED_NEWSLETTER_IMAGE_RE = re.compile(
     r"(?:\?[^\s\"'<>]*)?",
     re.IGNORECASE,
 )
-_RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)
+# WP thumbs: -726x1024.jpg and -726x1024-1.jpg (Rathdrum). Keep -scaled.jpg.
+_RESIZED_IMAGE_SUFFIX_RE = re.compile(
+    r"-\d+x\d+(?:-\d+)?\.(?:png|jpe?g)$", re.IGNORECASE
+)
 
 
 def _wp_upload_abs_url(match: re.Match[str], base_url: str) -> str:
@@ -2136,6 +2147,15 @@ def _wp_upload_abs_url(match: re.Match[str], base_url: str) -> str:
     if origin:
         return f"{origin}/wp-content/uploads/{year:04d}/{month:02d}/{name}"
     return urljoin(base_url, f"/wp-content/uploads/{year:04d}/{month:02d}/{name}")
+
+
+def _wp_flat_upload_abs_url(match: re.Match[str], base_url: str) -> str:
+    """Absolute URL for flat /wp-content/uploads/<file> (no year/month folder)."""
+    name = match.group("name")
+    origin = match.group("origin")
+    if origin:
+        return f"{origin}/wp-content/uploads/{name}"
+    return urljoin(base_url, f"/wp-content/uploads/{name}")
 
 
 def _href_match_blob(url: str) -> str:
@@ -3450,6 +3470,24 @@ def _extract_scored_upload_images(
             or extract_bulletin_date(url)
             or date(year, month, 1)
         )
+        if found <= target_date + timedelta(days=3):
+            scored.append((found, url))
+    # Flat uploads (Rathdrum): /wp-content/uploads/Newsletter-Sunday-25-Oct-2026-Page-1.jpg
+    for match in _WP_FLAT_UPLOAD_IMAGE_RE.finditer(html or ""):
+        name = match.group("name")
+        if _RESIZED_IMAGE_SUFFIX_RE.search(name) or _SKIP_IMAGE_NAME_RE.search(name):
+            continue
+        url = _wp_flat_upload_abs_url(match, base_url)
+        if url in seen:
+            continue
+        seen.add(url)
+        if href_patterns and not _href_matches_patterns(url, href_patterns):
+            continue
+        if _is_non_bulletin_url(url):
+            continue
+        found = extract_date_from_string(name) or extract_bulletin_date(url)
+        if found is None:
+            continue
         if found <= target_date + timedelta(days=3):
             scored.append((found, url))
     # Squarespace ?format=json / HTML embeds Newsletter_YYYYMMDD.png on CDN.
