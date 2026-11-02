@@ -1,4 +1,24 @@
-﻿## 01/11/2026 — 42 Dublin and Tuam bulletins were still thrown out
+﻿## 02/11/2026 — Knocklyon ok. Cherry Orchard next
+
+- Balbriggan harvest 41450529846 ok. Knocklyon harvest 41451807474 ok. Ok count on main is 386. Saturday was 392. Date box empty on both.
+- Next missing host: cherryorchardparish.com. Was skipped on the Dublin card. Real list https://cherryorchardparish.com/2026/09/12/newsletters/. Proved 31st-Sunday-2026.pdf application/pdf 708528 bytes. Body has November Lists, Remembrance next Saturday 7 November, First Communion prep next Sunday 8 November.
+- cregganchapel.com and derriaghycatholicparish.org DNS fail. derriaghycatholicparish recipe already uses .com and is stale 23/09/2026. lucansouth already ok. cityquayparish.com has Squarespace image newsletters.
+- Not checked on parishpress.ie.
+- Reload the extension after the Cherry Orchard merge.
+## 02/11/2026 — Knocklyon next. Balbriggan is ok
+
+- Trainer 1.61.46 is working.
+- Balbriggan harvest 41450529846 ok. Date box empty. Do not pin the wixmp token URL.
+- Ok count on main is 385. Saturday was 392.
+- Knocklyon PR 454 merged. Harvest 41451807474 sent. Proved Sunday 1st November media/11553 application/pdf 862623 bytes. Not ok until parish_status says so.
+- Not checked on parishpress.ie.
+- Reload the extension at chrome://extensions. site_memory.js changed.
+
+## 02/11/2026 — Balbriggan next from the 29/10 directory list
+
+- Balbriggan was skipped. Real site https://www.balbrigganparish.com/bulletin. Proved 25/10/2026 PDF. PR 453. Harvest 41450529846 ok.
+
+## 01/11/2026 — 42 Dublin and Tuam bulletins were still thrown out
 
 - Saturday had 392 ok. The rerun 41313748997 finished at 344.
 - 43 files dated 25/10/2026 were kept. 42 more, all Dublin or Tuam, were still rejected with that same date.
