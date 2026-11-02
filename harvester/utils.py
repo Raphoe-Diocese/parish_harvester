@@ -790,27 +790,35 @@ def yearless_slug_date(
     the harvest Sunday), try the previous year — so a 04/01 harvest still
     reads '28th-December' as last December, not next December.
     A 14-day window treated Sunday-29th-Sept.pdf on 18/09 as 29/09/2026.
+
+    Weekend spans such as Newsletter-31st-October-1st-November.pdf keep the
+    later day (the Sunday) — found 02/11/2026, balallyparish.
     """
     raw = unquote(text or "")
-    m = _YEARLESS_SLUG_RE.search(raw)
-    if m:
+    candidates: list[date] = []
+    for m in _YEARLESS_SLUG_RE.finditer(raw):
         month = _MONTH_MAP.get(m.group(2).lower())
-        day = int(m.group(1))
-    else:
+        if not month:
+            continue
+        try:
+            candidates.append(date(assume_year, month, int(m.group(1))))
+        except ValueError:
+            continue
+    if not candidates:
         flipped = _MONTH_THEN_ORDINAL_RE.search(raw)
         if not flipped:
             return None
         month = _MONTH_MAP.get(flipped.group(1).lower())
-        day = int(flipped.group(2))
-    if not month:
-        return None
-    try:
-        candidate = date(assume_year, month, day)
-    except ValueError:
-        return None
+        if not month:
+            return None
+        try:
+            candidates.append(date(assume_year, month, int(flipped.group(2))))
+        except ValueError:
+            return None
+    candidate = max(candidates)
     if near is not None and (candidate - near).days > 7:
         try:
-            return date(assume_year - 1, month, int(m.group(1)))
+            return date(assume_year - 1, candidate.month, candidate.day)
         except ValueError:
             return candidate
     return candidate

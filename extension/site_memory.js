@@ -626,12 +626,16 @@
         "01/11/2026: keep last Sunday's file for the whole target week. The Sunday-only clock check still dropped 42 Dublin and Tuam files dated 25/10/2026. Two weeks behind stays stale. When both Sundays are listed, this Sunday still wins. A distance of 0 days was treated as missing, so last Sunday was picked instead.",
         "02/11/2026 Knocklyon: /news/weekly-newsletters/ lists Sunday rows. The PDF is /download/media/NNNN/ with no date in the path. Newest is at the top. Content-Disposition carries Sunday 1st November.pdf. Do not pin the media id.",
         "02/11/2026 Dromod: dromodparish.ie/churches/parish-newsletter/ has Dromod-1st-November-Newsletter.pdf. Certificate expired — ignore_https_errors. Do not pin the dated name or the old Kerry diocese 4 October file.",
+        "02/11/2026 Balally: open /category/parish-newsletters/ then the top balally-parish-newsletter post. PDF name is Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Later day wins. Folder year is junk.",
+        "02/11/2026 Killarney: killarneyparish.com/parish-newsletter/ has Newsletter-November-2nd-2026.pdf. Do not pin. Prefer the parish site over the Kerry diocese card.",
       ],
       do_not: [
         "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) — it breaks next week.",
         "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
         "Do not pin /download/media/NNNN/ on Knocklyon.",
         "Do not leave Dromod on the Kerry diocese card while dromodparish.ie has a newer newsletter.",
+        "Do not scrape only Balally homepage — PDFs are on the dated posts.",
+        "Do not leave Killarney on a pinned Kerry diocese October file.",
       ],
     },
   };

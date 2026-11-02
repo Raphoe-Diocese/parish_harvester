@@ -1,4 +1,13 @@
-﻿## 02/11/2026 — Dromod date fix. Right PDF, wrong day
+﻿## 02/11/2026 — Keep going: Balally + Killarney + Dromod date
+
+- Standing order: do not stop between harvests. Permission only for merge/dispatch walls.
+- Balally failed: homepage scrape missed. Category post has Newsletter-31st-October-1st-November.pdf (2551493 bytes). Weekend name → 01/11. Folder /2020/06/ is junk year.
+- Killarney retarget from pinned diocese Oct file to killarneyparish.com Newsletter-November-2nd-2026.pdf.
+- Yearless reader: take later day in a weekend span; do not trust ancient upload folder years.
+- Dromod re-harvest 41462822121 was still running when this note was written.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Dromod date fix. Right PDF, wrong day
 
 - Dromod harvest 41460617752 got Dromod-1st-November-Newsletter.pdf then marked stale as 01/10/2026. The /uploads/2026/10/ folder plus the "1" in 1st made that date.
 - Fix: yearless month name in the filename wins before that day guess. Test added. Re-harvest after merge.
