@@ -1,4 +1,12 @@
-﻿## 02/11/2026 — Cherry Orchard ok. City Quay next
+﻿## 02/11/2026 — City Quay failed page cap. Fix then next host
+
+- City Quay harvest 41455376833 failed: Too many pages 8 (max 4). print_to_pdf worked. max_bulletin_pages 12 on the fix branch.
+- Cherry Orchard still ok. Ok count 387. Saturday was 392.
+- Rathmore directory host has Parish-Bulletin-1st-November-2026.pdf. Recipe already ok via MCN 01/11/2026. Twin. Do not add a second recipe.
+- Beaufort archives stop at 2017. Lucan site has no bulletin links. Ligoniel PDF is May 2022.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Cherry Orchard ok. City Quay next
 
 - Cherry Orchard harvest 41453959584 ok. File 31st-Sunday-2026.pdf. Date box empty. Ok count on main is 387. Saturday was 392.
 - Next: cityquayparish.com/newsletter. Was skipped on the Dublin card. Top Newsletter title is Feast of All Saints, body 1st of November. print_to_pdf. Do not click Remembering or Reflection.
