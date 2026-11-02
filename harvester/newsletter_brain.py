@@ -837,7 +837,9 @@ def choose(candidates: list[Candidate], target: date, body_text: str = "") -> Ca
         pairs.sort(
             key=lambda pair: (
                 2 if _SIDE_PDF_RE.search(pair[0].url) else 1 if pair[0].strategy_id == "dated_bulletin_post" else 0,
-                abs(pair[1].days_from_target or 99),
+                abs(pair[1].days_from_target)
+                if pair[1].days_from_target is not None
+                else 99,
             )
         )
         return pairs[0][0]
