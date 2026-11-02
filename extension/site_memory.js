@@ -141,6 +141,7 @@
         "29/10/2026 Clonleigh: start on the homepage, not /category/newsletter/ (that listing lagged a week). Click top Strabane Pastoral Area Newsletter, then print_to_pdf. Publish day can be Sunday, not only Saturday.",
         "29/10/2026 Ballybrack-Killiney: start on news.html, click top Newsletter title (24th & 25th October), print_to_pdf. Do not pin last week's article URL.",
         "29/10/2026 Achonry-Mullinabreena: NEWS.aspx ASP.NET list → click top Parish Newsletter (ArticleDetail) → print_to_pdf. Do not pin articleid. Do not scrape achonrydiocese.org parish card (admin/wrong file).",
+        "02/11/2026 City Quay: cityquayparish.com/newsletter (Squarespace). Click the top title that starts with Newsletter (All Saints 01/11/2026 proved). Skip Remembering and Reflection. print_to_pdf + skip_listing_nav. Do not pin the random post slug.",
       ],
       do_not: [
         "Do not use Pick bulletin image when the page is mostly text paragraphs.",
@@ -148,6 +149,7 @@
         "Do not train only on /category/newsletter/ when the homepage already shows a newer post.",
         "Do not pin a dated /news/newsletter-… URL.",
         "Do not pin ArticleDetail.aspx?articleid=… on ASP.NET parish news lists.",
+        "Do not print City Quay Remembering or Reflection posts as the weekly newsletter.",
       ],
     },
     dated_pdf_bulletin: {

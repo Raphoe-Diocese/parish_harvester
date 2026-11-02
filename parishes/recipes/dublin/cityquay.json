@@ -1,19 +1,48 @@
 {
+  "version": 2,
   "parish_key": "cityquay",
   "display_name": "City Quay",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.dublindiocese.ie/parish/city-quay/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG.",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://cityquayparish.com/newsletter",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 90000,
+  "total_timeout_s": 250,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dublindiocese.ie/parish/city-quay/"
+      "url": "https://cityquayparish.com/newsletter"
+    },
+    {
+      "action": "click",
+      "selector": "a:has-text('Newsletter')",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='/newsletter/newsletter-']",
+        "a[href*='/newsletter/']"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "02/11/2026: directory site is cityquayparish.com (Squarespace). The Dublin card had no website, so the recipe was skipped.",
+    "Weekly list is /newsletter. Click the top title that starts with Newsletter (not Remembering, not Reflection). Then print_to_pdf with skip_listing_nav.",
+    "Proved Newsletter Feast of All Saints → /newsletter/kwlcz27c9d2ag9p0uvpuprxoycjxgp. Body says 1st of November. HTTP 200, ~5k chars of newsletter text. Do not pin the random slug.",
+    "Also listed Newsletter 30th Sunday (25/10/2026). Cover art JPEGs are not the bulletin."
+  ],
+  "do_not": [
+    "Do not pin /newsletter/kwlcz… or other dated/random post slugs.",
+    "Do not print Remembering or Reflection posts as the weekly newsletter.",
+    "Do not use the Dublin diocese card as the bulletin page.",
+    "Do not harvest the small sunday_art / appsundayart cover images as the bulletin."
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }

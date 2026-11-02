@@ -1,4 +1,11 @@
-﻿## 02/11/2026 — Knocklyon ok. Cherry Orchard next
+﻿## 02/11/2026 — Cherry Orchard ok. City Quay next
+
+- Cherry Orchard harvest 41453959584 ok. File 31st-Sunday-2026.pdf. Date box empty. Ok count on main is 387. Saturday was 392.
+- Next: cityquayparish.com/newsletter. Was skipped on the Dublin card. Top Newsletter title is Feast of All Saints, body 1st of November. print_to_pdf. Do not click Remembering or Reflection.
+- Ligoniel Wix PDF is May 2022. Leave it. Gardiner Street weekly pages are HTML text for 25/10/2026, no parish key yet. cregganchapel.com DNS fail.
+- Not checked on parishpress.ie.
+- Reload the extension after the City Quay merge.
+## 02/11/2026 — Knocklyon ok. Cherry Orchard next
 
 - Balbriggan harvest 41450529846 ok. Knocklyon harvest 41451807474 ok. Ok count on main is 386. Saturday was 392. Date box empty on both.
 - Next missing host: cherryorchardparish.com. Was skipped on the Dublin card. Real list https://cherryorchardparish.com/2026/09/12/newsletters/. Proved 31st-Sunday-2026.pdf application/pdf 708528 bytes. Body has November Lists, Remembrance next Saturday 7 November, First Communion prep next Sunday 8 November.
