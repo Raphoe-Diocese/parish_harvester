@@ -2747,25 +2747,29 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/balally.json",
       "recipe": {
-        "start_url": "https://www.balallyparish.ie/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
+        "start_url": "https://www.balallyparish.ie/category/parish-newsletters/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
         "operator_notes": [
-          "03/10/2026 cloud hunt: proved GET 200 pdf 1355384 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename. Folder /2020/06/ is not the bulletin date. Date is in the filename."
+          "02/11/2026: homepage http_scrape missed \u2014 PDFs sit on dated posts, not the home page.",
+          "Category /category/parish-newsletters/ top post is balally-parish-newsletter-31st-october-1st-november-2026. PDF Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Proved application/pdf 2551493 bytes %PDF-1.4.",
+          "Date is the later day in the weekend name (1 November). Folder 2020 is not the bulletin year. Do not pin the filename."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
+          "Do not pin Newsletter-31st-October-1st-November.pdf.",
+          "Do not scrape only the homepage \u2014 open the newest balally-parish-newsletter post.",
+          "Do not treat /uploads/2020/06/ as the bulletin date.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -22831,26 +22835,27 @@
       "diocese": "kerry",
       "recipe_file": "parishes/recipes/kerry/killarney.json",
       "recipe": {
-        "start_url": "https://www.dioceseofkerry.ie/parish/killarney/",
+        "start_url": "https://www.killarneyparish.com/parish-newsletter/",
         "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "02/10/2026: newsletter PDF is on the Kerry diocese parish card. Proved GET 200 application/pdf. Do not pin the dated filename."
+          "02/11/2026: directory site is killarneyparish.com. Old recipe pinned a Kerry diocese October file (status was 26/10/2026).",
+          "Weekly list is /parish-newsletter/. Newest is Newsletter-November-2nd-2026.pdf. Proved application/pdf 472585 bytes %PDF-1.7. Certificate verify can fail \u2014 ignore_https_errors. Do not pin the dated name."
         ],
         "do_not": [
-          "Do not pin the dated PDF.",
-          "Do not use the diocese Facebook page as this parish link.",
-          "Do not harvest Facebook."
+          "Do not pin Newsletter-November-2nd-2026.pdf.",
+          "Do not use the Kerry diocese card while killarneyparish.com has a newer newsletter.",
+          "Do not drop ignore_https_errors while the host certificate fails verify."
         ],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
