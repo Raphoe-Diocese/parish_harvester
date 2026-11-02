@@ -606,10 +606,12 @@
         "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
         "29/10/2026 Baldoyle/Ballinteer: pinned 18 Oct downloads went stale while 25 Oct files were already listed — prefer http_scrape_newest_pdf; never pin the download URL.",
         "01/11/2026: keep last Sunday's file for the whole target week. The Sunday-only clock check still dropped 42 Dublin and Tuam files dated 25/10/2026. Two weeks behind stays stale. When both Sundays are listed, this Sunday still wins. A distance of 0 days was treated as missing, so last Sunday was picked instead.",
+        "02/11/2026 Knocklyon: /news/weekly-newsletters/ lists Sunday rows. The PDF is /download/media/NNNN/ with no date in the path. Newest is at the top. Content-Disposition carries Sunday 1st November.pdf. Do not pin the media id.",
       ],
       do_not: [
         "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) — it breaks next week.",
         "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+        "Do not pin /download/media/NNNN/ on Knocklyon.",
       ],
     },
   };

@@ -1,19 +1,41 @@
 {
+  "version": 2,
   "parish_key": "knocklyon",
   "display_name": "Knocklyon",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.dublindiocese.ie/parish/knocklyon/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG.",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://www.knocklyonparish.ie/news/weekly-newsletters/",
+  "site_type": "pdf_download_list",
+  "playbook_type": "pdf_download_list",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dublindiocese.ie/parish/knocklyon/"
+      "url": "https://www.knocklyonparish.ie/news/weekly-newsletters/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/download/media/']",
+      "pick_strategy": "first_match",
+      "fallback_selectors": [
+        "a[href*='download/media']"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "02/11/2026: directory site is knocklyonparish.ie. The Dublin card had no website, so the recipe was skipped.",
+    "Weekly list is /news/weekly-newsletters/. Newest file is at the top. Date is in the row text and in Content-Disposition, not in the /download/media/NNNN/ path.",
+    "Proved Sunday 1st November → /download/media/11553/ GET 200 application/pdf 862623 bytes %PDF-1.5. Content-Disposition filename Sunday 1st November.pdf.",
+    "Also proved Sunday 25th October → /download/media/11551/ application/pdf 1386511 bytes. Do not pin the media id."
+  ],
+  "do_not": [
+    "Do not pin /download/media/NNNN/.",
+    "Do not use the Dublin diocese card as the bulletin page.",
+    "Do not harvest the seasonal Knocklyon News magazine instead of the weekly newsletter."
+  ]
 }
