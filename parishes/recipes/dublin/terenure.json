@@ -3,44 +3,48 @@
   "parish_key": "terenure",
   "display_name": "Terenure",
   "diocese": "dublin",
-  "start_url": "https://www.stjosephsterenure.com/",
-  "site_type": "wp_json_newest_media",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://stjosephsterenure.com/",
+  "site_type": "http_scrape_newest_images",
+  "playbook_type": "html_text_bulletin",
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
+  "timeout_ms": 90000,
+  "total_timeout_s": 250,
+  "example_url": "https://stjosephsterenure.com/wp-content/uploads/2026/10/IMG_20261025_123738_resized_20261025_123814477.jpg",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stjosephsterenure.com/"
+      "url": "https://stjosephsterenure.com/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='newsletter-sunday-']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='newsletter-sunday']"
+      ]
+    },
+    {
+      "action": "image_stack",
+      "count": 1,
+      "prefer": "largest",
+      "selector": "img[src*='/uploads/2026/']",
+      "min_long_side": 400
     }
   ],
   "operator_notes": [
-    "05/10/2026 Dublin leftover hunt: weekly PDF in wp-json media as NLYYYY-MM-DD.pdf. Homepage newsletter links are diocesan safeguarding sheets.",
-    "Proved NL2026-09-27.pdf GET 200 application/pdf 1230623 bytes magic %PDF. Date 27/09/2026 (accepted weekend file).",
-    "Skip JPEG previews. Do not pin the dated filename."
+    "02/11/2026: was stale on 18/10 NL PDF via wp-json. Site now posts photo newsletters. Top home link newsletter-sunday-25th-october-2026.",
+    "Proved IMG_20261025… full JPEG GET 200 image/jpeg 556641 bytes. Previous Sunday keep. Do not pin the image name. Skip diocese safeguarding PDFs."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
-    "Do not harvest Facebook."
+    "Do not pin IMG_20261025….jpg.",
+    "Do not harvest diocese safeguarding / CSPS PDFs from the homepage.",
+    "Do not keep wp_json NL*.pdf while the Sunday posts are photo bulletins."
   ],
   "bulletin_layout": {
-    "strategy": "newest_dated",
+    "strategy": "first_match",
     "position": "top"
   },
-  "href_patterns": [
-    ".pdf",
-    "NL20"
-  ],
-  "href_skip_patterns": [
-    "jpg",
-    "jpeg",
-    "png",
-    "-300x",
-    "-1024x",
-    "-150x",
-    "safeguarding",
-    "synod",
-    "child"
-  ]
+  "bulletin_format": "image_stack"
 }
