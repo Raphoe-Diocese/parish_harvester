@@ -478,6 +478,18 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(july_verdict.status, "stale")
         self.assertEqual(july_verdict.extracted_date, date(2026, 7, 5))
 
+    def test_wp_uploads_yearless_month_name_beats_folder_day(self) -> None:
+        # dromodparish.ie uploaded Dromod-1st-November-Newsletter.pdf under
+        # /uploads/2026/10/. slug_day used to take "1" from "1st" → 01/10/2026.
+        url = (
+            "https://dromodparish.ie/wp-content/uploads/2026/10/"
+            "Dromod-1st-November-Newsletter.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 11, 1))
+        verdict = check_bulletin_freshness(url, date(2026, 11, 1))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+
     def test_d_m_yy_oneweb_filenames_are_dated(self) -> None:
         target = date(2026, 8, 16)
         limavady = "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf"

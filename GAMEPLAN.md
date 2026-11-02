@@ -1,4 +1,11 @@
-﻿## 02/11/2026 — City Quay ok. Dromod next
+﻿## 02/11/2026 — Dromod date fix. Right PDF, wrong day
+
+- Dromod harvest 41460617752 got Dromod-1st-November-Newsletter.pdf then marked stale as 01/10/2026. The /uploads/2026/10/ folder plus the "1" in 1st made that date.
+- Fix: yearless month name in the filename wins before that day guess. Test added. Re-harvest after merge.
+- City Quay still ok. Ok count 388. Saturday was 392.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — City Quay ok. Dromod next
 
 - City Quay re-harvest 41456809571 ok after max_bulletin_pages 12. Ok count on main is 388. Saturday was 392.
 - Milltown/Listry directory host is a twin of milltownkerry (already ok 25/10/2026). Rathmore twin of MCN. Killarney parish site has Newsletter-November-2nd-2026.pdf while status is still 26/10 via diocese — park unless Frank wants a retarget.

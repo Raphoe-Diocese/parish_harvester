@@ -229,6 +229,13 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             liturgical = liturgical_date_from_text(basename, folder_year)
             if liturgical:
                 return liturgical
+            # Yearless "Dromod-1st-November-Newsletter.pdf" under /uploads/2026/10/
+            # — month name is November, not the upload folder. Without this,
+            # slug_day below takes the "1" from "1st" and returns 2026-10-01
+            # (found 02/11/2026, dromod harvest 41460617752).
+            yearless = yearless_slug_date(basename, folder_year)
+            if yearless:
+                return yearless
             # UUID/hash scans (Iskaheen) have no day-of-month. Do not let
             # slug_day pick a hex digit out of the hash; freshness then
             # treats same-month hashes as current-month.
