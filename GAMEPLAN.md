@@ -1,4 +1,14 @@
-﻿## 02/11/2026 — Dromod ok 389. Crumlin + Donore next
+﻿## 02/11/2026 — Ok 395. Tubbercurry + Gorey + Baldoyle/Ballinteer Nov
+
+- Howth + Terenure ok. Ok count 395. Rathdrum recipe on main (/newsletter/ Oct 25 images) — re-harvest 41471047331 running after hung cancel.
+- Baldoyle listing now has Newsletter-1st-November.pdf. Ballinteer Sunday_Message_20261101.pdf on Sunday-Message.htm. Re-harvests dispatched (recipes already http_scrape).
+- Tubbercurry: Nov 1 PDF is in /2026/10/ not /2026/11/. predicted_dated_pdf from that example.
+- Gorey: /images/Newsletter_DDMMYY-ParishOffice.jpg missed by http_scrape_newest_images — switch to image_stack Playwright.
+- Honest stale: Sallynoggin newest Bulletin 11 Oct; Kilnamanagh/Beechwood still 18 Oct; Ballygall still 25 Oct.
+- Not checked on parishpress.ie.
+- Reload extension after this merge (site_memory).
+
+## 02/11/2026 — Dromod ok 389. Crumlin + Donore next
 
 - Dromod ok 01/11/2026 after date fix. Ok count 389. Saturday was 392.
 - Balally + Killarney PR 460 merged. Harvests running.

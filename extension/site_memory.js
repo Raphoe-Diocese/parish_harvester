@@ -183,10 +183,12 @@
         "Listing HTML scrape looks empty. Live DOM has Sunday, Dth Month YYYY → /pdf/DDMMYY.pdf.",
         "Save this PDF. Harvester rewrites DDMMYY each Sunday (predicted_dated_pdf).",
         "Prefer HTTP if HTTPS TLS fails (Tempo / Pobal).",
+        "02/11/2026 Tubbercurry: 1st-November-2026.pdf was uploaded into /2026/10/, not /2026/11/. Keep example_url on the real upload folder or predicted_dated_pdf invents a 404 month folder.",
       ],
       do_not: [
         "Do not skip because news.html looks empty.",
         "Do not pin one week's filename.",
+        "Do not rewrite the WordPress /YYYY/MM/ folder to the bulletin month when the file still lives in the upload month.",
       ],
     },
     js_overwritten_html_newsletter: {
@@ -478,8 +480,13 @@
       label: "Newsletter JPG on the category page",
       operator_notes: [
         "31/10/2026 Durrow category has newsletter-25-oct-2026.jpg. Skip the resized copy.",
+        "02/11/2026 Gorey: /images/Newsletter_DDMMYY-ParishOffice.jpg is not wp-content/uploads. http_scrape_newest_images misses it — use site_type image_stack + Playwright selector img[src*='Newsletter_'].",
       ],
-      do_not: ["Do not pin the dated filename.", "Do not take the 300px resized copy."],
+      do_not: [
+        "Do not pin the dated filename.",
+        "Do not take the 300px resized copy.",
+        "Do not leave Gorey on http_scrape_newest_images — that path never opens the browser for /images/ hosts.",
+      ],
     },
     yy_mm_d_pdf: {
       playbook_type: "pdf_download_list",
