@@ -1,4 +1,11 @@
-﻿## 02/11/2026 — Ok 399. Rathdrum flat uploads + Killenaule Nov
+﻿## 02/11/2026 — Ok 404. Mohill Nov via wp-json pages
+
+- Rathowen + Edgeworthstown ok 01/11. Ok count 404. Mohill still printed 25/10 — /newsletter/ HTML archive lags; pages API has newsletter-1st-november-2026.
+- Fix: start_url wp-json pages search; http_scrape_newest_html accepts JSON.
+- Armagh/Termon still timeout with Nov 1 URLs on file — park CI hang; do not spam.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Ok 399. Rathdrum flat uploads + Killenaule Nov
 
 - Tubbercurry + Gorey + Baldoyle + Ballinteer ok. Ok count 399.
 - Rathdrum timed out: HTTP image scrape only saw /YYYY/MM/ uploads. Real files are flat /uploads/Newsletter-Sunday-*.jpg. Fix scrape + skip -NxN-1 thumbs; keep -scaled.

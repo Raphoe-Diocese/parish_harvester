@@ -5260,7 +5260,14 @@ async def replay_recipe(
             if not listing_result:
                 continue
             listing_body, listing_headers = listing_result
-            if "text/html" not in (listing_headers.get("content-type") or "").lower():
+            content_type = (listing_headers.get("content-type") or "").lower()
+            # Mohill 02/11/2026: /newsletter/ HTML archive lags; wp-json/pages
+            # already has newsletter-1st-november-2026. Accept JSON listings.
+            if (
+                "text/html" not in content_type
+                and "json" not in content_type
+                and "javascript" not in content_type
+            ):
                 continue
             listing_html = listing_body.decode("utf-8", errors="ignore")
             listing_fetched_from = candidate
