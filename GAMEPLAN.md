@@ -1,4 +1,10 @@
-﻿## 02/11/2026 — Armagh + Termon predicted fast-fail
+﻿## 02/11/2026 — Armagh/Termon: PDF start_url skips listing hang
+
+- Predicted found Nov 1 then `_challenge_pin_against_listing` hung on /parish-bulletin/ and /bulletins/. Set start_url to the PDF itself.
+- Ok still 408 until re-harvest.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Armagh + Termon predicted fast-fail
 
 - Ok 408. Armagh/Termon already found Nov 1 PDFs then hung. Switch both to predicted_dated_pdf + total_timeout_s 90.
 - Not checked on parishpress.ie.

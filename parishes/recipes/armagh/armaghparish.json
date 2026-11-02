@@ -1,9 +1,9 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "armaghparish",
   "display_name": "Armagh",
   "diocese": "armagh",
-  "start_url": "https://armaghparish.net/parish-bulletin/",
+  "start_url": "https://armaghparish.net/wp-content/uploads/2026/09/1st-November.pdf",
   "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "November",
@@ -16,17 +16,17 @@
   "example_url": "https://armaghparish.net/wp-content/uploads/2026/09/1st-November.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://armaghparish.net/parish-bulletin/"
+      "action": "download",
+      "url": "https://armaghparish.net/wp-content/uploads/2026/09/1st-November.pdf"
     }
   ],
   "operator_notes": [
-    "02/11/2026: http_scrape + Playwright hung past total timeout after finding 1st-November.pdf under the September upload folder. Prefer predicted_dated_pdf from that working example; keep total_timeout_s 90 so a miss fails fast."
+    "02/11/2026: predicted PDF under /2026/09/ worked, then _challenge_pin_against_listing hung on /parish-bulletin/. start_url must be the PDF itself so the listing challenge is skipped."
   ],
   "do_not": [
-    "Do not pin 1st-November.pdf.",
-    "Do not force the WordPress folder month to November — upload folder can stay /2026/09/.",
-    "Do not open a long Playwright scrape on this host."
+    "Do not set start_url to /parish-bulletin/ — listing challenge hangs.",
+    "Do not pin 1st-November.pdf forever — predicted_dated_pdf rewrites the date.",
+    "Do not force the WordPress folder month to November."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
