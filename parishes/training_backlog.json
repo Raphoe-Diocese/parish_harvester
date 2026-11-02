@@ -2,16 +2,16 @@
   "generated_at": "2026-11-02",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 405,
+    "downloaded": 406,
     "html_links": 0,
     "skipped": 770,
-    "failed": 86,
+    "failed": 85,
     "stale_rejected": 54
   },
   "action_counts": {
-    "ok": 428,
+    "ok": 429,
     "skip": 778,
-    "investigate": 68
+    "investigate": 67
   },
   "parishes": [
     {
@@ -11612,10 +11612,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: 'NoneType' object has no attribute 'group'",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: 'NoneType' object has no attribute 'group'"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "clonmelstoliverplunkett",
@@ -28337,7 +28337,7 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/mohill.json",
       "recipe": {
-        "start_url": "https://mohillparish.ie/newsletter/",
+        "start_url": "https://mohillparish.ie/wp-json/wp/v2/pages?per_page=15&search=newsletter&orderby=date&order=desc",
         "site_type": "http_scrape_newest_html",
         "playbook_type": "html_text_bulletin",
         "status": "",
@@ -28347,18 +28347,17 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "29/10/2026: Playwright click on /newsletter/ timed out (selectors never matched in headless). Plain HTTP listing HTML still has newsletter-* links; newest by date is newsletter-25th-october-2026 (WP pages API agrees).",
-          "29/10/2026 harvest: found the page then Too many pages 6 (max 4) \u2014 print path ignored max_bulletin_pages 8. Fixed _print_brain_html to honour the recipe ceiling.",
-          "site_type:http_scrape_newest_html scores newsletter- slugs over HTTP then print_to_pdf. Listing order is not newest-first \u2014 do not use first_match.",
+          "02/11/2026: /newsletter/ HTML archive still tops out at 25 Oct. WP pages API already has newsletter-1st-november-2026 (published 02/11). Prefer wp-json pages search as start_url; http_scrape_newest_html accepts JSON.",
+          "29/10/2026: Playwright click on /newsletter/ timed out. Plain HTTP listing lagged. print_to_pdf + skip_listing_nav. max_bulletin_pages 8.",
           "Page text includes Mohill + Fenagh + Gortletteragh \u2014 harvest once here."
         ],
         "do_not": [
           "Do not harvest Fenagh or Gortletteragh separately from this file.",
-          "Do not pin newsletter-27th-september-2026 or any dated newsletter slug.",
-          "Do not rely on Playwright click of a[href*='newsletter-'] on this archive \u2014 it times out in harvest.",
+          "Do not pin newsletter-25th-october-2026 or newsletter-1st-november-2026.",
+          "Do not rely on the /newsletter/ HTML archive alone \u2014 it lags the WP pages API.",
           "Do not remove skip_listing_nav."
         ],
-        "recorded_date": "2026-10-29"
+        "recorded_date": "2026-11-02"
       },
       "bulletin_format": "html",
       "learned_pattern": "",
