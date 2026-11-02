@@ -1,9 +1,31 @@
-﻿## 01/11/2026 — 42 Dublin and Tuam bulletins were still thrown out
+﻿## 02/11/2026 — The other agent's parish list was queued, not added
+
+- The ok count is bulletins saved, not new parishes. Saturday was 392. After the Sunday throw-out it was 344. Tuam brought it to 359. Dublin harvest 41439420816 was still running when this was written.
+- Pasted 29/10/2026 from the cloud search. Not added as new parishes. 382 already had a recipe website and were not ok. 15 were churchservices webcam pages. 542 still had no parish website. 339 were already ok. 38 share one bulletin and were left out.
+- 37 directory websites were not in the records. Checked the recipe files on 02/11/2026. 30 hosts are still not in any recipe. Seven hosts already appear: clonesparish.ie and errigaltruparish.com are the dead names inside existing recipes. stbrendansparishtralee.net, corrandullachurch.com, balla.ie, islandeady.ie, and tocharvalley.com are in recipes.
+- The 30 still missing, not opened again today: sppd.ie, northsideparishes.ie/clogheen-kerry-pike, cregganchapel.com, dungivenparish.com, derriaghycatholicparish.org, staroftheseakillyleagh.com, stmarysportglenone.co.uk, saintanthony.co.uk, stmichaelthearchangel.godaddysites.org, stteresasparish.com, saintvincentdepaulligoniel.co.uk, balbrigganparish.com, cherryorchardparish.com, cityquayparish.com, stmartin.ie, dublinoratory.com, knocklyonparish.ie, lucanparish.com, gardinerstchurch.ie, stmartinsparish.ie, ptrav.ie, standrews.ie, beaufort-parish.com, dromodparish.ie, killarneyparish.com, listowelparish.com, milltownlistryparish.com, rathmoreparish.ie, stmarystarbert.com, knockshrine.ie.
+- 11 Kerry card files were listed for Allihies, Ballybunion, Ballyheigue, Castlemaine, Dingle, Duagh, Fossa, Moyvane, Our Lady and St Brendan's, and Tuosist. Not pinned. Not checked again today.
+- Still to hunt, not done today: Ardboe Canva page, Gartan/Termon Drive file (was stale 18/10/2026), Burt Drive folder (no status row). Ballintubber Abbey and Killawalla had no parish key. Not added.
+- Webcam dig: recipes were not edited. Those JSON files are not in this checkout. Not re-checked today.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Dublin and Tuam sent again so last Sunday's files stay
+
+- Saturday had 392 ok. The Sunday rerun 41313748997 finished at 344.
+- 43 files dated 25/10/2026 were kept. 42 more, all Dublin or Tuam, were still thrown out with that same date.
+- The keep-last-Sunday fix is on main. PR 449 merged 02/11/2026. Commit 336cbbcb.
+- This Sunday still wins when both weeks are listed. A distance of 0 days was treated as missing, so last Sunday was picked instead.
+- Dublin harvest 41439420816 is still running.
+- Tuam harvest 41439426320 finished. parish_status generated 02/11/2026 11:56 UTC. Ok went from 344 to 359. Tuam gained 15 and lost none. Fourteen were the 25/10/2026 files. Islandeady is now 01/11/2026. An Cnoc Indreabhán is ok with no date stored.
+- Not checked on parishpress.ie.
+- Reload the Chrome extension at chrome://extensions. site_memory.js changed.
+
+## 01/11/2026 — 42 Dublin and Tuam bulletins were still thrown out
 
 - Saturday had 392 ok. The rerun 41313748997 finished at 344.
 - 43 files dated 25/10/2026 were kept. 42 more, all Dublin or Tuam, were still rejected with that same date.
 - The clock check was the hole. Last Sunday's file now stays for the whole target week. Two weeks behind stays stale.
-- Not checked on parishpress.ie. Dublin and Tuam are not sent again until this is on main.
+- Not checked on parishpress.ie. Dublin and Tuam were waiting on the fix. That fix is on main now. The new runs are in the note above.
 
 ## 01/11/2026 — Sunday harvest found fewer bulletins
 

@@ -570,6 +570,7 @@
       operator_notes: [
         "Webcam first. Look on the same page for a real newsletter file.",
         "Else keep the parish website. Do not invent a PDF.",
+        "02/11/2026: the 29/10 cloud list is not done. 542 parishes had no website. 30 directory hosts are still not in any recipe. Do not invent a site for them.",
       ],
       do_not: [
         "Do not harvest the livestream as a bulletin.",
