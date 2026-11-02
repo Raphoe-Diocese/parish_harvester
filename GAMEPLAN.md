@@ -1,4 +1,10 @@
-﻿## 02/11/2026 — Ok 404. Mohill Nov via wp-json pages
+﻿## 02/11/2026 — Clonmel St Marys Nov PDF
+
+- Ok still 404 after Rathowen. Mohill wp-json harvest hung on print — cancelled; park.
+- Clonmel St Marys: /images/1st%20november%202026.pdf on newsletter list. Old recipe patterns only october/sept + NoneType.group crash. predicted_dated_pdf + ignore_https_errors.
+- Not checked on parishpress.ie.
+
+## 02/11/2026 — Ok 404. Mohill Nov via wp-json pages
 
 - Rathowen + Edgeworthstown ok 01/11. Ok count 404. Mohill still printed 25/10 — /newsletter/ HTML archive lags; pages API has newsletter-1st-november-2026.
 - Fix: start_url wp-json pages search; http_scrape_newest_html accepts JSON.

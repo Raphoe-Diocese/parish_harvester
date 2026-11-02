@@ -1,19 +1,22 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "clonmelstmarys",
   "display_name": "Clonmel - St. Mary's",
   "diocese": "waterford_and_lismore",
   "start_url": "https://stmarysparishclonmel.ie/newsletter",
-  "site_type": "http_scrape_newest_pdf",
+  "site_type": "predicted_dated_pdf",
+  "ignore_https_errors": true,
   "href_patterns": [
+    "november",
     "october",
-    "sept",
+    "images/",
     ".pdf"
   ],
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-11-02",
+  "example_url": "https://stmarysparishclonmel.ie/images/1st%20november%202026.pdf",
   "steps": [
     {
       "action": "goto",
@@ -21,10 +24,12 @@
     }
   ],
   "operator_notes": [
-    "05/10/2026 Waterford leftover hunt: /newsletter lists dated PDFs under /images/. Proved https://stmarysparishclonmel.ie/images/3rd%20october%202026.pdf GET 200 application/pdf 1429984 bytes magic %PDF-1.7. Link text 4th October 2026 Newsletter; filename date 03/10/2026. Do not pin the dated filename."
+    "02/11/2026: listing has /images/1st%20november%202026.pdf. Old href_patterns only october/sept so November was invisible; scrape also hit NoneType.group on some space filenames.",
+    "TLS cert expired — ignore_https_errors. Prefer predicted_dated_pdf from the working November example. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not pin a dated filename under /images/.",
+    "Do not pin 1st november 2026.pdf.",
+    "Do not leave href_patterns stuck on october/sept only.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
