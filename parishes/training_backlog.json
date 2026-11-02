@@ -4,14 +4,14 @@
   "summary": {
     "downloaded": 388,
     "html_links": 0,
-    "skipped": 771,
-    "failed": 98,
+    "skipped": 770,
+    "failed": 99,
     "stale_rejected": 58
   },
   "action_counts": {
     "ok": 415,
-    "skip": 779,
-    "investigate": 80
+    "skip": 778,
+    "investigate": 81
   },
   "parishes": [
     {
@@ -10383,27 +10383,37 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/cityquay.json",
       "recipe": {
-        "start_url": "https://www.dublindiocese.ie/parish/city-quay/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://cityquayparish.com/newsletter",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "02/11/2026: directory site is cityquayparish.com (Squarespace). The Dublin card had no website, so the recipe was skipped.",
+          "Weekly list is /newsletter. Click the top title that starts with Newsletter (not Remembering, not Reflection). Then print_to_pdf with skip_listing_nav.",
+          "Proved Newsletter Feast of All Saints \u2192 /newsletter/kwlcz27c9d2ag9p0uvpuprxoycjxgp. Body says 1st of November. HTTP 200, ~5k chars of newsletter text. Do not pin the random slug.",
+          "Also listed Newsletter 30th Sunday (25/10/2026). Cover art JPEGs are not the bulletin."
+        ],
+        "do_not": [
+          "Do not pin /newsletter/kwlcz\u2026 or other dated/random post slugs.",
+          "Do not print Remembering or Reflection posts as the weekly newsletter.",
+          "Do not use the Dublin diocese card as the bulletin page.",
+          "Do not harvest the small sunday_art / appsundayart cover images as the bulletin."
+        ],
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: \u274c Too many pages: 8 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: \u274c Too many pages: 8 pages (max 4)"
     },
     {
       "parish_key": "clanerathcoffey",
