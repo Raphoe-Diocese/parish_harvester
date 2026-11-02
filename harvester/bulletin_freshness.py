@@ -746,6 +746,13 @@ def issue_date_verdict(
                 and body_date is not None
                 and body_date > url_verdict.extracted_date
             ):
+                # A later notice must not replace this Sunday's filename.
+                # A this-Sunday heading still beats a previous-Sunday filename.
+                if (
+                    url_verdict.reason == "previous_sunday_still_current"
+                    and body_verdict.status == "fresh"
+                ):
+                    return body_verdict
                 return url_verdict
             return body_verdict
         return url_verdict

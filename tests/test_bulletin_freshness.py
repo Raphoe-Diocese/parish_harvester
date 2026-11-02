@@ -471,7 +471,8 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertIsNone(extract_bulletin_date(august))
         self.assertIsNone(extract_bulletin_date(july))
         august_verdict = check_bulletin_freshness(august, target)
-        self.assertEqual(august_verdict.status, "stale")
+        self.assertEqual(august_verdict.status, "fresh")
+        self.assertEqual(august_verdict.reason, "previous_sunday_still_current")
         self.assertEqual(august_verdict.extracted_date, date(2026, 8, 9))
         july_verdict = check_bulletin_freshness(july, target)
         self.assertEqual(july_verdict.status, "stale")
@@ -486,9 +487,12 @@ class BulletinFreshnessTests(unittest.TestCase):
             check_bulletin_freshness(limavady, target).status, "fresh"
         )
         self.assertEqual(extract_bulletin_date(claudy), date(2026, 8, 9))
-        self.assertEqual(check_bulletin_freshness(claudy, target).status, "stale")
-        self.assertNotEqual(
-            check_bulletin_freshness(claudy, target).reason, "within_grace_days"
+        self.assertEqual(
+            check_bulletin_freshness(claudy, target).status, "fresh"
+        )
+        self.assertEqual(
+            check_bulletin_freshness(claudy, target).reason,
+            "previous_sunday_still_current",
         )
 
     def test_ballymoney_yy_mm_dd_filename_is_this_week(self) -> None:
@@ -502,7 +506,11 @@ class BulletinFreshnessTests(unittest.TestCase):
             "https://www.ballymoneyparish.com/media/other/31871/26-08-16pdf.pdf"
         )
         self.assertEqual(extract_bulletin_date(old), date(2026, 8, 16))
-        self.assertEqual(check_bulletin_freshness(old, target).status, "stale")
+        self.assertEqual(check_bulletin_freshness(old, target).status, "fresh")
+        self.assertEqual(
+            check_bulletin_freshness(old, target).reason,
+            "previous_sunday_still_current",
+        )
         kilbrittain = "https://kilbrittainparish.ie/images/bulletin/26-11-1.pdf"
         self.assertEqual(extract_bulletin_date(kilbrittain), date(2026, 11, 1))
         october = "https://kilbrittainparish.ie/images/bulletin/26-10-18.pdf"
@@ -532,9 +540,10 @@ class BulletinFreshnessTests(unittest.TestCase):
         target = date(2026, 8, 16)
         self.assertEqual(extract_bulletin_date(post), date(2026, 8, 9))
         self.assertEqual(extract_bulletin_date(image), date(2026, 8, 9))
-        self.assertEqual(check_bulletin_freshness(post, target).status, "stale")
-        self.assertNotEqual(
-            check_bulletin_freshness(post, target).reason, "within_grace_days"
+        self.assertEqual(check_bulletin_freshness(post, target).status, "fresh")
+        self.assertEqual(
+            check_bulletin_freshness(post, target).reason,
+            "previous_sunday_still_current",
         )
         self.assertEqual(
             check_bulletin_freshness(
@@ -688,13 +697,16 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
     def test_html_article_slug_last_sunday_is_stale(self) -> None:
         # Ardara printed last week's HTML into the 06/09 mega because
         # sun-30th-august-26 was unknown (2-digit year refused by yearless).
+        # The date is now known. 30/08/2026 is the previous Sunday before
+        # 06/09/2026, so it stays fresh for that target week.
         url = (
             "https://ardara.ie/news/"
             "church-of-the-holy-family-newsletter-sun-30th-august-26/"
         )
         self.assertEqual(extract_bulletin_date(url), date(2026, 8, 30))
         verdict = check_bulletin_freshness(url, date(2026, 9, 6))
-        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "previous_sunday_still_current")
         self.assertEqual(verdict.extracted_date, date(2026, 8, 30))
 
     def test_weekend_range_double_underscore_slug_is_stale(self) -> None:
@@ -706,7 +718,8 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
         )
         self.assertEqual(extract_bulletin_date(url), date(2026, 8, 30))
         verdict = check_bulletin_freshness(url, date(2026, 9, 6))
-        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "previous_sunday_still_current")
 
     def test_plus_separated_yearless_september_is_fresh(self) -> None:
         url = (
@@ -732,7 +745,8 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
         )
         self.assertEqual(extract_bulletin_date(url), date(2026, 8, 30))
         verdict = check_bulletin_freshness(url, date(2026, 9, 6))
-        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "previous_sunday_still_current")
         self.assertEqual(verdict.extracted_date, date(2026, 8, 30))
 
     def test_ddmmyy_rewrite_moves_wordpress_month_folder(self) -> None:
