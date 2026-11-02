@@ -527,6 +527,20 @@
       ],
       do_not: ["Do not pin the dated filename."],
     },
+    nth_sunday_year_pdf: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Nth-Sunday-YYYY.pdf on a WordPress newsletters page",
+      operator_notes: [
+        "02/11/2026 Cherry Orchard: /2026/09/12/newsletters/ lists 31st-Sunday-2026.pdf at the top. Application/pdf 708528 bytes. Body has November Lists and next Sunday 8 November. Do not pin the Sunday number. Older weeks can sit in an old /uploads/ year folder.",
+      ],
+      do_not: [
+        "Do not pin Nth-Sunday-YYYY.pdf.",
+        "Do not leave Cherry Orchard on the Dublin diocese card when cherryorchardparish.com has newsletters.",
+      ],
+    },
     mayo_ie_newsletters: {
       playbook_type: "pdf_download_list",
       site_type: "http_scrape_newest_pdf",
