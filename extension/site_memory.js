@@ -314,11 +314,13 @@
       operator_notes: [
         "Wix /_files/ugd/ hashes have no date — the date is in the link text.",
         "Click newest_dated, then download. Never pin the hash.",
+        "02/11/2026 Balbriggan: /bulletin lists dated posts. Open the newest Parish Newsletter post, then click the file-upload Download PDF button ([data-hook=file-upload-viewer] button). The hash is not in an <a href> on the post. Do not pin it.",
       ],
       do_not: [
         "Do not pin a hashed /_files/ugd/ URL.",
         "Do not use http_scrape_newest_pdf on hashed Wix files.",
         "Do not download rota or vocations PDFs.",
+        "Do not leave Balbriggan on the Dublin diocese card when balbrigganparish.com/bulletin has a post.",
       ],
     },
     office_rtf_newsletter: {

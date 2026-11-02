@@ -1,19 +1,49 @@
 {
+  "version": 2,
   "parish_key": "balbriggan",
   "display_name": "Balbriggan",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.dublindiocese.ie/parish/balbriggan/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG.",
+  "recorded_date": "2026-11-02",
+  "start_url": "https://www.balbrigganparish.com/bulletin",
+  "site_type": "wix_html",
+  "playbook_type": "wix_html",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dublindiocese.ie/parish/balbriggan/"
+      "url": "https://www.balbrigganparish.com/bulletin"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/post/parish-newsletter']",
+      "pick_strategy": "newest_dated",
+      "fallback_selectors": [
+        "a[href*='/post/']"
+      ]
+    },
+    {
+      "action": "click",
+      "selector": "[data-hook='file-upload-viewer'] button",
+      "fallback_selectors": [
+        "button.FXLYF",
+        "button:has-text('Download PDF')"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "02/11/2026: directory site is balbrigganparish.com (Wix). The diocese card had no website, so the recipe was skipped.",
+    "Weekly list is /bulletin. Open the newest Parish Newsletter post. The PDF sits behind the file-upload Download PDF button, not an <a href>.",
+    "Proved post parish-newsletter-25th-october. File Balbriggan_Parish_Newsletter_24-25_Oct_2026_updated.pdf. GET application/pdf, 771448 bytes, %PDF-1.7. Date 25/10/2026. No 01/11/2026 post on the list.",
+    "The hashed /_files/ugd/ path changes each week. Do not pin it."
+  ],
+  "do_not": [
+    "Do not pin a hashed Wix /_files/ugd/ URL.",
+    "Do not use the Dublin diocese card as the bulletin page.",
+    "Do not leave skip true while balbrigganparish.com/bulletin has a newsletter post."
+  ]
 }
