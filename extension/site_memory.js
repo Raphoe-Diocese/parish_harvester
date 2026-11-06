@@ -403,11 +403,14 @@
         "31/10/2026 theparishioner proved 26-10-25.pdf and 26-11-01.pdf. Scrape the listing.",
         "The HTML article link is not the PDF.",
         "31/10/2026 onefaith newest proved file was 26-10-12.pdf. That is behind the 25/10 target.",
+        "06/11/2026: View the Newsletter still /images/newsletter/26-10-12.pdf (12/10/2026). Title October/November 2026 can lag the file — date the PDF, not the title.",
+        "Harvest once under barryroe; alias the other five OneFaith keys. http_scrape_newest_pdf — never print_to_pdf the HTML listing.",
       ],
       do_not: [
         "Do not pin YY-MM-DD.pdf.",
         "Do not print the HTML article as the bulletin.",
         "Do not call onefaith fresh while its newest PDF is 12/10/2026.",
+        "Do not invent a November date from the listing title alone.",
       ],
     },
     ddmmyyyy_listing_pdf: {
@@ -541,11 +544,13 @@
       recipe_flow: "direct_download",
       label: "Bantry family weekly PDF, harvest once",
       operator_notes: [
-        "One PDF covers Bantry, Caheragh, Goleen, Muintir Bhaire, and Schull. Harvest once under bantry.",
+        "One PDF covers Bantry, Caheragh, Goleen, Muintir Bháire, and Schull. Harvest once under bantry.",
+        "06/11/2026: caheragh/goleen/muintirbhaire were failing HTML print on /notices — set alias_of bantry + skip like schull.",
       ],
       do_not: [
         "Do not pin the dated filename.",
-        "Do not add recipes for caheragh, goleen, muintirbhaire, or schull.",
+        "Do not print_to_pdf the notices HTML for the alias keys.",
+        "Do not run a second harvest for caheragh, goleen, muintirbhaire, or schull.",
       ],
     },
     iso_newsletter_pdf: {
