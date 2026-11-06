@@ -1,25 +1,33 @@
 {
+  "version": 2,
   "parish_key": "doonbeg",
   "display_name": "Doonbeg (Killard)",
   "diocese": "killaloe",
-  "recorded_date": "2026-10-18",
-  "start_url": "https://www.killaloediocese.ie/parish/doonbeg-killard/",
-  "site_type": "wp_json_newest_media",
-  "playbook_type": "direct_download",
-  "status": "active",
-  "skip": false,
+  "start_url": "https://www.doonbegparish.com/churches",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["Newsletter", "newsletter", ".pdf", "irp.cdn-website.com"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_01+Newsletter.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.killaloediocese.ie/parish/doonbeg-killard/"
+      "url": "https://www.doonbegparish.com/churches"
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "18/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 17/10/2026. Do not pin https://www.killaloediocese.ie/wp-content/uploads/2026/10/Working-Document-of-the-National-Synodal-Assembly-on-17-October-2026.pdf."
+    "06/11/2026: real site doonbegparish.com NEWSLETTERS list. Proved links 2026_11_01+Newsletter.pdf and 2026_11_08+Newsletter.pdf on irp.cdn-website.com.",
+    "Old recipe used killaloediocese.ie parish card + wp-json media (false hub-scan hit on Synodal Working Document). Do not go back to the diocese card."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
+    "Do not pin 2026_11_01+Newsletter.pdf.",
+    "Do not scrape killaloediocese.ie/parish/doonbeg-killard/.",
+    "Do not use wp-json media on the diocese card.",
     "Do not harvest Facebook."
-  ]
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

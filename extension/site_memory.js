@@ -69,6 +69,22 @@
         "Do not read YY.MM.DD as DD.MM.YY.",
       ],
     },
+    achonry_diocese_card: {
+      playbook_type: "link_only",
+      site_type: "link_only",
+      page_type: "diocese_parish_card",
+      recipe_flow: "skip",
+      label: "Achonry diocese parish card — not a bulletin",
+      operator_notes: [
+        "06/11/2026: achonrydiocese.org/parishes/… pages are admin/mass-times cards. Harvest marked them wrong-file.",
+        "Ballaghaderreen / Ballisodare / Bunninadden / Carracastle / Swinford: no weekly PDF found — skip until a real host posts.",
+        "Killasser: use mayo.ie parish-newsletters listing instead of the diocese card.",
+      ],
+      do_not: [
+        "Do not scrape achonrydiocese.org parish cards as bulletins.",
+        "Do not keep failing forever on admin HTML.",
+      ],
+    },
     canva_site: {
       playbook_type: "canva_site",
       site_type: "canva_site_bulletin_image",
@@ -759,6 +775,12 @@
     }
     if (start.includes("churchmedia.tv")) {
       return CATALOG.churchmedia_newsletter;
+    }
+    if (start.includes("achonrydiocese.org")) {
+      return CATALOG.achonry_diocese_card;
+    }
+    if (start.includes("doonbegparish.com")) {
+      return CATALOG.dated_pdf_bulletin;
     }
     if (start.includes("mayo.ie")) {
       return CATALOG.mayo_ie_newsletters;
