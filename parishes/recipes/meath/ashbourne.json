@@ -4,7 +4,7 @@
   "display_name": "Ashbourne-Donaghmore",
   "diocese": "meath",
   "start_url": "https://ashbourneparish.ie/newsletters/",
-  "site_type": "wp_json_newest_media",
+  "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
     "sunday",
     ".pdf"
@@ -12,7 +12,7 @@
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-06",
   "steps": [
     {
       "action": "goto",
@@ -20,13 +20,14 @@
     }
   ],
   "operator_notes": [
-    "03/10/2026: listing https://ashbourneparish.ie/newsletters/ (WP post /2025/08/11/newsletters/). Proved 26th-sunday-a-2026.pdf GET 200 application/pdf 367275 bytes %PDF-1.7. PDF text: 27th September 2026. Folder /2025/08/ is not the bulletin date. Do not pin the dated filename. 27th-sunday-a-2026.pdf was 404 this hunt.",
-    "03/10/2026 harvest 37124522917 failed http_scrape: listing had no dated PDF href (filename is 26th-sunday-a-2026, week is in the PDF text). Switch to wp_json_newest_media so the media library date can score the file."
+    "03/10/2026: listing https://ashbourneparish.ie/newsletters/ (WP post /2025/08/11/newsletters/). Folder /2025/08/ is not the bulletin date. Do not pin the dated filename.",
+    "06/11/2026: wp-json/wp/v2/media search returns 404. Listing has direct PDF hrefs: 28th–31st-sunday-a-2026.pdf. Proved 31st-sunday-a-2026.pdf GET 200 application/pdf 445720 bytes; PDF text Saturday 31st / Sunday 1st Nov All Saints Day — week of 01/11/2026. Switch to http_scrape_newest_pdf. If no newer Sunday file is posted, expect honest stale not failed."
   ],
   "do_not": [
     "Do not pin a dated filename.",
     "Do not harvest Facebook.",
-    "Do not use the diocese Facebook page as this parish link."
+    "Do not use the diocese Facebook page as this parish link.",
+    "Do not use wp_json_newest_media — media API 404s here."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
