@@ -1,34 +1,53 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "sallynoggin",
   "display_name": "Sallynoggin",
   "diocese": "dublin",
-  "start_url": "https://www.sallynogginandglenagearyparish.com/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://sallynogginandglenagearyparish.com/category/parish-newsletter/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
   "href_patterns": [
     "Bulletin",
-    "October",
-    ".pdf"
+    "November",
+    "October"
   ],
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
+  "timeout_ms": 60000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-06",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.sallynogginandglenagearyparish.com/"
+      "url": "https://sallynogginandglenagearyparish.com/category/parish-newsletter/"
+    },
+    {
+      "action": "click",
+      "selector": "h2 a",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "article h2 a",
+        "a:has-text('Bulletin')"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 537395 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "06/11/2026: homepage http_scrape found no PDF. Category /category/parish-newsletter/ lists Bulletin 8th November 2026 at top.",
+    "Posts are HTML (no PDF on the article). Click top Bulletin post and print_to_pdf. Do not pin /bulletin-8th-november-2026/.",
+    "October-only href_patterns missed November — include November."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin a dated bulletin slug.",
+    "Do not scrape the homepage for .pdf — there is none.",
+    "Do not leave October-only patterns.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
-    "strategy": "newest_dated",
+    "strategy": "first_match",
     "position": "top"
   }
 }
