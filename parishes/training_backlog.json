@@ -2,16 +2,16 @@
   "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 413,
+    "downloaded": 409,
     "html_links": 0,
     "skipped": 778,
-    "failed": 73,
-    "stale_rejected": 51
+    "failed": 75,
+    "stale_rejected": 53
   },
   "action_counts": {
-    "ok": 433,
+    "ok": 431,
     "skip": 786,
-    "investigate": 64
+    "investigate": 66
   },
   "parishes": [
     {
@@ -2107,15 +2107,14 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "03/10/2026: /current-newsletter/ redirects to the current dated file. Do not pin the dated name.",
-          "06/11/2026: redirect is now Sunday-1st-November.png (image bulletin, not PDF). Keep permanent_redirect_document \u2014 fetcher wraps image to PDF. Date from Sunday-1st-November."
+          "03/10/2026: /current-newsletter/ redirects to the current dated PDF. Do not pin the dated file.",
+          "30/10/2026: redirect is Sunday-25th-October-2026-Bulletin.pdf (application/pdf 265243). Status was still on 27 Sept \u2014 re-harvest only."
         ],
         "do_not": [
-          "Do not pin Sunday-1st-November.png or any dated upload.",
-          "Do not assume the redirect is always a PDF \u2014 it can be PNG/JPEG.",
+          "Do not pin the dated PDF.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-10-30"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -5993,10 +5992,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
+      "suggested_action": "investigate",
+      "suggested_reason": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop"
     },
     {
       "parish_key": "bawnogue",
@@ -6760,28 +6759,25 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/blessington.json",
       "recipe": {
-        "start_url": "https://blessingtonparish.ie/newsletters/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "html_text_bulletin",
+        "start_url": "https://www.blessingtonparish.ie",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
-          "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
-          "Do not pin /2026/11/05/newsletter-november-8th-2026/."
+          "15/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://blessingtonparish.ie/wp-content/uploads/2026/09/Newsletter-4th-Oct-2026-NEWGraohic2-.pdf."
         ],
         "do_not": [
-          "Do not pin a dated newsletter slug.",
-          "Do not rely on wp-json media alone \u2014 host can 403.",
+          "Do not pin a dated filename.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-10-15"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -34088,36 +34084,32 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/sallynoggin.json",
       "recipe": {
-        "start_url": "https://sallynogginandglenagearyparish.com/category/parish-newsletter/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "html_text_bulletin",
+        "start_url": "https://www.sallynogginandglenagearyparish.com/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "06/11/2026: homepage http_scrape found no PDF. Category /category/parish-newsletter/ lists Bulletin 8th November 2026 at top.",
-          "Posts are HTML (no PDF on the article). Click top Bulletin post and print_to_pdf. Do not pin /bulletin-8th-november-2026/.",
-          "October-only href_patterns missed November \u2014 include November."
+          "03/10/2026 cloud hunt: proved GET 200 pdf 537395 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin a dated bulletin slug.",
-          "Do not scrape the homepage for .pdf \u2014 there is none.",
-          "Do not leave October-only patterns.",
+          "Do not pin a dated filename or Wix hash.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-10-03"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.sallynogginandglenagearyparish.com/ \u2014 no dated bulletin PDF matching ['bulletin', 'october', '.pdf'] (not a selector problem; parish may not have posted)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.sallynogginandglenagearyparish.com/ \u2014 no dated bulletin PDF matching ['bulletin', 'october', '.pdf'] (not "
     },
     {
       "parish_key": "salthill",
