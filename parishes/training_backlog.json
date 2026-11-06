@@ -2,17 +2,17 @@
   "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 420,
+    "downloaded": 422,
     "html_links": 0,
     "skipped": 800,
-    "failed": 47,
-    "stale_rejected": 48
+    "failed": 46,
+    "stale_rejected": 47
   },
   "action_counts": {
-    "ok": 437,
+    "ok": 438,
     "skip": 808,
     "mark_inactive": 1,
-    "investigate": 42,
+    "investigate": 41,
     "retrain": 1
   },
   "parishes": [
@@ -7149,27 +7149,28 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/booterstown.json",
       "recipe": {
-        "start_url": "https://booterstownparish.ie/",
-        "site_type": "wp_json_newest_media",
+        "start_url": "https://booterstownparish.ie/wp-content/uploads/2026/10/Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: media library has Sun-8-November-2026 as a hash PDF (bp-bfecaa62\u2026.pdf, media date 06/11/2026) and named Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf.",
-          "Prior harvest timed out because wp-json miss then newsletter_brain opened the homepage. example_url lets predicted run before the brain. Do not pin the hash. Skip JPEG/PNG fronts of the same week."
+          "06/11/2026: two harvests green then row still Total timeout exceeded. wp_json + homepage newsletter_brain hangs. Proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1134965 bytes magic %PDF-1.4. start_url is the PDF. Sun-8-November is a hash PDF; do not pin the hash."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
+          "Do not set start_url to the homepage \u2014 newsletter_brain hangs.",
+          "Do not pin Sun-1-November-2026 forever \u2014 predicted_dated_pdf rewrites the date.",
+          "Do not pin the Sun-8 hash PDF.",
           "Do not harvest Facebook.",
           "Do not take newsletter-front PNG instead of the PDF."
         ],
         "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "booterstown_sunday_pdf+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -10524,28 +10525,26 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/churchtown.json",
       "recipe": {
-        "start_url": "https://churchtownparish.com/",
-        "site_type": "wp_json_newest_media",
+        "start_url": "https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: /newsletter/ is now an HTML week page (Week of Sunday 8 November 2026) with no PDF href. HTTP-scrape then opened Playwright and hit Total timeout exceeded.",
-          "Weekly PDF is in wp-json/wp/v2/media?search=newsletter. Proved newsletter-2026-11-01.pdf GET 200 application/pdf 1400380 bytes magic %PDF-1.7. All Saints 01/11/2026. Folder is /2026/10/ not /2026/11/.",
-          "Keep example_url so predicted can run before newsletter_brain if wp-json 403s. Do not pin the dated filename."
+          "06/11/2026: wp_json + homepage hung 17m52s then cancelled. /newsletter/ is HTML with no PDF href. Proved newsletter-2026-11-01.pdf GET 200 application/pdf 1400380 bytes magic %PDF-1.7. Folder is /2026/10/. 08/11 URL 404 this turn. start_url is the PDF so listing challenge is skipped."
         ],
         "do_not": [
-          "Do not scrape /newsletter/ for PDFs \u2014 that page is HTML.",
-          "Do not pin a dated filename or Wix hash.",
+          "Do not set start_url to the homepage or /newsletter/ \u2014 Playwright hangs.",
+          "Do not pin newsletter-2026-11-01.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "newsletter-YYYY-MM-DD.pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -14572,32 +14571,34 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/donaghmedeclongriffinbalgriffin.json",
       "recipe": {
-        "start_url": "https://www.holytrinityparish.ie",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "direct_download",
-        "status": "active",
+        "start_url": "https://holytrinityparish.ie/wp/wp-content/uploads/dlm_uploads/2026.11.01.pdf",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "",
+        "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "08/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://holytrinityparish.ie/wp/wp-content/uploads/dlm_uploads/The-Peoples-Mass-26.10.04.pdf."
+          "06/11/2026: homepage wp-json timed out. Media search newsletter only finds annual Share-Newsletter. Weekly files are dlm_uploads/2026.11.01.pdf (456333 bytes, media 30/10) and 2026.11.08.pdf (461595 bytes, media 06/11). start_url is the PDF so listing challenge is skipped."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
+          "Do not set start_url to the homepage \u2014 newsletter_brain hangs.",
+          "Do not search media for newsletter \u2014 that hits the annual Share Newsletter.",
+          "Do not pin 2026.11.01.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-08"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "donaghmore",
@@ -14704,26 +14705,26 @@
       "diocese": "clogher",
       "recipe_file": "parishes/recipes/clogher/donaghmoyne.json",
       "recipe": {
-        "start_url": "https://donaghmoyne.com/",
-        "site_type": "wp_json_newest_media",
+        "start_url": "https://donaghmoyne.com/wp-content/uploads/2026/11/21st-of-Ordinary-Time-Sunday-1st-November-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: category /parish-bulletin/ hits ERR_HTTP2_PROTOCOL_ERROR. wp-json media lists 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf (media date 06/11/2026). Do not open the category listing. Do not pin the Ordinary Time number."
+          "06/11/2026: harvest 42249070814 found 21st-of-Ordinary-Time-Sunday-1st-November-2026.pdf dated 01/11 then Total timeout exceeded on the homepage. Category listing is ERR_HTTP2. start_url is the PDF so listing challenge is skipped. Also 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf in media."
         ],
         "do_not": [
-          "Do not set start_url to /category/parish-bulletin/ \u2014 HTTP2 hang.",
-          "Do not pin 32nd-of-Ordinary-Time or 08th-November.",
+          "Do not set start_url to the homepage or /category/parish-bulletin/ \u2014 HTTP2 / brain hang.",
+          "Do not pin 21st-of-Ordinary-Time or 1st-November forever \u2014 predicted rewrites the date.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "News page with PDF links",
       "host_profile": {
         "total_timeout_s": 490,
@@ -14770,25 +14771,26 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/donnybrook.json",
       "recipe": {
-        "start_url": "https://donnybrookparish.ie/",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "direct_download",
-        "status": "active",
+        "start_url": "https://donnybrookparish.ie/wp-content/uploads/Notices-1st-November-2026.pdf",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "",
+        "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: homepage wp-json timed out. Media search Notices lists Notices-1st-November-2026.pdf (application/pdf, 3026548 bytes, media date 02/11/2026). example_url lets predicted run before newsletter_brain. Do not pin."
+          "06/11/2026: wp_json homepage still Total timeout exceeded after harvest 42249061223. Media previously listed Notices-1st-November-2026.pdf 3026548 bytes. start_url is the PDF so listing challenge and newsletter_brain are skipped. This IP RemoteDisconnected on a later GET; GitHub fetch is the proof."
         ],
         "do_not": [
-          "Do not pin Notices-1st-November-2026.pdf.",
+          "Do not set start_url to the homepage \u2014 wp-json then newsletter_brain hangs.",
+          "Do not pin Notices-1st-November-2026.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -34361,25 +34363,26 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/sandyford.json",
       "recipe": {
-        "start_url": "https://www.sandyfordparish.org",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "direct_download",
-        "status": "active",
+        "start_url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-01.pdf",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "",
+        "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "08/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://sandyfordparish.org/wp-content/uploads/2026/10/Newsletter-04.10.26.pdf."
+          "06/11/2026: homepage wp-json then newsletter_brain hit Total timeout exceeded. wp-json media has Newsletter-2026-11-01.pdf and Newsletter-2026-11-08.pdf. Proved GET 200 application/pdf 431750 bytes magic %PDF-1.7 (01/11) and 423870 bytes (08/11). start_url is the PDF so listing challenge is skipped."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
+          "Do not set start_url to the homepage \u2014 scrape then newsletter_brain hangs.",
+          "Do not pin Newsletter-2026-11-01.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-08"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
