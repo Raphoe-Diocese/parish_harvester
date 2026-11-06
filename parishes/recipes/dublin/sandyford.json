@@ -1,25 +1,35 @@
 {
+  "version": 2,
   "parish_key": "sandyford",
   "display_name": "Sandyford",
   "diocese": "dublin",
-  "recorded_date": "2026-10-08",
-  "start_url": "https://www.sandyfordparish.org",
-  "site_type": "wp_json_newest_media",
-  "playbook_type": "direct_download",
-  "status": "active",
-  "skip": false,
+  "start_url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-01.pdf",
+  "site_type": "predicted_dated_pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-01.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.sandyfordparish.org"
+      "action": "download",
+      "url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-01.pdf"
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "08/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://sandyfordparish.org/wp-content/uploads/2026/10/Newsletter-04.10.26.pdf."
+    "06/11/2026: homepage wp-json then newsletter_brain hit Total timeout exceeded. wp-json media has Newsletter-2026-11-01.pdf and Newsletter-2026-11-08.pdf. Proved GET 200 application/pdf 431750 bytes magic %PDF-1.7 (01/11) and 423870 bytes (08/11). start_url is the PDF so listing challenge is skipped."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
+    "Do not set start_url to the homepage — scrape then newsletter_brain hangs.",
+    "Do not pin Newsletter-2026-11-01.pdf forever — predicted_dated_pdf rewrites the date.",
     "Do not harvest Facebook."
-  ]
+  ],
+  "href_patterns": [
+    "Newsletter",
+    ".pdf"
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

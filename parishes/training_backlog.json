@@ -2,17 +2,17 @@
   "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 418,
+    "downloaded": 420,
     "html_links": 0,
     "skipped": 800,
-    "failed": 49,
+    "failed": 47,
     "stale_rejected": 48
   },
   "action_counts": {
-    "ok": 435,
+    "ok": 437,
     "skip": 808,
     "mark_inactive": 1,
-    "investigate": 44,
+    "investigate": 42,
     "retrain": 1
   },
   "parishes": [
@@ -13680,10 +13680,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape images https://lowercregganparish.com/ \u2014 no bulletin page images matching ['sunday', 'october', 'september', '.jpg', 'uploads'] (browser was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://lowercregganparish.com/ \u2014 no bulletin page images matching ['sunday', 'october', 'september', '.jpg', 'uploads'"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "culmoreparish",
@@ -15018,9 +15018,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.doonbegparish.com/churches \u2014 no dated bulletin PDF matching ['newsletter', 'newsletter', '.pdf', 'irp.cdn-website.com'] (not a selector problem; parish may not have posted)",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_01+Newsletter.pdf for 2026-11-01 did not resolve to a real file (listing page was not opened)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.doonbegparish.com/churches \u2014 no dated bulletin PDF matching ['newsletter', 'newsletter', '.pdf', 'irp.cdn-"
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_01+Newsletter.pdf for 2026-11-01 did not resol"
     },
     {
       "parish_key": "doorabarefield",
@@ -18036,10 +18036,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "fermoy",
@@ -20575,7 +20575,7 @@
       "recipe_file": "parishes/recipes/down_and_connor/holy-familyparish.json",
       "recipe": {
         "start_url": "https://www.holy-familyparish.com/bulletin/",
-        "site_type": "http_scrape_newest_pdf",
+        "site_type": "http_scrape_newest_images",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -20584,14 +20584,14 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "Listing already has /app/uploads/2026/08/Twentieth-Sunday-in-Ordinary-Time.pdf (HTTP 200, 1019586 bytes, 18/08/2026).",
-          "Previous harvest dated that liturgical filename as 01/08/2026 (WordPress folder day=1) and stale-rejected a current bulletin. liturgical_date_from_text now maps Twentieth Sunday \u2192 16/08/2026.",
-          "site_type:http_scrape_newest_pdf. Do not click a:has-text('Bulletin') \u2014 too generic."
+          "06/11/2026: listing has JPEG scans named like PDFs, not real PDFs. Thirty-Second-Sunday-in-Ordinary-Time-.pdf-2.jpg proved GET 200 image/jpeg 656906. Feast-of-All-Saints-.pdf.jpg is 01/11. Do not scrape .pdf hrefs. Thirty-Second Sunday 2026 is 08/11."
         ],
         "do_not": [
-          "Do not treat the /uploads/YYYY/MM/ folder day as the bulletin date when the filename is only a liturgical Sunday name."
+          "Do not treat .pdf.jpg as a PDF \u2014 it is a JPEG.",
+          "Do not pin Thirty-Second-Sunday filename.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -28505,34 +28505,33 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/milltowndublin.json",
       "recipe": {
-        "start_url": "https://milltownparish.ie/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: listing /newsletter/.",
-          "Proved Weekly-Bulletin-Sunday-October-4th-2026.pdf GET 200 application/pdf 655698 bytes magic %PDF. Date 04/10/2026.",
-          "Do not pin the dated filename."
+          "06/11/2026: /newsletter/ scrape timed out. Listing and wp-json both have Weekly-Bulletin-Sunday-November-8th-2026.pdf. Proved GET 200 application/pdf 557095 bytes magic %PDF-1.7. start_url is the PDF. Also November-1st in /2026/10/."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
+          "Do not set start_url to /newsletter/ \u2014 scrape then brain hangs.",
+          "Do not pin November-8th forever \u2014 predicted rewrites the date.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf for 2026-11-01 did not resolve to a real file (listing page was not opened)",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf for 2026"
     },
     {
       "parish_key": "milltownkerry",
@@ -30596,16 +30595,14 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "07/10/2026: cloynediocese.ie card links newmarketparish.com. Newest newsletter PDF in wp-json media is 27/09/2026. A later JPEG is a photo of \u00c9ala Horgan, not the bulletin.",
-          "Proved Newsletter-Sunday-27th-September-2026.pdf GET 200 application/pdf 615183 bytes %PDF. PDF text: Parish of Newmarket and Taur. Filename date 27/09/2026. Accepted for this harvest week.",
-          "wp_json_newest_media. Do not pin the dated name."
+          "06/11/2026: old href_patterns required September or October, so November files were skipped, then homepage timed out. Drop month names. example_url lets predicted run before brain. Skip JPEG photos. Do not pin."
         ],
         "do_not": [
-          "Do not pin Newsletter-Sunday-27th-September-2026.pdf.",
+          "Do not require September/October in href_patterns \u2014 that misses November.",
           "Do not harvest the \u00c9ala Horgan photo.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-07"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
