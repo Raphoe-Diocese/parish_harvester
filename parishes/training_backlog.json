@@ -2,17 +2,17 @@
   "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 417,
+    "downloaded": 419,
     "html_links": 0,
     "skipped": 800,
-    "failed": 50,
+    "failed": 48,
     "stale_rejected": 48
   },
   "action_counts": {
-    "ok": 434,
+    "ok": 436,
     "skip": 808,
     "mark_inactive": 1,
-    "investigate": 45,
+    "investigate": 43,
     "retrain": 1
   },
   "parishes": [
@@ -11610,10 +11610,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.clonduffparish.com/about/bulletin \u2014 no dated bulletin PDF matching ['sunday', '.pdf', 'uploads', '2026'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.clonduffparish.com/about/bulletin \u2014 no dated bulletin PDF matching ['sunday', '.pdf', 'uploads', '2026'] ("
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "clonegal",
@@ -13657,32 +13657,33 @@
       "recipe_file": "parishes/recipes/armagh/cullyhanna.json",
       "recipe": {
         "start_url": "https://lowercregganparish.com/",
-        "site_type": "http_scrape_newest_images",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 continuous hunt: official card Facebook-only. Live twin lowercregganparish.com (Lower Creggan / Cullyhanna). Homepage lists Parish Bulletin 4th October 2026. Proved Sunday-4th-October-2026-page-001-scaled.jpg GET 200 image/jpeg 890260 bytes magic JPEG. One page this week. Do not pin dated name."
+          "06/11/2026: homepage HTML has no Sunday- image hrefs. Old recipe required October/September so November files were skipped. wp-json image media lists Sunday-1st-November-2026-page-001-scaled.jpg (GET 200 image/jpeg 814393) and Sunday-8th-November-2026 in /2026/11/ (GET 200 image/jpeg 792633). Do not pin. One page this week."
         ],
         "do_not": [
           "Do not pin the dated JPEG filename.",
+          "Do not require October/September in href_patterns \u2014 that misses November.",
           "Do not harvest Facebook.",
           "Do not confuse with Upper Creggan / Crossmaglen."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "image_stack",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape images https://lowercregganparish.com/ \u2014 no bulletin page images matching ['sunday', 'october', 'september', '.jpg', 'uploads'] (browser was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://lowercregganparish.com/ \u2014 no bulletin page images matching ['sunday', 'october', 'september', '.jpg', 'uploads'"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "culmoreparish",
@@ -14703,27 +14704,26 @@
       "diocese": "clogher",
       "recipe_file": "parishes/recipes/clogher/donaghmoyne.json",
       "recipe": {
-        "start_url": "https://donaghmoyne.com/category/parish-bulletin/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://donaghmoyne.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 4,
-        "click_count": 3,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "06/11/2026: category /parish-bulletin/ hits ERR_HTTP2_PROTOCOL_ERROR. wp-json media lists 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf (media date 06/11/2026). Do not open the category listing. Do not pin the Ordinary Time number."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not set start_url to /category/parish-bulletin/ \u2014 HTTP2 hang.",
+          "Do not pin 32nd-of-Ordinary-Time or 08th-November.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-09-14"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": {
         "total_timeout_s": 490,
@@ -14770,7 +14770,7 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/donnybrook.json",
       "recipe": {
-        "start_url": "https://www.donnybrookparish.ie",
+        "start_url": "https://donnybrookparish.ie/",
         "site_type": "wp_json_newest_media",
         "playbook_type": "direct_download",
         "status": "active",
@@ -14780,13 +14780,13 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "08/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://donnybrookparish.ie/wp-content/uploads/Notices-4th-October-2026.pdf."
+          "06/11/2026: homepage wp-json timed out. Media search Notices lists Notices-1st-November-2026.pdf (application/pdf, 3026548 bytes, media date 02/11/2026). example_url lets predicted run before newsletter_brain. Do not pin."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
+          "Do not pin Notices-1st-November-2026.pdf.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-08"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
@@ -14993,28 +14993,27 @@
       "diocese": "killaloe",
       "recipe_file": "parishes/recipes/killaloe/doonbeg.json",
       "recipe": {
-        "start_url": "https://www.doonbegparish.com/churches",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_01+Newsletter.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: real site doonbegparish.com NEWSLETTERS list. Proved links 2026_11_01+Newsletter.pdf and 2026_11_08+Newsletter.pdf on irp.cdn-website.com.",
-          "Old recipe used killaloediocese.ie parish card + wp-json media (false hub-scan hit on Synodal Working Document). Do not go back to the diocese card."
+          "06/11/2026: /churches HTML has the CDN hrefs but http_scrape did not score 2026_11_01+Newsletter.pdf (underscore date). Proved GET 200 application/pdf 316788 bytes %PDF-1.7. Also 2026_11_08+Newsletter.pdf 256842 bytes. start_url is the PDF. Do not scrape killaloediocese.ie."
         ],
         "do_not": [
-          "Do not pin 2026_11_01+Newsletter.pdf.",
+          "Do not pin 2026_11_01+Newsletter.pdf forever \u2014 predicted rewrites the date.",
           "Do not scrape killaloediocese.ie/parish/doonbeg-killard/.",
           "Do not use wp-json media on the diocese card.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -18014,27 +18013,26 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/ferbane.json",
       "recipe": {
-        "start_url": "https://www.ferbaneparish.ie/index.php/archived-bulletins",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://www.ferbaneparish.ie/images/bulletins/20261101%2001%20November%202026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "29/10/2026: Old recipe kept a Sept download step; status stayed on CurrentBulletin.pdf dated 27/09. Archive lists 20261025 25 October 2026.pdf (scored locally as 25/10).",
-          "site_type:http_scrape_newest_pdf on archived-bulletins. Skip undated CurrentBulletin.pdf. Do not pin the dated archive filename."
+          "06/11/2026: archive scrape timed out on a huge listing. Proved 20261101 01 November 2026.pdf GET 200 application/pdf 297605 bytes magic %PDF-1.4. start_url is the PDF so the archive is not opened. Skip undated CurrentBulletin.pdf."
         ],
         "do_not": [
-          "Do not pin 20260927 or 20261025.",
-          "Do not treat CurrentBulletin.pdf as dated \u2014 scrape the archive list.",
-          "Do not keep a download step with a Sept dated URL."
+          "Do not pin 20261101 forever \u2014 predicted rewrites the date.",
+          "Do not scrape the full archive listing (timeout).",
+          "Do not treat CurrentBulletin.pdf as dated."
         ],
-        "recorded_date": "2026-10-29"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -18480,27 +18478,26 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/foxrock.json",
       "recipe": {
-        "start_url": "https://foxrockparish.ie/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: homepage Latest News has Parish Newsletter November 1st. PDF on page: Newsletter-November-1st-2026.pdf. wp-json media path was timing out.",
-          "http_scrape_newest_pdf on homepage. Do not pin the dated filename."
+          "06/11/2026: homepage scrape still timed out. Proved Newsletter-November-1st-2026.pdf GET 200 application/pdf 567718 bytes magic %PDF-1.7. start_url is the PDF so listing challenge is skipped."
         ],
         "do_not": [
-          "Do not pin Newsletter-November-1st-2026.pdf.",
-          "Do not use wp_json_newest_media here (timeout).",
+          "Do not set start_url to the homepage \u2014 scrape then newsletter_brain hangs.",
+          "Do not pin Newsletter-November-1st-2026.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
