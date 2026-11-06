@@ -1,34 +1,38 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "emly",
   "display_name": "Emly",
   "diocese": "cashel_and_emly",
   "start_url": "https://emly.ie/category/parish-bulletin/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Bulletin",
-    ".docx",
-    ".doc",
-    "uploads"
-  ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-02",
-  "example_url": "https://emly.ie/wp-content/uploads/2026/09/Emly-Parish-Bulletin-27th-September-2026-sent.docx",
+  "site_type": "click_then_download",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://emly.ie/wp-content/uploads/2026/10/Emly-Parish-Bulletin-25th-Octaber-2026.docx",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://emly.ie/category/parish-bulletin/"
+    },
+    {
+      "action": "click",
+      "text": "Emly Parish Bulletin",
+      "match": "first"
+    },
+    {
       "action": "download",
-      "url": "https://emly.ie/wp-content/uploads/2026/09/Emly-Parish-Bulletin-27th-September-2026-sent.docx"
+      "url_pattern": "*Bulletin*.docx"
     }
   ],
   "operator_notes": [
-    "02/10/2026 hunt: official Cashel & Emly card had no website. Kitchen-sink emly.ie category/parish-bulletin.",
-    "Proved Emly-Parish-Bulletin-27th-September-2026-sent.docx on post emly-parish-bulletin-27th-september-2026 (LibreOffice/python-docx \u2192 PDF).",
-    "Scrape newest .docx/.doc/.pdf from category listing or post download link."
+    "06/11/2026: category listing timed out on pinned September download. Click top Emly Parish Bulletin post, then Download .docx.",
+    "Proved 25th Oct post Download → Emly-Parish-Bulletin-25th-Octaber-2026.docx (site typo Octaber). LibreOffice converts docx.",
+    "Honest stale until a November post appears. Do not pin the misspelled filename."
   ],
   "do_not": [
-    "Do not pin the 27th September docx filename.",
-    "Do not harvest Facebook."
+    "Do not pin Emly-Parish-Bulletin-*-sent.docx or *Octaber*.",
+    "Do not harvest Facebook.",
+    "Do not stay on the category page waiting for a direct PDF."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
