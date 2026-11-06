@@ -2,17 +2,17 @@
   "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 414,
+    "downloaded": 418,
     "html_links": 0,
     "skipped": 800,
-    "failed": 51,
-    "stale_rejected": 50
+    "failed": 49,
+    "stale_rejected": 48
   },
   "action_counts": {
-    "ok": 433,
+    "ok": 435,
     "skip": 808,
     "mark_inactive": 1,
-    "investigate": 46,
+    "investigate": 44,
     "retrain": 1
   },
   "parishes": [
@@ -2288,10 +2288,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "athloneelphin",
@@ -7159,15 +7159,13 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: weekly PDF is in wp-json media. Listing /newsletter/ is a webp, not the file.",
-          "Proved Sun-4-October-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1675137 bytes magic %PDF. Date 04/10/2026.",
-          "31/10/2026: wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026, 1134965 bytes) and Sun-25-October-2026 (application/pdf, 25/10/2026, 1218254 bytes).",
-          "06/11/2026: media already has Sun-8-November-2026 (hash filename bp-bfecaa62\u2026.pdf, media date 06/11/2026). Title carries the Sunday date \u2014 do not pin the hash. Prior harvest timed out; bumped timeouts.",
-          "Skip JPEG previews of the same PDF. Do not pin the dated filename."
+          "06/11/2026: media library has Sun-8-November-2026 as a hash PDF (bp-bfecaa62\u2026.pdf, media date 06/11/2026) and named Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf.",
+          "Prior harvest timed out because wp-json miss then newsletter_brain opened the homepage. example_url lets predicted run before the brain. Do not pin the hash. Skip JPEG/PNG fronts of the same week."
         ],
         "do_not": [
           "Do not pin a dated filename or Wix hash.",
-          "Do not harvest Facebook."
+          "Do not harvest Facebook.",
+          "Do not take newsletter-front PNG instead of the PDF."
         ],
         "recorded_date": "2026-11-06"
       },
@@ -10526,8 +10524,8 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/churchtown.json",
       "recipe": {
-        "start_url": "https://churchtownparish.com/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://churchtownparish.com/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -10536,16 +10534,16 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: official card goodshepherdchurchtown.ie redirects to churchtownparish.com.",
-          "Proved Newsletter-Sunday-Message-4th-October-2026.pdf GET 200 application/pdf 1451104 bytes magic %PDF. Date 04/10/2026. Folder /2026/09/ is not the Sunday.",
-          "Score the filename. Do not pin the dated PDF.",
-          "31/10/2026 listing proved newsletter-2026-11-01.pdf. application/pdf, 1400380 bytes, date 01/11/2026. This Sunday was not on the page. The file is inside the 8-day window."
+          "06/11/2026: /newsletter/ is now an HTML week page (Week of Sunday 8 November 2026) with no PDF href. HTTP-scrape then opened Playwright and hit Total timeout exceeded.",
+          "Weekly PDF is in wp-json/wp/v2/media?search=newsletter. Proved newsletter-2026-11-01.pdf GET 200 application/pdf 1400380 bytes magic %PDF-1.7. All Saints 01/11/2026. Folder is /2026/10/ not /2026/11/.",
+          "Keep example_url so predicted can run before newsletter_brain if wp-json 403s. Do not pin the dated filename."
         ],
         "do_not": [
+          "Do not scrape /newsletter/ for PDFs \u2014 that page is HTML.",
           "Do not pin a dated filename or Wix hash.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "newsletter-YYYY-MM-DD.pdf",
@@ -11588,7 +11586,7 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/clonduff.json",
       "recipe": {
-        "start_url": "https://www.clonduffparish.com/about/bulletin",
+        "start_url": "https://clonduffparish.com/bulletin/",
         "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
@@ -11596,25 +11594,26 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "02/10/2026 hunt: listing /about/bulletin. Proved Sunday-27th-September-2026.pdf GET 200 application/pdf 2156592 bytes.",
-          "wp-json media also lists the same file. Do not pin the dated filename."
+          "06/11/2026: old listing /about/bulletin 404s after the Hotpress rebuild. Live archive is /bulletin/. Proved Sunday-1st-November-2026.pdf GET 200 application/pdf 2289713 bytes magic %PDF-1.3.",
+          "Do not pin the dated filename. Do not go back to /about/bulletin or /wp-content/uploads/2026/09/Sunday-27th-September-2026.pdf."
         ],
         "do_not": [
-          "Do not pin Sunday-27th-September-2026.pdf.",
+          "Do not pin Sunday-1st-November-2026.pdf.",
+          "Do not use /about/bulletin \u2014 that path 404s.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.clonduffparish.com/about/bulletin \u2014 no dated bulletin PDF matching ['sunday', '.pdf', 'uploads', '2026'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.clonduffparish.com/about/bulletin \u2014 no dated bulletin PDF matching ['sunday', '.pdf', 'uploads', '2026'] ("
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "clonegal",
