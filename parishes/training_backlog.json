@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-11-02",
+  "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 409,
+    "downloaded": 410,
     "html_links": 0,
-    "skipped": 770,
-    "failed": 83,
-    "stale_rejected": 53
+    "skipped": 778,
+    "failed": 75,
+    "stale_rejected": 52
   },
   "action_counts": {
     "ok": 431,
-    "skip": 778,
-    "investigate": 65
+    "skip": 786,
+    "investigate": 66
   },
   "parishes": [
     {
@@ -279,16 +279,17 @@
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "24/10/2026: ferns.ie/adamstown/ Website line is http://saintabbans.com/. Newsletters page ?page_id=21 lists 18th October, 2026 at the top, linking ?p=1605.",
-          "That page text is ADAMSTOWN PARISH NEWSLETTER, Saturday 17th and Sunday 18th October 2026, Volume 22 Number 41. No PDF on the page. The print is 7 pages, so this recipe allows 8. Do not pin ?p=1605."
+          "24/10/2026: ferns.ie/adamstown/ Website line is http://saintabbans.com/. Newsletters page ?page_id=21. No PDF \u2014 print the top dated HTML post.",
+          "06/11/2026: listing top is 1st November, 2026 (All Saints weekend). first_match top must not be pinned to October-only fallbacks. Cookie banner can block clicks \u2014 dismiss if replay stalls. Do not pin ?p=."
         ],
         "do_not": [
-          "Do not pin ?p=1605.",
+          "Do not pin a dated ?p= id.",
+          "Do not leave October-only fallbacks \u2014 November posts must win.",
           "Do not remove skip_listing_nav.",
           "Do not harvest Facebook.",
           "Do not use the ferns.ie mass-times card as the bulletin."
         ],
-        "recorded_date": "2026-10-24"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "html",
       "learned_pattern": "html_listing_still_stale+direct_download",
@@ -944,14 +945,16 @@
         "operator_notes": [
           "25/10/2026: clonfertgalway.ie/parish/an-spideal/ is the mass-times card. The newsletter is on https://cilleinde.ie/.",
           "The page links 30\u00fa Domhnach A 25 Deireadh F\u00f3mhair 2026.pdf. Deireadh F\u00f3mhair is October. The referee reads that as 25/10/2026. Proved application/pdf.",
-          "The site certificate is incomplete. The downloader already retries once without verify. Do not pin the Irish filename. Do not harvest Facebook."
+          "06/11/2026: live top link L\u00e1 na Naomh Uile 1 Samhain 2026.pdf under /newsletters/2026/q4/. Samhain is November \u2014 date reader must know it. Do not pin the Irish filename.",
+          "The site certificate is incomplete. The downloader already retries once without verify. Do not harvest Facebook."
         ],
         "do_not": [
           "Do not pin the Irish filename.",
+          "Do not miss Samhain / Deireadh F\u00f3mhair in href_patterns.",
           "Do not use the clonfertgalway.ie card as the bulletin.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-25"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -1535,6 +1538,39 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "ardfieldrathbarry",
+      "display_name": "Ardfield & Rathbarry",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/ardfieldrathbarry.json",
+      "recipe": {
+        "start_url": "https://onefaith.ie/newsletter",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: shared OneFaith /images/newsletter/YY-MM-DD.pdf."
+        ],
+        "do_not": [
+          "Do not harvest separately from barryroe.",
+          "Do not print_to_pdf the HTML listing."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same OneFaith Family of Parishes newsletter PDF. Harvest once under barryroe."
+    },
+    {
       "parish_key": "ardfinnan",
       "display_name": "Ardfinnan",
       "diocese": "waterford_and_lismore",
@@ -1872,8 +1908,8 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/armaghparish.json",
       "recipe": {
-        "start_url": "https://armaghparish.net/parish-bulletin/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://armaghparish.net/wp-content/uploads/2026/09/1st-November.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -1882,12 +1918,14 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "29/09/2026: 27th-September.pdf on parish-bulletin listing (this week)."
+          "02/11/2026: predicted PDF under /2026/09/ worked, then _challenge_pin_against_listing hung on /parish-bulletin/. start_url must be the PDF itself so the listing challenge is skipped."
         ],
         "do_not": [
-          "Do not pin this week's dated filename."
+          "Do not set start_url to /parish-bulletin/ \u2014 listing challenge hangs.",
+          "Do not pin 1st-November.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
+          "Do not force the WordPress folder month to November."
         ],
-        "recorded_date": "2026-09-29"
+        "recorded_date": "2026-11-02"
       },
       "bulletin_format": "download",
       "learned_pattern": "yearless_month_pdf+direct_download",
@@ -5923,6 +5961,43 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "barryroe",
+      "display_name": "Barryroe (OneFaith Family)",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/barryroe.json",
+      "recipe": {
+        "start_url": "https://onefaith.ie/newsletter",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: View the Newsletter is /images/newsletter/YY-MM-DD.pdf (26-10-12.pdf = 12/10/2026). Title October/November 2026 can lag the file.",
+          "Covers Ardfield & Rathbarry, Barryroe, Clonakilty, Kilmeen & Castleventry, Rosscarbery & Lisavaird, Timoleague. Harvest once under barryroe.",
+          "Do not print_to_pdf the HTML listing \u2014 that failed. Scrape the PDF. Honest stale until a newer YY-MM-DD posts."
+        ],
+        "do_not": [
+          "Do not pin 26-10-12.pdf.",
+          "Do not print_to_pdf /newsletter HTML.",
+          "Do not invent a November date from the title alone.",
+          "Do not add separate harvest recipes for the other five OneFaith keys."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
+      "suggested_action": "investigate",
+      "suggested_reason": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop"
+    },
+    {
       "parish_key": "bawnogue",
       "display_name": "Bawnogue",
       "diocese": "dublin",
@@ -7891,6 +7966,43 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+    },
+    {
+      "parish_key": "caheragh",
+      "display_name": "Caheragh",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/caheragh.json",
+      "recipe": {
+        "start_url": "https://bantryfamilyofparishes.ie/notices",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: was failing HTML print on notices. Bantry already scrapes /pdf/ and is ok 01/11. Alias like Schull."
+        ],
+        "do_not": [
+          "Do not harvest Caheragh separately from bantry.",
+          "Do not print_to_pdf the notices HTML page."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": {
+        "total_timeout_s": 190,
+        "navigation_timeout_ms": 55000,
+        "notes": "Cork family listing (OneFaith, West Cork, The Parishioner, OurParish, Bantry, Cathedral, Parishes Together, Kilbrittain). Point at this week's PDF on this page. Harvest the list once. Official /parishes/Name may 404 \u2014 stay on /newsletter, /newsletters or /notices."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same Bantry Family of Parishes weekly PDF. Harvest once under bantry (ok 01/11/2026)."
     },
     {
       "parish_key": "caherconlishinchstlawrence",
@@ -11100,6 +11212,39 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official card / search is Facebook-only \u2014 cannot scrape Facebook (checked 29/09/2026)."
+    },
+    {
+      "parish_key": "clonakilty",
+      "display_name": "Clonakilty",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/clonakilty.json",
+      "recipe": {
+        "start_url": "https://onefaith.ie/newsletter",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: shared OneFaith /images/newsletter/YY-MM-DD.pdf."
+        ],
+        "do_not": [
+          "Do not harvest separately from barryroe.",
+          "Do not print_to_pdf the HTML listing."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same OneFaith Family of Parishes newsletter PDF. Harvest once under barryroe."
     },
     {
       "parish_key": "clonard",
@@ -19261,6 +19406,43 @@
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official card / kitchen-sink still open. Do not invent Facebook PDFs."
     },
     {
+      "parish_key": "goleen",
+      "display_name": "Goleen",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/goleen.json",
+      "recipe": {
+        "start_url": "https://bantryfamilyofparishes.ie/notices",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: was failing HTML print on notices. Bantry already scrapes /pdf/ and is ok 01/11. Alias like Schull."
+        ],
+        "do_not": [
+          "Do not harvest Goleen separately from bantry.",
+          "Do not print_to_pdf the notices HTML page."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": {
+        "total_timeout_s": 190,
+        "navigation_timeout_ms": 55000,
+        "notes": "Cork family listing (OneFaith, West Cork, The Parishioner, OurParish, Bantry, Cathedral, Parishes Together, Kilbrittain). Point at this week's PDF on this page. Harvest the list once. Official /parishes/Name may 404 \u2014 stay on /newsletter, /newsletters or /notices."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same Bantry Family of Parishes weekly PDF. Harvest once under bantry (ok 01/11/2026)."
+    },
+    {
       "parish_key": "goodshepherd",
       "display_name": "Good Shepherd",
       "diocese": "galway",
@@ -23775,6 +23957,39 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "07/10/2026: card website kilmallockparish.ie has no this-week bulletin PDF or JPEG. Left skip. Ardpatrick uses the same site."
+    },
+    {
+      "parish_key": "kilmeencastleventry",
+      "display_name": "Kilmeen & Castleventry",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/kilmeencastleventry.json",
+      "recipe": {
+        "start_url": "https://onefaith.ie/newsletter",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: shared OneFaith /images/newsletter/YY-MM-DD.pdf."
+        ],
+        "do_not": [
+          "Do not harvest separately from barryroe.",
+          "Do not print_to_pdf the HTML listing."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same OneFaith Family of Parishes newsletter PDF. Harvest once under barryroe."
     },
     {
       "parish_key": "kilmeena",
@@ -29323,6 +29538,44 @@
       "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
     },
     {
+      "parish_key": "muintirbhaire",
+      "display_name": "Muintir Bh\u00e1ire",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/muintirbhaire.json",
+      "recipe": {
+        "start_url": "https://bantryfamilyofparishes.ie/notices",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: was failing HTML print on notices. Bantry already scrapes /pdf/ and is ok 01/11. Alias like Schull. Keep Irish name Muintir Bh\u00e1ire."
+        ],
+        "do_not": [
+          "Do not harvest Muintir Bh\u00e1ire separately from bantry.",
+          "Do not print_to_pdf the notices HTML page.",
+          "Do not Anglicise Muintir Bh\u00e1ire."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": {
+        "total_timeout_s": 190,
+        "navigation_timeout_ms": 55000,
+        "notes": "Cork family listing (OneFaith, West Cork, The Parishioner, OurParish, Bantry, Cathedral, Parishes Together, Kilbrittain). Point at this week's PDF on this page. Harvest the list once. Official /parishes/Name may 404 \u2014 stay on /newsletter, /newsletters or /notices."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same Bantry Family of Parishes weekly PDF. Harvest once under bantry (ok 01/11/2026)."
+    },
+    {
       "parish_key": "mulhuddart",
       "display_name": "Mulhuddart",
       "diocese": "dublin",
@@ -33330,6 +33583,39 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 Galway kitchen-sink still open. Do not invent Facebook PDFs."
+    },
+    {
+      "parish_key": "rosscarberylisavaird",
+      "display_name": "Rosscarbery & Lisavaird",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/rosscarberylisavaird.json",
+      "recipe": {
+        "start_url": "https://onefaith.ie/newsletter",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: shared OneFaith /images/newsletter/YY-MM-DD.pdf."
+        ],
+        "do_not": [
+          "Do not harvest separately from barryroe.",
+          "Do not print_to_pdf the HTML listing."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same OneFaith Family of Parishes newsletter PDF. Harvest once under barryroe."
     },
     {
       "parish_key": "rossespoint",
@@ -37679,27 +37965,26 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/termonmaguirc.json",
       "recipe": {
-        "start_url": "https://www.termonmaguircparish.com/bulletins/",
-        "site_type": "wp_json_newest_media",
+        "start_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "29/10/2026: http_scrape_newest_pdf timed out 3x190s on GitHub Actions (local scrape of Thirtieth-Sunday-in-Ordinary-Time-25-Oct-2026.pdf works). WP media API lists the same PDFs (Thirty-First 1 Nov, Thirtieth 25 Oct).",
-          "site_type:wp_json_newest_media. Do not invent Twenty-Sixth for 25 Oct \u2014 live name is Thirtieth. Do not pin the dated filename."
+          "02/11/2026: predicted PDF found then listing challenge on /bulletins/ hung. start_url is the PDF so challenge is skipped. Liturgical ordinal in the filename can be wrong \u2014 keep the site stem."
         ],
         "do_not": [
-          "Do not pin this week's dated filename.",
-          "Do not keep a download step with a Sept dated URL.",
-          "Do not invent Twenty-Sixth-Sunday for 25 Oct."
+          "Do not set start_url to /bulletins/ \u2014 listing challenge hangs.",
+          "Do not pin the dated filename forever.",
+          "Do not invent a different Sunday ordinal when rewriting."
         ],
-        "recorded_date": "2026-10-29"
+        "recorded_date": "2026-11-02"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -37886,6 +38171,39 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "timoleague",
+      "display_name": "Timoleague",
+      "diocese": "cork_and_ross",
+      "recipe_file": "parishes/recipes/cork_and_ross/timoleague.json",
+      "recipe": {
+        "start_url": "https://onefaith.ie/newsletter",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "06/11/2026: shared OneFaith /images/newsletter/YY-MM-DD.pdf."
+        ],
+        "do_not": [
+          "Do not harvest separately from barryroe.",
+          "Do not print_to_pdf the HTML listing."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same OneFaith Family of Parishes newsletter PDF. Harvest once under barryroe."
     },
     {
       "parish_key": "tinryland",
