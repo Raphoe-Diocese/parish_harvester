@@ -1,25 +1,49 @@
 {
+  "version": 2,
   "parish_key": "blessington",
   "display_name": "Blessington",
   "diocese": "dublin",
-  "recorded_date": "2026-10-15",
-  "start_url": "https://www.blessingtonparish.ie",
-  "site_type": "wp_json_newest_media",
-  "playbook_type": "direct_download",
+  "recorded_date": "2026-11-06",
+  "start_url": "https://blessingtonparish.ie/newsletters/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
   "status": "active",
   "skip": false,
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 8,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.blessingtonparish.ie"
+      "url": "https://blessingtonparish.ie/newsletters/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='newsletter-']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "h3 a",
+        "a:has-text('Newsletter')"
+      ]
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "15/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://blessingtonparish.ie/wp-content/uploads/2026/09/Newsletter-4th-Oct-2026-NEWGraohic2-.pdf."
+    "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
+    "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
+    "Do not pin /2026/11/05/newsletter-november-8th-2026/."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
+    "Do not pin a dated newsletter slug.",
+    "Do not rely on wp-json media alone — host can 403.",
     "Do not harvest Facebook."
-  ]
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }
