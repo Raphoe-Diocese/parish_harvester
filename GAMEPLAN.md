@@ -1,3 +1,5 @@
+## 06/11/2026 17:10 - A1 hunt: Tullylish + Ballyfermot
+Holy Family ok 08/11 JPEG. Ok count 420. Tullylish listing is Joomla articles; real files 01.11.26.pdf GET 200 488139 and 08.11.26.pdf 512931. Ballyfermot Sunday-Message-All-Saints-1-Nov-26-A4-Double.pdf in media 807368 bytes. PR 484 tests in flight. Not checked on parishpress.ie.
 ## 06/11/2026 16:10 - A1 hunt: Milltown + Holy Family + Newmarket
 Milltown Weekly-Bulletin-Sunday-November-8th-2026.pdf GET 200 557095 bytes %PDF. Holy Family listing is JPEG not PDF; 32nd Sunday jpg 656906. Newmarket drop Sept/Oct pattern lock. PR 482 merged; six harvests dispatched. Hung Churchtown cancelled. Not checked on parishpress.ie.
 ## 06/11/2026 16:00 - A1 hunt: Donnybrook + Donaghmoyne + Ferbane
