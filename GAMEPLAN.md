@@ -1,3 +1,5 @@
+## 06/11/2026 16:10 - A1 hunt: Milltown + Holy Family + Newmarket
+Milltown Weekly-Bulletin-Sunday-November-8th-2026.pdf GET 200 557095 bytes %PDF. Holy Family listing is JPEG not PDF; 32nd Sunday jpg 656906. Newmarket drop Sept/Oct pattern lock. PR 482 merged; six harvests dispatched. Hung Churchtown cancelled. Not checked on parishpress.ie.
 ## 06/11/2026 16:00 - A1 hunt: Donnybrook + Donaghmoyne + Ferbane
 Donnybrook wp-json Notices-1st-November-2026.pdf 3026548 bytes. Donaghmoyne skip HTTP2 listing; media has 08/11 PDF. Ferbane 20261101 01 November 2026.pdf GET 200 297605 bytes %PDF. Clonduff ok 01/11. Not checked on parishpress.ie.
 ## 06/11/2026 15:55 - A1 hunt: Cullyhanna + Foxrock + Doonbeg

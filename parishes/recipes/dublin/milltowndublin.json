@@ -1,35 +1,35 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "milltowndublin",
   "display_name": "Milltown",
   "diocese": "dublin",
-  "start_url": "https://milltownparish.ie/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
+  "start_url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "href_patterns": [
+    "Weekly-Bulletin",
+    ".pdf"
+  ],
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://milltownparish.ie/newsletter/"
+      "action": "download",
+      "url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf"
     }
   ],
   "operator_notes": [
-    "05/10/2026 Dublin leftover hunt: listing /newsletter/.",
-    "Proved Weekly-Bulletin-Sunday-October-4th-2026.pdf GET 200 application/pdf 655698 bytes magic %PDF. Date 04/10/2026.",
-    "Do not pin the dated filename."
+    "06/11/2026: /newsletter/ scrape timed out. Listing and wp-json both have Weekly-Bulletin-Sunday-November-8th-2026.pdf. Proved GET 200 application/pdf 557095 bytes magic %PDF-1.7. start_url is the PDF. Also November-1st in /2026/10/."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not set start_url to /newsletter/ — scrape then brain hangs.",
+    "Do not pin November-8th forever — predicted rewrites the date.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  },
-  "href_patterns": [
-    "Weekly-Bulletin",
-    ".pdf"
-  ]
+  }
 }
