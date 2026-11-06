@@ -218,12 +218,15 @@
         "Prefer HTTP if HTTPS TLS fails (Tempo / Pobal).",
         "02/11/2026 Tubbercurry: 1st-November-2026.pdf was uploaded into /2026/10/, not /2026/11/. Keep example_url on the real upload folder or predicted_dated_pdf invents a 404 month folder.",
         "02/11/2026 Mohill: /newsletter/ HTML archive lagged a week. wp-json/wp/v2/pages?search=newsletter already had newsletter-1st-november-2026 — use that as start_url for http_scrape_newest_html.",
+        "06/11/2026 Blessington: cookie consent blocks Playwright click on a[href*='newsletter-']. Raw /newsletters/ HTML already has the post URLs — use http_scrape_newest_html then print_to_pdf (covers Valleymount alias).",
+        "06/11/2026 Ashbourne: 31st-sunday-a-2026.pdf is cycle-letter liturgical naming; score with liturgical_date_from_text, not wp-json (media 404).",
       ],
       do_not: [
         "Do not skip because news.html looks empty.",
         "Do not pin one week's filename.",
         "Do not rewrite the WordPress /YYYY/MM/ folder to the bulletin month when the file still lives in the upload month.",
         "Do not trust Mohill /newsletter/ HTML alone when the pages API is newer.",
+        "Do not click Blessington listing through cookie consent — scrape the HTML post URL instead.",
       ],
     },
     js_overwritten_html_newsletter: {

@@ -115,6 +115,16 @@ class LiturgicalCalendarTests(unittest.TestCase):
             liturgical_date_from_text("22nd-Sunday-in-OT-A.jpg", 2026),
             date(2026, 8, 30),
         )
+        # Ashbourne: Nth-sunday-a-YYYY.pdf (cycle letter, no "Ordinary Time").
+        # 2026 has no 31st OT Sunday (All Saints displaces it) — still map to 01/11/2026.
+        self.assertEqual(
+            liturgical_date_from_text("31st-sunday-a-2026.pdf", 2026),
+            date(2026, 11, 1),
+        )
+        self.assertEqual(
+            liturgical_date_from_text("30th-sunday-a-2026.pdf", 2026),
+            date(2026, 10, 25),
+        )
 
     def test_rewrite_greenlough_url_uses_dynamic_liturgical_name(self) -> None:
         original = "http://www.greenlough.com/publications/newsletter/Easter_Sunday_2026_[2026-4-5].pdf"

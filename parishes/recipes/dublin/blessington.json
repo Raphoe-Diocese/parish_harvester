@@ -1,49 +1,38 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "blessington",
   "display_name": "Blessington",
   "diocese": "dublin",
   "recorded_date": "2026-11-06",
   "start_url": "https://blessingtonparish.ie/newsletters/",
-  "site_type": "html_text_bulletin",
+  "site_type": "http_scrape_newest_html",
   "playbook_type": "html_text_bulletin",
   "status": "active",
   "skip": false,
   "timeout_ms": 60000,
   "total_timeout_s": 180,
   "max_bulletin_pages": 8,
+  "post_slug_patterns": [
+    "newsletter-"
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://blessingtonparish.ie/newsletters/"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='newsletter-']",
-      "pick_strategy": "first_match",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "h3 a",
-        "a:has-text('Newsletter')"
-      ]
-    },
-    {
-      "action": "print_to_pdf",
-      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
-    "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
-    "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
+    "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 (HTML post). Cookie consent blocks Playwright click on a[href*='newsletter-'].",
+    "http_scrape_newest_html: plain HTTP listing already has newsletter-* post URLs, then print_to_pdf. Covers Valleymount (shared site).",
     "Do not pin /2026/11/05/newsletter-november-8th-2026/."
   ],
   "do_not": [
     "Do not pin a dated newsletter slug.",
-    "Do not rely on wp-json media alone — host can 403.",
+    "Do not click through the listing — cookie dialog times out selectors.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
-    "strategy": "first_match",
+    "strategy": "newest_dated",
     "position": "top"
   }
 }

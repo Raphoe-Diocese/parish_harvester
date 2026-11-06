@@ -233,15 +233,42 @@ def liturgical_date_from_text(text: str, year: int) -> date | None:
     if len(needle) < 8:
         return None
 
+    # Ashbourne / Meath: 31st-sunday-a-2026.pdf (cycle letter A/B/C, no
+    # "Ordinary Time" words). Also 23-Sunday-OT-A and 20th sunday in OT.
     compact_ot = re.search(
-        r"\b(\d{1,2})(?:st|nd|rd|th)? sunday(?: in)?(?: ordinary time| ot)\b",
+        r"\b(\d{1,2})(?:st|nd|rd|th)? sunday(?: in)?(?: ordinary time| ot)?(?:\s*[abc])?\b",
         needle,
     )
     if compact_ot:
-        want = normalize_liturgical_phrase(_ordinary_time_name(int(compact_ot.group(1))))
-        for sunday, name in get_liturgical_sundays(year).items():
+        week = int(compact_ot.group(1))
+        want = normalize_liturgical_phrase(_ordinary_time_name(week))
+        sundays = get_liturgical_sundays(year)
+        for sunday, name in sundays.items():
             if normalize_liturgical_phrase(name) == want:
                 return sunday
+        # Displaced OT Sunday (e.g. All Saints on Sunday replaces 31st OT
+        # in 2026): parish still names the file 31st-sunday-a. Use the
+        # Sunday sitting between week-1 and week+1 when that gap is 14 days.
+        prev_d = next(
+            (
+                sunday
+                for sunday, name in sundays.items()
+                if normalize_liturgical_phrase(name)
+                == normalize_liturgical_phrase(_ordinary_time_name(week - 1))
+            ),
+            None,
+        )
+        next_d = next(
+            (
+                sunday
+                for sunday, name in sundays.items()
+                if normalize_liturgical_phrase(name)
+                == normalize_liturgical_phrase(_ordinary_time_name(week + 1))
+            ),
+            None,
+        )
+        if prev_d and next_d and (next_d - prev_d).days == 14:
+            return prev_d + timedelta(days=7)
 
     def _best_in_year(lookup_year: int) -> date | None:
         best_date: date | None = None

@@ -5352,11 +5352,10 @@ async def replay_recipe(
         )
 
     if site_type == "wp_json_newest_media" and target_date is not None:
-        sunday_pdf = await _try_sunday_upload_pdf(
-            start_url, dest, target_date, browser
-        )
-        if sunday_pdf:
-            return dest, sunday_pdf[1], sunday_pdf[0]
+        # Media library first (fast HTTP). Sunday-upload browser probe used
+        # to run first and burn the whole total_timeout on slow Dublin hosts
+        # (Sandyford / Donnybrook 06/11/2026) even when wp-json already had
+        # this week's PDF.
         href_patterns = [
             str(p).strip().lower()
             for p in (recipe.get("href_patterns") or [])
@@ -5390,6 +5389,11 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        sunday_pdf = await _try_sunday_upload_pdf(
+            start_url, dest, target_date, browser
+        )
+        if sunday_pdf:
+            return dest, sunday_pdf[1], sunday_pdf[0]
         example_url = _recipe_example_document_url(recipe)
         if example_url:
             predicted = await _try_predicted_dated_pdf(
