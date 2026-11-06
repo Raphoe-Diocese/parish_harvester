@@ -184,20 +184,21 @@ def hint_for_url(url: str) -> HubHint | None:
 
     if host == "armaghparish.net":
         return HubHint(
-            key="yearless_month_pdf",
-            site_type="http_scrape_newest_pdf",
-            label="Yearless Month PDF under /YYYY/MM/",
+            key="predicted_pdf_no_listing_challenge",
+            site_type="predicted_dated_pdf",
+            label="Predicted dated PDF — skip listing challenge",
             confidence="high",
             notes=(
-                "31/10/2026 the Armagh listing newest file was 18th-October.pdf under /2026/10/.",
-                "The filename has no year. The folder year is 2026. That file is behind the 25/10 target.",
-                "Leave it stale. Do not pin 27 September and do not pin 18 October.",
+                "02/11/2026: 1st-November.pdf lived under /2026/09/ (folder month can lag).",
+                "Predicted download worked, then listing challenge on /parish-bulletin/ hung the job.",
+                "start_url must be the PDF itself so challenge is skipped. Yearless day-Month.pdf names.",
             ),
             do_not=(
-                "Do not pin 18th-October.pdf.",
-                "Do not pin the older 27 September file.",
+                "Do not set start_url to /parish-bulletin/ — listing challenge hangs.",
+                "Do not pin 1st-November.pdf forever — predicted_dated_pdf rewrites the date.",
+                "Do not force the WordPress folder month to match the bulletin month.",
             ),
-            pattern_key="yearless_month_pdf+direct_download",
+            pattern_key="predicted_dated_pdf+direct_download",
         )
 
     if host == "stbrendansbirr.ie":
