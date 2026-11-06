@@ -1,3 +1,5 @@
+## 06/11/2026 15:55 - A1 hunt: Cullyhanna + Foxrock + Doonbeg
+Cullyhanna November JPEGs in wp-json (01/11 and 08/11 proved). Foxrock PDF start_url Newsletter-November-1st-2026.pdf 567718 bytes %PDF. Doonbeg CDN 2026_11_01+Newsletter.pdf 316788 and 08/11 256842; scrape missed underscore dates. PR 481 merged; Clonduff/Churchtown/Booterstown harvests in flight. Not checked on parishpress.ie.
 ## 06/11/2026 15:50 - A1 hunt: Clonduff + Churchtown + Booterstown
 Clonduff listing moved to /bulletin/ (old /about/bulletin 404). Proved Sunday-1st-November-2026.pdf 2289713 bytes %PDF. Churchtown /newsletter/ is HTML so scrape hung; wp-json has newsletter-2026-11-01.pdf 1400380 bytes %PDF. Booterstown: add example_url so predicted runs before homepage brain hang. Parked file Bulletins/.grok_parked.txt. Not checked on parishpress.ie.
 ## 06/11/2026 15:35 - GROK RUNBOOK written

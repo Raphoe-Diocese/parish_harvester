@@ -1,39 +1,36 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "cullyhanna",
   "display_name": "Cullyhanna (Creggan Lower)",
   "diocese": "armagh",
   "start_url": "https://lowercregganparish.com/",
-  "site_type": "http_scrape_newest_images",
+  "site_type": "wp_json_newest_media",
   "href_patterns": [
     "Sunday",
-    "October",
-    "September",
-    ".jpg",
-    "uploads"
+    ".jpg"
+  ],
+  "href_skip_patterns": [
+    "png",
+    "-300x",
+    "Go-Rebuild"
   ],
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
-  "example_url": "https://lowercregganparish.com/wp-content/uploads/sites/6/2026/10/Sunday-4th-October-2026-page-001-scaled.jpg",
+  "total_timeout_s": 120,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://lowercregganparish.com/wp-content/uploads/sites/6/2026/10/Sunday-1st-November-2026-page-001-scaled.jpg",
   "steps": [
     {
       "action": "goto",
       "url": "https://lowercregganparish.com/"
-    },
-    {
-      "action": "image_stack",
-      "count": 1,
-      "position": "first",
-      "selector": "img[src*='Sunday'][src*='2026']",
-      "min_long_side": 500
     }
   ],
   "operator_notes": [
-    "05/10/2026 continuous hunt: official card Facebook-only. Live twin lowercregganparish.com (Lower Creggan / Cullyhanna). Homepage lists Parish Bulletin 4th October 2026. Proved Sunday-4th-October-2026-page-001-scaled.jpg GET 200 image/jpeg 890260 bytes magic JPEG. One page this week. Do not pin dated name."
+    "06/11/2026: homepage HTML has no Sunday- image hrefs. Old recipe required October/September so November files were skipped. wp-json image media lists Sunday-1st-November-2026-page-001-scaled.jpg (GET 200 image/jpeg 814393) and Sunday-8th-November-2026 in /2026/11/ (GET 200 image/jpeg 792633). Do not pin. One page this week."
   ],
   "do_not": [
     "Do not pin the dated JPEG filename.",
+    "Do not require October/September in href_patterns — that misses November.",
     "Do not harvest Facebook.",
     "Do not confuse with Upper Creggan / Crossmaglen."
   ],
