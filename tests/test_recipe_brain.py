@@ -46,11 +46,12 @@ def test_arklow_homepage_date_is_in_brackets() -> None:
     assert hint.site_type == "http_scrape_newest_pdf"
 
 
-def test_armagh_yearless_filename_stays_a_listing() -> None:
+def test_armagh_predicted_pdf_skips_listing_challenge() -> None:
     hint = hint_for_url("https://armaghparish.net/parish-bulletin/")
     assert hint is not None
-    assert hint.key == "yearless_month_pdf"
-    assert any("September" in line for line in hint.do_not)
+    assert hint.key == "predicted_pdf_no_listing_challenge"
+    assert hint.site_type == "predicted_dated_pdf"
+    assert any("parish-bulletin" in line for line in hint.do_not)
 
 
 def test_adamstown_listing_stays_stale() -> None:
@@ -327,6 +328,18 @@ def test_anspideal_irish_october_name_is_25_october() -> None:
     )
     assert extract_date_from_string(url) == date(2026, 10, 25)
     assert extract_bulletin_date(url) == date(2026, 10, 25)
+
+
+def test_anspideal_samhain_name_is_1_november() -> None:
+    from harvester.bulletin_freshness import extract_bulletin_date
+    from harvester.utils import extract_date_from_string
+
+    url = (
+        "https://cilleinde.ie/newsletters/2026/q4/"
+        "Lá na Naomh Uile 1 Samhain 2026.pdf"
+    )
+    assert extract_date_from_string(url) == date(2026, 11, 1)
+    assert extract_bulletin_date(url) == date(2026, 11, 1)
 
 
 def test_salthill_october_page_name_is_25_october() -> None:

@@ -81,12 +81,29 @@
         "Media path hash changes when they swap the photo — never pin it.",
         "Other large photos sit beside the sheet — image_stack prefer=largest so next week still wins.",
         "Accessibility tree may miss the image — look at the page / media assets.",
+        "Will work next week only if prefer=largest still picks the sheet (not a bigger church photo).",
       ],
       do_not: [
         "Do not pin /_assets/media/<hash>.png.",
         "Do not pin blob: URLs.",
         "Do not leave link_only/skip when the bulletin photo is on the Canva page.",
         "Do not Save page as PDF of the whole Canva chrome.",
+      ],
+    },
+    irish_filename_dates: {
+      playbook_type: "http_scrape",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "irish_dated_pdf",
+      recipe_flow: "http_scrape",
+      label: "Irish month names in PDF filenames",
+      operator_notes: [
+        "Keep Irish as Irish. Deireadh Fómhair = October. Samhain = November.",
+        "06/11/2026 An Spidéal: Lá na Naomh Uile 1 Samhain 2026.pdf is 01/11/2026.",
+        "Put Samhain and Deireadh in href_patterns so scrape does not miss the new month.",
+      ],
+      do_not: [
+        "Do not translate Irish month names into English filenames.",
+        "Do not pin the Irish PDF name.",
       ],
     },
     parish_messenger: {

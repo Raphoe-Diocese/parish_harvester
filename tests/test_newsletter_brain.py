@@ -292,10 +292,12 @@ class InventTests(unittest.TestCase):
         self.assertEqual(candidate_verdict(picked, date(2026, 10, 18)).status, "fresh")
 
     def test_armagh_parish_newest_pdf_is_11_october(self) -> None:
+        # Trap must not parse as target Sunday — a fake "18th-October" under /09/
+        # was winning invent/choose and hiding the real previous-Sunday keep.
         html = """
         <a href="https://armaghparish.net/wp-content/uploads/2026/10/11th-October.pdf">11</a>
         <a href="https://armaghparish.net/wp-content/uploads/2026/10/4th-October.pdf">4</a>
-        <a href="https://armaghparish.net/wp-content/uploads/2026/09/18th-October.pdf">old name</a>
+        <a href="https://armaghparish.net/wp-content/uploads/2026/09/27th-September.pdf">old name</a>
         """
         found = invent_candidates(html, "https://armaghparish.net/parish-bulletin/", date(2026, 10, 18))
         picked = choose(found, date(2026, 10, 18))

@@ -349,24 +349,35 @@ def image_newsletter_is_newer(
     return image_date > pdf_date
 
 
-def _irish_october_date(text: str) -> date | None:
-    """25 Deireadh Fómhair 2026 is 25/10/2026. The Irish month name stays Irish."""
+def _irish_month_date(text: str) -> date | None:
+    """Irish month names stay Irish. 25 Deireadh Fómhair = 25/10; 1 Samhain = 01/11."""
     folded = unicodedata.normalize("NFD", text or "")
     folded = "".join(ch for ch in folded if unicodedata.category(ch) != "Mn")
     folded = re.sub(r"\s+", " ", folded.lower())
-    match = re.search(
-        r"(?<!\d)(\d{1,2})(?:st|nd|rd|th|u)? deireadh fomhair (20\d{2})(?!\d)",
-        folded,
+    months = (
+        ("deireadh fomhair", 10),
+        ("samhain", 11),
     )
-    if not match:
-        return None
-    try:
-        candidate = date(int(match.group(2)), 10, int(match.group(1)))
-    except ValueError:
-        return None
-    if not _is_plausible_bulletin_year(candidate.year):
-        return None
-    return candidate
+    for name, month in months:
+        match = re.search(
+            rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th|u)? {name} (20\d{{2}})(?!\d)",
+            folded,
+        )
+        if not match:
+            continue
+        try:
+            candidate = date(int(match.group(2)), month, int(match.group(1)))
+        except ValueError:
+            continue
+        if not _is_plausible_bulletin_year(candidate.year):
+            continue
+        return candidate
+    return None
+
+
+def _irish_october_date(text: str) -> date | None:
+    """Back-compat name — Irish months including Samhain."""
+    return _irish_month_date(text)
 
 
 def prefer_upload_folder_year(text: str, parsed: date) -> date:

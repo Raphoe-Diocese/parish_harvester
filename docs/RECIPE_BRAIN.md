@@ -19,6 +19,9 @@ Frank unlocked this on 23/09/2026. The written list is in `GAMEPLAN.md` (23/09 l
 | `mayo.ie` parish-newsletters | Mayo County Council hosts PDFs (Belmullet proved). | `http_scrape_newest_pdf` on the listing | Do not pin the `getmedia` GUID. PNG is not a PDF recipe. |
 | `churchservices.tv` | Webcam. Sometimes a pointer to a real parish site. | Look for a newsletter on the same page; else keep the real site | Do not harvest the stream. Do not invent a PDF. |
 | `/current-newsletter/` | Same path every week, redirects to this Sunday’s PDF (Naas / Kildare). | `permanent_redirect_document` | Do not pin the dated upload name. |
+| `*.my.canva.site` | Printed weekly sheet as a photo on the Canva page (Ardboe proved). Own domain may redirect here. | `image_stack` `prefer=largest` on `img[src*="_assets/media"]` | Do not pin `/_assets/media/<hash>.png`. Do not pin `blob:` URLs. Accessibility text can miss the image. |
+| Google Drive year folders | Parent “Parish Newsletters” stays; year folders get new ids each January (2026→2027→2028). Files `YY.MM.DD.pdf` (`26.10.25.pdf` = 25/10/2026). | Start on **parent** only; click folder named this year; pick dated row | Do not pin year-folder id. Do not pin `/file/d/` id. Do not read YY.MM.DD as DD.MM.YY. |
+| Listing challenge hang | Predicted PDF found, then `_challenge_pin_against_listing` hangs on HTML bulletin index (Armagh/Termon). | `start_url` = the PDF itself + `predicted_dated_pdf` | Do not set `start_url` to `/parish-bulletin/` or `/bulletins/` when the challenge hangs. |
 
 Kitchen-sink search (Google / Bing / Yahoo) stays in [`DIOCESE_HUNT.md`](DIOCESE_HUNT.md). That runs in cloud hunts, not on this 16GB laptop.
 

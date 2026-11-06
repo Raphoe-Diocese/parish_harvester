@@ -1,9 +1,9 @@
 {
-  "version": 5,
+  "version": 6,
   "parish_key": "termonmaguirc",
   "display_name": "Termonmaguirc (Carrickmore, Loughmacrory & Creggan)",
   "diocese": "armagh",
-  "start_url": "https://www.termonmaguircparish.com/bulletins/",
+  "start_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf",
   "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "Sunday",
@@ -18,18 +18,17 @@
   "example_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.termonmaguircparish.com/bulletins/"
+      "action": "download",
+      "url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "02/11/2026: wp_json_newest_media / listing hung on GitHub past total timeout even after a Nov 1 URL was found. Prefer predicted_dated_pdf from the proved Nov 1 upload path; total_timeout_s 90.",
-    "Filename liturgical ordinal can be wrong on the site — trust the 1-November date in the path, not the Sunday number."
+    "02/11/2026: predicted PDF found then listing challenge on /bulletins/ hung. start_url is the PDF so challenge is skipped. Liturgical ordinal in the filename can be wrong — keep the site stem."
   ],
   "do_not": [
-    "Do not pin the dated filename.",
-    "Do not invent a different Sunday ordinal when rewriting — keep the site's own stem when possible.",
-    "Do not leave a 180s Playwright hang on this host."
+    "Do not set start_url to /bulletins/ — listing challenge hangs.",
+    "Do not pin the dated filename forever.",
+    "Do not invent a different Sunday ordinal when rewriting."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
