@@ -1,4 +1,7 @@
-﻿## 02/11/2026 — Armagh/Termon: PDF start_url skips listing hang
+## 06/11/2026 15:35 - GROK RUNBOOK written
+Forensic audit + autopilot cards: docs/GROK_RUNBOOK_2026-11-06.md (copy in Dropbox Harvester). Key proved bugs: green run != parish ok, single-parish runs clobber docs/report, retry_queue never scheduled, ~470 own-site skipped recipes untapped, kiltubrid BOM.
+
+## 02/11/2026 — Armagh/Termon: PDF start_url skips listing hang
 
 - Predicted found Nov 1 then `_challenge_pin_against_listing` hung on /parish-bulletin/ and /bulletins/. Set start_url to the PDF itself.
 - Ok still 408 until re-harvest.
