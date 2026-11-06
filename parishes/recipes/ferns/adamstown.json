@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "adamstown",
   "display_name": "Adamstown",
   "diocese": "ferns",
@@ -9,7 +9,7 @@
   "timeout_ms": 60000,
   "total_timeout_s": 120,
   "max_bulletin_pages": 8,
-  "recorded_date": "2026-10-24",
+  "recorded_date": "2026-11-06",
   "steps": [
     {
       "action": "goto",
@@ -22,7 +22,9 @@
       "bulletin_position": "top",
       "fallback_selectors": [
         "article h2 a",
-        "a:has-text('October')"
+        "a:has-text('November')",
+        "a:has-text('October')",
+        "a:has-text('1st November')"
       ]
     },
     {
@@ -31,11 +33,12 @@
     }
   ],
   "operator_notes": [
-    "24/10/2026: ferns.ie/adamstown/ Website line is http://saintabbans.com/. Newsletters page ?page_id=21 lists 18th October, 2026 at the top, linking ?p=1605.",
-    "That page text is ADAMSTOWN PARISH NEWSLETTER, Saturday 17th and Sunday 18th October 2026, Volume 22 Number 41. No PDF on the page. The print is 7 pages, so this recipe allows 8. Do not pin ?p=1605."
+    "24/10/2026: ferns.ie/adamstown/ Website line is http://saintabbans.com/. Newsletters page ?page_id=21. No PDF — print the top dated HTML post.",
+    "06/11/2026: listing top is 1st November, 2026 (All Saints weekend). first_match top must not be pinned to October-only fallbacks. Cookie banner can block clicks — dismiss if replay stalls. Do not pin ?p=."
   ],
   "do_not": [
-    "Do not pin ?p=1605.",
+    "Do not pin a dated ?p= id.",
+    "Do not leave October-only fallbacks — November posts must win.",
     "Do not remove skip_listing_nav.",
     "Do not harvest Facebook.",
     "Do not use the ferns.ie mass-times card as the bulletin."
