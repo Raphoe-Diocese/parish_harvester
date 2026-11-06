@@ -1,3 +1,5 @@
+## 06/11/2026 15:50 - A1 hunt: Clonduff + Churchtown + Booterstown
+Clonduff listing moved to /bulletin/ (old /about/bulletin 404). Proved Sunday-1st-November-2026.pdf 2289713 bytes %PDF. Churchtown /newsletter/ is HTML so scrape hung; wp-json has newsletter-2026-11-01.pdf 1400380 bytes %PDF. Booterstown: add example_url so predicted runs before homepage brain hang. Parked file Bulletins/.grok_parked.txt. Not checked on parishpress.ie.
 ## 06/11/2026 15:35 - GROK RUNBOOK written
 Forensic audit + autopilot cards: docs/GROK_RUNBOOK_2026-11-06.md (copy in Dropbox Harvester). Key proved bugs: green run != parish ok, single-parish runs clobber docs/report, retry_queue never scheduled, ~470 own-site skipped recipes untapped, kiltubrid BOM.
 
