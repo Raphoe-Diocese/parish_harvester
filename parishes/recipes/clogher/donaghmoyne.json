@@ -1,56 +1,36 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "donaghmoyne",
   "display_name": "Donaghmoyne",
   "diocese": "clogher",
-  "start_url": "https://donaghmoyne.com/category/parish-bulletin/",
+  "start_url": "https://donaghmoyne.com/",
+  "site_type": "wp_json_newest_media",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf",
   "steps": [
     {
-      "action": "click",
-      "href": "https://donaghmoyne.com/13th-september-2026/",
-      "selector": "article#post-3143 > header > h2 > a",
-      "text": "13th September 2026 | 13th September 2026"
-    },
-    {
-      "action": "click",
-      "href": "https://donaghmoyne.com/13th-september-2026/",
-      "selector": "html > body > a:nth-of-type(2)",
-      "text": ""
-    },
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://donaghmoyne.com/wp-content/uploads/2026/09/24th-of-Ordinary-Time-Sunday-13th-September-2026.pdf",
-      "text": "24th of Ordinary Time Sunday 13th September 2026 | 24th of O",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://donaghmoyne.com/wp-content/uploads/2026/09/24th-of-Ordinary-Time-Sunday-13th-September-2026.pdf"
+      "action": "goto",
+      "url": "https://donaghmoyne.com/"
     }
   ],
-  "observed_load_ms": 1558.300048828125,
-  "timeout_ms": 55000,
-  "total_timeout_s": 490,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "06/11/2026: category /parish-bulletin/ hits ERR_HTTP2_PROTOCOL_ERROR. wp-json media lists 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf (media date 06/11/2026). Do not open the category listing. Do not pin the Ordinary Time number."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not set start_url to /category/parish-bulletin/ — HTTP2 hang.",
+    "Do not pin 32nd-of-Ordinary-Time or 08th-November.",
+    "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    "Sunday",
+    "November",
+    ".pdf"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  },
-  "recorded_date": "2026-09-14"
+  }
 }
