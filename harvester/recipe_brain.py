@@ -571,15 +571,32 @@ def hint_for_url(url: str) -> HubHint | None:
         )
 
     if "wp-json" in path or path.rstrip("/").endswith("newsletters"):
+        if "ashbourneparish.ie" in host:
+            return HubHint(
+                key="ashbourne_liturgical_listing",
+                site_type="http_scrape_newest_pdf",
+                label="Ashbourne liturgical Sunday listing PDFs",
+                confidence="high",
+                notes=(
+                    "06/11/2026: listing has 28th–31st-sunday-a-2026.pdf. wp-json/media 404s.",
+                    "Score Nth-sunday-a-YYYY via liturgical_date_from_text (cycle letter). All Saints can displace 31st OT — still maps to that Sunday.",
+                    "http_scrape_newest_pdf. Do not pin the dated name.",
+                ),
+                do_not=(
+                    "Do not use wp_json_newest_media — media API 404s here.",
+                    "Do not pin a dated filename.",
+                    "Do not harvest Facebook.",
+                ),
+                pattern_key="http_scrape+liturgical_sunday_a",
+            )
         return HubHint(
             key="wp_json_media",
             site_type="wp_json_newest_media",
-            label="WordPress media library (Ashbourne / Askea pattern)",
+            label="WordPress media library (Askea pattern)",
             confidence="high",
             notes=(
-                "Ashbourne: listing had no calendar date in the PDF href. wp-json scored the file.",
                 "Askea: /newsletters/ lists dated PDFs. Do not pin the dated name.",
-                "31/10/2026 urllib GET of ashbourneparish.ie/newsletters/ returned HTTP 403. That is not proof the file is missing. Use the browser or wp-json.",
+                "06/11/2026: try wp-json media before the sunday-upload browser probe — that probe burned total_timeout on Sandyford/Donnybrook.",
             ),
             do_not=("Do not pin a dated filename.", "Do not harvest Facebook."),
             pattern_key="wp_json+direct_download",
