@@ -2,19 +2,56 @@
   "generated_at": "2026-11-06",
   "target_date": "2026-11-01",
   "summary": {
-    "downloaded": 413,
+    "downloaded": 417,
     "html_links": 0,
     "skipped": 800,
-    "failed": 51,
-    "stale_rejected": 51
+    "failed": 50,
+    "stale_rejected": 48
   },
   "action_counts": {
-    "ok": 433,
+    "ok": 434,
     "skip": 808,
     "mark_inactive": 1,
-    "investigate": 47
+    "investigate": 45,
+    "retrain": 1
   },
   "parishes": [
+    {
+      "parish_key": "blessington",
+      "display_name": "Blessington",
+      "diocese": "dublin",
+      "recipe_file": "parishes/recipes/dublin/blessington.json",
+      "recipe": {
+        "start_url": "https://blessingtonparish.ie/newsletters/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "active",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
+          "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
+          "Do not pin /2026/11/05/newsletter-november-8th-2026/."
+        ],
+        "do_not": [
+          "Do not pin a dated newsletter slug.",
+          "Do not rely on wp-json media alone \u2014 host can 403.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-06"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "wp_json+direct_download",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Blessington is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Blessington\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a[href*='newsletter-']: Locator.get_attribute: Ti",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
+    },
     {
       "parish_key": "abbeydorney",
       "display_name": "Abbeydorney",
@@ -1909,7 +1946,7 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/armaghparish.json",
       "recipe": {
-        "start_url": "https://armaghparish.net/wp-content/uploads/2026/09/1st-November.pdf",
+        "start_url": "https://armaghparish.net/wp-content/uploads/2026/11/1st-November.pdf",
         "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
@@ -1919,14 +1956,15 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "02/11/2026: predicted PDF under /2026/09/ worked, then _challenge_pin_against_listing hung on /parish-bulletin/. start_url must be the PDF itself so the listing challenge is skipped."
+          "02/11/2026: predicted PDF under /2026/09/ worked, then _challenge_pin_against_listing hung on /parish-bulletin/. start_url must be the PDF itself so the listing challenge is skipped.",
+          "06/11/2026: live file moved to /2026/11/1st-November.pdf (GET 200 application/pdf). /2026/09/1st-November.pdf is now 404. Do not set start_url to listing pages (403)."
         ],
         "do_not": [
-          "Do not set start_url to /parish-bulletin/ \u2014 listing challenge hangs.",
+          "Do not set start_url to /parish-bulletin/ \u2014 listing challenge hangs and listing is 403.",
           "Do not pin 1st-November.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
-          "Do not force the WordPress folder month to November."
+          "Do not keep the old /2026/09/ folder once the site moves the month folder."
         ],
-        "recorded_date": "2026-11-02"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "download",
       "learned_pattern": "yearless_month_pdf+direct_download",
@@ -1997,9 +2035,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: wp-json media at https://ashbourneparish.ie/newsletters/ \u2014 no dated bulletin PDF matching ['sunday', '.pdf'] (listing page was not opened)",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://ashbourneparish.ie/newsletters/ \u2014 no dated bulletin PDF matching ['sunday', '.pdf'] (not a selector problem; parish may not have posted)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: wp-json media at https://ashbourneparish.ie/newsletters/ \u2014 no dated bulletin PDF matching ['sunday', '.pdf'] (listing page was not opened)"
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://ashbourneparish.ie/newsletters/ \u2014 no dated bulletin PDF matching ['sunday', '.pdf'] (not a selector problem; p"
     },
     {
       "parish_key": "ashford",
@@ -2250,10 +2288,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "athloneelphin",
@@ -6828,42 +6866,6 @@
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official card / kitchen-sink still open. Do not invent Facebook PDFs."
     },
     {
-      "parish_key": "blessington",
-      "display_name": "Blessington",
-      "diocese": "dublin",
-      "recipe_file": "parishes/recipes/dublin/blessington.json",
-      "recipe": {
-        "start_url": "https://blessingtonparish.ie/newsletters/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "html_text_bulletin",
-        "status": "active",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
-          "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
-          "Do not pin /2026/11/05/newsletter-november-8th-2026/."
-        ],
-        "do_not": [
-          "Do not pin a dated newsletter slug.",
-          "Do not rely on wp-json media alone \u2014 host can 403.",
-          "Do not harvest Facebook."
-        ],
-        "recorded_date": "2026-11-06"
-      },
-      "bulletin_format": "html",
-      "learned_pattern": "wp_json+direct_download",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
-    },
-    {
       "parish_key": "bluebell",
       "display_name": "Bluebell",
       "diocese": "dublin",
@@ -7157,15 +7159,13 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: weekly PDF is in wp-json media. Listing /newsletter/ is a webp, not the file.",
-          "Proved Sun-4-October-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1675137 bytes magic %PDF. Date 04/10/2026.",
-          "31/10/2026: wp-json proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf (application/pdf, 01/11/2026, 1134965 bytes) and Sun-25-October-2026 (application/pdf, 25/10/2026, 1218254 bytes).",
-          "06/11/2026: media already has Sun-8-November-2026 (hash filename bp-bfecaa62\u2026.pdf, media date 06/11/2026). Title carries the Sunday date \u2014 do not pin the hash. Prior harvest timed out; bumped timeouts.",
-          "Skip JPEG previews of the same PDF. Do not pin the dated filename."
+          "06/11/2026: media library has Sun-8-November-2026 as a hash PDF (bp-bfecaa62\u2026.pdf, media date 06/11/2026) and named Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf.",
+          "Prior harvest timed out because wp-json miss then newsletter_brain opened the homepage. example_url lets predicted run before the brain. Do not pin the hash. Skip JPEG/PNG fronts of the same week."
         ],
         "do_not": [
           "Do not pin a dated filename or Wix hash.",
-          "Do not harvest Facebook."
+          "Do not harvest Facebook.",
+          "Do not take newsletter-front PNG instead of the PDF."
         ],
         "recorded_date": "2026-11-06"
       },
@@ -10524,8 +10524,8 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/churchtown.json",
       "recipe": {
-        "start_url": "https://churchtownparish.com/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://churchtownparish.com/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -10534,16 +10534,16 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: official card goodshepherdchurchtown.ie redirects to churchtownparish.com.",
-          "Proved Newsletter-Sunday-Message-4th-October-2026.pdf GET 200 application/pdf 1451104 bytes magic %PDF. Date 04/10/2026. Folder /2026/09/ is not the Sunday.",
-          "Score the filename. Do not pin the dated PDF.",
-          "31/10/2026 listing proved newsletter-2026-11-01.pdf. application/pdf, 1400380 bytes, date 01/11/2026. This Sunday was not on the page. The file is inside the 8-day window."
+          "06/11/2026: /newsletter/ is now an HTML week page (Week of Sunday 8 November 2026) with no PDF href. HTTP-scrape then opened Playwright and hit Total timeout exceeded.",
+          "Weekly PDF is in wp-json/wp/v2/media?search=newsletter. Proved newsletter-2026-11-01.pdf GET 200 application/pdf 1400380 bytes magic %PDF-1.7. All Saints 01/11/2026. Folder is /2026/10/ not /2026/11/.",
+          "Keep example_url so predicted can run before newsletter_brain if wp-json 403s. Do not pin the dated filename."
         ],
         "do_not": [
+          "Do not scrape /newsletter/ for PDFs \u2014 that page is HTML.",
           "Do not pin a dated filename or Wix hash.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "newsletter-YYYY-MM-DD.pdf",
@@ -11586,7 +11586,7 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/clonduff.json",
       "recipe": {
-        "start_url": "https://www.clonduffparish.com/about/bulletin",
+        "start_url": "https://clonduffparish.com/bulletin/",
         "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
@@ -11594,18 +11594,19 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "02/10/2026 hunt: listing /about/bulletin. Proved Sunday-27th-September-2026.pdf GET 200 application/pdf 2156592 bytes.",
-          "wp-json media also lists the same file. Do not pin the dated filename."
+          "06/11/2026: old listing /about/bulletin 404s after the Hotpress rebuild. Live archive is /bulletin/. Proved Sunday-1st-November-2026.pdf GET 200 application/pdf 2289713 bytes magic %PDF-1.3.",
+          "Do not pin the dated filename. Do not go back to /about/bulletin or /wp-content/uploads/2026/09/Sunday-27th-September-2026.pdf."
         ],
         "do_not": [
-          "Do not pin Sunday-27th-September-2026.pdf.",
+          "Do not pin Sunday-1st-November-2026.pdf.",
+          "Do not use /about/bulletin \u2014 that path 404s.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-11-06"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -15018,9 +15019,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: wp-json media at https://www.killaloediocese.ie/parish/doonbeg-killard/ \u2014 no dated bulletin PDF matching ['sunday', 'bulletin', 'newsletter'] (listing page was not opened)",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.doonbegparish.com/churches \u2014 no dated bulletin PDF matching ['newsletter', 'newsletter', '.pdf', 'irp.cdn-website.com'] (not a selector problem; parish may not have posted)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: wp-json media at https://www.killaloediocese.ie/parish/doonbeg-killard/ \u2014 no dated bulletin PDF matching ['sunday', 'bulletin', 'newslette"
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.doonbegparish.com/churches \u2014 no dated bulletin PDF matching ['newsletter', 'newsletter', '.pdf', 'irp.cdn-"
     },
     {
       "parish_key": "doorabarefield",
@@ -17297,33 +17298,34 @@
       "recipe_file": "parishes/recipes/cashel_and_emly/emly.json",
       "recipe": {
         "start_url": "https://emly.ie/category/parish-bulletin/",
-        "site_type": "http_scrape_newest_pdf",
+        "site_type": "click_then_download",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 3,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "02/10/2026 hunt: official Cashel & Emly card had no website. Kitchen-sink emly.ie category/parish-bulletin.",
-          "Proved Emly-Parish-Bulletin-27th-September-2026-sent.docx on post emly-parish-bulletin-27th-september-2026 (LibreOffice/python-docx \u2192 PDF).",
-          "Scrape newest .docx/.doc/.pdf from category listing or post download link."
+          "06/11/2026: category listing timed out on pinned September download. Click top Emly Parish Bulletin post, then Download .docx.",
+          "Proved 25th Oct post Download \u2192 Emly-Parish-Bulletin-25th-Octaber-2026.docx (site typo Octaber). LibreOffice converts docx.",
+          "Honest stale until a November post appears. Do not pin the misspelled filename."
         ],
         "do_not": [
-          "Do not pin the 27th September docx filename.",
-          "Do not harvest Facebook."
+          "Do not pin Emly-Parish-Bulletin-*-sent.docx or *Octaber*.",
+          "Do not harvest Facebook.",
+          "Do not stay on the category page waiting for a direct PDF."
         ],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "Recipe replay failed: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://emly.ie/category/parish-bulletin/\nCall log:\n  - navigating to \"https://emly.ie/category/parish-bulletin/\", waiting until \"domcontentloaded\"\n",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://emly.ie/category/parish-bulletin/\nCall log:\n  - navigating to \"https://emly.ie/categor"
     },
     {
       "parish_key": "emo",
@@ -18478,8 +18480,8 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/foxrock.json",
       "recipe": {
-        "start_url": "https://www.foxrockparish.ie/",
-        "site_type": "wp_json_newest_media",
+        "start_url": "https://foxrockparish.ie/",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -18488,15 +18490,15 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: weekly PDF in wp-json media.",
-          "Proved Newsletter-September-27th-2026.pdf GET 200 application/pdf 367076 bytes magic %PDF. Date 27/09/2026 (accepted weekend file).",
-          "Skip JPEG previews. Do not pin the dated filename."
+          "06/11/2026: homepage Latest News has Parish Newsletter November 1st. PDF on page: Newsletter-November-1st-2026.pdf. wp-json media path was timing out.",
+          "http_scrape_newest_pdf on homepage. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
+          "Do not pin Newsletter-November-1st-2026.pdf.",
+          "Do not use wp_json_newest_media here (timeout).",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-06"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
