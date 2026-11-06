@@ -1,40 +1,32 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "foxrock",
   "display_name": "Foxrock",
   "diocese": "dublin",
-  "start_url": "https://foxrockparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "Newsletter",
+    "November",
     ".pdf"
   ],
-  "href_skip_patterns": [
-    "jpg",
-    "jpeg",
-    "png",
-    "-300x",
-    "-1024x",
-    "-150x"
-  ],
-  "max_bulletin_pages": 16,
   "timeout_ms": 30000,
   "total_timeout_s": 90,
+  "weeks_ahead": 1,
   "recorded_date": "2026-11-06",
   "example_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://foxrockparish.ie/"
+      "action": "download",
+      "url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf"
     }
   ],
   "operator_notes": [
-    "06/11/2026: homepage Latest News has Parish Newsletter November 1st. PDF on page: Newsletter-November-1st-2026.pdf. wp-json media path was timing out.",
-    "http_scrape_newest_pdf on homepage. Do not pin the dated filename."
+    "06/11/2026: homepage scrape still timed out. Proved Newsletter-November-1st-2026.pdf GET 200 application/pdf 567718 bytes magic %PDF-1.7. start_url is the PDF so listing challenge is skipped."
   ],
   "do_not": [
-    "Do not pin Newsletter-November-1st-2026.pdf.",
-    "Do not use wp_json_newest_media here (timeout).",
+    "Do not set start_url to the homepage — scrape then newsletter_brain hangs.",
+    "Do not pin Newsletter-November-1st-2026.pdf forever — predicted_dated_pdf rewrites the date.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
