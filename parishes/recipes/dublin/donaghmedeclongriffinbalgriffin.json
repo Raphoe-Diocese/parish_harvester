@@ -1,25 +1,35 @@
 {
+  "version": 2,
   "parish_key": "donaghmedeclongriffinbalgriffin",
   "display_name": "Donaghmede",
   "diocese": "dublin",
-  "recorded_date": "2026-10-08",
-  "start_url": "https://www.holytrinityparish.ie",
-  "site_type": "wp_json_newest_media",
-  "playbook_type": "direct_download",
-  "status": "active",
-  "skip": false,
+  "start_url": "https://holytrinityparish.ie/wp/wp-content/uploads/dlm_uploads/2026.11.01.pdf",
+  "site_type": "predicted_dated_pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://holytrinityparish.ie/wp/wp-content/uploads/dlm_uploads/2026.11.01.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.holytrinityparish.ie"
+      "action": "download",
+      "url": "https://holytrinityparish.ie/wp/wp-content/uploads/dlm_uploads/2026.11.01.pdf"
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "08/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://holytrinityparish.ie/wp/wp-content/uploads/dlm_uploads/The-Peoples-Mass-26.10.04.pdf."
+    "06/11/2026: homepage wp-json timed out. Media search newsletter only finds annual Share-Newsletter. Weekly files are dlm_uploads/2026.11.01.pdf (456333 bytes, media 30/10) and 2026.11.08.pdf (461595 bytes, media 06/11). start_url is the PDF so listing challenge is skipped."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
+    "Do not set start_url to the homepage — newsletter_brain hangs.",
+    "Do not search media for newsletter — that hits the annual Share Newsletter.",
+    "Do not pin 2026.11.01.pdf forever — predicted_dated_pdf rewrites the date.",
     "Do not harvest Facebook."
-  ]
+  ],
+  "href_patterns": [
+    ".pdf"
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
