@@ -1,38 +1,41 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "dungarvan",
   "display_name": "Dungarvan",
   "diocese": "waterford_and_lismore",
-  "start_url": "https://dungarvanparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://dungarvanparish.ie/wp-content/uploads/2026/10/St.-Marys-Parish-Newsletter-November-2026.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "St.-Marys-Parish-Newsletter",
     "Parish-Newsletter",
-    "October",
     ".pdf"
   ],
   "href_skip_patterns": [
     "Faith-at-Home",
     "Faith-at-Home-Photo",
     "Youth-Club",
-    "Church-on-Easter"
+    "Church-on-Easter",
+    "-Page-"
   ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-07",
+  "example_url": "https://dungarvanparish.ie/wp-content/uploads/2026/10/St.-Marys-Parish-Newsletter-November-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://dungarvanparish.ie/"
+      "action": "download",
+      "url": "https://dungarvanparish.ie/wp-content/uploads/2026/10/St.-Marys-Parish-Newsletter-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "05/10/2026 Waterford leftover hunt: St. Mary's Parish Newsletter October 2026 PDF on the homepage/post. Proved https://dungarvanparish.ie/wp-content/uploads/2026/08/St.-Marys-Parish-Newsletter-October-2026.pdf GET 200 application/pdf 486708 bytes magic %PDF-1.7. Filename date October 2026; CreationDate 20261001. Faith-at-Home weekly PDF/JPEG is not the parish bulletin — leave it out (href_skip_patterns). Do not pin the dated filename."
+    "07/11/2026: href_patterns required October so November was skipped. Monthly St.-Marys-Parish-Newsletter-November-2026.pdf is in /2026/10/. Proved GET 200 application/pdf 226478 bytes magic %PDF-1.7. Skip Faith-at-Home and -Page- JPEGs. start_url is the PDF."
   ],
   "do_not": [
+    "Do not require October in href_patterns — that misses November.",
     "Do not harvest Faith-at-Home — it is not the parish bulletin.",
-    "Do not pin a dated St.-Marys-Parish-Newsletter filename.",
+    "Do not take Newsletter-Page-1.jpg when the PDF exists.",
+    "Do not pin November-2026 forever — predicted rewrites the month.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {

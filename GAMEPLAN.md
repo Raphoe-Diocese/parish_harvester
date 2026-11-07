@@ -1,3 +1,5 @@
+## 07/11/2026 13:20 - A1: Tullylish ok 422; Dungarvan + SMA Blackrock
+Tullylish ok 01/11 01.11.26.pdf. Ok 422. Ballyfermot and Newmarket still timeout on GitHub after PDF start_url — parked. PR 486 merged; DKR harvest 42376639268. Dungarvan November monthly PDF GET 200 226478 in /2026/10/; old recipe locked October. SMA Blackrock All-Saints 1st November GET 200 934342; old pattern missed All Saints. Not checked on parishpress.ie.
 ## 07/11/2026 11:40 - A1: Donaghmede ok 421; DKR next
 Donaghmede ok on 2026.11.01.pdf (date field empty). Ok 421. PR 484 six harvests: only Donaghmede ok. Sandyford/Churchtown GitHub predicted miss. Donnybrook/Booterstown still timeout. Donaghmoyne predicted miss. PR 485 merged; Tullylish/Ballyfermot/Newmarket harvests 42369102614 42369105298 42369107837. DKR media has Newsletter-2026-11-01.pdf 381542 and 11-08 392377. Not checked on parishpress.ie.
 ## 06/11/2026 17:10 - A1 hunt: Tullylish + Ballyfermot + Newmarket PDF
