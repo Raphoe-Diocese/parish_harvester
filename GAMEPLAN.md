@@ -1,3 +1,5 @@
+## 07/11/2026 18:05 - A1: Ok 425 Caherdaniel; Kilgarvan Nov PDF
+Caherdaniel ok 01/11. Ok 425. Kilmoremoy GitHub predicted miss. Shannon West timeout. Bearna harvest still in flight. Kilgarvan Newsletter-1st-November-2026-1.pdf GET 200 123343; old recipe locked October. Honest stale: Killeentierna newest 19/10. PR 489 merged; Caherdaniel/Bearna harvests 42399462205 42399467352. Not checked on parishpress.ie.
 ## 07/11/2026 17:50 - A1: Ok 424; Caherdaniel + Bearna Nov PDFs
 Dungarvan ok November monthly PDF. Blackrock ok 01/11 All Saints. Ok 424. PR 488 merged; Kilmoremoy harvest 42398470103 and Shannon West 42398473625. Caherdaniel-1st-November-Newsletter.pdf GET 200 1891661; old recipe locked October. Bearna 1stNov2026.pdf GET 200 403649 and 8thNov2026.pdf 409991; old recipe locked Oct/Sept. Keep Irish. Not checked on parishpress.ie.
 ## 07/11/2026 17:45 - A1: Kilmoremoy + Shannon West PDFs
