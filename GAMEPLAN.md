@@ -1,3 +1,5 @@
+## 06/11/2026 17:10 - A1 hunt: Tullylish + Ballyfermot + Newmarket PDF
+Holy Family ok 08/11 JPEG. Ok count 420. Tullylish 01.11.26.pdf GET 200 488139. Ballyfermot Sunday-Message-All-Saints-1-Nov-26 in media. Milltown GitHub predicted miss after local GET 200 — parked with Foxrock/Doonbeg. Newmarket still timeout on homepage; media has Newsletter-Sunday-1st-November-2026.pdf. PR 484 merged. Not checked on parishpress.ie.
 ## 06/11/2026 17:05 - A1 hunt: Sandyford + Churchtown PDF + Donnybrook
 Cullyhanna ok 01/11 JPEG. Ferbane ok 01/11 PDF. Ok count 419. Foxrock/Doonbeg GitHub predicted miss after local GET 200 — parked. Donaghmoyne found Nov 1 PDF then timed out. Donnybrook still timeout. PR 483 merged; milltown/holy-family/newmarket harvests 42258052453 42258060279 42258068401. Sandyford Newsletter-2026-11-01.pdf GET 200 431750. Churchtown PDF start_url after 17m hang. Not checked on parishpress.ie.
 ## 06/11/2026 16:10 - A1 hunt: Milltown + Holy Family + Newmarket

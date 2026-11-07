@@ -1,33 +1,32 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "tullylish",
   "display_name": "Tullylish",
   "diocese": "dromore",
-  "start_url": "https://www.tullylish.com/bulletin",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "bulletin",
-    ".pdf",
-    "BULLETINS",
-    "2026"
-  ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-02",
-  "example_url": "https://www.tullylish.com/images/stories/BULLETINS/2026/bulletin%2027.09.26pub1.pdf",
+  "start_url": "https://www.tullylish.com/images/stories/BULLETINS/2026/01.11.26.pdf",
+  "site_type": "predicted_dated_pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-06",
+  "example_url": "https://www.tullylish.com/images/stories/BULLETINS/2026/01.11.26.pdf",
   "steps": [
     {
       "action": "download",
-      "url": "https://www.tullylish.com/images/stories/BULLETINS/2026/bulletin%2027.09.26pub1.pdf"
+      "url": "https://www.tullylish.com/images/stories/BULLETINS/2026/01.11.26.pdf"
     }
   ],
   "operator_notes": [
-    "02/10/2026 hunt: tullylish.com/bulletin rows like Bulletin 27.09.26. File /images/stories/BULLETINS/2026/bulletin 27.09.26pub1.pdf.",
-    "Proved GET 200 application/pdf 892093 bytes."
+    "06/11/2026: /bulletin listing is Joomla article rows (bulletin-011126, bulletin-081126) with no .pdf href, so http_scrape_newest_pdf missed. Article pages have /images/stories/BULLETINS/2026/01.11.26.pdf. Proved GET 200 application/pdf 488139 bytes magic %PDF-1.7. Also 08.11.26.pdf 512931 bytes. Old bulletin 27.09.26pub1.pdf name is gone. start_url is the PDF."
   ],
   "do_not": [
-    "Do not pin 27.09.26 filename.",
+    "Do not scrape /bulletin for .pdf hrefs — that page only has article links.",
+    "Do not pin 01.11.26.pdf forever — predicted_dated_pdf rewrites the date.",
+    "Do not use the old bulletin%2027.09.26pub1.pdf name.",
     "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    ".pdf"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
