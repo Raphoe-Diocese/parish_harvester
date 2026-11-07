@@ -1,3 +1,5 @@
+## 07/11/2026 18:35 - A1: Ok 427 Beechwood + Bellaghy; Bearna 8 Nov
+Beechwood ok (date empty) Newsletter-8th-November-2026.pdf via current-newsletter redirect. Bellaghy ok (date empty) 1-Nov-2026.pdf. Ok 427. Recipe already correct; re-harvest only. Caherdaniel still ok 01/11. Bearna 1stNov in /2026/10/ dated 01/10; switch start_url to 8thNov2026.pdf in /2026/11/ GET 200 409991. Kilgarvan PR 490 merged; harvest 42406452538 in flight. Parked: Ballymote 31/10 images dated 01/10; Enniskeane Newsletter-11-01-2026 is 1 Nov (US MM-DD, parent slug 1st-november) dated 11/01; Bundoran newest still 09/02/2025. Not checked on parishpress.ie.
 ## 07/11/2026 18:05 - A1: Ok 425 Caherdaniel; Kilgarvan Nov PDF
 Caherdaniel ok 01/11. Ok 425. Kilmoremoy GitHub predicted miss. Shannon West timeout. Bearna harvest still in flight. Kilgarvan Newsletter-1st-November-2026-1.pdf GET 200 123343; old recipe locked October. Honest stale: Killeentierna newest 19/10. PR 489 merged; Caherdaniel/Bearna harvests 42399462205 42399467352. Not checked on parishpress.ie.
 ## 07/11/2026 17:50 - A1: Ok 424; Caherdaniel + Bearna Nov PDFs
