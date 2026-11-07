@@ -1,33 +1,31 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "kilmoremoy",
   "display_name": "Kilmoremoy",
   "diocese": "killala",
-  "start_url": "https://ballinaparish.org/bulletin/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-61.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "newsletter",
-    ".pdf",
-    "uploads"
+    ".pdf"
   ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-02",
-  "example_url": "https://ballinaparish.org/wp-content/uploads/2026/09/newsletter-56.pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-07",
+  "example_url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-61.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ballinaparish.org/bulletin/"
+      "action": "download",
+      "url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-61.pdf"
     }
   ],
   "operator_notes": [
-    "02/10/2026: official card website is ballinaparish.org. Bulletin page links newsletter-56.pdf. PDF text masthead: 27th September, 2026, Twenty-Sixth Sunday. Priests match the Kilmoremoy card (Gillespie, Holmes, O'Boyle).",
-    "WordPress media: application/pdf, 2656319 bytes, uploaded 2026-09-27. Filename has no day, so scrape must follow the bulletin page link.",
-    "Direct GET from the hunt VM was SiteGround HTTP 202 challenge HTML, so %PDF magic was not saved on this machine. A PDF reader still extracted the bulletin text from that URL."
+    "07/11/2026: /bulletin/ scrape timed out. wp-json media newest is newsletter-61.pdf uploaded 01/11/2026, 2850206 bytes. Filename has no day. start_url is the PDF so listing challenge is skipped. This IP RemoteDisconnected on GET; GitHub fetch is the proof."
   ],
   "do_not": [
-    "Do not pin newsletter-56.pdf.",
-    "Do not use facebook.com/dioceseofkillala as this parish Facebook. The parish site footer is facebook.com/profile.php?id=100064629674564.",
+    "Do not set start_url to /bulletin/ — scrape hangs.",
+    "Do not pin newsletter-61.pdf forever — the number ticks each week.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {

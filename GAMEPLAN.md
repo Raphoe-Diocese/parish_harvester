@@ -1,3 +1,5 @@
+## 07/11/2026 17:45 - A1: Kilmoremoy + Shannon West PDFs
+Tullylish still ok 422. DKR harvest timed out on GitHub after PDF start_url — parked. PR 487 merged; Dungarvan and Blackrock harvests 42397936351 42397940088. Kilmoremoy newsletter-61.pdf media 01/11 2850206 bytes. Shannon West NL-31st-Oct-1st-Nov.-2026.pdf 432272 and NL-7th-and-8th-Nov 522504. Honest stale parked: Bandon 13/09, Barryroe 12/10, Boherbue 04/10. WAF cluster parked. Not checked on parishpress.ie.
 ## 07/11/2026 13:20 - A1: Tullylish ok 422; Dungarvan + SMA Blackrock
 Tullylish ok 01/11 01.11.26.pdf. Ok 422. Ballyfermot and Newmarket still timeout on GitHub after PDF start_url — parked. PR 486 merged; DKR harvest 42376639268. Dungarvan November monthly PDF GET 200 226478 in /2026/10/; old recipe locked October. SMA Blackrock All-Saints 1st November GET 200 934342; old pattern missed All Saints. Not checked on parishpress.ie.
 ## 07/11/2026 11:40 - A1: Donaghmede ok 421; DKR next
