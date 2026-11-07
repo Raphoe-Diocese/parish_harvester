@@ -1,3 +1,5 @@
+## 07/11/2026 11:40 - A1: Donaghmede ok 421; DKR next
+Donaghmede ok on 2026.11.01.pdf (date field empty). Ok 421. PR 484 six harvests: only Donaghmede ok. Sandyford/Churchtown GitHub predicted miss. Donnybrook/Booterstown still timeout. Donaghmoyne predicted miss. PR 485 merged; Tullylish/Ballyfermot/Newmarket harvests 42369102614 42369105298 42369107837. DKR media has Newsletter-2026-11-01.pdf 381542 and 11-08 392377. Not checked on parishpress.ie.
 ## 06/11/2026 17:10 - A1 hunt: Tullylish + Ballyfermot + Newmarket PDF
 Holy Family ok 08/11 JPEG. Ok count 420. Tullylish 01.11.26.pdf GET 200 488139. Ballyfermot Sunday-Message-All-Saints-1-Nov-26 in media. Milltown GitHub predicted miss after local GET 200 — parked with Foxrock/Doonbeg. Newmarket still timeout on homepage; media has Newsletter-Sunday-1st-November-2026.pdf. PR 484 merged. Not checked on parishpress.ie.
 ## 06/11/2026 17:05 - A1 hunt: Sandyford + Churchtown PDF + Donnybrook
