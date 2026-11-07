@@ -1,3 +1,5 @@
+## 07/11/2026 17:50 - A1: Ok 424; Caherdaniel + Bearna Nov PDFs
+Dungarvan ok November monthly PDF. Blackrock ok 01/11 All Saints. Ok 424. PR 488 merged; Kilmoremoy harvest 42398470103 and Shannon West 42398473625. Caherdaniel-1st-November-Newsletter.pdf GET 200 1891661; old recipe locked October. Bearna 1stNov2026.pdf GET 200 403649 and 8thNov2026.pdf 409991; old recipe locked Oct/Sept. Keep Irish. Not checked on parishpress.ie.
 ## 07/11/2026 17:45 - A1: Kilmoremoy + Shannon West PDFs
 Tullylish still ok 422. DKR harvest timed out on GitHub after PDF start_url — parked. PR 487 merged; Dungarvan and Blackrock harvests 42397936351 42397940088. Kilmoremoy newsletter-61.pdf media 01/11 2850206 bytes. Shannon West NL-31st-Oct-1st-Nov.-2026.pdf 432272 and NL-7th-and-8th-Nov 522504. Honest stale parked: Bandon 13/09, Barryroe 12/10, Boherbue 04/10. WAF cluster parked. Not checked on parishpress.ie.
 ## 07/11/2026 13:20 - A1: Tullylish ok 422; Dungarvan + SMA Blackrock
