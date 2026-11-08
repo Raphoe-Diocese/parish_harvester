@@ -441,6 +441,29 @@ http://ardara.ie</p>
 
 
 class StaleParishCaptionTests(unittest.TestCase):
+    def test_ok_page_does_not_call_last_sunday_this_week(self) -> None:
+        uk, meta, masthead = parish_pages.parish_page_date_bits(
+            "2026-11-08",
+            "2026-11-01",
+            "Ardboe",
+            "Armagh Diocese",
+        )
+        self.assertEqual(uk, "01/11/2026")
+        self.assertEqual(masthead, "2026-11-01")
+        self.assertIn("not this Sunday 08/11/2026", meta)
+        self.assertNotIn("This week's bulletin", meta)
+
+    def test_ok_page_keeps_this_sunday_caption(self) -> None:
+        uk, meta, masthead = parish_pages.parish_page_date_bits(
+            "2026-11-08",
+            "2026-11-08",
+            "Kerry parish",
+            "Kerry Diocese",
+        )
+        self.assertEqual(uk, "08/11/2026")
+        self.assertEqual(masthead, "2026-11-08")
+        self.assertIn("This week's bulletin for Kerry parish — 08/11/2026", meta)
+
     def test_caption_uses_real_date_not_harvest_sunday(self) -> None:
         meta, note = parish_pages.stale_parish_caption("2026-08-30")
         self.assertEqual(note, "Latest bulletin we have: 30/08/2026 (not this week)")

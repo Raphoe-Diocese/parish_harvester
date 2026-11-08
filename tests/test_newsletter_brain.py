@@ -189,8 +189,8 @@ class InventTests(unittest.TestCase):
         assert picked is not None
         self.assertTrue(picked.url.endswith("Charlestown-11-10-2026.pdf"))
         week_later = candidate_verdict(picked, date(2026, 10, 18))
-        self.assertEqual(week_later.status, "fresh")
-        self.assertEqual(week_later.reason, "previous_sunday_still_current")
+        self.assertEqual(week_later.status, "stale")
+        self.assertEqual(week_later.reason, "date_behind_of_target")
         self.assertEqual(candidate_verdict(picked, date(2026, 10, 11)).status, "fresh")
 
     def test_edgeworthstown_picks_this_sunday_not_the_thought_file(self) -> None:
@@ -305,8 +305,8 @@ class InventTests(unittest.TestCase):
         assert picked is not None
         self.assertTrue(picked.url.endswith("/2026/10/11th-October.pdf"))
         verdict = candidate_verdict(picked, date(2026, 10, 18))
-        self.assertEqual(verdict.status, "fresh")
-        self.assertEqual(verdict.reason, "previous_sunday_still_current")
+        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.reason, "date_behind_of_target")
 
     def test_cullyhanna_post_is_kept_until_the_picture_is_on_the_page(self) -> None:
         home = """
