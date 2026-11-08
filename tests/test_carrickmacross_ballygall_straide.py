@@ -17,12 +17,11 @@ class CarrickmacrossBallygallStraideTests(unittest.TestCase):
     def test_ballygall_scrapes_blog_not_pinned_sept(self) -> None:
         path = REPO_ROOT / "parishes" / "recipes" / "dublin" / "ballygallparish.json"
         payload = json.loads(path.read_text(encoding="utf-8"))
-        self.assertEqual(payload.get("site_type"), "http_scrape_newest_pdf")
-        self.assertIn("blog", payload.get("start_url", ""))
-        steps = payload.get("steps") or []
-        self.assertEqual([s.get("action") for s in steps], ["goto"])
+        self.assertEqual(payload.get("site_type"), "predicted_dated_pdf")
+        self.assertIn("Newsletter-for-November-8th.pdf", payload.get("start_url", ""))
+        self.assertNotIn("November-1st", payload.get("start_url", ""))
+        self.assertNotIn("October25th", payload.get("start_url", ""))
         self.assertIn("Newsletter-for-", " ".join(payload.get("href_patterns") or []))
-        self.assertIn("October25th", payload.get("example_url") or "")
 
     def test_straide_scrapes_and_bohola_aliases(self) -> None:
         straide = json.loads(
