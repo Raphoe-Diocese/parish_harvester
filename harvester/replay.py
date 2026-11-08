@@ -331,6 +331,25 @@ def _recipe_example_document_url(recipe: dict) -> str:
     return ""
 
 
+def _recipe_week_span(
+    recipe: dict, *, back_default: int = 8, ahead_default: int = 0
+) -> tuple[int, int]:
+    """Read weeks_back / weeks_ahead. JSON 0 is a real window, not missing.
+
+    ``int(recipe.get("weeks_back") or 8)`` turns Beaumont's 0 into 8, so
+    predicted then accepts Newsletter25.10.26.pdf after the 9.7MB 8 November
+    file times out of the 12s budget.
+    """
+
+    def _int(key: str, default: int) -> int:
+        raw = recipe.get(key)
+        if raw is None or raw == "":
+            return default
+        return int(raw)
+
+    return _int("weeks_back", back_default), _int("weeks_ahead", ahead_default)
+
+
 def _is_gdrive_usercontent_url(url: str) -> bool:
     return "drive.usercontent.google.com/download" in unquote((url or "").strip()).lower()
 
@@ -2884,12 +2903,13 @@ async def _try_http_recipe_document_fallbacks(
     if target_date is not None:
         example_url = _recipe_example_document_url(recipe)
         if example_url:
+            weeks_back, weeks_ahead = _recipe_week_span(recipe)
             predicted = await _try_predicted_dated_pdf(
                 example_url,
                 dest,
                 target_date,
-                weeks_back=int(recipe.get("weeks_back") or 8),
-                weeks_ahead=int(recipe.get("weeks_ahead") or 0),
+                weeks_back=weeks_back,
+                weeks_ahead=weeks_ahead,
             )
             if predicted:
                 return await _accept_pin(predicted)
@@ -5185,7 +5205,7 @@ async def replay_recipe(
             post_slug_patterns=post_slug_patterns,
             target_date=target_date,
             example_post_url=example_post_url or None,
-            weeks_back=int(recipe.get("weeks_back") or 8),
+            weeks_back=_recipe_week_span(recipe)[0],
         )
         if found:
             return dest, found[1], found[0]
@@ -5327,8 +5347,7 @@ async def replay_recipe(
         and target_date is not None
     ):
         example_url = _recipe_example_document_url(recipe) or start_url
-        weeks_back = int(recipe.get("weeks_back") or 8)
-        weeks_ahead = int(recipe.get("weeks_ahead") or 0)
+        weeks_back, weeks_ahead = _recipe_week_span(recipe)
         found = await _try_predicted_dated_pdf(
             example_url,
             dest,
@@ -5406,12 +5425,13 @@ async def replay_recipe(
             return dest, found[1], found[0]
         example_url = _recipe_example_document_url(recipe)
         if example_url:
+            weeks_back, weeks_ahead = _recipe_week_span(recipe)
             predicted = await _try_predicted_dated_pdf(
                 example_url,
                 dest,
                 target_date,
-                weeks_back=int(recipe.get("weeks_back") or 8),
-                weeks_ahead=int(recipe.get("weeks_ahead") or 0),
+                weeks_back=weeks_back,
+                weeks_ahead=weeks_ahead,
             )
             if predicted:
                 return dest, predicted[1], predicted[0]
@@ -5451,7 +5471,7 @@ async def replay_recipe(
             slug_patterns=slug_patterns,
             target_date=target_date,
             example_post_url=str(recipe.get("example_post_url") or "").strip() or None,
-            weeks_back=int(recipe.get("weeks_back") or 3),
+            weeks_back=_recipe_week_span(recipe, back_default=3)[0],
             image_count=image_count,
             href_patterns=image_href_patterns or None,
         )
@@ -5585,7 +5605,7 @@ async def replay_recipe(
                     resolved = await _try_resolve_wix_dated_slug(
                         [url, str(step.get("url") or ""), start_url],
                         target_date,
-                        weeks_back=int(recipe.get("weeks_back") or 3),
+                        weeks_back=_recipe_week_span(recipe, back_default=3)[0],
                     )
                     if resolved:
                         url = resolved
