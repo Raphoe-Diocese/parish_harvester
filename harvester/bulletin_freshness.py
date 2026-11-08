@@ -27,9 +27,9 @@ if TYPE_CHECKING:
     from .fetcher import FetchResult, ParishEntry
 
 # Ahead grace: up to 8 calendar days after harvest target is still fresh.
-# The previous Sunday (exactly 7 days before the target) stays fresh for
-# that whole target week. 01/11/2026 the Sunday-only clock check still
-# dropped 42 Dublin and Tuam files dated 25/10/2026. Two weeks behind stays stale.
+# The previous Sunday is last week's paper. 08/11/2026 Frank: a file dated
+# exactly 7 days before the target Sunday is stale, not this week.
+# Two weeks behind stays stale.
 MAX_STALE_DAYS_FROM_TARGET = 8
 # Bulletin week window used by fetcher candidate scoring (Sun − 6 … target Sun).
 WEEK_LOOKBACK_DAYS = 6
@@ -497,20 +497,10 @@ def verdict_for_extracted_date(
             days_from_target=days_from_target,
         )
 
-    # 01/11/2026 rerun 41313748997 kept 43 files dated 25/10/2026 and
-    # still rejected 42 Dublin and Tuam files with the same date. The
-    # clock check (today must equal the target Sunday) did not hold at
-    # the stitch. Keep that previous Sunday for the whole target week.
+    # 08/11/2026: a paper dated the previous Sunday was kept as fresh and
+    # the diocese page then said this Sunday. Exactly 7 days behind is stale.
     # `today` stays in the signature so callers can still pass it.
-    # The gate is the target week, not the computer clock.
     _ = today
-    if days_from_target == -7:
-        return FreshnessVerdict(
-            status="fresh",
-            extracted_date=extracted,
-            reason="previous_sunday_still_current",
-            days_from_target=days_from_target,
-        )
 
     direction = "ahead" if days_from_target > 0 else "behind"
     return FreshnessVerdict(

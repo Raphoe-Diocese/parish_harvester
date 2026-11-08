@@ -294,6 +294,39 @@ class OkParish:
     key: str
     display_name: str
     url: str
+    bulletin_date: str = ""
+
+
+def parish_page_date_bits(
+    harvest_iso: str,
+    parish_iso: str,
+    display_name: str,
+    diocese_name: str,
+) -> tuple[str, str, str]:
+    """Return (title date, meta line, masthead ISO) for one ok parish page.
+
+    A file dated on another day must not be captioned as this Sunday.
+    """
+    from ocr.generate_bulletin_pages import format_uk_date
+
+    harvest = (harvest_iso or "").strip()[:10]
+    parish = (parish_iso or "").strip()[:10]
+    harvest_uk = format_uk_date(harvest)
+    name = (display_name or "").strip() or "this parish"
+    diocese = (diocese_name or "").strip() or "this diocese"
+    if parish and parish != harvest:
+        parish_uk = format_uk_date(parish)
+        meta = (
+            f"Latest bulletin we have for {name}: {parish_uk} "
+            f"(not this Sunday {harvest_uk}). "
+            f"Part of the {diocese} collated bulletin."
+        )
+        return parish_uk, meta, parish
+    meta = (
+        f"This week's bulletin for {name} — {harvest_uk}. "
+        f"Part of the {diocese} collated bulletin."
+    )
+    return harvest_uk, meta, harvest
 
 
 def load_ok_parishes(diocese_key: str, parish_status_path: Path | None = None) -> list[OkParish]:
@@ -321,7 +354,15 @@ def load_ok_parishes(diocese_key: str, parish_status_path: Path | None = None) -
             continue
         display_name = str(row.get("display_name") or key).strip() or str(key)
         url = str(row.get("url") or "").strip()
-        out.append(OkParish(key=str(key), display_name=display_name, url=url))
+        bulletin_date = str(row.get("bulletin_date") or "").strip()[:10]
+        out.append(
+            OkParish(
+                key=str(key),
+                display_name=display_name,
+                url=url,
+                bulletin_date=bulletin_date,
+            )
+        )
     out.sort(key=lambda p: p.display_name.lower())
     return out
 
@@ -409,7 +450,6 @@ def write_parish_pages_for_diocese(
         DioceseConfig,
         _fragment_to_plain_text,
         count_pdf_pages,
-        format_uk_date,
         render_bulletin_viewer_shell,
         render_ocr_standalone_page,
         render_pdf_standalone_page,
@@ -453,7 +493,6 @@ def write_parish_pages_for_diocese(
     out_root.mkdir(parents=True, exist_ok=True)
 
     diocese_label = config.display_name.replace(" Diocese", "").upper()
-    uk_date = format_uk_date(bulletin_date)
     written: list[str] = []
     sliced_keys: list[str] = []
     missing_keys: list[str] = []
@@ -473,9 +512,11 @@ def write_parish_pages_for_diocese(
             if pdf_bytes is not None and len(pdf_bytes) < 32:
                 pdf_bytes = None
 
-            base_meta = (
-                f"This week's bulletin for {parish.display_name} — {uk_date}. "
-                f"Part of the {config.display_name} collated bulletin."
+            uk_date, base_meta, masthead_iso = parish_page_date_bits(
+                bulletin_date,
+                parish.bulletin_date,
+                parish.display_name,
+                config.display_name,
             )
             if pdf_bytes:
                 pdf_out = out_root / f"{parish.key}.pdf"
@@ -531,7 +572,7 @@ def write_parish_pages_for_diocese(
 
             ocr_fragment = structure_ocr_html(
                 tighten_ocr_paragraphs(ocr_fragment),
-                bulletin_date=bulletin_date,
+                bulletin_date=masthead_iso,
                 single_parish_name=parish.display_name,
             )
 
@@ -567,13 +608,19 @@ def write_parish_pages_for_diocese(
             _write_text(
                 out_root / f"{parish.key}-pdf.html",
                 render_pdf_standalone_page(
-                    parish_config, bulletin_date, pdf_href=pdf_href, viewer_href=viewer_filename
+                    parish_config,
+                    masthead_iso or bulletin_date,
+                    pdf_href=pdf_href,
+                    viewer_href=viewer_filename,
                 ),
             )
             _write_text(
                 out_root / f"{parish.key}-ocr.html",
                 render_ocr_standalone_page(
-                    parish_config, bulletin_date, ocr_fragment, viewer_href=viewer_filename
+                    parish_config,
+                    masthead_iso or bulletin_date,
+                    ocr_fragment,
+                    viewer_href=viewer_filename,
                 ),
             )
             written.append(parish.key)
