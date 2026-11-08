@@ -2316,6 +2316,7 @@ class HarvestMissRecipeTests(unittest.TestCase):
         )
         self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertIn("Parish-Life-Newsletter-8th-November-2026-A.pdf", recipe["start_url"])
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
         self.assertNotIn("4th-October", recipe["start_url"])
         self.assertNotIn("October", " ".join(recipe.get("href_patterns") or []))
 
