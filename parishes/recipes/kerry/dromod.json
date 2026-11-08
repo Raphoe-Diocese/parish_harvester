@@ -1,36 +1,36 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "dromod",
   "display_name": "Dromod/Waterville",
   "diocese": "kerry",
-  "recorded_date": "2026-11-02",
-  "start_url": "https://dromodparish.ie/churches/parish-newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "playbook_type": "pdf_download_list",
+  "recorded_date": "2026-11-08",
+  "start_url": "https://dromodparish.ie/wp-content/uploads/2026/11/Dromod-8th-November-Newsletter.pdf",
+  "site_type": "predicted_dated_pdf",
   "ignore_https_errors": true,
   "href_patterns": [
-    "Newsletter",
     "Dromod-",
+    "Newsletter",
     ".pdf"
   ],
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "example_url": "https://dromodparish.ie/wp-content/uploads/2026/10/Dromod-1st-November-Newsletter.pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_back": 0,
+  "weeks_ahead": 0,
+  "example_url": "https://dromodparish.ie/wp-content/uploads/2026/11/Dromod-8th-November-Newsletter.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://dromodparish.ie/churches/parish-newsletter/"
+      "action": "download",
+      "url": "https://dromodparish.ie/wp-content/uploads/2026/11/Dromod-8th-November-Newsletter.pdf"
     }
   ],
   "operator_notes": [
-    "02/11/2026: directory site is dromodparish.ie. Old recipe pinned diocese Dromod-4th-October-Newsletter.pdf and went stale 01/10/2026.",
-    "Weekly list is /churches/parish-newsletter/. Newest post 1st-november-2026 embeds Dromod-1st-November-Newsletter.pdf.",
-    "Proved GET application/pdf 1154131 bytes %PDF-1.4 with TLS verify off (certificate expired). ignore_https_errors true. Do not pin the dated filename."
+    "08/11/2026: listing still had Dromod-1st-November-Newsletter.pdf. Proved Dromod-8th-November-Newsletter.pdf in /2026/11/ GET 206 application/pdf magic %PDF, full size 687003 bytes. Text is Parish of Dromod, 7-15 November 2026. ignore_https_errors stays on while the certificate is expired."
   ],
   "do_not": [
-    "Do not pin Dromod-1st-November-Newsletter.pdf or Dromod-4th-October-Newsletter.pdf.",
-    "Do not use the Kerry diocese card while dromodparish.ie has a newer newsletter.",
-    "Do not drop ignore_https_errors while the dromodparish.ie certificate is expired."
+    "Do not keep Dromod-1st-November-Newsletter.pdf.",
+    "Do not set start_url to the listing page while the 8 November file is live.",
+    "Do not drop ignore_https_errors while the dromodparish.ie certificate is expired.",
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
