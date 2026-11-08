@@ -1,31 +1,32 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "ballinteerparish",
   "display_name": "Ballinteer",
   "diocese": "dublin",
-  "start_url": "https://www.ballinteerparish.ie/Sunday-Message.htm",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://www.ballinteerparish.ie/Sunday_Message_20261108.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "Sunday_Message_",
     ".pdf"
   ],
-  "playbook_type": "pdf_download_list",
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "recorded_date": "2026-10-29",
-  "example_url": "https://www.ballinteerparish.ie/Sunday_Message_20261025.pdf",
+  "playbook_type": "direct_download",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-08",
+  "example_url": "https://www.ballinteerparish.ie/Sunday_Message_20261108.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.ballinteerparish.ie/Sunday-Message.htm"
+      "action": "download",
+      "url": "https://www.ballinteerparish.ie/Sunday_Message_20261108.pdf"
     }
   ],
   "operator_notes": [
-    "29/10/2026: page links Sunday_Message_20261025.pdf. Old recipe pinned 20261018.",
-    "site_type:http_scrape_newest_pdf."
+    "08/11/2026: Sunday Message page kept Sunday_Message_20261101.pdf. Proved Sunday_Message_20261108.pdf GET 200 application/pdf 427236 bytes magic %PDF. The date rewrite does not move 20261108, so start_url is this week's file."
   ],
   "do_not": [
-    "Do not pin Sunday_Message_YYYYMMDD.pdf.",
+    "Do not start on Sunday-Message.htm — that page kept 1 November.",
+    "Do not pin Sunday_Message_20261108.pdf forever.",
     "Do not pick Payzone or admin PDFs."
   ],
   "bulletin_layout": {

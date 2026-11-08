@@ -17,12 +17,14 @@ class DublinOct25ScrapeTests(unittest.TestCase):
         self.assertEqual(actions, ["goto"])
         self.assertIn("25th-October", payload.get("example_url") or "")
 
-    def test_ballinteer_scrapes_20261025(self) -> None:
+    def test_ballinteer_uses_8_november_pdf(self) -> None:
         path = REPO_ROOT / "parishes" / "recipes" / "dublin" / "ballinteerparish.json"
         payload = json.loads(path.read_text(encoding="utf-8"))
-        self.assertEqual(payload.get("site_type"), "http_scrape_newest_pdf")
-        self.assertIn("20261025", payload.get("example_url") or "")
-        self.assertNotIn("20261018", json.dumps(payload.get("steps") or []))
+        self.assertEqual(payload.get("site_type"), "predicted_dated_pdf")
+        self.assertIn("Sunday_Message_20261108.pdf", payload.get("start_url") or "")
+        steps = json.dumps(payload.get("steps") or [])
+        self.assertNotIn("20261018", steps)
+        self.assertNotIn("20261101", payload.get("start_url") or "")
 
     def test_ballybrack_clicks_listing_not_pinned_week(self) -> None:
         path = (
