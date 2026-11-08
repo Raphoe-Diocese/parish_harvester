@@ -2197,6 +2197,21 @@ class HarvestMissRecipeTests(unittest.TestCase):
         do_not = " ".join(recipe.get("do_not") or []).lower()
         self.assertIn("churchtv", do_not)
 
+    def test_four_nov8_pdfs_replace_1_november_examples(self) -> None:
+        cases = {
+            "dublin/castleknock.json": "2026-11-08.pdf",
+            "dublin/swords.json": "08112026.pdf",
+            "dromore/tullylish.json": "08.11.26.pdf",
+            "ardagh/ferbane.json": "20261108%2008%20November%202026.pdf",
+        }
+        for rel, needle in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
+            self.assertEqual(recipe["site_type"], "predicted_dated_pdf", rel)
+            self.assertIn(needle, recipe["start_url"], rel)
+            self.assertNotIn("2026-11-01.pdf", recipe["start_url"])
+            self.assertNotIn("01.11.26.pdf", recipe["start_url"])
+            self.assertNotIn("01112026.pdf", recipe["start_url"])
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
