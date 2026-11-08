@@ -2394,6 +2394,28 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("Newsletter01.11.26.pdf", joined)
         self.assertEqual(len(urls), 5)
 
+    def test_sandyford_milltown_dkr_use_8_november_pdfs(self) -> None:
+        cases = {
+            "dublin/sandyford.json": "Newsletter-2026-11-08.pdf",
+            "dublin/milltowndublin.json": "Weekly-Bulletin-Sunday-November-8th-2026.pdf",
+            "limerick/donaghmoreknockearoxboro.json": "Newsletter-2026-11-08.pdf",
+        }
+        for rel, needle in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
+            self.assertEqual(recipe["site_type"], "predicted_dated_pdf", rel)
+            self.assertIn(needle, recipe["start_url"], rel)
+            self.assertNotIn("2026-11-01", recipe["start_url"], rel)
+            self.assertNotIn("November-1st", recipe["start_url"], rel)
+            self.assertEqual(int(recipe["weeks_back"]), 0, rel)
+            self.assertEqual(int(recipe["weeks_ahead"]), 0, rel)
+        dkr = json.loads(
+            Path("parishes/recipes/limerick/donaghmoreknockearoxboro.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertIn("/2026/11/", dkr["start_url"])
+        self.assertNotIn("/2026/10/", dkr["start_url"])
+
     def test_portmarnock_uses_8_november_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/dublin/portmarnock.json").read_text(encoding="utf-8")
