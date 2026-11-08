@@ -1,42 +1,35 @@
 {
+  "version": 2,
   "parish_key": "ayrfield",
   "display_name": "Ayrfield",
   "diocese": "dublin",
-  "recorded_date": "2026-10-19",
-  "start_url": "https://ayrfieldparish.ie/",
-  "site_type": "pdf_link_list",
+  "start_url": "https://www.ayrfieldparish.ie/warehouse/documents/Bulletin/Bulletin%202026-11-08S.pdf",
+  "site_type": "predicted_dated_pdf",
   "playbook_type": "pdf_download_list",
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "example_url": "https://www.ayrfieldparish.ie/warehouse/documents/Bulletin/Bulletin%202026-11-08S.pdf",
+  "href_patterns": [
+    "Bulletin",
+    "2026-11-08"
+  ],
+  "weeks_back": 4,
+  "weeks_ahead": 1,
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "recorded_date": "2026-11-08",
   "steps": [
     {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.ayrfieldparish.ie/warehouse/documents/Bulletin/Bulletin%202026-10-18S.pdf",
-      "text": "World Mission Sunday 18th October World Mission Sunday is th",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.ayrfieldparish.ie/warehouse/documents/Bulletin/Bulletin%202026-10-18S.pdf"
+      "action": "goto",
+      "url": "https://www.ayrfieldparish.ie/warehouse/documents/Bulletin/Bulletin%202026-11-08S.pdf"
     }
   ],
-  "version": 1,
-  "observed_load_ms": 18702.800048828125,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "08/11/2026: listing still pointed at October. Proved Bulletin 2026-11-08S.pdf GET 206 application/pdf magic %PDF, full size 691324 bytes. Did not download the whole file.",
+    "predicted_dated_pdf rewrites 2026-11-08 to the next Sunday. Do not harvest GDPR or Gift Aid files."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not keep Bulletin 2026-10-18S.pdf or Bulletin 2026-11-01S.pdf.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
