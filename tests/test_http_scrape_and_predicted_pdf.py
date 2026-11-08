@@ -2275,6 +2275,14 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("Look-", recipe["start_url"])
         self.assertNotIn("October", " ".join(recipe.get("href_patterns") or []))
 
+    def test_donnycarney_uses_8_november_not_the_cc_copy(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/donnycarney.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-online-8.11.2026pub.pdf", recipe["start_url"])
+        self.assertNotIn("-cc-", recipe["start_url"])
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
