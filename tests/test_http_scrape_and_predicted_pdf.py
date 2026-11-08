@@ -2394,6 +2394,22 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("Newsletter01.11.26.pdf", joined)
         self.assertEqual(len(urls), 5)
 
+    def test_doonbeg_uses_8_november_underscore_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/killaloe/doonbeg.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("2026_11_08+Newsletter.pdf", recipe["start_url"])
+        self.assertNotIn("2026_11_01", recipe["start_url"])
+        self.assertEqual(int(recipe["weeks_back"]), 0)
+        self.assertEqual(int(recipe["weeks_ahead"]), 0)
+        example = (
+            "https://irp.cdn-website.com/8e819f4b/files/uploaded/"
+            "2026_11_01+Newsletter.pdf"
+        )
+        rewritten = rewrite_date_url(example, date(2026, 11, 8))
+        self.assertIn("2026_11_01+Newsletter.pdf", rewritten)
+
     def test_dromod_and_foxford_allow_8_november(self) -> None:
         dromod = json.loads(
             Path("parishes/recipes/kerry/dromod.json").read_text(encoding="utf-8")
