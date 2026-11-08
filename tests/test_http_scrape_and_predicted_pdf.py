@@ -2394,6 +2394,23 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("Newsletter01.11.26.pdf", joined)
         self.assertEqual(len(urls), 5)
 
+    def test_dromod_and_foxford_allow_8_november(self) -> None:
+        dromod = json.loads(
+            Path("parishes/recipes/kerry/dromod.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(dromod["site_type"], "predicted_dated_pdf")
+        self.assertIn("Dromod-8th-November-Newsletter.pdf", dromod["start_url"])
+        self.assertNotIn("1st-November", dromod["start_url"])
+        self.assertEqual(int(dromod["weeks_back"]), 0)
+        self.assertEqual(int(dromod["weeks_ahead"]), 0)
+        foxford = json.loads(
+            Path("parishes/recipes/achonry/foxford.json").read_text(encoding="utf-8")
+        )
+        self.assertGreaterEqual(int(foxford["max_bulletin_pages"]), 8)
+        self.assertIn("November", foxford.get("href_patterns") or [])
+        self.assertNotIn("Oct", foxford.get("href_patterns") or [])
+        self.assertNotIn("Sept", foxford.get("href_patterns") or [])
+
     def test_sandyford_milltown_dkr_use_8_november_pdfs(self) -> None:
         cases = {
             "dublin/sandyford.json": "Newsletter-2026-11-08.pdf",
