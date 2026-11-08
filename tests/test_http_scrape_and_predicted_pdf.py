@@ -17,6 +17,7 @@ from harvester.replay import (
     _best_scored_link_index,
     _recipe_fresh_recorded_file_urls,
     _recipe_recorded_file_urls,
+    _recipe_week_span,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
     _extract_matching_href_texts,
@@ -2370,6 +2371,38 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertEqual(donaghmoyne["site_type"], "predicted_dated_pdf")
         self.assertIn("08th-November-2026.pdf", donaghmoyne["start_url"])
         self.assertNotIn("1st-November", donaghmoyne["start_url"])
+        self.assertEqual(int(donaghmoyne["weeks_back"]), 0)
+        self.assertEqual(int(donaghmoyne["weeks_ahead"]), 0)
+
+    def test_weeks_back_zero_is_not_eight(self) -> None:
+        self.assertEqual(_recipe_week_span({"weeks_back": 0, "weeks_ahead": 0}), (0, 0))
+        self.assertEqual(_recipe_week_span({}), (8, 0))
+        self.assertEqual(_recipe_week_span({"weeks_back": 0}), (0, 0))
+        beaumont_url = (
+            "https://holychildnativity.ie/wp-content/uploads/newsletters/"
+            "2026/11/Newsletter08.11.26.pdf"
+        )
+        urls = predicted_dated_upload_urls(
+            beaumont_url, date(2026, 11, 8), weeks_back=0, weeks_ahead=0
+        )
+        joined = " ".join(urls)
+        self.assertTrue(
+            "Newsletter08.11.26.pdf" in joined or "Newsletter8.11.26.pdf" in joined,
+            joined,
+        )
+        self.assertNotIn("Newsletter25.10.26.pdf", joined)
+        self.assertNotIn("Newsletter01.11.26.pdf", joined)
+        self.assertEqual(len(urls), 5)
+
+    def test_portmarnock_uses_8_november_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/portmarnock.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter%20November%208th%202026.pdf", recipe["start_url"])
+        self.assertNotIn("/newsletters/", recipe["start_url"])
+        self.assertEqual(int(recipe["weeks_back"]), 0)
+        self.assertEqual(int(recipe["weeks_ahead"]), 0)
 
     def test_falcarragh_uses_numbered_8_november_pdf(self) -> None:
         recipe = json.loads(

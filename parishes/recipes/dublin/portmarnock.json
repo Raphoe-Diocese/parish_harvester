@@ -1,35 +1,38 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "portmarnock",
   "display_name": "Portmarnock",
   "diocese": "dublin",
-  "start_url": "https://www.portmarnockparish.ie/newsletters/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://www.portmarnockparish.ie/_webedit/uploaded-files/All%20Files/Newsletter%20November%208th%202026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "href_patterns": [
+    "Newsletter",
+    "November",
+    ".pdf"
+  ],
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_back": 0,
+  "weeks_ahead": 0,
+  "recorded_date": "2026-11-08",
+  "example_url": "https://www.portmarnockparish.ie/_webedit/uploaded-files/All%20Files/Newsletter%20November%208th%202026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.portmarnockparish.ie/newsletters/"
+      "action": "download",
+      "url": "https://www.portmarnockparish.ie/_webedit/uploaded-files/All%20Files/Newsletter%20November%208th%202026.pdf"
     }
   ],
   "operator_notes": [
-    "05/10/2026 Dublin leftover hunt: listing /newsletters/. Same file as Kinsealy. Harvest once here.",
-    "Proved Newsletter 4th October 2026.pdf GET 200 application/pdf 327871 bytes magic %PDF. Date 04/10/2026.",
-    "Do not pin the dated filename. Kinsealy is alias_of this key."
+    "08/11/2026: listing /newsletters/ scrape only showed January in the fetched text. Proved Newsletter November 8th 2026.pdf GET 206 application/pdf magic %PDF, full size 393138 bytes. Kinsealy stays alias_of this key."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not scrape /newsletters/ — the listing fetch missed November.",
+    "Do not harvest Kinsealy separately.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  },
-  "href_patterns": [
-    "Newsletter",
-    ".pdf"
-  ]
+  }
 }
