@@ -2238,6 +2238,18 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("Newsletter-8th-November-2026.pdf", dermot["start_url"])
         self.assertNotIn("October", " ".join(dermot.get("href_patterns") or []))
 
+    def test_navan_road_and_firhouse_use_8_november_pdfs(self) -> None:
+        navan = json.loads(
+            Path("parishes/recipes/dublin/navanroad.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("8th-November-2026.pdf", navan["start_url"])
+        self.assertNotIn("September", " ".join(navan.get("href_patterns") or []))
+        firhouse = json.loads(
+            Path("parishes/recipes/dublin/firhouse.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("2026-11-08-Weekly-Notice.pdf", firhouse["start_url"])
+        self.assertNotIn("Partners", firhouse["start_url"])
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
