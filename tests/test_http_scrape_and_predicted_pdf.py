@@ -2258,6 +2258,14 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("Sunday_Message_20261108.pdf", recipe["start_url"])
         self.assertNotIn("20261101", recipe["start_url"])
 
+    def test_bayside_uses_parish_8_november_pdf_not_mcn(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/bayside.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-8-November-2026.pdf", recipe["start_url"])
+        self.assertNotIn("mcn.live", recipe["start_url"])
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
