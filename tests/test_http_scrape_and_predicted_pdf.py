@@ -2336,6 +2336,22 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("November-1st", lucan["start_url"])
         self.assertNotIn("October", " ".join(lucan.get("href_patterns") or []))
 
+    def test_four_more_nov8_pdfs_replace_1_november(self) -> None:
+        cases = {
+            "dublin/beaumont.json": "Newsletter08.11.26.pdf",
+            "dublin/clontarfstjohns.json": "Newsletter-8th-November-2026.pdf",
+            "dublin/aughrimstreet.json": "Newsletter-08-11-2026.pdf",
+            "achonry/straide.json": "Bohola-Straide-Newsletter-8th-November-2026.pdf",
+        }
+        for rel, needle in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
+            self.assertEqual(recipe["site_type"], "predicted_dated_pdf", rel)
+            self.assertIn(needle, recipe["start_url"], rel)
+            self.assertNotIn("01.11.26", recipe["start_url"])
+            self.assertNotIn("1st-November", recipe["start_url"])
+            self.assertNotIn("01-11-2026", recipe["start_url"])
+            self.assertNotIn("october", " ".join(recipe.get("href_patterns") or []).lower(), rel)
+
     def test_falcarragh_uses_numbered_8_november_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/naomhfionan.json").read_text(encoding="utf-8")
