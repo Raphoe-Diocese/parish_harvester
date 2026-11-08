@@ -2310,6 +2310,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("046_8Nov26-1.pdf", kilmichael["start_url"])
         self.assertNotIn("1Nov26", kilmichael["start_url"])
 
+    def test_castlegregory_uses_8_november_parish_life_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/kerry/castlegregory.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Parish-Life-Newsletter-8th-November-2026-A.pdf", recipe["start_url"])
+        self.assertNotIn("4th-October", recipe["start_url"])
+        self.assertNotIn("October", " ".join(recipe.get("href_patterns") or []))
+
     def test_falcarragh_uses_numbered_8_november_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/naomhfionan.json").read_text(encoding="utf-8")
