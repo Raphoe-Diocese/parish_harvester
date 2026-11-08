@@ -2250,6 +2250,14 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("2026-11-08-Weekly-Notice.pdf", firhouse["start_url"])
         self.assertNotIn("Partners", firhouse["start_url"])
 
+    def test_ballinteer_uses_8_november_sunday_message(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/ballinteerparish.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Sunday_Message_20261108.pdf", recipe["start_url"])
+        self.assertNotIn("20261101", recipe["start_url"])
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
