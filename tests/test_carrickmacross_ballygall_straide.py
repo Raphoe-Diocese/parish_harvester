@@ -35,8 +35,9 @@ class CarrickmacrossBallygallStraideTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(straide.get("site_type"), "http_scrape_newest_pdf")
-        self.assertNotIn("download", [s.get("action") for s in (straide.get("steps") or [])])
+        self.assertEqual(straide.get("site_type"), "predicted_dated_pdf")
+        self.assertIn("Bohola-Straide-Newsletter-8th-November-2026.pdf", straide["start_url"])
+        self.assertNotIn("1st-November", straide["start_url"])
         self.assertTrue(bohola.get("skip"))
         self.assertEqual(bohola.get("alias_of"), "straide")
 
