@@ -2266,6 +2266,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("Newsletter-8-November-2026.pdf", recipe["start_url"])
         self.assertNotIn("mcn.live", recipe["start_url"])
 
+    def test_marino_uses_weekly_bulletin_not_look_file(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/marino.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Weekly-Bulletin-8th-November-2026.pdf", recipe["start_url"])
+        self.assertNotIn("Look-", recipe["start_url"])
+        self.assertNotIn("October", " ".join(recipe.get("href_patterns") or []))
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
