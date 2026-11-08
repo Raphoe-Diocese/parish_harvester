@@ -1,37 +1,37 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "loughshoreparishes",
   "display_name": "Loughshore",
   "diocese": "down_and_connor",
-  "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
-  "site_type": "wp_json_newest_media",
+  "start_url": "https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
-    "sunday-in-ordinary-time"
+    "Sunday-in-Ordinary-Time",
+    ".pdf"
   ],
-  "example_url": "https://www.loughshoreparishes.org/app/uploads/2026/08/21st-Sunday-in-Ordinary-Time.pdf",
+  "example_url": "https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf",
+  "weeks_ahead": 1,
   "max_bulletin_pages": 8,
-  "playbook_type": "pdf_download_list",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "recorded_date": "2026-11-08",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.loughshoreparishes.org/sunday-bulletin/"
+      "action": "download",
+      "url": "https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf"
     }
   ],
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "recorded_date": "2026-08-25",
   "operator_notes": [
-    "Weekly file is app/uploads/.../Nth-Sunday-in-Ordinary-Time.pdf. 21st Sunday in Ordinary Time = 23/08/2026.",
-    "CONFIRMED 2026-08-25: https://www.loughshoreparishes.org/app/uploads/2026/08/21st-Sunday-in-Ordinary-Time.pdf HTTP 200, 4513290 bytes, application/pdf. Listing article /21st-sunday-in-ordinary-time-4/ serves the same PDF.",
-    "wp-json /wp/v2/media also lists DC-Vocations-Newsletter.pdf — href_patterns must stay sunday-in-ordinary-time.",
-    "Do not pin 20th Sunday or a dated filename. Skip Playwright / print_to_pdf."
+    "08/11/2026: wp_json_newest_media grabbed /2025/11/33rd-Sunday-in-Ordinary-Time.pdf and dated it 16/11/2025. Listing sunday-bulletin has 32nd Sunday 8 November 2026. Proved https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf GET 200 application/pdf 903755 bytes magic %PDF-1.7. start_url is the 2026 PDF so the 2025 liturgical twin is skipped."
   ],
   "do_not": [
-    "Do not pin 20th Sunday in Ordinary Time.",
+    "Do not scrape wp-json media for sunday-in-ordinary-time — the 2025 33rd Sunday file wins.",
+    "Do not pin 32nd-Sunday-in-Ordinary-Time.pdf forever — predicted rewrites the liturgical Sunday.",
     "Do not download DC-Vocations-Newsletter.pdf or Safeguarding PDFs.",
     "Do not print_to_pdf the listing."
   ],
-  "operator_notes_2026_09_06": [
-    "This week is https://www.loughshoreparishes.org/app/uploads/2026/09/23rd-Sunday-in-Ordinary-Time.pdf (HTTP 200, ~4.9MB). wp-json can miss it; predicted fallback rewrites the liturgical Sunday name and /YYYY/MM/. Real file can be 6 pages — page cap 8."
-  ]
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
