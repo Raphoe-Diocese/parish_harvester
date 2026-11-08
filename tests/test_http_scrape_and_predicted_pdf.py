@@ -2283,6 +2283,18 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("Newsletter-online-8.11.2026pub.pdf", recipe["start_url"])
         self.assertNotIn("-cc-", recipe["start_url"])
 
+    def test_killenaule_uses_8_november_newsletter_image(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/cashel_and_emly/killenaulemoyglass.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-8th-November.jpg", recipe["start_url"])
+        self.assertNotIn("1st-November", recipe["start_url"])
+        self.assertNotIn("/category/newsletter/", recipe["start_url"])
+        self.assertNotIn("KSC-POSTER", recipe["start_url"])
+
     def test_falcarragh_uses_numbered_8_november_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/naomhfionan.json").read_text(encoding="utf-8")
