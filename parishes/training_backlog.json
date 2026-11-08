@@ -5,13 +5,13 @@
     "downloaded": 415,
     "html_links": 0,
     "skipped": 800,
-    "failed": 50,
-    "stale_rejected": 50
+    "failed": 51,
+    "stale_rejected": 49
   },
   "action_counts": {
-    "ok": 435,
+    "ok": 434,
     "skip": 808,
-    "investigate": 42,
+    "investigate": 43,
     "mark_inactive": 2,
     "verify_autofix": 1,
     "retrain": 1
@@ -13496,8 +13496,8 @@
       "diocese": "killala",
       "recipe_file": "parishes/recipes/killala/crossmolina.json",
       "recipe": {
-        "start_url": "https://www.churchtv.ie/crossmolina/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://crossmolinaparish.com/bulletin/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
@@ -13506,26 +13506,24 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "02/10/2026: the Crossmolina ChurchTV page HTML links one newsletter PDF. Proved GET 200 application/pdf 2265814 bytes, magic %PDF-1.4. File text starts 4TH OCTOBER 2026.",
-          "The upload folder is /wp-content/uploads/2021/02/ even though the bulletin is October 2026. Scrape the page link. Do not date-rewrite the 2021/02 folder.",
-          "crossmolinaparish.com media library lists the same filename and the same 2265814 byte size at /wp-content/uploads/2026/10/. Direct GET of that copy from the hunt VM was SiteGround HTTP 202."
+          "08/11/2026: ChurchTV page has no newsletter PDF. Old scrape grabbed /2021/02/1st-November-Crossmolina-Parish-Newsletter.pdf and dated it 01/02/2021. Own site media lists 8th-November-Crossmolina-Parish-Newsletter.pdf in /2026/11/ (wp-json filesize 7366730, uploaded 05/11/2026) and 1st-November in /2026/10/. This IP RemoteDisconnected on the PDF; WebFetch 500. Use wp_json_newest_media on crossmolinaparish.com. Do not pin. Do not start on ChurchTV."
         ],
         "do_not": [
-          "Do not pin 4th-October-Crossmolina-Parish-Newsletter-1.pdf.",
-          "Do not treat /2021/02/ as the bulletin year.",
-          "Do not harvest Facebook.",
-          "Do not use the diocese Facebook page as this parish link."
+          "Do not scrape churchtv.ie/crossmolina \u2014 the /2021/02/ folder dates November files as February 2021.",
+          "Do not pin 8th-November-Crossmolina-Parish-Newsletter.pdf.",
+          "Do not require October in href_patterns \u2014 that misses November.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-02"
+        "recorded_date": "2026-11-08"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "crumlin",
