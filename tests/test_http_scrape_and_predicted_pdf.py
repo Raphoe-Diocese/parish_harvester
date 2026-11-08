@@ -2225,6 +2225,19 @@ class HarvestMissRecipeTests(unittest.TestCase):
             self.assertIn(needle, recipe["start_url"], rel)
             self.assertNotIn("/newsletter/", recipe["start_url"])
 
+    def test_blackrock_and_castledermot_use_8_november_pdfs(self) -> None:
+        blackrock = json.loads(
+            Path("parishes/recipes/cork_and_ross/blackrockroad.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("8th-November-2026.pdf", blackrock["start_url"])
+        self.assertNotIn("All-Saints", blackrock["start_url"])
+        dermot = json.loads(
+            Path("parishes/recipes/dublin/castledermot.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(dermot["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-8th-November-2026.pdf", dermot["start_url"])
+        self.assertNotIn("October", " ".join(dermot.get("href_patterns") or []))
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"

@@ -1,30 +1,31 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "castledermot",
   "display_name": "Castledermot",
   "diocese": "dublin",
-  "start_url": "https://www.castledermotparish.com/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://castledermotparish.com/wp-content/uploads/2026/11/Newsletter-8th-November-2026.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
     "Newsletter",
-    "October",
     ".pdf"
   ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-08",
+  "example_url": "https://castledermotparish.com/wp-content/uploads/2026/11/Newsletter-8th-November-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.castledermotparish.com/"
+      "action": "download",
+      "url": "https://castledermotparish.com/wp-content/uploads/2026/11/Newsletter-8th-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 79479 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "08/11/2026: href_patterns required October, so November was missed and the row stayed on Newsletter-1st-November-2026.pdf. Proved Newsletter-8th-November-2026.pdf GET 200 application/pdf 56079 bytes magic %PDF-1.7. start_url is the PDF."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not require October in href_patterns — that misses November.",
+    "Do not pin Newsletter-8th-November-2026.pdf forever — predicted rewrites the date.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
