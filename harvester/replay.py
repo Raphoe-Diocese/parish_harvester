@@ -2743,6 +2743,20 @@ async def _try_predicted_dated_pdf(
                 pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
                 dest.write_bytes(pdf_bytes)
                 return url, "docx_to_pdf"
+            # Killenaule 08/11/2026: the weekly file is Newsletter-8th-November.jpg.
+            # Only when the recipe example is itself an image. A PDF recipe's
+            # .jpg sibling guess must stay a miss.
+            example_is_image = urlparse(example_url).path.lower().endswith(
+                (".jpg", ".jpeg", ".png")
+            )
+            path_lower = urlparse(url).path.lower()
+            if (
+                example_is_image
+                and path_lower.endswith((".jpg", ".jpeg", ".png"))
+                and looks_like_image_bytes(file_body)
+            ):
+                write_image_bytes_as_pdf(dest, file_body)
+                return url, "image_to_pdf"
             continue
         # Dated notice pages (Holywood): HTML with a PDF Embedder iframe,
         # not a direct upload. 404s are already a hard miss above.
