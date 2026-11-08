@@ -1973,16 +1973,16 @@ class LoughshoreRecipeTests(unittest.TestCase):
     )
     RECIPE = Path("parishes/recipes/down_and_connor/loughshoreparishes.json")
 
-    def test_recipe_uses_wp_json_sunday_filter_not_20th_pin(self) -> None:
+    def test_recipe_uses_predicted_2026_pdf_not_2025_twin(self) -> None:
         raw = self.RECIPE.read_text(encoding="utf-8")
         data = json.loads(raw)
-        self.assertEqual(data["site_type"], "wp_json_newest_media")
-        self.assertIn("sunday-in-ordinary-time", data.get("href_patterns") or [])
+        self.assertEqual(data["site_type"], "predicted_dated_pdf")
+        self.assertIn("/2026/11/32nd-Sunday-in-Ordinary-Time.pdf", data.get("start_url") or "")
         self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
         self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
         steps_blob = json.dumps(data.get("steps") or [])
-        self.assertNotIn("20th-sunday", steps_blob.lower())
-        self.assertNotIn("21st-Sunday-in-Ordinary-Time.pdf", steps_blob)
+        self.assertNotIn("/2025/11/", steps_blob)
+        self.assertNotIn("33rd-Sunday-in-Ordinary-Time.pdf", steps_blob)
         self.assertFalse(
             any(
                 str(step.get("action") or "") == "print_to_pdf"
@@ -2142,7 +2142,7 @@ class HarvestMissRecipeTests(unittest.TestCase):
     def test_proved_dc_this_week_examples(self) -> None:
         cases = {
             "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
-            "down_and_connor/glenariffeparish.json": "Twenty-Third-Sunday-of-Ordinary-Time.pdf",
+            "down_and_connor/glenariffeparish.json": "Feast-of-All-Saints.pdf",
             "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
             # 29/10/2026 the September pin was removed. Example is 25-Oct-26.pdf.
             "down_and_connor/stoliverplunkettparish.json": "25-Oct-26.pdf",
