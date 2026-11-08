@@ -1,34 +1,32 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "howth",
   "display_name": "Howth",
   "diocese": "dublin",
-  "recorded_date": "2026-11-02",
-  "start_url": "https://howthparish.ie/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "playbook_type": "pdf_download_list",
+  "recorded_date": "2026-11-08",
+  "start_url": "https://howthparish.ie/wp-content/uploads/2026/11/Sunday-8-Nov-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "playbook_type": "direct_download",
   "href_patterns": [
     "Sunday-",
-    "Nov",
-    "Oct",
     ".pdf"
   ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 90000,
-  "total_timeout_s": 280,
-  "example_url": "https://howthparish.ie/wp-content/uploads/2026/10/Sunday-1-Nov-2026.pdf",
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
+  "example_url": "https://howthparish.ie/wp-content/uploads/2026/11/Sunday-8-Nov-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://howthparish.ie/newsletter/"
+      "action": "download",
+      "url": "https://howthparish.ie/wp-content/uploads/2026/11/Sunday-8-Nov-2026.pdf"
     }
   ],
   "operator_notes": [
-    "02/11/2026: previous harvest timed out on www.howthparish.ie. Apex howthparish.ie/newsletter/ lists Sunday-1-Nov-2026.pdf.",
-    "Proved GET application/pdf 352000 bytes %PDF-1.7. Raised timeouts. Do not pin the dated filename."
+    "08/11/2026: /newsletter/ kept Sunday-1-Nov-2026.pdf in /2026/10/. Proved https://howthparish.ie/wp-content/uploads/2026/11/Sunday-8-Nov-2026.pdf GET 200 application/pdf 430131 bytes magic %PDF. Sunday-8th-November-2026.pdf 404. start_url is the PDF."
   ],
   "do_not": [
-    "Do not pin Sunday-1-Nov-2026.pdf.",
+    "Do not start on /newsletter/ — that listing kept 1 November.",
+    "Do not pin Sunday-8-Nov-2026.pdf forever — predicted rewrites the date.",
     "Do not prefer www if apex is faster.",
     "Do not harvest Facebook."
   ],
