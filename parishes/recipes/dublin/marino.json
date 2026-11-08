@@ -1,30 +1,36 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "marino",
   "display_name": "Marino",
   "diocese": "dublin",
-  "start_url": "https://www.marinoparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://www.marinoparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-8th-November-2026.pdf",
+  "site_type": "predicted_dated_pdf",
   "href_patterns": [
-    "Bulletin",
-    "October",
+    "Weekly-Bulletin",
     ".pdf"
   ],
+  "href_skip_patterns": [
+    "Look-"
+  ],
+  "timeout_ms": 30000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
   "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-08",
+  "example_url": "https://www.marinoparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-8th-November-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.marinoparish.ie/"
+      "action": "download",
+      "url": "https://www.marinoparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-8th-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 372701 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "08/11/2026: homepage scrape required October, so it kept Weekly-Bulletin-1st-November-2026.pdf. Proved Weekly-Bulletin-8th-November-2026.pdf GET 200 application/pdf 445914 bytes magic %PDF-1.7. Look-8-November is a separate file. start_url is the weekly bulletin."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not require October in href_patterns — that misses November.",
+    "Do not harvest Look-8-November-2026 or In-November-we-remember.pdf.",
+    "Do not pin Weekly-Bulletin-8th-November-2026.pdf forever.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
