@@ -2179,6 +2179,24 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
         self.assertIn("Newsletter-sept-6th-3-2.pdf", recipe["example_url"])
 
+    def test_crossmolina_uses_own_parish_media_not_churchtv(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/killala/crossmolina.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertIn("crossmolinaparish.com", recipe["start_url"])
+        self.assertNotIn("churchtv.ie", recipe["start_url"])
+        self.assertIn(
+            "8th-November-Crossmolina-Parish-Newsletter.pdf",
+            recipe.get("example_url") or "",
+        )
+        self.assertNotIn("/2021/02/", recipe["start_url"])
+        self.assertNotIn("/2021/02/", recipe.get("example_url") or "")
+        do_not = " ".join(recipe.get("do_not") or []).lower()
+        self.assertIn("churchtv", do_not)
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
