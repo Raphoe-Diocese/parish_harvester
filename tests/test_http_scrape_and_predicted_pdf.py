@@ -2351,6 +2351,11 @@ class HarvestMissRecipeTests(unittest.TestCase):
             self.assertNotIn("1st-November", recipe["start_url"])
             self.assertNotIn("01-11-2026", recipe["start_url"])
             self.assertNotIn("october", " ".join(recipe.get("href_patterns") or []).lower(), rel)
+        beaumont = json.loads(
+            Path("parishes/recipes/dublin/beaumont.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(int(beaumont["weeks_back"]), 0)
+        self.assertEqual(int(beaumont["weeks_ahead"]), 0)
 
     def test_ballygall_and_donaghmoyne_use_8_november_pdfs(self) -> None:
         ballygall = json.loads(
