@@ -2212,6 +2212,13 @@ class HarvestMissRecipeTests(unittest.TestCase):
             self.assertNotIn("01.11.26.pdf", recipe["start_url"])
             self.assertNotIn("01112026.pdf", recipe["start_url"])
 
+    def test_blackrock_road_uses_8_november_not_all_saints(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/cork_and_ross/blackrockroad.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("8th-November-2026.pdf", recipe["start_url"])
+        self.assertNotIn("All-Saints", recipe["start_url"])
+
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):
     LISTING = "https://cappaghparish.com/bulletins"
