@@ -2410,6 +2410,24 @@ class HarvestMissRecipeTests(unittest.TestCase):
         rewritten = rewrite_date_url(example, date(2026, 11, 8))
         self.assertIn("2026_11_01+Newsletter.pdf", rewritten)
 
+    def test_donnybrook_and_newmarket_use_8_november(self) -> None:
+        donnybrook = json.loads(
+            Path("parishes/recipes/dublin/donnybrook.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(donnybrook["site_type"], "predicted_dated_pdf")
+        self.assertIn("Notices-8th-November-2026.pdf", donnybrook["start_url"])
+        self.assertNotIn("1st-November", donnybrook["start_url"])
+        self.assertEqual(int(donnybrook["weeks_back"]), 0)
+        self.assertEqual(int(donnybrook["weeks_ahead"]), 0)
+        newmarket = json.loads(
+            Path("parishes/recipes/cloyne/newmarkettaur.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(newmarket["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-Sunday-8th-November-2026.pdf", newmarket["start_url"])
+        self.assertNotIn("1st-November", newmarket["start_url"])
+        self.assertEqual(int(newmarket["weeks_back"]), 0)
+        self.assertEqual(int(newmarket["weeks_ahead"]), 0)
+
     def test_parishes_together_use_8_november_pdfs(self) -> None:
         cases = {
             "cork_and_ross/carraignabhfear.json": "Carraig-8-11-26.pdf",
