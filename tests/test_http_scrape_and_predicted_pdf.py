@@ -2410,6 +2410,26 @@ class HarvestMissRecipeTests(unittest.TestCase):
         rewritten = rewrite_date_url(example, date(2026, 11, 8))
         self.assertIn("2026_11_01+Newsletter.pdf", rewritten)
 
+    def test_edgeworthstown_rathowen_use_8_november(self) -> None:
+        edge = json.loads(
+            Path("parishes/recipes/ardagh/edgeworthstown.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(edge["site_type"], "predicted_dated_pdf")
+        self.assertIn("08-11-2026-edgeworthstown_compressed.pdf", edge["start_url"])
+        self.assertNotIn("01-11-2026", edge["start_url"])
+        self.assertNotIn("rathowenstreete", edge["start_url"])
+        self.assertEqual(int(edge["weeks_back"]), 0)
+        self.assertEqual(int(edge["weeks_ahead"]), 0)
+        rathowen = json.loads(
+            Path("parishes/recipes/ardagh/rathowen.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(rathowen["site_type"], "predicted_dated_pdf")
+        self.assertIn("08-11-2026-rathowenstreete_compressed.pdf", rathowen["start_url"])
+        self.assertNotIn("01-11-2026", rathowen["start_url"])
+        self.assertNotIn("edgeworthstown_compressed", rathowen["start_url"])
+        self.assertEqual(int(rathowen["weeks_back"]), 0)
+        self.assertEqual(int(rathowen["weeks_ahead"]), 0)
+
     def test_termon_bree_kilmoremoy_use_8_november(self) -> None:
         termon = json.loads(
             Path("parishes/recipes/armagh/termonmaguirc.json").read_text(encoding="utf-8")
