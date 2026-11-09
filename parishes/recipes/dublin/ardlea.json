@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "ardlea",
   "display_name": "Ardlea",
   "diocese": "dublin",
@@ -8,7 +8,8 @@
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
+  "recorded_date": "2026-11-09",
+  "example_url": "https://johnvianneydublin.com/resources/8%20Nov%202026%2C%20page%20one.jpg",
   "steps": [
     {
       "action": "goto",
@@ -18,17 +19,17 @@
       "action": "image_stack",
       "count": 2,
       "position": "first",
-      "selector": "img[src*='Oct']",
+      "selector": "img[src*='page']",
       "min_long_side": 400
     }
   ],
   "operator_notes": [
-    "05/10/2026 Dublin leftover hunt: listing newsletters.php has dated JPEG pages.",
-    "Proved page one GET 200 image/jpeg 208259 bytes magic JPEG. Filename 4 Oct 2026. Page two GET 200 image/jpeg 183665 bytes.",
-    "Stack the newest Sunday images. Do not pin dated jpg names."
+    "09/11/2026: listing already has 8 Nov 2026, page one.jpg and page two.jpg. Old img[src*='Oct'] and href Oct missed November. Scrape newsletters.php for /resources/ dated JPEGs. Proved GET 206 image/jpeg magic JPEG, 184738 and 140457 bytes. Do not pin the dated jpg names.",
+    "05/10/2026 Dublin leftover hunt: listing newsletters.php has dated JPEG pages."
   ],
   "do_not": [
     "Do not pin a dated filename or Wix hash.",
+    "Do not keep img[src*='Oct'] — that misses November and December.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
@@ -36,7 +37,7 @@
     "position": "top"
   },
   "href_patterns": [
-    "Oct",
+    "page",
     "2026",
     ".jpg"
   ]

@@ -2155,6 +2155,12 @@ _SQUARESPACE_DATED_NEWSLETTER_IMAGE_RE = re.compile(
 _RESIZED_IMAGE_SUFFIX_RE = re.compile(
     r"-\d+x\d+(?:-\d+)?\.(?:png|jpe?g)$", re.IGNORECASE
 )
+# Ardlea / St John Vianney: newsletters.php lists
+# /resources/8%20Nov%202026%2C%20page%20one.jpg (not wp-content/uploads).
+_RESOURCE_DATED_IMAGE_RE = re.compile(
+    r"""(?:src|href)\s*=\s*["']([^"']*resources/[^"']+\.(?:jpe?g|png))""",
+    re.IGNORECASE,
+)
 
 
 def _wp_upload_abs_url(match: re.Match[str], base_url: str) -> str:
@@ -3531,6 +3537,26 @@ def _extract_scored_upload_images(
         if url in seen:
             continue
         seen.add(url)
+        if href_patterns and not _href_matches_patterns(url, href_patterns):
+            continue
+        if _is_non_bulletin_url(url):
+            continue
+        found = extract_date_from_string(name) or extract_bulletin_date(url)
+        if found is None:
+            continue
+        if found <= target_date + timedelta(days=3):
+            scored.append((found, url))
+    for match in _RESOURCE_DATED_IMAGE_RE.finditer(html or ""):
+        raw = unescape(match.group(1)).strip()
+        url = urljoin(base_url, raw)
+        if url in seen:
+            continue
+        seen.add(url)
+        name = unquote(urlparse(url).path).rsplit("/", 1)[-1]
+        if ".opt" in name.lower():
+            continue
+        if _RESIZED_IMAGE_SUFFIX_RE.search(name) or _SKIP_IMAGE_NAME_RE.search(name):
+            continue
         if href_patterns and not _href_matches_patterns(url, href_patterns):
             continue
         if _is_non_bulletin_url(url):
