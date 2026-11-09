@@ -20,6 +20,7 @@ on:
           - fast
           - deep
           - more
+          - pasted
 
 permissions:
   contents: write
@@ -51,14 +52,19 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
           SCAN_MODE: ${{ github.event.inputs.mode || 'both' }}
-        run: python scripts/parish_scan.py --mode "$SCAN_MODE" --apply --workers 30
+        run: |
+          if [ "$SCAN_MODE" = "pasted" ]; then
+            python scripts/scan_pasted_sites.py --apply --workers 30
+          else
+            python scripts/parish_scan.py --mode "$SCAN_MODE" --apply --workers 30
+          fi
 
       - name: Commit scan wins
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add parishes/recipes parishes/site_patterns.json parishes/parish_scan_report.json parishes/parish_status.json
+          git add parishes/recipes parishes/site_patterns.json parishes/parish_scan_report.json parishes/parish_status.json parishes/pasted_sites_scan.json
           git diff --cached --quiet && exit 0
           git commit -m "Parish scan: remember proved bulletins."
           git push origin HEAD:main
