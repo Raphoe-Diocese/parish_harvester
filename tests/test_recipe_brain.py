@@ -528,6 +528,16 @@ def test_scan_skips_aliases_and_does_not_unskip_without_proof(tmp_path: Path) ->
     assert leftover["skip"] is True
 
 
+def test_front_page_date_does_not_need_the_word_newsletter() -> None:
+    from harvester.bulletin_freshness import front_page_issue_date
+
+    sunday = date(2026, 11, 8)
+    text = "Sunday 8th November 2026\nMass at 11am\nMary died on 9th July 2023"
+    assert front_page_issue_date(text, sunday) == sunday
+    memorial = "John died on 9th July 2023. Anniversary Mass."
+    assert front_page_issue_date(memorial, sunday) is None
+
+
 def test_do_not_reenable_keeps_the_recipe_skipped(tmp_path) -> None:
     from harvester.recipe_brain import _unskip_recipe
 
@@ -586,7 +596,7 @@ def test_undated_pdf_name_uses_the_date_inside_the_file(monkeypatch) -> None:
     monkeypatch.setattr(recipe_brain, "_http_get", fake_get)
     monkeypatch.setattr(
         "harvester.bulletin_freshness.heading_date_in_pdf_bytes",
-        lambda data, max_pages=2: date(2026, 11, 8),
+        lambda data, max_pages=2, target=None: date(2026, 11, 8),
     )
     html = b'<a href="/files/bulletin.pdf">Parish newsletter</a>'
     proved = recipe_brain._prove_from_listing_html(
@@ -606,7 +616,7 @@ def test_saved_pdf_with_no_date_in_the_name_gets_the_heading_date(tmp_path, monk
     pdf.write_bytes(b"%PDF-1.4")
     monkeypatch.setattr(
         "harvester.bulletin_freshness.heading_date_in_pdf",
-        lambda path: date(2026, 11, 8),
+        lambda path, target=None: date(2026, 11, 8),
     )
     fields = _bulletin_date_fields("https://exampleparish.ie/bulletin.pdf", pdf_path=pdf)
     assert fields["bulletin_date"] == "2026-11-08"
