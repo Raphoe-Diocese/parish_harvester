@@ -1,31 +1,31 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "churchtown",
   "display_name": "Churchtown",
   "diocese": "dublin",
-  "start_url": "https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf",
-  "site_type": "predicted_dated_pdf",
+  "start_url": "https://churchtownparish.com/newsletter/",
+  "site_type": "wp_json_newest_media",
   "timeout_ms": 30000,
   "total_timeout_s": 90,
-  "weeks_ahead": 1,
-  "recorded_date": "2026-11-06",
-  "example_url": "https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf",
+  "recorded_date": "2026-11-09",
+  "example_url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf"
+      "action": "goto",
+      "url": "https://churchtownparish.com/newsletter/"
     }
   ],
   "operator_notes": [
-    "06/11/2026: wp_json + homepage hung 17m52s then cancelled. /newsletter/ is HTML with no PDF href. Proved newsletter-2026-11-01.pdf GET 200 application/pdf 1400380 bytes magic %PDF-1.7. Folder is /2026/10/. 08/11 URL 404 this turn. start_url is the PDF so listing challenge is skipped."
+    "09/11/2026: predicted rewrite of newsletter-2026-11-01.pdf to 2026-11-08 404. wp-json media has churchtown-auto HASH.pdf dated 06/11/2026 GET 206 application/pdf 1381831 bytes magic %PDF-1.7. Hash changes each week. Use wp_json_newest_media so next Sunday's auto file wins by media date. Do not pin the hash.",
+    "06/11/2026: wp_json + homepage hung 17m52s then cancelled. /newsletter/ is HTML. Folder is /2026/10/. start_url was the PDF so listing challenge is skipped."
   ],
   "do_not": [
-    "Do not set start_url to the homepage or /newsletter/ — Playwright hangs.",
-    "Do not pin newsletter-2026-11-01.pdf forever — predicted_dated_pdf rewrites the date.",
+    "Do not pin churchtown-auto-*.pdf — the hash changes each week.",
+    "Do not pin newsletter-2026-11-01.pdf.",
+    "Do not Playwright-scrape the homepage — it hangs.",
     "Do not harvest Facebook."
   ],
   "href_patterns": [
-    "newsletter",
     ".pdf"
   ],
   "href_skip_patterns": [

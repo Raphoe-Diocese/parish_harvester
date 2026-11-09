@@ -2640,7 +2640,93 @@ class CappaghExtensionlessBulletinTests(unittest.TestCase):
         self.assertEqual(max(scored)[1], self.THIS_WEEK)
 
 
+class ChurchtownWpJsonRecipeTests(unittest.TestCase):
+    """Hashed churchtown-auto PDF has no day in the filename; wp-json media date wins."""
+
+    AUTO_PDF = (
+        "https://churchtownparish.com/wp-content/uploads/2026/11/"
+        "churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf"
+    )
+    LAST_WEEK = (
+        "https://churchtownparish.com/wp-content/uploads/2026/10/"
+        "newsletter-2026-11-01.pdf"
+    )
+
+    def test_recipe_uses_wp_json_not_predicted_pin(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/churchtown.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertTrue(recipe["start_url"].startswith("https://churchtownparish.com/"))
+        self.assertFalse(recipe["start_url"].endswith(".pdf"))
+        self.assertIn(".pdf", recipe.get("href_patterns") or [])
+        steps = recipe.get("steps") or []
+        self.assertFalse(
+            any(
+                str(step.get("url") or "").lower().endswith(".pdf")
+                for step in steps
+                if isinstance(step, dict)
+            ),
+            "pinned PDF step would 404 when the auto hash changes",
+        )
+        do_not = " ".join(recipe.get("do_not") or []).lower()
+        self.assertIn("pin", do_not)
+
+    def test_media_date_beats_last_week_filename(self) -> None:
+        import asyncio
+        import tempfile
+        from unittest.mock import patch
+
+        from harvester.replay import _try_wp_json_newest_media
+
+        payload = [
+            {
+                "source_url": self.AUTO_PDF,
+                "date": "2026-11-06T13:02:16",
+                "slug": "churchtown-auto",
+                "title": {"rendered": "churchtown-auto"},
+            },
+            {
+                "source_url": self.LAST_WEEK,
+                "date": "2026-10-30T15:12:33",
+                "slug": "newsletter-2026-11-01",
+                "title": {"rendered": "newsletter-2026-11-01"},
+            },
+        ]
+        api_body = json.dumps(payload).encode()
+        pdf_body = b"%PDF-1.7 fake churchtown auto"
+
+        def fake_fetch(url, **_kwargs):
+            if "wp-json" in url:
+                return api_body, {"content-type": "application/json"}
+            if str(url).endswith(".pdf"):
+                return pdf_body, {"content-type": "application/pdf"}
+            return None
+
+        dest = Path(tempfile.gettempdir()) / "ph_churchtown_wp_json_test.pdf"
+        try:
+            with patch(
+                "harvester.replay._fetch_bytes_with_retries",
+                side_effect=fake_fetch,
+            ):
+                found = asyncio.run(
+                    _try_wp_json_newest_media(
+                        "https://churchtownparish.com/newsletter/",
+                        dest,
+                        href_patterns=[".pdf"],
+                        target_date=date(2026, 11, 8),
+                        href_skip_patterns=["png"],
+                    )
+                )
+            self.assertIsNotNone(found)
+            self.assertIn("churchtown-auto-", found[0])
+            self.assertNotIn("newsletter-2026-11-01", found[0])
+        finally:
+            dest.unlink(missing_ok=True)
+
+
 class AthloneWpJsonMediaDateFallbackTests(unittest.TestCase):
+
     """I-Sept2726.pdf has no parseable day; media library date must win over PalmSunday."""
 
     def test_media_date_beats_older_filename_date(self) -> None:
