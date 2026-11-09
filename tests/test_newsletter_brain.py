@@ -429,6 +429,16 @@ class MemoryTests(unittest.TestCase):
         self.assertIn("prefer=largest", canva["how"])
         self.assertIn("_assets/media", canva["how"])
         self.assertIn("blob:", canva["how"])
+        scrape = next(item for item in LEARNED if item["id"] == "http_scrape_newest_pdf")
+        self.assertIn("42682994666", scrape["how"])
+        self.assertIn("wsimg", scrape["how"])
+        media = next(item for item in LEARNED if item["id"] == "wp_json_newest_media")
+        self.assertIn("42686379039", media["how"])
+        self.assertIn("Do not open the HTML newsletter page", media["how"])
+        images = next(item for item in LEARNED if item["id"] == "image_stack")
+        self.assertIn("page-0.jpg", images["how"])
+        facebook = next(item for item in LEARNED if item["id"] == "facebook_link_only")
+        self.assertIn("Do not scrape the post", facebook["how"])
 
     def test_this_sunday_upload_names_are_guessed(self) -> None:
         sunday = date(2026, 10, 18)
