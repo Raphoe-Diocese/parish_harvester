@@ -1,37 +1,38 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "collooney",
   "display_name": "Collooney",
   "diocese": "achonry",
-  "start_url": "https://img1.wsimg.com/blobby/go/feef6feb-5174-4089-b09e-a49e1802623a/downloads/01a3b2d8-1152-4616-94f8-f212973318a9/2026Nov08CollooneyR%20WWW.pdf",
-  "site_type": "predicted_dated_pdf",
+  "start_url": "https://kilvarnetparish.com/newsletters",
+  "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
     "RCB.pdf",
-    "Collooney",
-    "Nov08"
+    "Collooney"
   ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
+  "href_skip_patterns": [
+    "Chy3",
+    "Conservation"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "recorded_date": "2026-11-09",
   "example_url": "https://img1.wsimg.com/blobby/go/feef6feb-5174-4089-b09e-a49e1802623a/downloads/01a3b2d8-1152-4616-94f8-f212973318a9/2026Nov08CollooneyR%20WWW.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://img1.wsimg.com/blobby/go/feef6feb-5174-4089-b09e-a49e1802623a/downloads/01a3b2d8-1152-4616-94f8-f212973318a9/2026Nov08CollooneyR%20WWW.pdf"
+      "action": "goto",
+      "url": "https://kilvarnetparish.com/newsletters"
     }
   ],
   "operator_notes": [
-    "09/11/2026: Sunday harvest still had 2026Nov01RCB.pdf because href_patterns was only RCB.pdf. This week file is 2026Nov08CollooneyR WWW.pdf on the same Kilvarnet listing. Proved GET 200 application/pdf magic %PDF-1.3. HEAD 204 Content-Length 423876 (Wix HEAD often 204). GitHub has fetched img1.wsimg.com for Foxford. start_url is the PDF. weeks_back 0 weeks_ahead 0.",
-    "Official display name Collooney; site brand Kilvarnet. Listing https://kilvarnetparish.com/newsletters.",
-    "Filename date is glued YearMonthDay (2026Nov08)."
+    "09/11/2026: Sunday harvest kept 2026Nov01RCB.pdf because href_patterns was only RCB.pdf. This week file is 2026Nov08CollooneyR WWW.pdf on the same Kilvarnet listing. Do not pin the wsimg blob path — the hash changes every week. Scrape https://kilvarnetparish.com/newsletters and keep both RCB.pdf and Collooney so either weekly name is found.",
+    "Official display name Collooney; site brand Kilvarnet. Filename date is glued YearMonthDay (2026Nov08).",
+    "HEAD on wsimg may return 204. GET is application/pdf magic %PDF."
   ],
   "do_not": [
-    "Do not keep 2026Nov01RCB.pdf.",
+    "Do not pin the wsimg hash path for next week.",
+    "Do not keep href_patterns as only RCB.pdf — that missed 2026Nov08CollooneyR WWW.pdf.",
     "Do not download Chy3.pdf or Conservation.pdf from the same downloads folder.",
-    "Do not use collooneyparish.com — host does not resolve.",
-    "Do not pin Booterstown or Mayo.ie hashes. This Wix path is this week's Collooney file only."
+    "Do not use collooneyparish.com — host does not resolve."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
