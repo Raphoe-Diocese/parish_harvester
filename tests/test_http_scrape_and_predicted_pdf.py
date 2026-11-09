@@ -2410,6 +2410,17 @@ class HarvestMissRecipeTests(unittest.TestCase):
         rewritten = rewrite_date_url(example, date(2026, 11, 8))
         self.assertIn("2026_11_01+Newsletter.pdf", rewritten)
 
+    def test_collooney_uses_8_november_wsimg_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/achonry/collooney.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("2026Nov08CollooneyR", recipe["start_url"])
+        self.assertNotIn("2026Nov01RCB", recipe["start_url"])
+        self.assertEqual(int(recipe["weeks_back"]), 0)
+        self.assertEqual(int(recipe["weeks_ahead"]), 0)
+        self.assertIn("Collooney", recipe["href_patterns"])
+
     def test_donnybrook_and_newmarket_use_8_november(self) -> None:
         donnybrook = json.loads(
             Path("parishes/recipes/dublin/donnybrook.json").read_text(encoding="utf-8")
