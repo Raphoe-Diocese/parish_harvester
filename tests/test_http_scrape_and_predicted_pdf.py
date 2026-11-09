@@ -976,6 +976,46 @@ class RathdrumFlatUploadImageTests(unittest.TestCase):
         self.assertEqual(best, date(2026, 10, 25))
 
 
+class ArdleaResourcesImageTests(unittest.TestCase):
+    LISTING = "https://johnvianneydublin.com/newsletters.php"
+    PAGE1 = "https://johnvianneydublin.com/resources/8%20Nov%202026%2C%20page%20one.jpg"
+    PAGE2 = "https://johnvianneydublin.com/resources/8%20Nov%202026%2C%20page%20two.jpg"
+    OLD_OPT = (
+        "https://johnvianneydublin.com/resources/"
+        "1%20Nov%202026%2C%20page%20one.jpg.opt775x1056o0%2C0s775x1056.jpg"
+    )
+
+    def test_scores_resources_jpegs_and_skips_opt_thumbs(self) -> None:
+        html = f"""
+        <img src="resources/8%20Nov%202026%2C%20page%20one.jpg" />
+        <img src="resources/8%20Nov%202026%2C%20page%20two.jpg" />
+        <img src="resources/1%20Nov%202026%2C%20page%20one.jpg.opt775x1056o0%2C0s775x1056.jpg" />
+        """
+        scored = _extract_scored_upload_images(
+            html,
+            self.LISTING,
+            href_patterns=["page", "2026", ".jpg"],
+            target_date=date(2026, 11, 8),
+        )
+        urls = [url for _found, url in scored]
+        self.assertIn(self.PAGE1, urls)
+        self.assertIn(self.PAGE2, urls)
+        self.assertNotIn(self.OLD_OPT, urls)
+        self.assertEqual(max(item[0] for item in scored), date(2026, 11, 8))
+
+    def test_ardlea_recipe_does_not_lock_october(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/ardlea.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_images")
+        self.assertEqual(recipe["start_url"], self.LISTING)
+        self.assertNotIn("Oct", recipe["href_patterns"])
+        self.assertIn("page", recipe["href_patterns"])
+        selector = recipe["steps"][1]["selector"]
+        self.assertNotIn("Oct", selector)
+        self.assertIn("page", selector)
+
+
 class ArdkeenLiturgicalImageTests(unittest.TestCase):
     LISTING = "https://parishofardkeen.co.uk/parish-bulletin/"
     THIS_WEEK = (
