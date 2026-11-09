@@ -10525,33 +10525,35 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/churchtown.json",
       "recipe": {
-        "start_url": "https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf",
-        "site_type": "predicted_dated_pdf",
+        "start_url": "https://churchtownparish.com/newsletter/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "06/11/2026: wp_json + homepage hung 17m52s then cancelled. /newsletter/ is HTML with no PDF href. Proved newsletter-2026-11-01.pdf GET 200 application/pdf 1400380 bytes magic %PDF-1.7. Folder is /2026/10/. 08/11 URL 404 this turn. start_url is the PDF so listing challenge is skipped."
+          "09/11/2026: predicted rewrite of newsletter-2026-11-01.pdf to 2026-11-08 404. wp-json media has churchtown-auto HASH.pdf dated 06/11/2026 GET 206 application/pdf 1381831 bytes magic %PDF-1.7. Hash changes each week. Use wp_json_newest_media so next Sunday's auto file wins by media date. Do not pin the hash.",
+          "06/11/2026: wp_json + homepage hung 17m52s then cancelled. /newsletter/ is HTML. Folder is /2026/10/. start_url was the PDF so listing challenge is skipped."
         ],
         "do_not": [
-          "Do not set start_url to the homepage or /newsletter/ \u2014 Playwright hangs.",
-          "Do not pin newsletter-2026-11-01.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
+          "Do not pin churchtown-auto-*.pdf \u2014 the hash changes each week.",
+          "Do not pin newsletter-2026-11-01.pdf.",
+          "Do not Playwright-scrape the homepage \u2014 it hangs.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-11-09"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "newsletter-YYYY-MM-DD.pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf for 2026-11-01 did not resolve to a real file (listing page was not opened)",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://churchtownparish.com/wp-content/uploads/2026/10/newsletter-2026-11-01.pdf for 2026-11-01 did not r"
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "churchtownliscarroll",
