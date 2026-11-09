@@ -1073,6 +1073,14 @@ def remember_win(
 
 
 def _unskip_recipe(recipe: dict[str, Any], *, site_type: str, start_url: str, note: str) -> None:
+    """Turn a skipped recipe back on after a proved file.
+
+    A recipe that says "Do not re-enable" stays skipped. The Derry copies of
+    Foxford and Gurteen are that case. The real parishes live in Achonry.
+    """
+    forbidden = " ".join(str(line) for line in (recipe.get("do_not") or [])).lower()
+    if "do not re-enable" in forbidden:
+        return
     path = Path(recipe["_path"])
     data = json.loads(path.read_text(encoding="utf-8"))
     data["skip"] = False
