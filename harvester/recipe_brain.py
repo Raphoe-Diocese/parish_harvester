@@ -847,7 +847,11 @@ def missed_week_should_retry(meta: dict) -> bool:
 def _heading_date_ok(blob: bytes, accepted: set[date]) -> date | None:
     from harvester.bulletin_freshness import heading_date_in_pdf_bytes
 
-    found = heading_date_in_pdf_bytes(blob)
+    sundays = [day for day in accepted if day.weekday() == 6]
+    target = max(sundays) if sundays else (max(accepted) if accepted else None)
+    found = heading_date_in_pdf_bytes(blob, target=target)
+    if found is None:
+        return None
     if found in accepted:
         return found
     return None

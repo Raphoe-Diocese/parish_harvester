@@ -42,6 +42,11 @@ jobs:
       - name: Install PDF text reader
         run: pip install 'PyPDF2==3.0.1'
 
+      - name: Date saved bulletins from the front page
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python scripts/date_saved_bulletins.py
+
       - name: Scan parish websites
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -53,7 +58,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add parishes/recipes parishes/site_patterns.json parishes/parish_scan_report.json
+          git add parishes/recipes parishes/site_patterns.json parishes/parish_scan_report.json parishes/parish_status.json
           git diff --cached --quiet && exit 0
           git commit -m "Parish scan: remember proved bulletins."
           git push origin HEAD:main

@@ -647,7 +647,45 @@ _BODY_YEAR_RE = re.compile(r"\b(20\d{2})\b")
 _ANCIENT_BODY_YEAR_GAP = 3
 
 
-def heading_date_in_pdf_bytes(data: bytes, *, max_pages: int = 2) -> date | None:
+def front_page_issue_date(text: str, target: date) -> date | None:
+    """This week's date on the front page. The word newsletter is not required.
+
+    "Sunday 8th November 2026" counts. "died on 9th July 2023" does not.
+    A photo of a page has no text, so this returns nothing.
+    """
+    week_start, week_end = week_window(target)
+    found: list[date] = []
+    lines = _nonempty_text_lines(text)[:40]
+    if not lines and text:
+        lines = [text[:500]]
+    for line in lines:
+        if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
+            continue
+        parsed = extract_date_from_string(line)
+        if parsed is not None and week_start <= parsed <= week_end:
+            found.append(parsed)
+    if not found:
+        return None
+    if target in found:
+        return target
+    return max(found)
+
+
+def _date_from_pdf_text(text: str, target: date | None) -> date | None:
+    if target is not None:
+        hit = front_page_issue_date(text, target)
+        if hit is not None:
+            return hit
+    found = extract_bulletin_date_from_text(text)
+    if found is None or target is None:
+        return found
+    week_start, week_end = week_window(target)
+    if week_start <= found <= week_end:
+        return found
+    return None
+
+
+def heading_date_in_pdf_bytes(data: bytes, *, max_pages: int = 2, target: date | None = None) -> date | None:
     """Date from the heading text inside a PDF. Empty when the PDF is a photo scan.
 
     Photo scans have no embedded text. This does not invent a date from a
@@ -669,15 +707,15 @@ def heading_date_in_pdf_bytes(data: bytes, *, max_pages: int = 2) -> date | None
             chunks.append(page.extract_text() or "")
         except Exception:
             chunks.append("")
-    return extract_bulletin_date_from_text("\n".join(chunks))
+    return _date_from_pdf_text("\n".join(chunks), target)
 
 
-def heading_date_in_pdf(path: Path) -> date | None:
+def heading_date_in_pdf(path: Path, *, target: date | None = None) -> date | None:
     """Date from the first pages of a PDF already saved on disk."""
     text = read_pdf_text_head(path, max_pages=2)
     if not text.strip():
         return None
-    return extract_bulletin_date_from_text(text)
+    return _date_from_pdf_text(text, target)
 
 
 def read_pdf_text_head(path: Path, max_pages: int = 4) -> str:
