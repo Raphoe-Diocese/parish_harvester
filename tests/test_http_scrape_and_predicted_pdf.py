@@ -2410,6 +2410,36 @@ class HarvestMissRecipeTests(unittest.TestCase):
         rewritten = rewrite_date_url(example, date(2026, 11, 8))
         self.assertIn("2026_11_01+Newsletter.pdf", rewritten)
 
+    def test_termon_bree_kilmoremoy_use_8_november(self) -> None:
+        termon = json.loads(
+            Path("parishes/recipes/armagh/termonmaguirc.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(termon["site_type"], "predicted_dated_pdf")
+        self.assertIn(
+            "Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
+            termon["start_url"],
+        )
+        self.assertNotIn("Twenty-Sixth", termon["start_url"])
+        self.assertNotIn("1-November", termon["start_url"])
+        self.assertEqual(int(termon["weeks_back"]), 0)
+        self.assertEqual(int(termon["weeks_ahead"]), 0)
+        bree = json.loads(
+            Path("parishes/recipes/ferns/bree.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(bree["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-3745-Nov-7th-8th.pdf", bree["start_url"])
+        self.assertNotIn("3744", bree["start_url"])
+        self.assertEqual(int(bree["weeks_back"]), 0)
+        self.assertEqual(int(bree["weeks_ahead"]), 0)
+        kilmoremoy = json.loads(
+            Path("parishes/recipes/killala/kilmoremoy.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(kilmoremoy["site_type"], "predicted_dated_pdf")
+        self.assertIn("newsletter-62.pdf", kilmoremoy["start_url"])
+        self.assertNotIn("newsletter-61.pdf", kilmoremoy["start_url"])
+        self.assertEqual(int(kilmoremoy["weeks_back"]), 0)
+        self.assertEqual(int(kilmoremoy["weeks_ahead"]), 0)
+
     def test_dromod_and_foxford_allow_8_november(self) -> None:
         dromod = json.loads(
             Path("parishes/recipes/kerry/dromod.json").read_text(encoding="utf-8")
