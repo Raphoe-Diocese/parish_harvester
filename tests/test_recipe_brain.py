@@ -583,3 +583,30 @@ def test_saved_pdf_with_no_date_in_the_name_gets_the_heading_date(tmp_path, monk
     fields = _bulletin_date_fields("https://exampleparish.ie/bulletin.pdf", pdf_path=pdf)
     assert fields["bulletin_date"] == "2026-11-08"
     assert fields["bulletin_date_uk"] == "08/11/2026"
+
+
+def test_do_not_reenable_keeps_the_recipe_skipped(tmp_path) -> None:
+    from harvester.recipe_brain import _unskip_recipe
+
+    path = tmp_path / "churchtv.json"
+    path.write_text(
+        json.dumps(
+            {
+                "parish_key": "churchtv",
+                "skip": True,
+                "do_not": ["Do not re-enable under Derry — use achonry/gurteen."],
+                "steps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    recipe = json.loads(path.read_text(encoding="utf-8"))
+    recipe["_path"] = str(path)
+    _unskip_recipe(
+        recipe,
+        site_type="http_scrape_newest_pdf",
+        start_url="https://www.churchtv.ie/gurteen/",
+        note="scan",
+    )
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert saved["skip"] is True
