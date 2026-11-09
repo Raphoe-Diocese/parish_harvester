@@ -528,6 +528,34 @@ def test_scan_skips_aliases_and_does_not_unskip_without_proof(tmp_path: Path) ->
     assert leftover["skip"] is True
 
 
+def test_do_not_reenable_keeps_the_recipe_skipped(tmp_path) -> None:
+    from harvester.recipe_brain import _unskip_recipe
+
+    path = tmp_path / "foxfordparish.json"
+    path.write_text(
+        json.dumps(
+            {
+                "parish_key": "foxfordparish",
+                "skip": True,
+                "start_url": "https://foxfordparish.com/newsletter-1",
+                "do_not": ["Do not re-enable under Derry — use achonry/foxford."],
+                "steps": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    recipe = json.loads(path.read_text(encoding="utf-8"))
+    recipe["_path"] = str(path)
+    _unskip_recipe(
+        recipe,
+        site_type="http_scrape_newest_pdf",
+        start_url="https://foxfordparish.com/newsletter-1",
+        note="scan",
+    )
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert saved["skip"] is True
+
+
 def test_missed_week_is_tried_again_and_facebook_stays_skipped() -> None:
     from harvester.recipe_brain import missed_week_should_retry
 
