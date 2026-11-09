@@ -1692,15 +1692,15 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "05/10/2026 Dublin leftover hunt: listing newsletters.php has dated JPEG pages.",
-          "Proved page one GET 200 image/jpeg 208259 bytes magic JPEG. Filename 4 Oct 2026. Page two GET 200 image/jpeg 183665 bytes.",
-          "Stack the newest Sunday images. Do not pin dated jpg names."
+          "09/11/2026: listing already has 8 Nov 2026, page one.jpg and page two.jpg. Old img[src*='Oct'] and href Oct missed November. Scrape newsletters.php for /resources/ dated JPEGs. Proved GET 206 image/jpeg magic JPEG, 184738 and 140457 bytes. Do not pin the dated jpg names.",
+          "05/10/2026 Dublin leftover hunt: listing newsletters.php has dated JPEG pages."
         ],
         "do_not": [
           "Do not pin a dated filename or Wix hash.",
+          "Do not keep img[src*='Oct'] \u2014 that misses November and December.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-09"
       },
       "bulletin_format": "image_stack",
       "learned_pattern": "",
@@ -12485,29 +12485,29 @@
       "diocese": "achonry",
       "recipe_file": "parishes/recipes/achonry/collooney.json",
       "recipe": {
-        "start_url": "https://img1.wsimg.com/blobby/go/feef6feb-5174-4089-b09e-a49e1802623a/downloads/01a3b2d8-1152-4616-94f8-f212973318a9/2026Nov08CollooneyR%20WWW.pdf",
-        "site_type": "predicted_dated_pdf",
+        "start_url": "https://kilvarnetparish.com/newsletters",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "09/11/2026: Sunday harvest still had 2026Nov01RCB.pdf because href_patterns was only RCB.pdf. This week file is 2026Nov08CollooneyR WWW.pdf on the same Kilvarnet listing. Proved GET 200 application/pdf magic %PDF-1.3. HEAD 204 Content-Length 423876 (Wix HEAD often 204). GitHub has fetched img1.wsimg.com for Foxford. start_url is the PDF. weeks_back 0 weeks_ahead 0.",
-          "Official display name Collooney; site brand Kilvarnet. Listing https://kilvarnetparish.com/newsletters.",
-          "Filename date is glued YearMonthDay (2026Nov08)."
+          "09/11/2026: Sunday harvest kept 2026Nov01RCB.pdf because href_patterns was only RCB.pdf. This week file is 2026Nov08CollooneyR WWW.pdf on the same Kilvarnet listing. Do not pin the wsimg blob path \u2014 the hash changes every week. Scrape https://kilvarnetparish.com/newsletters and keep both RCB.pdf and Collooney so either weekly name is found.",
+          "Official display name Collooney; site brand Kilvarnet. Filename date is glued YearMonthDay (2026Nov08).",
+          "HEAD on wsimg may return 204. GET is application/pdf magic %PDF."
         ],
         "do_not": [
-          "Do not keep 2026Nov01RCB.pdf.",
+          "Do not pin the wsimg hash path for next week.",
+          "Do not keep href_patterns as only RCB.pdf \u2014 that missed 2026Nov08CollooneyR WWW.pdf.",
           "Do not download Chy3.pdf or Conservation.pdf from the same downloads folder.",
-          "Do not use collooneyparish.com \u2014 host does not resolve.",
-          "Do not pin Booterstown or Mayo.ie hashes. This Wix path is this week's Collooney file only."
+          "Do not use collooneyparish.com \u2014 host does not resolve."
         ],
         "recorded_date": "2026-11-09"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
