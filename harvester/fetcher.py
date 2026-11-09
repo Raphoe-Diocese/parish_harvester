@@ -2223,6 +2223,46 @@ async def _fetch_entry(
         recipe_status = str(recipe_meta.get("status", "")).strip().lower()
         should_skip = bool(recipe_meta.get("skip")) or recipe_status in {"dead_url", "inactive"}
         needs_retraining = bool(recipe_meta.get("needs_retraining")) or recipe_status == "needs_retraining"
+        if should_skip and not needs_retraining:
+            from .recipe_brain import (
+                accepted_hunt_dates,
+                download_missed_week,
+                missed_week_should_retry,
+            )
+
+            if missed_week_should_retry(recipe_meta):
+                start = str(recipe_meta.get("start_url") or target_url or "")
+                proved = await asyncio.to_thread(
+                    download_missed_week,
+                    start,
+                    dest,
+                    accepted_hunt_dates(target),
+                )
+                if proved and dest.exists():
+                    print(
+                        f"  {key}: found this Sunday after a missed week "
+                        f"({proved.get('date')})"
+                    )
+                    return FetchResult(
+                        key=key,
+                        display_name=entry.display_name,
+                        status="ok",
+                        url=str(proved.get("url") or start),
+                        file_path=dest,
+                        file_type="pdf",
+                    )
+                print(f"  {key}: no bulletin for this Sunday yet. Will try again next Sunday.")
+                return FetchResult(
+                    key=key,
+                    display_name=entry.display_name,
+                    status="skipped",
+                    url=start,
+                    file_type="skipped",
+                    error=(
+                        "No bulletin on the website for this Sunday. "
+                        "Will try again next Sunday."
+                    ),
+                )
         if should_skip or needs_retraining:
             reason = (
                 str(

@@ -526,3 +526,60 @@ def test_scan_skips_aliases_and_does_not_unskip_without_proof(tmp_path: Path) ->
     assert wins == []
     leftover = json.loads((recipes / "facebook.json").read_text(encoding="utf-8"))
     assert leftover["skip"] is True
+
+
+def test_missed_week_is_tried_again_and_facebook_stays_skipped() -> None:
+    from harvester.recipe_brain import missed_week_should_retry
+
+    assert missed_week_should_retry(
+        {
+            "reason": (
+                "Official/kitchen-sink site opened. "
+                "No this-week PDF or JPEG with GET 200 and date on the file."
+            )
+        }
+    )
+    assert not missed_week_should_retry(
+        {"reason": "Official card / search is Facebook-only — cannot scrape Facebook."}
+    )
+    assert not missed_week_should_retry(
+        {"reason": "No parish website on the official card. No this-week PDF or JPEG."}
+    )
+
+
+def test_undated_pdf_name_uses_the_date_inside_the_file(monkeypatch) -> None:
+    from harvester import recipe_brain
+
+    pdf = b"%PDF-1.4 fake bulletin"
+
+    def fake_get(url, timeout=20, max_bytes=256_000):
+        return 200, "application/pdf", pdf, url
+
+    monkeypatch.setattr(recipe_brain, "_http_get", fake_get)
+    monkeypatch.setattr(
+        "harvester.bulletin_freshness.heading_date_in_pdf_bytes",
+        lambda data, max_pages=2: date(2026, 11, 8),
+    )
+    html = b'<a href="/files/bulletin.pdf">Parish newsletter</a>'
+    proved = recipe_brain._prove_from_listing_html(
+        html,
+        "https://exampleparish.ie/",
+        {date(2026, 11, 8)},
+    )
+    assert proved is not None
+    assert proved["date"] == "2026-11-08"
+    assert proved["url"].endswith("/files/bulletin.pdf")
+
+
+def test_saved_pdf_with_no_date_in_the_name_gets_the_heading_date(tmp_path, monkeypatch) -> None:
+    from harvester.report import _bulletin_date_fields
+
+    pdf = tmp_path / "bulletin.pdf"
+    pdf.write_bytes(b"%PDF-1.4")
+    monkeypatch.setattr(
+        "harvester.bulletin_freshness.heading_date_in_pdf",
+        lambda path: date(2026, 11, 8),
+    )
+    fields = _bulletin_date_fields("https://exampleparish.ie/bulletin.pdf", pdf_path=pdf)
+    assert fields["bulletin_date"] == "2026-11-08"
+    assert fields["bulletin_date_uk"] == "08/11/2026"
