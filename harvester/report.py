@@ -180,8 +180,9 @@ def _bulletin_date_fields(
     *,
     error: str | None = None,
     diagnosis: dict | None = None,
+    pdf_path: Path | None = None,
 ) -> dict[str, str]:
-    """ISO + UK bulletin date from diagnosis, stale-error text, or the URL. Never invent."""
+    """ISO + UK bulletin date from diagnosis, the URL, or the PDF heading. Never invent."""
     iso = ""
     if isinstance(diagnosis, dict):
         raw = str(diagnosis.get("bulletin_date") or "").strip()
@@ -195,6 +196,12 @@ def _bulletin_date_fields(
         from .bulletin_freshness import extract_bulletin_date
 
         extracted = extract_bulletin_date(url)
+        if extracted is not None:
+            iso = extracted.isoformat()
+    if not iso and pdf_path is not None and Path(pdf_path).is_file():
+        from .bulletin_freshness import heading_date_in_pdf
+
+        extracted = heading_date_in_pdf(Path(pdf_path))
         if extracted is not None:
             iso = extracted.isoformat()
     if not iso:
@@ -278,7 +285,7 @@ def generate_report(
                 "url": r.url,
                 "file": dest.name if dest else f"{r.key}.pdf",
                 "file_type": r.file_type,
-                **_bulletin_date_fields(r.url),
+                **_bulletin_date_fields(r.url, pdf_path=r.file_path),
             }
             downloaded.append(entry)
         elif r.status == "html_link":
@@ -402,7 +409,7 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
             "url": r.url,
             "file": dest.name if dest else f"{r.key}.pdf",
             "file_type": r.file_type,
-            **_bulletin_date_fields(r.url),
+            **_bulletin_date_fields(r.url, pdf_path=r.file_path),
         }
     if r.status == "html_link":
         return "html_links", {

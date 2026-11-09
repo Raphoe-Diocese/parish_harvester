@@ -748,6 +748,8 @@ def candidate_probe_urls(start_url: str) -> list[tuple[str, str, str]]:
 
     if hint and hint.confidence == "high":
         add(raw, hint.site_type, hint.pattern_key or hint.key)
+    elif raw and not raw.lower().split("?", 1)[0].endswith(".pdf"):
+        add(raw, "http_scrape_newest_pdf", "homepage_listing")
 
     if hint is None or hint.key != "churchservices_tv":
         add(
@@ -815,13 +817,40 @@ def _sunday_guess_probes(origin: str, sunday: date) -> list[tuple[str, str, str]
     return found
 
 
-def _http_get(url: str, timeout: int = 20) -> tuple[int, str, bytes, str]:
+def _http_get(
+    url: str, timeout: int = 20, max_bytes: int = 256_000
+) -> tuple[int, str, bytes, str]:
     req = Request(url, headers={"User-Agent": UA})
     with urlopen(req, timeout=timeout) as resp:
-        body = resp.read(256_000)
+        body = resp.read(max_bytes)
         ctype = resp.headers.get("Content-Type") or ""
         final = resp.geturl() or url
         return int(resp.status), ctype, body, final
+
+
+def missed_week_should_retry(meta: dict) -> bool:
+    """A parish that had no file this week is tried again next Sunday.
+
+    Facebook-only and no-website rows stay skipped. A late upload is not a
+    permanent stop.
+    """
+    reason = " ".join(
+        str(meta.get(key) or "") for key in ("reason", "dead_reason")
+    ).lower()
+    if "facebook-only" in reason or "cannot scrape facebook" in reason:
+        return False
+    if "no parish website" in reason:
+        return False
+    return "no this-week" in reason or "not proved yet" in reason
+
+
+def _heading_date_ok(blob: bytes, accepted: set[date]) -> date | None:
+    from harvester.bulletin_freshness import heading_date_in_pdf_bytes
+
+    found = heading_date_in_pdf_bytes(blob)
+    if found in accepted:
+        return found
+    return None
 
 
 def _magic_ok(body: bytes, ctype: str) -> str | None:
@@ -854,12 +883,22 @@ def prove_this_week_file(url: str, accepted: set[date]) -> dict[str, Any] | None
     if kind == "pdf" or (kind is None and "html" in ctype.lower()):
         if kind == "pdf":
             found = _date_ok(final, accepted) or _date_ok(url, accepted)
+            blob = body
+            if found is None:
+                try:
+                    status, _ctype, blob, final = _http_get(
+                        final or url, max_bytes=1_500_000
+                    )
+                except Exception:
+                    blob = body
+                if status == 200:
+                    found = _heading_date_ok(blob, accepted)
             if found is None:
                 return None
             return {
                 "url": final,
                 "kind": "pdf",
-                "bytes": len(body),
+                "bytes": len(blob),
                 "date": found.isoformat(),
             }
         return _prove_from_listing_html(body, final, accepted)
@@ -883,25 +922,71 @@ def _prove_from_listing_html(body: bytes, page_url: str, accepted: set[date]) ->
         html = body.decode("utf-8", errors="ignore")
     except Exception:
         return None
+    dated: list[tuple[str, date]] = []
+    undated: list[str] = []
     for href in _HREF_PDF_RE.findall(html):
         absolute = urljoin(page_url, href)
         found = _date_ok(absolute, accepted) or _date_ok(href, accepted)
         if found is None:
+            undated.append(absolute)
+        else:
+            dated.append((absolute, found))
+    for absolute, found in dated[:6]:
+        proved = _prove_pdf_url(absolute, accepted, known_date=found)
+        if proved:
+            return proved
+    for absolute in undated[:4]:
+        proved = _prove_pdf_url(absolute, accepted, known_date=None)
+        if proved:
+            return proved
+    return None
+
+
+def _prove_pdf_url(
+    absolute: str, accepted: set[date], *, known_date: date | None
+) -> dict[str, Any] | None:
+    """Download a PDF and keep it when the name or the heading is this week."""
+    try:
+        status, ctype, blob, final = _http_get(absolute, max_bytes=1_500_000)
+    except Exception:
+        return None
+    if status != 200 or _magic_ok(blob, ctype) != "pdf":
+        return None
+    if not blob.startswith(b"%PDF"):
+        return None
+    found = known_date or _heading_date_ok(blob, accepted)
+    if found is None:
+        return None
+    return {
+        "url": final,
+        "kind": "pdf",
+        "bytes": len(blob),
+        "date": found.isoformat(),
+    }
+
+
+def download_missed_week(
+    start_url: str, dest: Path, accepted: set[date]
+) -> dict[str, Any] | None:
+    """Look again for this Sunday. Save the PDF when the date is real."""
+    for url, _site_type, _pattern in candidate_probe_urls(start_url)[:4]:
+        proved = prove_this_week_file(url, accepted)
+        if not proved or proved.get("kind") != "pdf":
+            continue
+        file_url = str(proved.get("url") or "")
+        if not file_url:
             continue
         try:
-            status, ctype, blob, final = _http_get(absolute)
+            status, _ctype, blob, final = _http_get(file_url, max_bytes=8_000_000)
         except Exception:
             continue
-        if status != 200 or _magic_ok(blob, ctype) != "pdf":
+        if status != 200 or not blob.startswith(b"%PDF"):
             continue
-        if not blob.startswith(b"%PDF"):
-            continue
-        return {
-            "url": final,
-            "kind": "pdf",
-            "bytes": len(blob),
-            "date": found.isoformat(),
-        }
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(blob)
+        saved = dict(proved)
+        saved["url"] = final
+        return saved
     return None
 
 

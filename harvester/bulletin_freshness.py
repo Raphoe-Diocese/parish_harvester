@@ -647,6 +647,39 @@ _BODY_YEAR_RE = re.compile(r"\b(20\d{2})\b")
 _ANCIENT_BODY_YEAR_GAP = 3
 
 
+def heading_date_in_pdf_bytes(data: bytes, *, max_pages: int = 2) -> date | None:
+    """Date from the heading text inside a PDF. Empty when the PDF is a photo scan.
+
+    Photo scans have no embedded text. This does not invent a date from a
+    memorial line. The caller decides whether the date is this Sunday.
+    """
+    if not data or not data.startswith(b"%PDF"):
+        return None
+    try:
+        from io import BytesIO
+
+        from PyPDF2 import PdfReader
+
+        reader = PdfReader(BytesIO(data))
+    except Exception:
+        return None
+    chunks: list[str] = []
+    for page in reader.pages[:max_pages]:
+        try:
+            chunks.append(page.extract_text() or "")
+        except Exception:
+            chunks.append("")
+    return extract_bulletin_date_from_text("\n".join(chunks))
+
+
+def heading_date_in_pdf(path: Path) -> date | None:
+    """Date from the first pages of a PDF already saved on disk."""
+    text = read_pdf_text_head(path, max_pages=2)
+    if not text.strip():
+        return None
+    return extract_bulletin_date_from_text(text)
+
+
 def read_pdf_text_head(path: Path, max_pages: int = 4) -> str:
     """Embedded PDF text from the first pages (same text born-digital OCR sees).
 
