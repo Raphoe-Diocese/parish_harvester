@@ -571,14 +571,20 @@
     },
     iso_newsletter_pdf: {
       playbook_type: "pdf_download_list",
-      site_type: "http_scrape_newest_pdf",
+      site_type: "wp_json_newest_media",
       page_type: "pdf_link_list",
       recipe_flow: "direct_download",
-      label: "newsletter-YYYY-MM-DD.pdf",
+      label: "Churchtown weekly auto PDF in the media library",
       operator_notes: [
-        "31/10/2026 Churchtown proved newsletter-2026-11-01.pdf. Date is in the filename.",
+        "09/11/2026 predicted newsletter-2026-11-08.pdf was 404. The old newsletter-2026-11-01.pdf is still in the library.",
+        "The weekly file is a churchtown-auto hash PDF. Media date 06/11/2026. The hash is not the Sunday.",
+        "Harvest 42686379039 timed out on the HTML page. Do not send that again.",
       ],
-      do_not: ["Do not pin the dated filename."],
+      do_not: [
+        "Do not pin the churchtown-auto hash.",
+        "Do not pin newsletter-2026-11-01.pdf.",
+        "Do not open the HTML newsletter page.",
+      ],
     },
     nth_sunday_year_pdf: {
       playbook_type: "pdf_download_list",

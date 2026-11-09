@@ -174,9 +174,9 @@ def hint_for_url(url: str) -> HubHint | None:
             label="Homepage PDF with [YYYY-MM-DD] in the filename",
             confidence="high",
             notes=(
-                "31/10/2026 the Arklow homepage linked newsletter_1st_November_2026[2026-11-01].pdf.",
-                "Proved application/pdf, %PDF-1.7, date 01/11/2026. The date in square brackets is the bulletin date.",
-                "The recipe already scrapes the homepage. The 25/10 harvest failed because that file was not there yet.",
+                "09/11/2026 the Arklow homepage linked Newsletter_8th_November_2026[2026-11-08].pdf.",
+                "Proved application/pdf, %PDF-1.7, 686168 bytes, date 08/11/2026. The date in square brackets is the bulletin date.",
+                "Harvest 42682994666 ok 08/11/2026. The recipe already scrapes the homepage. Do not pin the filename.",
             ),
             do_not=("Do not pin the dated homepage PDF.",),
             pattern_key="homepage_bracket_date+direct_download",
@@ -359,15 +359,19 @@ def hint_for_url(url: str) -> HubHint | None:
     if host == "churchtownparish.com":
         return HubHint(
             key="iso_newsletter_pdf",
-            site_type="http_scrape_newest_pdf",
-            label="Churchtown newsletter-YYYY-MM-DD.pdf",
+            site_type="wp_json_newest_media",
+            label="Churchtown weekly auto PDF in the media library",
             confidence="high",
             notes=(
-                "31/10/2026 /newsletter/ proved newsletter-2026-11-01.pdf (application/pdf, 1400380 bytes).",
-                "This Sunday was not on the page. The 01/11/2026 file is inside the 8-day window.",
-                "Harvest 41244086775 timed out three times. The file was proved locally. Do not send the same scrape again.",
+                "09/11/2026 predicted newsletter-2026-11-08.pdf was 404. The old file newsletter-2026-11-01.pdf is still in the library.",
+                "Media has a churchtown-auto hash PDF uploaded 06/11/2026. GET 206 application/pdf 1381831 bytes. The hash has no Sunday in the name.",
+                "Harvest 42686379039 timed out on the HTML newsletter page. Do not send that HTML start again.",
             ),
-            do_not=("Do not pin the dated filename.",),
+            do_not=(
+                "Do not pin the churchtown-auto hash.",
+                "Do not pin newsletter-2026-11-01.pdf.",
+                "Do not open the HTML newsletter page.",
+            ),
             pattern_key="iso_newsletter_pdf+direct_download",
         )
 
