@@ -181,6 +181,7 @@ def _bulletin_date_fields(
     error: str | None = None,
     diagnosis: dict | None = None,
     pdf_path: Path | None = None,
+    target: date | None = None,
 ) -> dict[str, str]:
     """ISO + UK bulletin date from diagnosis, the URL, or the PDF heading. Never invent."""
     iso = ""
@@ -201,7 +202,7 @@ def _bulletin_date_fields(
     if not iso and pdf_path is not None and Path(pdf_path).is_file():
         from .bulletin_freshness import heading_date_in_pdf
 
-        extracted = heading_date_in_pdf(Path(pdf_path))
+        extracted = heading_date_in_pdf(Path(pdf_path), target=target)
         if extracted is not None:
             iso = extracted.isoformat()
     if not iso:
@@ -285,7 +286,7 @@ def generate_report(
                 "url": r.url,
                 "file": dest.name if dest else f"{r.key}.pdf",
                 "file_type": r.file_type,
-                **_bulletin_date_fields(r.url, pdf_path=r.file_path),
+                **_bulletin_date_fields(r.url, pdf_path=r.file_path, target=target),
             }
             downloaded.append(entry)
         elif r.status == "html_link":
@@ -375,7 +376,9 @@ def generate_report(
     return report
 
 
-def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, dict | None]:
+def _result_to_report_entry(
+    r: "FetchResult", current_dir: Path, target: date | None = None
+) -> tuple[str, dict | None]:
     """Map one FetchResult to (bucket, entry) where bucket is a report section key."""
     if r.is_stale:
         kept = _copy_harvested_pdf(r, _stale_dir_for_current(current_dir))
@@ -409,7 +412,7 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
             "url": r.url,
             "file": dest.name if dest else f"{r.key}.pdf",
             "file_type": r.file_type,
-            **_bulletin_date_fields(r.url, pdf_path=r.file_path),
+            **_bulletin_date_fields(r.url, pdf_path=r.file_path, target=target),
         }
     if r.status == "html_link":
         return "html_links", {
@@ -588,7 +591,7 @@ def patch_report_for_parishes(
 
     for r in results:
         _remove_parish_from_sections(report, r.key)
-        bucket, entry = _result_to_report_entry(r, current_dir)
+        bucket, entry = _result_to_report_entry(r, current_dir, target)
         if entry is None:
             continue
         entry["last_tested_at"] = tested_at
