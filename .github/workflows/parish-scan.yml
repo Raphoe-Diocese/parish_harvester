@@ -1,0 +1,58 @@
+name: Parish scan
+
+# Sunday fast pass, then deep pass, on GitHub. Not Frank's laptop.
+# Starts at 05:30 UTC so it can finish before the 09:00 harvest.
+# Facebook, no website, and blocked hosts are left out.
+# A proved file teaches site_patterns and turns a skipped recipe back on.
+
+on:
+  schedule:
+    - cron: '30 5 * * 0'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: fast, deep, or both
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - fast
+          - deep
+
+permissions:
+  contents: write
+
+concurrency:
+  group: parish-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PDF text reader
+        run: pip install 'PyPDF2==3.0.1'
+
+      - name: Scan parish websites
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+          SCAN_MODE: ${{ github.event.inputs.mode || 'both' }}
+        run: python scripts/parish_scan.py --mode "$SCAN_MODE" --apply --workers 30
+
+      - name: Commit scan wins
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add parishes/recipes parishes/site_patterns.json parishes/parish_scan_report.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Parish scan: remember proved bulletins."
+          git push origin HEAD:main
