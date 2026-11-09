@@ -106,11 +106,24 @@ def ordered_probes(recipe: dict[str, Any]) -> list[tuple[str, str, str]]:
         add(origin + "/bulletin/", "http_scrape_newest_pdf", "pdf_link_list+click_then_pdf")
     for url, site, pattern in candidate_probe_urls(start):
         add(url, site, pattern)
-    return out[:8]
+    if parsed.scheme and parsed.netloc:
+        origin = f"{parsed.scheme}://{parsed.netloc}"
+        for path in (
+            "/publications/",
+            "/bulletins/",
+            "/parish-newsletter/",
+            "/parish-bulletin/",
+            "/weekly-newsletter/",
+            "/news/",
+        ):
+            add(origin + path, "http_scrape_newest_pdf", "pdf_link_list+click_then_pdf")
+    return out[:14]
 
 
 def _phase_urls(recipe: dict[str, Any], *, phase: str, mode: str) -> list[tuple[str, str, str]]:
     urls = ordered_probes(recipe)
+    if mode == "more":
+        return urls[8:14]
     if phase == "fast":
         return urls[:3]
     if mode == "both":
@@ -215,7 +228,7 @@ def run_parish_scan(
     today: date | None = None,
 ) -> dict[str, Any]:
     """Scan websites. Teach the brain only when apply is true and a file is proved."""
-    mode = mode if mode in {"fast", "deep", "both"} else "both"
+    mode = mode if mode in {"fast", "deep", "both", "more"} else "both"
     recipes = load_scan_recipes(recipes_dir)
     left: dict[str, int] = {}
     pool: list[dict[str, Any]] = []
@@ -237,7 +250,9 @@ def run_parish_scan(
         return _phase_urls(recipe, phase="deep", mode=mode)
 
     hits: list[dict[str, Any]] = []
-    if mode in {"fast", "both"}:
+    if mode == "more":
+        hits.extend(_run_phase(pool, urls_for=deep_urls, accepted=accepted, workers=workers))
+    elif mode in {"fast", "both"}:
         hits.extend(_run_phase(pool, urls_for=fast_urls, accepted=accepted, workers=workers))
     found_keys = {str(hit["parish_key"]) for hit in hits}
     if mode in {"deep", "both"}:

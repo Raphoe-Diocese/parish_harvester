@@ -16,7 +16,7 @@ from harvester.parish_scan import REPORT_NAME, run_parish_scan  # noqa: E402
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Scan parish websites for this Sunday")
-    parser.add_argument("--mode", choices=("fast", "deep", "both"), default="both")
+    parser.add_argument("--mode", choices=("fast", "deep", "both", "more"), default="both")
     parser.add_argument("--workers", type=int, default=30)
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
