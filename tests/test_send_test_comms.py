@@ -88,7 +88,23 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.47"', text)
+        self.assertIn('"version": "1.61.48"', text)
+        memory = (REPO / "extension" / "site_memory.js").read_text(encoding="utf-8")
+        self.assertIn("/newsletters/parish/wicklow_rathnew/", memory)
+        self.assertIn("ww-news", memory)
+        self.assertIn("/newsletters/parish/ashford_glenealy/", memory)
+        self.assertIn("af-news", memory)
+        self.assertIn("/newsletters/parish/kbb/", memory)
+        self.assertIn("kbb-news", memory)
+        self.assertIn("Do not give one parish another parish's file.", memory)
+        self.assertIn("Do not pin Share2026Newsletter.pdf.", memory)
+        self.assertIn(
+            "A bulletin dated this Sunday is kept however many pages it has.",
+            memory,
+        )
+        self.assertIn("A long file with no date is not this week.", memory)
+        self.assertIn("A stale date is not this week.", memory)
+        self.assertIn('start.includes("stmantan.ie")', memory)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("T6: a dated bulletin page is this week's post", content)
         self.assertIn("await _setToolbarHiddenForHost(false);", content)

@@ -668,6 +668,26 @@
         "Do not treat familyofparishes.ie/news as a weekly newsletter — notices only.",
       ],
     },
+    stmantan_parish_lists: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "stmantan.ie — one newsletter list per parish",
+      operator_notes: [
+        "10/11/2026: a shared site can have a different newsletter list per parish. Do not give one parish another parish's file.",
+        "Wicklow uses /newsletters/parish/wicklow_rathnew/ and ww-news. Ashford uses /newsletters/parish/ashford_glenealy/ and af-news. Kilbride and Barndarrig uses /newsletters/parish/kbb/ and kbb-news.",
+        "http_scrape_newest_pdf of that parish's listing page. Do not pin the dated filename. Do not pin Share2026Newsletter.pdf.",
+        "A bulletin dated this Sunday is kept however many pages it has. A long file with no date is not this week. A stale date is not this week.",
+      ],
+      do_not: [
+        "Do not give one parish another parish's file.",
+        "Do not pin the dated filename.",
+        "Do not pin Share2026Newsletter.pdf.",
+        "Do not keep a long file with no date as this week.",
+        "Do not keep a stale date as this week.",
+      ],
+    },
     pdf_download_list: {
       playbook_type: "pdf_download_list",
       site_type: "pdf_link_list",
@@ -683,9 +703,13 @@
         "02/11/2026 Dromod: dromodparish.ie/churches/parish-newsletter/ has Dromod-1st-November-Newsletter.pdf. Certificate expired — ignore_https_errors. Do not pin the dated name or the old Kerry diocese 4 October file.",
         "02/11/2026 Balally: open /category/parish-newsletters/ then the top balally-parish-newsletter post. PDF name is Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Later day wins. Folder year is junk.",
         "02/11/2026 Killarney: killarneyparish.com/parish-newsletter/ has Newsletter-November-2nd-2026.pdf. Do not pin. Prefer the parish site over the Kerry diocese card.",
+        "10/11/2026: a bulletin dated this Sunday is kept however many pages it has. A long file with no date is not this week. A stale date is not this week.",
       ],
       do_not: [
         "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) — it breaks next week.",
+        "Do not drop this Sunday's dated bulletin because it has many pages.",
+        "Do not keep a long file with no date as this week.",
+        "Do not keep a stale date as this week.",
         "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
         "Do not pin /download/media/NNNN/ on Knocklyon.",
         "Do not leave Dromod on the Kerry diocese card while dromodparish.ie has a newer newsletter.",
@@ -824,6 +848,9 @@
     }
     if (start.includes("churchtownparish.com")) {
       return CATALOG.iso_newsletter_pdf;
+    }
+    if (start.includes("stmantan.ie")) {
+      return CATALOG.stmantan_parish_lists;
     }
     if (start.includes("castleconnellparish.ie") || start.includes("clarecastleballyeaparish.ie") || start.includes("imeallboirne.ie") || start.includes("ennisparish.com") || start.includes("inaghkilnamonaparish.ie")) {
       return CATALOG.spelled_month_listing_pdf;
