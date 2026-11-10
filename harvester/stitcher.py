@@ -254,6 +254,7 @@ def stitch_mega_pdf(
 
     # Collect parishes without a PDF (logged only — listed on the diocese page)
     missing_entries: list[tuple[str, str, str | None]] = []
+    from .bulletin_freshness import pdf_date_before_harvest_week
 
     for parish_key, (pdf_path, parish_url, display_name) in sorted_entries:
         info = contacts.get(parish_key, {})
@@ -265,6 +266,19 @@ def stitch_mega_pdf(
         if pdf_path and pdf_path.exists():
             try:
                 link_url = _absolute_http_url(website) or _absolute_http_url(parish_url)
+                # Own printed date, any length. Before this harvest week stays
+                # out. For 08/11/2026 that is a date before 02/11/2026. No
+                # printed date is not filled in as the harvest Sunday. The
+                # page cap below is unchanged.
+                too_old = pdf_date_before_harvest_week(pdf_path, target)
+                if too_old is not None:
+                    print(
+                        f"    ⏭️  Skipping {parish_key}: bulletin date "
+                        f"{too_old.isoformat()} is before this week "
+                        f"({target.isoformat()})"
+                    )
+                    missing_entries.append((display_name, parish_url, website))
+                    continue
                 reader = PyPDF2.PdfReader(str(pdf_path))
                 page_count = len(reader.pages)
                 page_limit = _max_bulletin_pages_for_parish(parish_key)
