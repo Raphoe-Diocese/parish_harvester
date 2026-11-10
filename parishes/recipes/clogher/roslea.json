@@ -1,28 +1,31 @@
 {
   "version": 2,
   "parish_key": "roslea",
-  "harvest_note": "Blocked from GitHub runners (WAF/403). Needs a different network. Do not re-hunt weekly.",
   "display_name": "Roslea",
   "diocese": "clogher",
-  "start_url": "https://parishofroslea.com/",
-  "site_type": "predicted_dated_pdf",
+  "start_url": "https://parishofroslea.com/category/parish-bulletin/",
+  "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
+    "Bulletin-Sunday"
+  ],
+  "post_slug_patterns": [
     "bulletin-sunday"
   ],
-  "example_url": "https://parishofroslea.com/wp-content/uploads/2026/08/Bulletin-Sunday-23rd-August-2026.pdf",
+  "example_url": "https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-8th-November-2026.pdf",
   "playbook_type": "pdf_download_list",
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-08-22",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
-      "url": "https://parishofroslea.com/"
+      "url": "https://parishofroslea.com/category/parish-bulletin/"
     }
   ],
   "operator_notes": [
     "Newest on 22/08/2026 is Bulletin-Sunday-23rd-August-2026.pdf (HTTP 200, 148359 bytes).",
-    "site_type:predicted_dated_pdf. Harvest 07/09 wp-json / homepage 403'd; predicted must try Sept and September. Do not pin only September."
+    "site_type:predicted_dated_pdf. Harvest 07/09 wp-json / homepage 403'd; predicted must try Sept and September. Do not pin only September.",
+    "10/11/2026: category page lists Bulletin-Sunday-8th-November-2026.pdf. GET 200 application/pdf. Filename date 08/11/2026. Scrape the category page. Do not pin the dated filename."
   ],
   "do_not": [
     "Do not pin a dated filename.",

@@ -4,50 +4,38 @@
   "display_name": "Sallynoggin",
   "diocese": "dublin",
   "start_url": "https://sallynogginandglenagearyparish.com/category/parish-newsletter/",
-  "site_type": "html_text_bulletin",
-  "playbook_type": "html_text_bulletin",
+  "site_type": "wp_json_newest_media",
+  "playbook_type": "direct_download",
   "href_patterns": [
-    "Bulletin",
-    "November",
-    "October"
+    "buletin",
+    "bulletin"
   ],
   "max_bulletin_pages": 16,
   "timeout_ms": 60000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-11-06",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
       "url": "https://sallynogginandglenagearyparish.com/category/parish-newsletter/"
-    },
-    {
-      "action": "click",
-      "selector": "h2 a",
-      "pick_strategy": "first_match",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "article h2 a",
-        "a:has-text('Bulletin')"
-      ]
-    },
-    {
-      "action": "print_to_pdf",
-      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
     "06/11/2026: homepage http_scrape found no PDF. Category /category/parish-newsletter/ lists Bulletin 8th November 2026 at top.",
     "Posts are HTML (no PDF on the article). Click top Bulletin post and print_to_pdf. Do not pin /bulletin-8th-november-2026/.",
-    "October-only href_patterns missed November — include November."
+    "October-only href_patterns missed November — include November.",
+    "10/11/2026: wp-json media has Buletin-8th-November-2026.pdf. GET 200 application/pdf 516768 bytes, magic %PDF. Filename date 08/11/2026. The category page itself has no PDF href. Do not pin the dated filename."
   ],
   "do_not": [
     "Do not pin a dated bulletin slug.",
     "Do not scrape the homepage for .pdf — there is none.",
     "Do not leave October-only patterns.",
-    "Do not harvest Facebook."
+    "Do not harvest Facebook.",
+    "Do not pin a dated filename."
   ],
   "bulletin_layout": {
     "strategy": "first_match",
     "position": "top"
-  }
+  },
+  "example_url": "https://sallynogginandglenagearyparish.com/wp-content/uploads/2026/11/Buletin-8th-November-2026.pdf"
 }
