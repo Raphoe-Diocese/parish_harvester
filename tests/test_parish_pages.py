@@ -432,6 +432,55 @@ http://ardara.ie</p>
             self.assertIn("22nd", html_out)
             self.assertNotIn("Saturday 2nd August", html_out)
 
+    def test_filename_sunday_does_not_caption_a_november_body(self) -> None:
+        fragment = """
+<p class="page-label">Page 1</p>
+<p>Bantry Parish<br>
+https://bantry.ie/newsletter</p>
+<p>FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45</p>
+<p>Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.</p>
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            status_path = root / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "bantry": {
+                                "outcome": "ok",
+                                "diocese": "Cork and Ross Diocese",
+                                "display_name": "Bantry",
+                                "bulletin_date": "2026-11-08",
+                                "url": "https://bantryfamilyofparishes.ie/pdf/8th_November_2026.pdf",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            pdf_path = root / "cork_and_ross_mega_bulletin.pdf"
+            pdf_path.write_bytes(_make_pdf(1))
+            out_dir = root / "docs" / "parishes" / "cork_and_ross"
+            written = parish_pages.write_parish_pages_for_diocese(
+                "cork_and_ross",
+                "2026-11-08",
+                pdf_path,
+                fragment,
+                diocese_pdf_href="../../mega_pdf/cork_and_ross_mega_bulletin.pdf",
+                out_dir=out_dir,
+                parish_status_path=status_path,
+            )
+            self.assertEqual(written, ["bantry"])
+            html_out = (out_dir / "bantry.html").read_text(encoding="utf-8")
+            self.assertIn("1st November 2026", html_out)
+            self.assertIn("<title>Bantry Bulletin — 01/11/2026</title>", html_out)
+            self.assertNotIn("Bulletin — 08/11/2026", html_out)
+            self.assertIn('class="ocr-parish-date">01/11/2026<', html_out)
+            self.assertNotIn('class="ocr-parish-date">08/11/2026<', html_out)
+            self.assertIn("Latest bulletin we have for Bantry: 01/11/2026", html_out)
+            self.assertNotIn("This week's bulletin", html_out)
+
     def test_write_text_strips_nuls_and_leaves_no_tmp(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "note.html"
@@ -463,6 +512,49 @@ class StaleParishCaptionTests(unittest.TestCase):
         self.assertEqual(uk, "08/11/2026")
         self.assertEqual(masthead, "2026-11-08")
         self.assertIn("This week's bulletin for Kerry parish — 08/11/2026", meta)
+
+    def test_blank_date_does_not_invent_harvest_sunday(self) -> None:
+        uk, meta, masthead = parish_pages.parish_page_date_bits(
+            "2026-11-08",
+            "",
+            "Gurranabraher",
+            "Cork and Ross Diocese",
+        )
+        self.assertEqual(uk, "")
+        self.assertEqual(masthead, "")
+        self.assertNotIn("08/11/2026", meta)
+        self.assertNotIn("This week's bulletin", meta)
+
+    def test_november_body_does_not_render_as_harvest_sunday(self) -> None:
+        """A 1 November paper whose file name says 8 November is not this Sunday."""
+        page = (
+            "<html><head><title>Bantry Bulletin — 08/11/2026</title></head><body>"
+            "<h1>Bantry Parish Bulletin</h1>"
+            '<p class="meta">This week&#x27;s bulletin for Bantry — 08/11/2026. '
+            "Part of the Cork and Ross Diocese collated bulletin.</p>"
+            '<div id="ocr-panel"><header class="ocr-parish-masthead" '
+            'data-parish-name="Bantry"><h2 class="ocr-parish-name">Bantry</h2>'
+            '<p class="ocr-parish-date">08/11/2026</p></header>'
+            "<p>FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45</p>"
+            "<p>Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.</p>"
+            "</div><div class=\"note-box\">Note</div></body></html>"
+        )
+        updated, uk = parish_pages.refresh_parish_page_html(
+            page,
+            "2026-11-08",
+            "Bantry",
+            "Cork and Ross Diocese",
+        )
+        self.assertEqual(uk, "01/11/2026")
+        self.assertIn("<title>Bantry Bulletin — 01/11/2026</title>", updated)
+        self.assertNotIn("Bulletin — 08/11/2026", updated)
+        self.assertIn('class="ocr-parish-date">01/11/2026<', updated)
+        self.assertNotIn('class="ocr-parish-date">08/11/2026<', updated)
+        self.assertIn("Latest bulletin we have for Bantry: 01/11/2026", updated)
+        self.assertIn("not this Sunday 08/11/2026", updated)
+        self.assertNotIn("This week's bulletin", updated)
+        self.assertNotIn("This week&#x27;s bulletin", updated)
+        self.assertIn("1st November 2026", updated)
 
     def test_caption_uses_real_date_not_harvest_sunday(self) -> None:
         meta, note = parish_pages.stale_parish_caption("2026-08-30")

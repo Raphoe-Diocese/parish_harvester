@@ -411,6 +411,50 @@ class BulletinLayoutTests(unittest.TestCase):
         )
         self.assertIn('class="ocr-parish-date">01/11/2026<', numeric)
         self.assertIn("31/10/2026", numeric)
+        smashed = structure_ocr_html(
+            "<p>Sunday 01-November-2026 THE PARISHIONER "
+            "Next Sunday’s Readings 08-November-2026 Wis. 6:12-16.</p>"
+            "<p>Sunday 8th November 2026. Doors open: 7.30 p.m.</p>",
+            single_parish_name="Kilmurry",
+            bulletin_date=harvest,
+        )
+        self.assertIn('class="ocr-parish-date">01/11/2026<', smashed)
+        self.assertNotIn('class="ocr-parish-date">08/11/2026<', smashed)
+        self.assertIn("Next Sunday", smashed)
+        doors = structure_ocr_html(
+            "<p>Sunday 1st November: Feast of All Saints</p>"
+            "<p>Sunday 8th November 2026. Doors open: 7.30 p.m. Curtain: 8.00 p.m.</p>",
+            single_parish_name="Crosserlough",
+            bulletin_date=harvest,
+        )
+        self.assertNotIn('class="ocr-parish-date">08/11/2026<', doors)
+        self.assertNotIn("08/11/2026", doors)
+        self.assertIn("Feast of All Saints", doors)
+        commemoration = structure_ocr_html(
+            "<p>SOLEMNITY OF ALL SAINTS</p>"
+            "<p>Sunday 8th November 2026 at 11am, Market Square, Longford. All welcome.</p>",
+            single_parish_name="Mohill",
+            bulletin_date=harvest,
+        )
+        self.assertNotIn('class="ocr-parish-date">08/11/2026<', commemoration)
+        self.assertIn("Market Square", commemoration)
+        self.assertIn("SOLEMNITY OF ALL SAINTS", commemoration)
+        future_course = structure_ocr_html(
+            "<p>Sunday 01-November-2026 THE PARISHIONER</p>"
+            "<p>Pre-Marriage courses 26-28 Feb 2027.</p>",
+            single_parish_name="Kiltimagh",
+            bulletin_date=harvest,
+        )
+        self.assertIn('class="ocr-parish-date">01/11/2026<', future_course)
+        self.assertNotIn("28/02/2027", future_course)
+        only_future = structure_ocr_html(
+            "<p>Parish newsletter Pre-Marriage courses 26-28 Feb 2027.</p>",
+            single_parish_name="Kiltimagh",
+            bulletin_date=harvest,
+        )
+        self.assertNotIn("ocr-parish-date", only_future)
+        self.assertNotIn("08/11/2026", only_future)
+        self.assertIn("Feb 2027", only_future)
         self.assertNotIn('class="ocr-parish-date">31/10/2026<', numeric)
         self.assertNotIn('class="ocr-parish-date">08/11/2026<', numeric)
 

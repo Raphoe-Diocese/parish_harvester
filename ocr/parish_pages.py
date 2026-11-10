@@ -303,18 +303,19 @@ def parish_page_date_bits(
     display_name: str,
     diocese_name: str,
 ) -> tuple[str, str, str]:
-    """Return (title date, meta line, masthead ISO) for one ok parish page.
+    """Return (title date, meta line, masthead ISO) for one parish page.
 
-    A file dated on another day must not be captioned as this Sunday.
+    ``parish_iso`` is the date printed on that bulletin. A different day is
+    the latest bulletin we have, not this Sunday. A blank date is left blank.
     """
     from ocr.generate_bulletin_pages import format_uk_date
 
     harvest = (harvest_iso or "").strip()[:10]
     parish = (parish_iso or "").strip()[:10]
-    harvest_uk = format_uk_date(harvest)
+    harvest_uk = format_uk_date(harvest) if harvest else ""
     name = (display_name or "").strip() or "this parish"
     diocese = (diocese_name or "").strip() or "this diocese"
-    if parish and parish != harvest:
+    if parish and harvest and parish != harvest:
         parish_uk = format_uk_date(parish)
         meta = (
             f"Latest bulletin we have for {name}: {parish_uk} "
@@ -322,11 +323,16 @@ def parish_page_date_bits(
             f"Part of the {diocese} collated bulletin."
         )
         return parish_uk, meta, parish
-    meta = (
-        f"This week's bulletin for {name} — {harvest_uk}. "
-        f"Part of the {diocese} collated bulletin."
-    )
-    return harvest_uk, meta, harvest
+    if parish and (not harvest or parish == harvest):
+        shown = format_uk_date(parish)
+        when = "This week's bulletin" if harvest and parish == harvest else "Bulletin"
+        meta = (
+            f"{when} for {name} — {shown}. "
+            f"Part of the {diocese} collated bulletin."
+        )
+        return shown, meta, parish
+    meta = f"Bulletin for {name}. Part of the {diocese} collated bulletin."
+    return "", meta, ""
 
 
 def load_ok_parishes(diocese_key: str, parish_status_path: Path | None = None) -> list[OkParish]:
@@ -512,12 +518,6 @@ def write_parish_pages_for_diocese(
             if pdf_bytes is not None and len(pdf_bytes) < 32:
                 pdf_bytes = None
 
-            uk_date, base_meta, masthead_iso = parish_page_date_bits(
-                bulletin_date,
-                parish.bulletin_date,
-                parish.display_name,
-                config.display_name,
-            )
             if pdf_bytes:
                 pdf_out = out_root / f"{parish.key}.pdf"
                 existing_ok = (
@@ -528,7 +528,6 @@ def write_parish_pages_for_diocese(
                 if not existing_ok:
                     pdf_out.write_bytes(pdf_bytes)
                 pdf_href = f"{parish.key}.pdf"
-                meta_line = base_meta
                 fail_reason = ""
                 sliced_keys.append(parish.key)
             else:
@@ -537,7 +536,6 @@ def write_parish_pages_for_diocese(
                 if stub.exists():
                     stub.unlink()
                 pdf_href = ""
-                meta_line = f"{base_meta} {fail_reason}."
                 missing_keys.append(parish.key)
 
             slice_pdf = out_root / f"{parish.key}.pdf"
@@ -568,13 +566,28 @@ def write_parish_pages_for_diocese(
                         f"⚠️ {html.escape(why)}</div>"
                     )
 
-            from ocr.bulletin_layout import structure_ocr_html
+            from ocr.bulletin_layout import read_parish_issue_date, structure_ocr_html
 
             ocr_fragment = structure_ocr_html(
                 tighten_ocr_paragraphs(ocr_fragment),
-                bulletin_date=masthead_iso,
+                bulletin_date=bulletin_date,
                 single_parish_name=parish.display_name,
             )
+            # The date on the paper, not the file name or the harvest Sunday.
+            printed_iso = read_parish_issue_date(
+                _fragment_to_plain_text(ocr_fragment),
+                not_after=bulletin_date,
+            )
+            uk_date, base_meta, masthead_iso = parish_page_date_bits(
+                bulletin_date,
+                printed_iso,
+                parish.display_name,
+                config.display_name,
+            )
+            if fail_reason:
+                meta_line = f"{base_meta} {fail_reason}."
+            else:
+                meta_line = base_meta
 
             parish_config = DioceseConfig(
                 key=parish.key,
@@ -587,8 +600,11 @@ def write_parish_pages_for_diocese(
             ocr_standalone_href = f"{parish.key}-ocr.html"
             viewer_filename = f"{parish.key}.html"
 
+            page_title = f"{parish.display_name} Bulletin"
+            if uk_date:
+                page_title = f"{page_title} — {uk_date}"
             page_html = render_bulletin_viewer_shell(
-                page_title=f"{parish.display_name} Bulletin — {uk_date}",
+                page_title=page_title,
                 diocese_label=diocese_label,
                 display_name=parish.display_name,
                 headline=f"{parish.display_name} Parish Bulletin",
@@ -609,7 +625,7 @@ def write_parish_pages_for_diocese(
                 out_root / f"{parish.key}-pdf.html",
                 render_pdf_standalone_page(
                     parish_config,
-                    masthead_iso or bulletin_date,
+                    masthead_iso,
                     pdf_href=pdf_href,
                     viewer_href=viewer_filename,
                 ),
@@ -618,7 +634,7 @@ def write_parish_pages_for_diocese(
                 out_root / f"{parish.key}-ocr.html",
                 render_ocr_standalone_page(
                     parish_config,
-                    masthead_iso or bulletin_date,
+                    masthead_iso,
                     ocr_fragment,
                     viewer_href=viewer_filename,
                 ),
@@ -644,3 +660,138 @@ def write_parish_pages_for_diocese(
     if leftover:
         print(f"  Relabelled {len(leftover)} leftover parish page(s) as not this week")
     return written
+
+
+_PANEL_RE = re.compile(
+    r'(<div id="ocr-panel">\s*)(.*?)(\s*</div>\s*<div class="note-box">)',
+    re.DOTALL | re.IGNORECASE,
+)
+_OCR_BODY_RE = re.compile(
+    r'(<div class="ocr-body"[^>]*>\s*)(.*?)(\s*</div>\s*<p class="note-box">)',
+    re.DOTALL | re.IGNORECASE,
+)
+_TITLE_DATE_RE = re.compile(
+    r"\s+(?:—|–|&mdash;|&#8212;)\s+\d{2}/\d{2}/\d{4}\s*$"
+)
+_LINE_DATE_RE = re.compile(r"\s*·\s*\d{2}/\d{2}/\d{4}\s*$")
+
+
+def _parish_display_name(page_html: str, fallback: str) -> str:
+    match = re.search(r"<h1>(.*?)</h1>", page_html, re.DOTALL | re.IGNORECASE)
+    if not match:
+        return fallback
+    text = html.unescape(re.sub(r"<[^>]+>", "", match.group(1))).strip()
+    text = re.sub(r"\s+Parish Bulletin\s*$", "", text).strip()
+    return text or fallback
+
+
+def _replace_meta(page_html: str, meta: str) -> str:
+    repl = f'<p class="meta">{html.escape(meta)}</p>'
+    if not re.search(r'<p class="meta">', page_html):
+        return page_html
+    return re.sub(r'<p class="meta">.*?</p>', repl, page_html, count=1, flags=re.DOTALL)
+
+
+def _replace_title_date(page_html: str, uk: str) -> str:
+    def repl(match: re.Match[str]) -> str:
+        inner = _TITLE_DATE_RE.sub("", match.group(1))
+        if uk:
+            inner = f"{inner} — {uk}"
+        return f"<title>{inner}</title>"
+
+    return re.sub(r"<title>(.*?)</title>", repl, page_html, count=1, flags=re.DOTALL)
+
+
+def _replace_title_line_date(page_html: str, uk: str) -> str:
+    def repl(match: re.Match[str]) -> str:
+        inner = _LINE_DATE_RE.sub("", match.group(1))
+        if uk:
+            inner = f"{inner} · {uk}"
+        return f'<span class="title-line">{inner}</span>'
+
+    return re.sub(
+        r'<span class="title-line">(.*?)</span>',
+        repl,
+        page_html,
+        count=1,
+        flags=re.DOTALL,
+    )
+
+
+def refresh_parish_page_html(
+    page_html: str,
+    harvest_iso: str,
+    display_name: str,
+    diocese_name: str,
+) -> tuple[str, str]:
+    """Return the page with the printed bulletin date, and that date as DD/MM/YYYY."""
+    match = _PANEL_RE.search(page_html or "")
+    if not match:
+        return page_html, ""
+    from ocr.bulletin_layout import read_parish_issue_date, restamp_masthead_dates
+
+    structured = restamp_masthead_dates(match.group(2), not_after=harvest_iso)
+    text = re.sub(r"<[^>]+>", "\n", structured)
+    text = html.unescape(text)
+    lines = [re.sub(r"\s+", " ", line).strip() for line in text.splitlines()]
+    printed = read_parish_issue_date(
+        "\n".join(line for line in lines if line),
+        not_after=harvest_iso,
+    )
+    uk, meta, _iso = parish_page_date_bits(
+        harvest_iso,
+        printed,
+        display_name,
+        diocese_name,
+    )
+    updated = page_html[: match.start(2)] + structured + page_html[match.end(2) :]
+    updated = _replace_meta(updated, meta)
+    updated = _replace_title_date(updated, uk)
+    return updated, uk
+
+
+def restamp_published_parish_pages(
+    harvest_iso: str,
+    root: Path | None = None,
+) -> list[Path]:
+    """Rewrite parish HTML already on disk so the caption matches the printed date."""
+    from ocr.generate_bulletin_pages import DIOCESES
+
+    out_root = root or PARISHES_OUT_DIR
+    changed: list[Path] = []
+    if not out_root.exists():
+        return changed
+    for viewer in sorted(out_root.glob("*/*.html")):
+        if viewer.name.endswith(("-ocr.html", "-pdf.html")):
+            continue
+        config = DIOCESES.get(viewer.parent.name)
+        if config is None:
+            continue
+        original = viewer.read_text(encoding="utf-8")
+        name = _parish_display_name(original, viewer.stem)
+        updated, uk = refresh_parish_page_html(
+            original,
+            harvest_iso,
+            name,
+            config.display_name,
+        )
+        if updated != original:
+            _write_text(viewer, updated)
+            changed.append(viewer)
+        panel = _PANEL_RE.search(updated)
+        structured = panel.group(2) if panel else ""
+        for suffix in ("-ocr.html", "-pdf.html"):
+            sibling = viewer.with_name(viewer.stem + suffix)
+            if not sibling.exists():
+                continue
+            sib = sibling.read_text(encoding="utf-8")
+            new = _replace_title_date(sib, uk)
+            new = _replace_title_line_date(new, uk)
+            if suffix == "-ocr.html" and structured:
+                body = _OCR_BODY_RE.search(new)
+                if body:
+                    new = new[: body.start(2)] + structured + new[body.end(2) :]
+            if new != sib:
+                _write_text(sibling, new)
+                changed.append(sibling)
+    return changed

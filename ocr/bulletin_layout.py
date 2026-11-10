@@ -403,11 +403,19 @@ _MEMORIAL_DATE_RE = re.compile(
 _WEEK_BEGINNING_NUMERIC_RE = re.compile(
     r"(?i)\bweek\s+beginning\b\D{0,20}(\d{1,2})[./-](\d{1,2})[./-](20\d{2})"
 )
+# A concert or cemetery notice is not the paper's date. "Next Sunday's
+# readings" glued onto the same OCR line is not this issue either.
+_EVENT_NOT_ISSUE_RE = re.compile(
+    r"(?i)\b(?:doors?\s+open|curtain|tickets?|box office|cemetery|graveyard|market square)\b"
+)
+_NEXT_ISSUE_SPLIT_RE = re.compile(r"(?i)\bnext\s+(?:sunday|week)\b")
 
 
 def _line_is_issue_stamp(line: str) -> bool:
     """True when this line is the paper's own date, not a later notice."""
     if _MEMORIAL_DATE_RE.search(line):
+        return False
+    if _EVENT_NOT_ISSUE_RE.search(line) and not _ISSUE_STAMP_RE.search(line):
         return False
     if _ISSUE_STAMP_RE.search(line):
         return True
@@ -418,14 +426,21 @@ def _line_is_issue_stamp(line: str) -> bool:
     return False
 
 
-def _date_on_issue_line(line: str):
-    """A year-bearing date on an issue line, or None.
+def _issue_line_for_date(line: str) -> str:
+    """Keep the paper's date when next Sunday's readings are glued on."""
+    if not _ISSUE_STAMP_RE.search(line):
+        return line
+    head = _NEXT_ISSUE_SPLIT_RE.split(line, maxsplit=1)[0].strip()
+    if head and _ISSUE_STAMP_RE.search(head):
+        return head
+    return line
 
-    The year digits must actually be on the line. "11 a.m." is not 2011.
-    """
+
+def _first_parsed_date(source: str):
+    """First year-bearing date on this text, or None."""
     from harvester.utils import extract_date_from_string
 
-    numeric = _WEEK_BEGINNING_NUMERIC_RE.search(line)
+    numeric = _WEEK_BEGINNING_NUMERIC_RE.search(source)
     parsed = None
     if numeric:
         try:
@@ -433,27 +448,58 @@ def _date_on_issue_line(line: str):
         except ValueError:
             parsed = None
     if parsed is None:
-        parsed = extract_date_from_string(line)
-    if parsed is None:
-        return None
-    if str(parsed.year) not in line:
+        parsed = extract_date_from_string(source)
+    if parsed is None or str(parsed.year) not in source:
         return None
     if parsed.year < 2020 or parsed.year > 2035:
         return None
     return parsed
 
 
-def read_parish_issue_date(text: str) -> str:
+def _remove_parsed_date(source: str, parsed: date) -> str:
+    """Drop one printed date so a later date on the same line can be read."""
+    year = str(parsed.year)
+    return re.sub(rf"\b\d{{1,2}}\b(?:st|nd|rd|th)?(?:\D{{0,24}}){year}", " ", source, count=1, flags=re.I)
+
+
+def _date_on_issue_line(line: str, ceiling: date | None = None):
+    """A year-bearing date on an issue line, or None.
+
+    The year digits must actually be on the line. "11 a.m." is not 2011.
+    A course dated after the harvest Sunday is not this paper's date.
+    """
+    source = _issue_line_for_date(line)
+    for _attempt in range(5):
+        parsed = _first_parsed_date(source)
+        if parsed is None:
+            return None
+        if ceiling and parsed > ceiling:
+            source = _remove_parsed_date(source, parsed)
+            continue
+        return parsed
+    return None
+
+
+def read_parish_issue_date(text: str, *, not_after: str = "") -> str:
     """ISO date printed on this parish's bulletin, or "" when none is printed.
 
     Does not guess the harvest Sunday. Irish month names stay as printed
     in the body; this returns the calendar day only for the masthead label.
+    ``not_after`` is a ceiling (the harvest Sunday). A later date is a
+    notice, not this paper.
     """
+    ceiling = None
+    raw_ceiling = (not_after or "").strip()[:10]
+    if raw_ceiling:
+        try:
+            ceiling = date.fromisoformat(raw_ceiling)
+        except ValueError:
+            ceiling = None
     lines = [_SPACE_RE.sub(" ", line).strip() for line in (text or "").splitlines()]
     for line in lines:
         if not line or not _line_is_issue_stamp(line):
             continue
-        parsed = _date_on_issue_line(line)
+        parsed = _date_on_issue_line(line, ceiling)
         if parsed is None:
             continue
         return parsed.isoformat()
@@ -466,6 +512,33 @@ def _masthead_display_name(part: str) -> str:
         return html.unescape(match.group(1)).strip()
     match = re.search(r"ocr-parish-name[^>]*>(.*?)</h2>", part, re.I | re.S)
     return _plain(match.group(1)) if match else ""
+
+
+def restamp_masthead_dates(fragment: str, *, not_after: str = "") -> str:
+    """Set each existing masthead from the date printed under it.
+
+    Does not rewrite the bulletin text.
+    """
+    if "ocr-parish-masthead" not in (fragment or ""):
+        return fragment or ""
+    parts = re.split(r"(?=<header\b[^>]*ocr-parish-masthead)", fragment)
+    out: list[str] = []
+    for part in parts:
+        if "ocr-parish-masthead" not in part[:400]:
+            out.append(part)
+            continue
+        end = part.lower().find("</header>")
+        if end < 0:
+            out.append(part)
+            continue
+        end += len("</header>")
+        header, body = part[:end], part[end:]
+        text = re.sub(r"<[^>]+>", "\n", body)
+        text = html.unescape(text)
+        lines = [_SPACE_RE.sub(" ", line).strip() for line in text.splitlines()]
+        iso = read_parish_issue_date("\n".join(line for line in lines if line), not_after=not_after)
+        out.append(_set_masthead_date(header, iso) + body)
+    return "".join(out)
 
 
 def _set_masthead_date(part: str, iso: str) -> str:
@@ -487,9 +560,27 @@ def _set_masthead_date(part: str, iso: str) -> str:
     )
 
 
+def _drop_name_repeat_before_masthead(parts: list[str]) -> list[str]:
+    """A parish name line that is also the masthead is not a second heading."""
+    cleaned: list[str] = []
+    for part in parts:
+        if cleaned and "ocr-parish-masthead" in part:
+            prev = cleaned[-1].strip()
+            match = re.fullmatch(r"<p>(.*?)</p>", prev, flags=re.I | re.S)
+            name = _masthead_display_name(part)
+            if match and name:
+                plain = html.unescape(re.sub(r"<[^>]+>", "", match.group(1))).strip()
+                if plain.lower() == name.lower():
+                    cleaned.pop()
+        cleaned.append(part)
+    return cleaned
+
+
 def _stamp_issue_dates_on_mastheads(
     parts: list[str],
     prefixes: dict[str, list[str]],
+    *,
+    not_after: str = "",
 ) -> list[str]:
     """Each masthead shows the date read from that parish's own text."""
     indexes = [i for i, part in enumerate(parts) if "ocr-parish-masthead" in part]
@@ -500,10 +591,10 @@ def _stamp_issue_dates_on_mastheads(
         forward = "\n".join(_plain(part) for part in parts[index + 1 : nxt])
         # The body under this header wins. The name line is only a fallback
         # when that line was the issue date and was not copied into the body.
-        iso = read_parish_issue_date(forward)
+        iso = read_parish_issue_date(forward, not_after=not_after)
         if not iso:
             prefix = "\n".join(prefixes.get(name.lower(), []))
-            iso = read_parish_issue_date(prefix)
+            iso = read_parish_issue_date(prefix, not_after=not_after)
         chosen[index] = iso
     stamped: list[str] = []
     for index, part in enumerate(parts):
@@ -683,12 +774,11 @@ def structure_ocr_html(
     assigned and a name printed outside that span is left as body text.
 
     The masthead date is the date printed in that parish's bulletin. The
-    harvest Sunday (``bulletin_date``) and ``parish_dates`` from a file name
-    or parish_status are not used. No printed date means no masthead date.
+    harvest Sunday (``bulletin_date``) is only a ceiling: a later notice is
+    not this paper. ``parish_dates`` from a file name are not used. No
+    printed date means no masthead date.
     """
-    # File-name and status dates stamped 08/11/2026 on a paper that says
-    # 1 November. The text below is the only source.
-    del bulletin_date, parish_dates
+    del parish_dates
     source = _reset_reader_markup(fragment or "")
     entries_raw = list(parish_entries or [])
     packed: list[tuple[str, str, list[str], list[str]]] = []
@@ -889,8 +979,15 @@ def structure_ocr_html(
         for part in _drop_empty_directory_mastheads(_stick_comma_after_heading(out))
         if part
     ]
+    parts = _drop_name_repeat_before_masthead(parts)
     return linkify_html(
-        "\n".join(_stamp_issue_dates_on_mastheads(parts, issue_prefix))
+        "\n".join(
+            _stamp_issue_dates_on_mastheads(
+                parts,
+                issue_prefix,
+                not_after=(bulletin_date or "")[:10],
+            )
+        )
     )
 
 
