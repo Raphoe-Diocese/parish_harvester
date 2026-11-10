@@ -1,65 +1,33 @@
 {
+  "version": 2,
   "parish_key": "naomhfionan",
   "display_name": "Falcarragh",
   "diocese": "raphoe",
-  "recorded_date": "2026-11-08",
-  "start_url": "https://naomhfionan.com/wp-content/uploads/2026/11/Parish-Newsletter-45-for-Sun-A-08112026.pdf",
-  "example_url": "https://naomhfionan.com/wp-content/uploads/2026/11/Parish-Newsletter-45-for-Sun-A-08112026.pdf",
+  "start_url": "https://mcn.live/Camera/falcarragh-parish-church",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 403,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://mcn.live/Camera/falcarragh-parish-church"
+    },
+    {
       "action": "download",
-      "url": "https://naomhfionan.com/wp-content/uploads/2026/11/Parish-Newsletter-45-for-Sun-A-08112026.pdf"
+      "url_pattern": "*.pdf"
     }
   ],
-  "site_type": "naomhfionan_numbered_pdf",
-  "version": 2,
-  "operator_notes_2026_08_10": [
-    "NOT a genuine dead-end — the earlier 'confirmed Cloudflare block, no fix",
-    "available' verdict is superseded. /nuachtlitir/ (the trained listing",
-    "page) really is behind a genuine Cloudflare Managed Challenge blocking",
-    "both headless AND headful Playwright — but the bulletin PDF itself lives",
-    "on wp-content/uploads, an asset path that is NOT challenged at all (a",
-    "plain HTTP GET to a known filename returns 200 immediately, confirmed",
-    "2026-08-10). The only real obstacle was the filename itself, which",
-    "encodes two values that are not simple date substitutions: a sequential",
-    "'newsletter number' and a liturgical Mass-reading cycle letter (A/B/C).",
-    "CRACKED both via the Wayback Machine CDX index (~50 real historical",
-    "filenames, 2022-2026): filename shape is",
-    "Parish-Newsletter-{N}-for-Sun-{A/B/C}-{DDMMYYYY}.pdf under",
-    "wp-content/uploads/{YYYY}/{MM}/. N = weeks between the target Sunday and",
-    "the first Sunday counted that calendar year (resets every 1 Jan), +1 —",
-    "verified an EXACT match (zero drift) across 8 independent real",
-    "filenames spanning 2024, 2025 and 2026. The cycle letter follows the",
-    "standard 3-year A/B/C rotation keyed off the calendar year, EXCEPT any",
-    "date on/after that year's First Sunday of Advent already uses next",
-    "year's letter (confirmed via the exact Dec 2023 SunA->SunB flip at the",
-    "real Advent boundary).",
-    "Implementation: naomhfionan_bulletin_url()/naomhfionan_newsletter_number()",
-    "in harvester/utils.py, liturgical_cycle_letter() in",
-    "harvester/liturgical.py. site_type:naomhfionan_numbered_pdf",
-    "(harvester/replay.py, _try_naomhfionan_predicted_pdf) skips Playwright",
-    "and the challenged /nuachtlitir/ page entirely: builds the predicted",
-    "wp-content/uploads URL for the target Sunday and fetches it directly via",
-    "plain HTTP, with a small +-1 number fallback for the rare skipped-week",
-    "numbering seen in older (2022) filenames.",
-    "Confirmed 2026-08-10 via direct curl: predicted URL for 9 Aug 2026",
-    "(.../2026/08/Parish-Newsletter-32-for-Sun-A-09082026.pdf) returns HTTP",
-    "200 with real bulletin content — matches the site's own live listing",
-    "page (whose HTML — fetchable via curl even though a browser can't render",
-    "it — links that exact same file for today's date)."
+  "operator_notes": [
+    "10/11/2026: falcarragh-parish-church church_id 403. Latest Bulletin stated 2026-11-08 (Parish Newsletter Sunday 8th November 2026). Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "observed_load_ms": 12760.5,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "operator_notes": [
-    "08/11/2026: the pinned download was still Parish-Newsletter-44-for-Sun-A-01112026.pdf. Proved Parish-Newsletter-45-for-Sun-A-08112026.pdf GET 200 application/pdf 1789382 bytes magic %PDF-1.5. Media title is Parish Newsletter Sunday 8th November 2026. site_type naomhfionan_numbered_pdf predicts that exact file for 08/11/2026.",
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not pin a dated Parish-Newsletter filename on naomhfionan.com.",
+    "Do not screenshot the camera feed.",
+    "Do not harvest Facebook."
   ]
 }

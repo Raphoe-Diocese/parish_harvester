@@ -3,32 +3,31 @@
   "parish_key": "stpaulswaterford",
   "display_name": "St. Paul's",
   "diocese": "waterford_and_lismore",
-  "start_url": "https://stpaulsandbutlerstown.ie/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Newsletter",
-    "October",
-    ".pdf"
-  ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
+  "start_url": "https://mcn.live/Camera/st-paul-s",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 259,
+  "timeout_ms": 90000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
-      "url": "https://stpaulsandbutlerstown.ie/newsletter/"
+      "url": "https://mcn.live/Camera/st-paul-s"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 426525 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "10/11/2026: st-paul-s church_id 259. Latest Bulletin card title is Newsletter 8th of November 2026. Butlerstown camera buttlerstown (church_id 260) is the same file. Harvest once here. Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not harvest buttlerstown as a second bulletin.",
+    "Do not screenshot the camera feed.",
     "Do not harvest Facebook."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  ]
 }
