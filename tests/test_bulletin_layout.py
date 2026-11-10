@@ -476,14 +476,14 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, blank)
 
         irish = structure_ocr_html(
-            "<p>1 Samhain 2026</p><p>Aifrinn na Seachtaine</p>",
-            single_parish_name="Gaoth Dobhair",
+            "<p>1ú Samhain 2026</p><p>Aifrinn na Seachtaine</p>",
+            single_parish_name="Gortahork",
             bulletin_date=harvest,
         )
-        self.assertIn(NO_BULLETIN_THIS_SUNDAY, irish)
-        self.assertNotIn("Aifrinn na Seachtaine", irish)
-        self.assertNotIn("Samhain", irish)
-        self.assertNotIn("November", irish)
+        self.assertIn("Aifrinn na Seachtaine", irish)
+        self.assertIn("Samhain", irish)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, irish)
+        self.assertNotIn("08/11/2026", irish)
         irish_now = structure_ocr_html(
             "<p>8 Samhain 2026</p><p>Aifrinn na Seachtaine</p><p>Dé Domhnaigh</p>",
             single_parish_name="Gaoth Dobhair",

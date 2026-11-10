@@ -503,11 +503,10 @@ class StaleParishCaptionTests(unittest.TestCase):
             "Ardboe",
             "Armagh Diocese",
         )
-        self.assertEqual(uk, "")
-        self.assertEqual(masthead, "")
-        self.assertEqual(meta, "There is no bulletin for this Sunday.")
-        self.assertNotIn("08/11/2026", meta)
-        self.assertNotIn("01/11/2026", meta)
+        self.assertEqual(uk, "01/11/2026")
+        self.assertEqual(masthead, "2026-11-01")
+        self.assertIn("Latest bulletin we have for Ardboe: 01/11/2026", meta)
+        self.assertIn("not this Sunday 08/11/2026", meta)
         self.assertNotIn("This week's bulletin", meta)
 
     def test_ok_page_keeps_this_sunday_caption(self) -> None:

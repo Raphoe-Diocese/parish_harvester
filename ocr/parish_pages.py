@@ -305,15 +305,11 @@ def parish_page_date_bits(
 ) -> tuple[str, str, str]:
     """Return (title date, meta line, masthead ISO) for one parish page.
 
-    ``parish_iso`` is the date printed on that bulletin. A date before this
-    harvest week is not shown: the page says there is no bulletin for this
-    Sunday, and neither date is invented onto the body. A later day in the
-    same week is the latest bulletin we have. A blank date is left blank.
+    ``parish_iso`` is the date printed on that bulletin. A different day is
+    the latest bulletin we have, not this Sunday. A blank date is left blank.
+    Hiding the body is a separate decision: an English issue date before this
+    harvest week drops the text, and 08/11/2026 is not written onto that body.
     """
-    from ocr.bulletin_layout import (
-        NO_BULLETIN_THIS_SUNDAY,
-        printed_issue_is_before_this_week,
-    )
     from ocr.generate_bulletin_pages import format_uk_date
 
     harvest = (harvest_iso or "").strip()[:10]
@@ -321,8 +317,6 @@ def parish_page_date_bits(
     harvest_uk = format_uk_date(harvest) if harvest else ""
     name = (display_name or "").strip() or "this parish"
     diocese = (diocese_name or "").strip() or "this diocese"
-    if printed_issue_is_before_this_week(parish, harvest):
-        return "", NO_BULLETIN_THIS_SUNDAY, ""
     if parish and harvest and parish != harvest:
         parish_uk = format_uk_date(parish)
         meta = (
@@ -575,8 +569,8 @@ def write_parish_pages_for_diocese(
                     )
 
             from ocr.bulletin_layout import (
+                NO_BULLETIN_THIS_SUNDAY,
                 leading_parish_issue_iso,
-                printed_issue_is_before_this_week,
                 read_parish_issue_date,
                 structure_ocr_html,
             )
@@ -600,8 +594,11 @@ def write_parish_pages_for_diocese(
                 parish.display_name,
                 config.display_name,
             )
-            stale_issue = printed_issue_is_before_this_week(printed_iso, bulletin_date)
+            # structure_ocr_html marks an English issue date before this week.
+            # An Irish date line, or no date, is not marked and the body stays.
+            stale_issue = 'data-no-bulletin="1"' in ocr_fragment
             if stale_issue:
+                uk_date, base_meta, masthead_iso = "", NO_BULLETIN_THIS_SUNDAY, ""
                 meta_line = base_meta
                 pdf_href = ""
                 stale_pdf = out_root / f"{parish.key}.pdf"
@@ -782,33 +779,35 @@ def refresh_parish_page_html(
     if not match:
         return page_html, ""
     from ocr.bulletin_layout import (
+        NO_BULLETIN_THIS_SUNDAY,
         _html_to_issue_text,
-        printed_issue_is_before_this_week,
+        body_should_be_hidden,
         read_parish_issue_date,
         restamp_masthead_dates,
         withhold_stale_issue_bodies,
     )
 
     structured = restamp_masthead_dates(match.group(2), not_after=harvest_iso)
-    from ocr.bulletin_layout import leading_parish_issue_iso
-
-    printed = read_parish_issue_date(
-        _html_to_issue_text(structured),
-        not_after=harvest_iso,
+    plain = _html_to_issue_text(structured)
+    printed = read_parish_issue_date(plain, not_after=harvest_iso)
+    already_hidden = (
+        'data-no-bulletin="1"' in structured and NO_BULLETIN_THIS_SUNDAY in plain
     )
-    if not printed:
-        printed = leading_parish_issue_iso(structured)
-    uk, meta, _iso = parish_page_date_bits(
-        harvest_iso,
-        printed,
-        display_name,
-        diocese_name,
-    )
+    hide = body_should_be_hidden(plain, harvest_iso) or already_hidden
+    if hide:
+        uk, meta = "", NO_BULLETIN_THIS_SUNDAY
+    else:
+        uk, meta, _iso = parish_page_date_bits(
+            harvest_iso,
+            printed,
+            display_name,
+            diocese_name,
+        )
     structured = withhold_stale_issue_bodies(structured, harvest_iso)
     updated = page_html[: match.start(2)] + structured + page_html[match.end(2) :]
     updated = _replace_meta(updated, meta)
     updated = _replace_title_date(updated, uk)
-    if printed_issue_is_before_this_week(printed, harvest_iso):
+    if hide:
         updated = detach_parish_pdf(updated)
     return updated, uk
 
