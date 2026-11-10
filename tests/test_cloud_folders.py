@@ -90,6 +90,20 @@ class CloudFolderTests(unittest.TestCase):
         self.assertEqual(extract_date_from_string("16-8-26.pdf"), date(2026, 8, 16))
         self.assertEqual(extract_date_from_string("9-8-26.docx"), date(2026, 8, 9))
 
+    def test_issue_number_does_not_hide_month_name_date(self) -> None:
+        # Palmerstown newsletter No. 2. "2-07-08" is not 02/07/2008.
+        name = "Nov-No.-2-07-08-Nov-2026.pdf"
+        url = (
+            "https://palmerstownparish.com/wp-content/uploads/2026/11/"
+            + name
+        )
+        self.assertEqual(extract_date_from_string(name), date(2026, 11, 8))
+        self.assertEqual(extract_date_from_string(url), date(2026, 11, 8))
+        self.assertEqual(
+            extract_date_from_string("Oct-No.-2-10-11-Oct-2026.pdf"),
+            date(2026, 10, 11),
+        )
+
     def test_detect_cloud_date_format(self) -> None:
         self.assertEqual(detect_cloud_date_format("26.06.14.pdf"), "YY.MM.DD")
         self.assertIsNone(detect_cloud_date_format("bulletin.pdf"))
