@@ -891,7 +891,11 @@ def proved_win(
 
 
 def remember(win: Win, path: Path | None = None) -> dict:
-    """Append a proved win. The same parish and strategy is not stored twice."""
+    """Append a proved win. The same parish and strategy is stored once.
+
+    Pass the listing URL pattern, not a one-week filename. A later win for
+    that same parish and strategy is not added again.
+    """
     target = path or MEMORY_PATH
     memory = {"version": 1, "wins": []}
     if target.is_file():
@@ -901,10 +905,11 @@ def remember(win: Win, path: Path | None = None) -> dict:
     wins = memory.setdefault("wins", [])
     row = asdict(win)
     for existing in wins:
+        if not isinstance(existing, dict):
+            continue
         if (
             existing.get("parish_key") == row["parish_key"]
             and existing.get("strategy_id") == row["strategy_id"]
-            and existing.get("url") == row["url"]
         ):
             return memory
     wins.append(row)

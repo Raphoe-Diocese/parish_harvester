@@ -451,6 +451,8 @@ jobs:
             fi
           fi
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
+          git add -f parishes/site_patterns.json 2>/dev/null || true
+          git add -f parishes/newsletter_brain.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."
             exit 0
@@ -594,6 +596,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f Bulletins/report.json Bulletins/report.txt parishes/parish_status.json parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
+          git add -f parishes/site_patterns.json 2>/dev/null || true
+          git add -f parishes/newsletter_brain.json 2>/dev/null || true
           git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf" 2>/dev/null || true
           git add -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg" 2>/dev/null || true
           if git diff --cached --quiet; then

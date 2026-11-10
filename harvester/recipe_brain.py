@@ -5,6 +5,9 @@
 hint_for_url() is click-memory: one proved host must suggest the same
 recipe shape for the next similar URL. remember_win() writes the trick
 back into parishes/site_patterns.json.
+
+A harvest calls remember_harvest_results() only when the result is outcome
+ok and the bulletin date is the target Sunday.
 """
 from __future__ import annotations
 
@@ -14,7 +17,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
 from harvester.config import BASE_DIR, target_sunday
@@ -1040,13 +1043,244 @@ def _prove_from_wp_json(body: bytes, page_url: str, accepted: set[date]) -> dict
     return None
 
 
+# Frank, 10/11/2026. The harvest remembers a strategy only under this rule.
+HARVEST_MEMORY_RULE = (
+    "Remember a strategy only when a harvest result is outcome ok and the "
+    "bulletin date is the harvest target Sunday. Do not remember a stale "
+    "bulletin. Do not remember a miss. Do not remember Facebook. Store the "
+    "site_type and the listing URL pattern, not a one-week filename. The same "
+    "parish and strategy is stored once."
+)
+
+_FILE_EXT_RE = re.compile(r"\.(?:pdf|docx?|rtf|jpe?g|png|webp)$", re.I)
+_UPLOAD_DATE_PART_RE = re.compile(r"20\d{2}|0?[1-9]|[12]\d|3[01]")
+_SOCIAL_HOSTS = {
+    "facebook.com",
+    "m.facebook.com",
+    "fb.com",
+    "fb.watch",
+    "instagram.com",
+}
+
+
+def _is_facebook(url: str, site_type: str = "") -> bool:
+    """True for Facebook and Instagram. Those are not bulletin strategies."""
+    if "facebook" in (site_type or "").lower():
+        return True
+    raw = (url or "").strip()
+    if not raw:
+        return False
+    host = _host(raw)
+    if (
+        host in _SOCIAL_HOSTS
+        or host.endswith(".facebook.com")
+        or host.endswith(".instagram.com")
+    ):
+        return True
+    lowered = raw.lower()
+    return "facebook.com" in lowered or "instagram.com" in lowered or "fb.watch" in lowered
+
+
+def listing_url_pattern(url: str) -> str:
+    """Listing address for a strategy. A one-week filename is removed.
+
+    ``/wp-content/uploads/2026/11/newsletter-8th-November-2026.pdf`` becomes
+    ``/wp-content/uploads/``. ``/current-newsletter/`` stays as it is.
+    """
+    raw = (url or "").strip()
+    if not raw or _is_facebook(raw):
+        return ""
+    parsed = urlparse(raw)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return ""
+    parts = [unquote(part) for part in parsed.path.split("/") if part]
+    if parts and _FILE_EXT_RE.search(parts[-1]):
+        parts.pop()
+    kept: list[str] = []
+    dropping_dates = False
+    for part in parts:
+        if part.lower() == "uploads":
+            kept.append(part)
+            dropping_dates = True
+            continue
+        if dropping_dates and _UPLOAD_DATE_PART_RE.fullmatch(part):
+            continue
+        dropping_dates = False
+        kept.append(part)
+    path = "/" + "/".join(kept)
+    if kept:
+        path += "/"
+    return f"{parsed.scheme}://{parsed.netloc}{path}"
+
+
+def _strategy_pattern_key(site_type: str, listing_pattern: str) -> str:
+    path = urlparse(listing_pattern).path or "/"
+    return f"{site_type.strip()}+{path}"
+
+
+def _as_date(value: Any) -> date | None:
+    if isinstance(value, date):
+        return date(value.year, value.month, value.day)
+    raw = str(value or "").strip()
+    if not raw or raw.lower() == "unknown":
+        return None
+    try:
+        return date.fromisoformat(raw[:10])
+    except ValueError:
+        return None
+
+
+def _outcome_from_status(status: str, is_stale: bool) -> str:
+    if is_stale:
+        return "stale"
+    status = status.strip().lower()
+    if status == "ok":
+        return "ok"
+    if status == "html_link":
+        return "html_only"
+    if status == "skipped":
+        return "skipped"
+    if status == "error":
+        return "failed"
+    return status
+
+
+def _harvest_row(result: Any) -> dict[str, Any]:
+    """Normalise a FetchResult or a report row. Does not read a recipe."""
+    if isinstance(result, dict):
+        is_stale = bool(result.get("is_stale"))
+        outcome = str(result.get("outcome") or "").strip().lower()
+        if is_stale:
+            outcome = "stale"
+        elif not outcome:
+            outcome = _outcome_from_status(str(result.get("status") or ""), False)
+        diagnosis = result.get("diagnosis")
+        return {
+            "outcome": outcome,
+            "parish_key": str(
+                result.get("parish_key") or result.get("parish") or result.get("key") or ""
+            ).strip(),
+            "url": str(result.get("url") or "").strip(),
+            "bulletin_date": result.get("bulletin_date"),
+            "site_type": str(result.get("site_type") or "").strip(),
+            "listing_url": str(result.get("listing_url") or "").strip(),
+            "file_kind": str(
+                result.get("file_kind") or result.get("file_type") or "pdf"
+            ).strip()
+            or "pdf",
+            "file_path": result.get("file_path"),
+            "diagnosis": diagnosis if isinstance(diagnosis, dict) else {},
+        }
+    diagnosis = getattr(result, "diagnosis", None)
+    return {
+        "outcome": _outcome_from_status(
+            str(getattr(result, "status", "") or ""),
+            bool(getattr(result, "is_stale", False)),
+        ),
+        "parish_key": str(
+            getattr(result, "key", "") or getattr(result, "parish_key", "") or ""
+        ).strip(),
+        "url": str(getattr(result, "url", "") or "").strip(),
+        "bulletin_date": getattr(result, "bulletin_date", None),
+        "site_type": str(getattr(result, "site_type", "") or "").strip(),
+        "listing_url": str(getattr(result, "listing_url", "") or "").strip(),
+        "file_kind": str(getattr(result, "file_type", "") or "pdf").strip() or "pdf",
+        "file_path": getattr(result, "file_path", None),
+        "diagnosis": diagnosis if isinstance(diagnosis, dict) else {},
+    }
+
+
+def _result_bulletin_date(row: dict[str, Any], target: date) -> date | None:
+    """Date already on the result or in its URL. A saved PDF is read in place.
+
+    This does not download a PDF. No date means the Sunday was not proved.
+    """
+    found = _as_date(row.get("bulletin_date"))
+    if found:
+        return found
+    diagnosis = row.get("diagnosis") if isinstance(row.get("diagnosis"), dict) else {}
+    found = _as_date(diagnosis.get("bulletin_date"))
+    if found:
+        return found
+    from harvester.bulletin_freshness import extract_bulletin_date
+
+    found = extract_bulletin_date(str(row.get("url") or ""))
+    if found:
+        return found
+    listing = str(row.get("listing_url") or "")
+    if listing:
+        found = extract_bulletin_date(listing)
+        if found:
+            return found
+    file_path = row.get("file_path")
+    if not file_path:
+        return None
+    path = Path(file_path)
+    if not path.is_file():
+        return None
+    from harvester.bulletin_freshness import heading_date_in_pdf
+
+    return heading_date_in_pdf(path, target=target, url=str(row.get("url") or "") or None)
+
+
+def _recipe_file(parish_key: str, parishes_dir: Path) -> Path | None:
+    """Find a recipe JSON. Does not write it."""
+    recipes_dir = parishes_dir / "recipes"
+    if not recipes_dir.is_dir():
+        return None
+    for sub in sorted(recipes_dir.iterdir()):
+        if not sub.is_dir():
+            continue
+        candidate = sub / f"{parish_key}.json"
+        if candidate.is_file():
+            return candidate
+    flat = recipes_dir / f"{parish_key}.json"
+    if flat.is_file():
+        return flat
+    return None
+
+
+def _recipe_site(parish_key: str, parishes_dir: Path | None) -> tuple[str, str]:
+    """Read site_type and start_url. Does not write the recipe."""
+    if not parish_key:
+        return "", ""
+    from harvester.config import PARISHES_DIR
+
+    root = parishes_dir if parishes_dir is not None else PARISHES_DIR
+    path = _recipe_file(parish_key, root)
+    if path is None:
+        return "", ""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return "", ""
+    if not isinstance(data, dict):
+        return "", ""
+    return (
+        str(data.get("site_type") or "").strip(),
+        str(data.get("start_url") or "").strip(),
+    )
+
+
+def _file_kind(raw: str) -> str:
+    kind = (raw or "pdf").strip().lower()
+    if kind in {"docx_to_pdf", "image_to_pdf", "html_link"}:
+        return "pdf"
+    if kind in {"pdf", "html", "image", "rtf", "docx"}:
+        return kind
+    return "pdf"
+
+
 def remember_win(
     pattern_key: str,
     parish_key: str,
     note: str,
     patterns_path: Path | None = None,
 ) -> None:
-    """Write a proved trick into site_patterns.json (click memory)."""
+    """Write a proved trick into site_patterns.json (click memory).
+
+    The same parish on the same strategy is stored once.
+    """
     path = patterns_path or PATTERNS_PATH
     if path.exists():
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -1066,14 +1300,123 @@ def remember_win(
             "success_count": 0,
         }
         patterns[pattern_key] = row
-    examples = row.setdefault("example_parishes", [])
-    if parish_key and parish_key not in examples:
+    examples = row.get("example_parishes")
+    if not isinstance(examples, list):
+        examples = []
+        row["example_parishes"] = examples
+    if parish_key and parish_key in examples:
+        return
+    if parish_key:
         examples.append(parish_key)
     row["success_count"] = int(row.get("success_count") or 0) + 1
     notes = row.setdefault("operator_notes", [])
+    if not isinstance(notes, list):
+        notes = []
+        row["operator_notes"] = notes
     if note and note not in notes:
         notes.append(note)
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def _remember_one_harvest_result(
+    result: Any,
+    target: date,
+    *,
+    memory_path: Path | None,
+    patterns_path: Path | None,
+    parishes_dir: Path | None,
+) -> str:
+    """Store one win, or return '' when the rule says not to."""
+    row = _harvest_row(result)
+    if row["outcome"] != "ok":
+        return ""
+    found = _result_bulletin_date(row, target)
+    if found != target:
+        return ""
+    parish_key = row["parish_key"]
+    if not parish_key:
+        return ""
+    site_type = row["site_type"]
+    listing_url = row["listing_url"]
+    if not site_type or not listing_url:
+        recipe_type, recipe_start = _recipe_site(parish_key, parishes_dir)
+        if not site_type:
+            site_type = recipe_type
+        if not listing_url:
+            listing_url = recipe_start
+    file_url = row["url"]
+    if _is_facebook(file_url, site_type) or _is_facebook(listing_url):
+        return ""
+    if not site_type:
+        return ""
+    pattern = listing_url_pattern(listing_url or file_url)
+    if not pattern or _is_facebook(pattern):
+        return ""
+    if _FILE_EXT_RE.search(urlparse(pattern).path):
+        return ""
+    from harvester.newsletter_brain import Win, remember
+
+    remember(
+        Win(
+            strategy_id=site_type,
+            url=pattern,
+            parish_key=parish_key,
+            verdict="fresh",
+            bulletin_date=found.isoformat(),
+            file_kind=_file_kind(row["file_kind"]),
+        ),
+        path=memory_path,
+    )
+    path_only = urlparse(pattern).path or "/"
+    note = (
+        f"Harvest remembered {site_type} at {path_only} "
+        "when the bulletin date was the target Sunday. "
+        "Do not pin a dated filename."
+    )
+    remember_win(
+        _strategy_pattern_key(site_type, pattern),
+        parish_key,
+        note,
+        patterns_path=patterns_path,
+    )
+    return parish_key
+
+
+def remember_harvest_results(
+    results: list,
+    target: date,
+    *,
+    memory_path: Path | None = None,
+    patterns_path: Path | None = None,
+    parishes_dir: Path | None = None,
+) -> list[str]:
+    """Remember strategies that got this Sunday's bulletin.
+
+    Rule: Remember a strategy only when a harvest result is outcome ok and
+    the bulletin date is the harvest target Sunday. Do not remember a stale
+    bulletin. Do not remember a miss. Do not remember Facebook. Store the
+    site_type and the listing URL pattern, not a one-week filename. The same
+    parish and strategy is stored once.
+
+    Calls newsletter_brain.remember() and remember_win(). Does not edit a
+    parish recipe and does not write parish_status.json.
+    """
+    remembered: list[str] = []
+    for result in results:
+        try:
+            key = _remember_one_harvest_result(
+                result,
+                target,
+                memory_path=memory_path,
+                patterns_path=patterns_path,
+                parishes_dir=parishes_dir,
+            )
+        except (OSError, json.JSONDecodeError, ValueError):
+            continue
+        if key and key not in remembered:
+            remembered.append(key)
+    return remembered
 
 
 def _unskip_recipe(recipe: dict[str, Any], *, site_type: str, start_url: str, note: str) -> None:
