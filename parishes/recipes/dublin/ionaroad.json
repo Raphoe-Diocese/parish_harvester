@@ -1,19 +1,43 @@
 {
+  "version": 2,
   "parish_key": "ionaroad",
   "display_name": "Iona Road",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
   "start_url": "https://www.ionaroadparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    "Parish-Link"
+  ],
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x",
+    "-1024x"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "status": "active",
+  "skip": false,
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.ionaroadparish.ie"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "10/11/2026: GET /wp-json/wp/v2/media?per_page=20&after=2026-11-06T00:00:00 returned Parish-Link-Samhain-2026-2-1.pdf. Proved GET 200 application/pdf 317629 bytes, magic %PDF-1.3, 2 pages. WordPress media date 06/11/2026. The file is the Parish Link for Samhain/November 2026 and names Wednesday 4 November 2026. Parish-Link-October-4-2026-copy-2.pdf was uploaded the same evening; the filename date is 04/10/2026. Do not pin the dated filename. Keep Irish as Irish."
+  ],
+  "do_not": [
+    "Do not pin Parish-Link-Samhain-2026-2-1.pdf.",
+    "Do not pin a dated filename.",
+    "Do not take Parish-Link-October-4-2026-copy-2.pdf for this week.",
+    "Do not harvest Facebook.",
+    "Do not translate Irish."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
