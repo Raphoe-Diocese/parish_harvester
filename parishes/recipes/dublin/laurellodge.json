@@ -3,33 +3,31 @@
   "display_name": "Laurel Lodge",
   "diocese": "dublin",
   "recorded_date": "2026-11-10",
-  "start_url": "https://www.laurellodgeparish.ie/images/Newsletter/newsletter.pdf",
-  "site_type": "permanent_redirect_document",
+  "start_url": "https://www.laurellodgeparish.ie/",
+  "site_type": "http_scrape_newest_pdf",
   "playbook_type": "direct_download",
-  "disable_stale_rescrape_fallback": true,
   "status": "active",
   "skip": false,
   "href_patterns": [
-    "newsletter.pdf"
+    ".pdf",
+    "newsletter"
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 180,
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.laurellodgeparish.ie/images/Newsletter/newsletter.pdf",
-      "use_target_url": true
+      "action": "goto",
+      "url": "https://www.laurellodgeparish.ie/"
     }
   ],
   "version": 2,
   "operator_notes": [
     "09/11/2026 Parish scan: homepage link text Current Newsletter opens /images/Newsletter/newsletter.pdf.",
-    "10/11/2026: that stable file is still the weekly overwrite. GET 200 application/pdf 380954 bytes. PDF heading date 08/11/2026. permanent_redirect_document. Do not pin a dated filename."
+    "10/11/2026 inside read: homepage link Current Newsletter. File newsletter.pdf has no date in the name. GET 200 application/pdf 380954 bytes. Front page says Saturday/Sunday 7th-8th November 2026. Date 08/11/2026. Scrape the homepage. Do not pin the filename."
   ],
   "do_not": [
+    "Do not pin the filename.",
     "Do not pin a dated filename.",
-    "Do not replace newsletter.pdf with a week-specific URL.",
-    "Do not rescrape the homepage when the permanent newsletter link is stale.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
