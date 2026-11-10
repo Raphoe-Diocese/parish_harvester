@@ -1,19 +1,31 @@
 {
+  "version": 2,
   "parish_key": "porterstownclonsilla",
   "display_name": "Porterstown",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.stmochtasparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://churchmedia.tv/st-mochtas-church-dublin-15",
+  "site_type": "churchmedia_newsletter",
+  "playbook_type": "churchmedia_latest_newsletter",
+  "churchmedia_slug": "st-mochtas-church-dublin-15",
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stmochtasparish.ie"
+      "url": "https://churchmedia.tv/st-mochtas-church-dublin-15"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "10/11/2026 churchmedia search. St Mochta's Church, Porterstown / Clonsilla. The newsletter PDF is headed PARISH NEWSLETTER - NOVEMBER 2026. Worship opens on the 32nd Sunday of the Year (08/11/2026). The SVP collection is on the 7th and 8th November.",
+    "GET /api/getChannelAbout?slug=st-mochtas-church-dublin-15 returns the current newsletter PDF. Do not pin /newsletter/<token>.st-mochtas-church-dublin-15.pdf or ?cb=."
+  ],
+  "do_not": [
+    "Do not pin the churchmedia newsletter token or ?cb= cache-buster.",
+    "Do not harvest the parish homepage as the bulletin. The weekly file is the churchmedia newsletter."
+  ]
 }
