@@ -1,29 +1,36 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "portlaoise",
   "display_name": "Portlaoise",
   "diocese": "kildare_and_leighlin",
-  "start_url": "https://www.portlaoiseparish.ie/current-newsletter/",
-  "site_type": "permanent_redirect_document",
-  "playbook_type": "direct_download",
-  "recorded_date": "2026-10-29",
+  "start_url": "https://www.portlaoiseparish.ie/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "playbook_type": "pdf_download_list",
+  "recorded_date": "2026-11-10",
   "timeout_ms": 45000,
   "total_timeout_s": 120,
   "max_bulletin_pages": 28,
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.portlaoiseparish.ie/current-newsletter/",
-      "use_target_url": true
+      "action": "goto",
+      "url": "https://www.portlaoiseparish.ie/newsletters/"
     }
   ],
   "operator_notes": [
     "03/10/2026: /current-newsletter/ redirects to the current dated PDF. Do not pin the dated file.",
-    "29/10/2026: redirect is 30115-Nov-1st-online.pdf (All Saints week). Harvest failed Too many pages 24 (max 4) — set max_bulletin_pages 28."
+    "29/10/2026: redirect was a 24-page file. Harvest failed Too many pages (max 4). Keep max_bulletin_pages 28.",
+    "10/11/2026: /newsletters/ lists Nov-8th-online.pdf. GET 200 application/pdf 10535417 bytes. Filename date 08/11/2026. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not pin the dated PDF.",
-    "Do not keep the default 4-page cap — this week is 24 pages.",
+    "Do not pin a dated filename.",
+    "Do not leave max_bulletin_pages at 4. This bulletin is 24 pages.",
     "Do not harvest Facebook."
-  ]
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
