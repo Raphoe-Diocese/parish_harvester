@@ -2,18 +2,32 @@
   "parish_key": "bekan",
   "display_name": "Bekan",
   "diocese": "tuam",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.bekan-parish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "recorded_date": "2026-11-10",
+  "start_url": "https://bekan-parish.ie/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
+  "href_patterns": [
+    "bpn"
+  ],
+  "post_slug_patterns": [
+    "bekan-parish-newsletter"
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.bekan-parish.ie"
+      "url": "https://bekan-parish.ie/"
     }
   ],
-  "version": 1
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "version": 2,
+  "operator_notes": [
+    "10/11/2026: homepage links the newest bekan-parish-newsletter post. That post has bpn8nov26.png. Proved GET 200 image/png 187061 bytes. Parser date 08/11/2026 from the November upload folder and the 8 in the name. Follow the post. Do not pin the dated post URL."
+  ],
+  "do_not": [
+    "Do not pin /2026/11/08/ or bpn8nov26.png.",
+    "Do not harvest Facebook."
+  ]
 }

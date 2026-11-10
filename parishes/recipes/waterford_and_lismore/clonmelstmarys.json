@@ -1,22 +1,18 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "clonmelstmarys",
   "display_name": "Clonmel - St. Mary's",
   "diocese": "waterford_and_lismore",
   "start_url": "https://stmarysparishclonmel.ie/newsletter",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "http_scrape_newest_pdf",
   "ignore_https_errors": true,
   "href_patterns": [
-    "november",
-    "october",
-    "images/",
     ".pdf"
   ],
   "max_bulletin_pages": 16,
   "timeout_ms": 55000,
   "total_timeout_s": 190,
-  "recorded_date": "2026-11-02",
-  "example_url": "https://stmarysparishclonmel.ie/images/1st%20november%202026.pdf",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
@@ -24,12 +20,12 @@
     }
   ],
   "operator_notes": [
-    "02/11/2026: listing has /images/1st%20november%202026.pdf. Old href_patterns only october/sept so November was invisible; scrape also hit NoneType.group on some space filenames.",
-    "TLS cert expired — ignore_https_errors. Prefer predicted_dated_pdf from the working November example. Do not pin the dated filename."
+    "02/11/2026: the newsletter page lists dated files under /images/. The certificate can fail verify, so ignore_https_errors stays.",
+    "10/11/2026: the same page lists /images/8th november 2026.pdf. Proved GET 200 application/pdf 774018 bytes %PDF. Parser date 08/11/2026. Recipe scrapes the newsletter page. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not pin 1st november 2026.pdf.",
-    "Do not leave href_patterns stuck on october/sept only.",
+    "Do not pin 8th november 2026.pdf or 1st november 2026.pdf.",
+    "Do not drop ignore_https_errors while the certificate fails verify.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
