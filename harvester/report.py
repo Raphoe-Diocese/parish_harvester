@@ -193,16 +193,24 @@ def _bulletin_date_fields(
         match = re.search(r"bulletin date (\d{4}-\d{2}-\d{2})", str(error))
         if match:
             iso = match.group(1)
-    if not iso and url:
-        from .bulletin_freshness import extract_bulletin_date
-
-        extracted = extract_bulletin_date(url)
-        if extracted is not None:
-            iso = extracted.isoformat()
-    if not iso and pdf_path is not None and Path(pdf_path).is_file():
+    pdf_file = Path(pdf_path) if pdf_path is not None else None
+    has_pdf = pdf_file is not None and pdf_file.is_file()
+    if not iso and has_pdf:
         from .bulletin_freshness import heading_date_in_pdf
 
-        extracted = heading_date_in_pdf(Path(pdf_path), target=target)
+        extracted = heading_date_in_pdf(pdf_file, target=target, url=url or None)
+        if extracted is not None:
+            iso = extracted.isoformat()
+    if not iso and url:
+        from .bulletin_freshness import extract_bulletin_date, week_window
+
+        extracted = extract_bulletin_date(url)
+        if extracted is not None and has_pdf and target is not None:
+            week_start, week_end = week_window(target)
+            # The shared reader already took an in-week URL, or left it
+            # alone because the PDF already has an issue date.
+            if week_start <= extracted <= week_end:
+                extracted = None
         if extracted is not None:
             iso = extracted.isoformat()
     if not iso:
