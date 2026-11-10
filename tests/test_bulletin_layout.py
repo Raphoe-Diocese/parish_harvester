@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import html
 import unittest
 
 from ocr.bulletin_layout import (
     _is_url_only_line,
     classify_heading_line,
+    read_parish_issue_date,
     render_parish_masthead,
     split_heading_prefix,
     split_readable_chunks,
@@ -154,7 +156,8 @@ class BulletinLayoutTests(unittest.TestCase):
         )
         self.assertIn("Ar dheis Dé go raibh a anam dílis.", html_out)
         self.assertIn("Gaoth Dobhair", html_out)
-        self.assertIn("16/08/2026", html_out)
+        self.assertNotIn("16/08/2026", html_out)
+        self.assertNotIn("ocr-parish-date", html_out)
 
     def test_does_not_promote_contact_phone_or_bingo_sentence(self) -> None:
         self.assertIsNone(classify_heading_line("Contact 085 8285228 or email kilmacshed@gmail.com"))
@@ -270,9 +273,8 @@ class BulletinLayoutTests(unittest.TestCase):
             "<p>MASS TIMES ANNIVERSARIES /INTENTIONS<br>\n"
             "Saturday 15th August 10:00am</p>"
         )
-        # Harvest Sunday alone must not stamp every masthead (Raphoe parish
-        # showed 25/10 while the body still said 27 September). Prefer
-        # parish_dates; without one, name-only masthead.
+        # "Saturday 15th August" has no year. The harvest Sunday and a
+        # parish_status date must not be invented onto the masthead.
         html_out = structure_ocr_html(
             fragment,
             parish_entries=[("annagryparish", "Annagry")],
@@ -282,19 +284,12 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn('class="ocr-parish-masthead"', html_out)
         self.assertIn('class="ocr-parish-name"', html_out)
         self.assertIn("Annagry", html_out)
-        self.assertIn("16/08/2026", html_out)
+        self.assertNotIn("16/08/2026", html_out)
+        self.assertNotIn("ocr-parish-date", html_out)
         self.assertIn('<h3 class="b-head">', html_out)
         self.assertIn("MASS TIMES", html_out)
         self.assertNotIn("<details", html_out)
         self.assertLess(html_out.index("ocr-parish-masthead"), html_out.index("MASS TIMES"))
-        undated = structure_ocr_html(
-            fragment,
-            parish_entries=[("annagryparish", "Annagry")],
-            bulletin_date="2026-08-16",
-            parish_dates={},
-        )
-        self.assertIn("Annagry", undated)
-        self.assertNotIn("16/08/2026", undated)
 
     def test_masthead_is_idempotent(self) -> None:
         first = structure_ocr_html(
@@ -327,8 +322,9 @@ class BulletinLayoutTests(unittest.TestCase):
             parish_dates={"drive-1jmslbrliw": "2026-09-28"},
             parish_page_spans={"Raphoe": (1, 1)},
         )
-        self.assertIn("28/09/2026", html_out)
+        self.assertIn('class="ocr-parish-date">27/09/2026<', html_out)
         self.assertNotIn("25/10/2026", html_out)
+        self.assertNotIn("28/09/2026", html_out)
         undated = structure_ocr_html(
             "<p>Page 1</p><p>Sunday 27 September 2026 RAPHOE PARISH NEWSLETTER</p>",
             parish_entries=[("drive-1jmslbrliw", "Raphoe")],
@@ -336,8 +332,143 @@ class BulletinLayoutTests(unittest.TestCase):
             parish_dates={},
             parish_page_spans={"Raphoe": (1, 1)},
         )
+        self.assertIn('class="ocr-parish-date">27/09/2026<', undated)
         self.assertNotIn("25/10/2026", undated)
-        self.assertNotIn("ocr-parish-date", undated)
+        self.assertNotIn("28/09/2026", undated)
+
+    def test_masthead_uses_the_date_printed_in_that_bulletin(self) -> None:
+        """Harvest Sunday 08/11/2026 must not replace the date in the text."""
+        harvest = "2026-11-08"
+        samples = {
+            "Ovens": (
+                "<p>Sunday 01-November-2026 THE PARISHIONER Ovens and Farran Parish</p>",
+                "01/11/2026",
+            ),
+            "Bantry": (
+                "<p>FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45</p>"
+                "<p>Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.</p>"
+                "<p>Tuesday 3rd November 2026 at 8 p.m. in the Bantry Primary Care Centre</p>"
+                "<p>died on 9th July 2023 RIP</p>",
+                "01/11/2026",
+            ),
+            "Glenfin": (
+                "<p>Dé Domhnaigh Sunday Leitir-Bric</p>"
+                "<p>Sunday November 8th 11 a.m. Molly Harkin 1st anniversary</p>"
+                "<p>All Saints Day - Sunday Year A — November 1st 2026</p>",
+                "01/11/2026",
+            ),
+            "St Eugene's": (
+                "<p>Sunday 8th November, beginning at 4pm.</p>"
+                "<p>Thursday 12th November 2026. Derry Diocesan Trust is an Equal Opportunities Employer.</p>"
+                "<p>Parish Pilgrimage from 24-31 May 2027.</p>"
+                "<p>Vol 54 No 43 Solemnity of All Saints 1st November 2026</p>",
+                "01/11/2026",
+            ),
+        }
+        for name, (body, expect) in samples.items():
+            with self.subTest(parish=name):
+                html_out = structure_ocr_html(
+                    body,
+                    single_parish_name=name,
+                    bulletin_date=harvest,
+                    parish_dates={name: harvest},
+                )
+                self.assertIn(f'class="ocr-parish-date">{expect}<', html_out)
+                self.assertNotIn('class="ocr-parish-date">08/11/2026<', html_out)
+                self.assertIn(html.escape(name), html_out)
+        self.assertIn("Dé Domhnaigh", structure_ocr_html(
+            samples["Glenfin"][0],
+            single_parish_name="Glenfin",
+            bulletin_date=harvest,
+        ))
+        self.assertIn("Molly Harkin", structure_ocr_html(
+            samples["Glenfin"][0],
+            single_parish_name="Glenfin",
+            bulletin_date=harvest,
+        ))
+
+        this_sunday = structure_ocr_html(
+            "<p>Sunday 8th November 2026 Parish Newsletter</p>",
+            single_parish_name="This Sunday",
+            bulletin_date=harvest,
+        )
+        self.assertIn('class="ocr-parish-date">08/11/2026<', this_sunday)
+
+        older = structure_ocr_html(
+            "<p>Week beginning 18th October 2026</p>",
+            single_parish_name="Older week",
+            bulletin_date=harvest,
+            parish_dates={"Older week": harvest},
+        )
+        self.assertIn('class="ocr-parish-date">18/10/2026<', older)
+        self.assertNotIn("08/11/2026", older)
+
+        numeric = structure_ocr_html(
+            "<p>Frankfield/Grange Parish Church 31/10/2026 Please see the "
+            "Parish newsletter for week beginning 01/11/2026.</p>",
+            single_parish_name="Week beginning",
+            bulletin_date=harvest,
+        )
+        self.assertIn('class="ocr-parish-date">01/11/2026<', numeric)
+        self.assertIn("31/10/2026", numeric)
+        self.assertNotIn('class="ocr-parish-date">31/10/2026<', numeric)
+        self.assertNotIn('class="ocr-parish-date">08/11/2026<', numeric)
+
+        blank = structure_ocr_html(
+            "<p>Copyright 2026 Diocese of Cork and Ross</p>"
+            "<p>Sunday Saturday 10:30am 6:30pm Vigil</p>",
+            single_parish_name="Gurranabraher",
+            bulletin_date=harvest,
+            parish_dates={"Gurranabraher": "2026-10-24"},
+        )
+        self.assertIn("Gurranabraher", blank)
+        self.assertNotIn("ocr-parish-date", blank)
+        self.assertNotIn("08/11/2026", blank)
+        self.assertNotIn("24/10/2026", blank)
+
+        irish = structure_ocr_html(
+            "<p>1 Samhain 2026</p><p>Aifrinn na Seachtaine</p>",
+            single_parish_name="Gaoth Dobhair",
+            bulletin_date=harvest,
+        )
+        self.assertIn('class="ocr-parish-date">01/11/2026<', irish)
+        self.assertIn("Samhain", irish)
+        self.assertIn("Aifrinn na Seachtaine", irish)
+
+        self.assertEqual(read_parish_issue_date("died on 9th July 2023 RIP"), "")
+        self.assertEqual(
+            read_parish_issue_date("Sunday November 8th 11 a.m. Molly Harkin 1st anniversary"),
+            "",
+        )
+
+        both = structure_ocr_html(
+            "<p>Page 1</p><p>FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45</p>"
+            "<p>Page 2</p><p>Week beginning 18th October 2026</p>",
+            parish_entries=[("bantry", "Bantry"), ("older", "Older Parish")],
+            bulletin_date=harvest,
+            parish_dates={"bantry": harvest, "older": harvest},
+            parish_page_spans={"Bantry": (1, 1), "Older Parish": (2, 2)},
+        )
+        bantry_at = both.index('data-parish-name="Bantry"')
+        older_at = both.index('data-parish-name="Older Parish"')
+        self.assertLess(bantry_at, older_at)
+        self.assertIn('class="ocr-parish-date">01/11/2026<', both[:older_at])
+        self.assertIn('class="ocr-parish-date">18/10/2026<', both[older_at:])
+        self.assertNotIn('class="ocr-parish-date">08/11/2026<', both)
+
+        once = structure_ocr_html(
+            samples["Ovens"][0],
+            single_parish_name="Ovens",
+            bulletin_date=harvest,
+        )
+        twice = structure_ocr_html(
+            once,
+            single_parish_name="Ovens",
+            bulletin_date=harvest,
+        )
+        self.assertEqual(once.count("ocr-parish-date"), 1)
+        self.assertEqual(twice.count("ocr-parish-date"), 1)
+        self.assertIn('class="ocr-parish-date">01/11/2026<', twice)
 
     def test_convert_bulletin_promotes_plain_topic_lines(self) -> None:
         from ocr.convert_bulletin import render_markdown_lines

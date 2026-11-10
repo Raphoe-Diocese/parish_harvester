@@ -647,42 +647,6 @@ def _parish_page_spans(diocese: str) -> dict[str, tuple[int, int]]:
     return {}
 
 
-def _parish_bulletin_dates(diocese: str) -> dict[str, str]:
-    """ISO bulletin dates from parish_status for this diocese, by key and name.
-
-    Empty when the status file has no date for that parish. Callers must not
-    fall back to the harvest Sunday — that stamped 25/10/2026 on Raphoe parish
-    while the OCR text still said 27 September 2026.
-    """
-    path = REPO_ROOT / "parishes" / "parish_status.json"
-    if not path.exists():
-        return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    rows = payload.get("parishes") if isinstance(payload, dict) else None
-    if not isinstance(rows, dict):
-        return {}
-    want = (diocese or "").strip().lower().replace("-", "_")
-    out: dict[str, str] = {}
-    for key, row in rows.items():
-        if not isinstance(row, dict):
-            continue
-        row_diocese = str(row.get("diocese") or "").strip().lower().replace(" ", "_")
-        if want and want not in row_diocese and row_diocese not in want:
-            continue
-        iso = str(row.get("bulletin_date") or "").strip()
-        if not iso:
-            continue
-        out[str(key)] = iso
-        name = str(row.get("display_name") or "").strip()
-        if name:
-            out[name] = iso
-            out[name.lower()] = iso
-    return out
-
-
 def prepare_ocr_fragment(
     diocese: str,
     ocr_fragment: str,
@@ -701,14 +665,15 @@ def prepare_ocr_fragment(
     prepends a failure banner when OCR produced nothing usable at all for
     any known parish this week.
     """
-    del bulletin_date  # diocese harvest Sunday must not label every parish
+    # The harvest Sunday is the diocese edition, not each parish's paper.
+    # structure_ocr_html reads the date printed in that parish's text.
+    del bulletin_date
     cleaned = tighten_ocr_paragraphs(_flatten_legacy_parish_accordions(ocr_fragment or ""))
     entries = _load_parish_entries(diocese, parish_links or []) if parish_links else []
     url_by_name = {name: url for name, url in (parish_links or [])}
     structured = structure_ocr_html(
         cleaned,
         parish_entries=entries,
-        parish_dates=_parish_bulletin_dates(diocese),
         parish_urls=url_by_name,
         parish_page_spans=_parish_page_spans(diocese),
     )
