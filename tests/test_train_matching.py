@@ -541,7 +541,7 @@ https://www.antrimparish.com
         self.assertTrue(has_new_window)
 
     def test_stitch_mega_pdf_skips_oversized_bulletins(self) -> None:
-        """PDFs with more than _MAX_BULLETIN_PAGES pages must be excluded from the mega PDF."""
+        """An undated PDF over _MAX_BULLETIN_PAGES is excluded. It has no issue date."""
         try:
             import PyPDF2
             from reportlab.lib.pagesizes import A4
@@ -620,6 +620,133 @@ https://www.antrimparish.com
             # trailing missing/online-only sheet.
             ok_page_count = 2  # both pages have real text
             self.assertEqual(len(reader.pages), ok_page_count)
+
+    def test_stitch_mega_pdf_includes_long_bulletin_with_fresh_heading(self) -> None:
+        """A long PDF whose heading date is the target Sunday is included.
+
+        An undated long PDF, and a long PDF with a stale heading date, stay out.
+        """
+        try:
+            import PyPDF2
+            from reportlab.lib.pagesizes import A4
+            from reportlab.pdfgen import canvas as rl_canvas
+        except ImportError:
+            self.skipTest("reportlab or PyPDF2 not available")
+
+        from datetime import date
+        from harvester.config import MIN_PDF_BYTES
+        from harvester.fetcher import FetchResult
+
+        target = date(2026, 4, 27)
+
+        def _make_pdf(lines_per_page: list[list[str]]) -> bytes:
+            buf = io.BytesIO()
+            c = rl_canvas.Canvas(buf, pagesize=A4)
+            for lines in lines_per_page:
+                y = 750
+                for line in lines:
+                    c.drawString(72, y, line)
+                    y -= 18
+                c.showPage()
+            c.save()
+            buf.seek(0)
+            return buf.read()
+
+        def _pad(path: Path, raw: bytes) -> None:
+            path.write_bytes(raw + b"\n% " + b"0" * MIN_PDF_BYTES)
+
+        filler = "weekly notices and mass times for the parish here."
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            current_dir = root / "current"
+            bulletins_dir = root / "bulletins"
+            current_dir.mkdir()
+            bulletins_dir.mkdir()
+
+            short_pdf = current_dir / "short_parish.pdf"
+            _pad(short_pdf, _make_pdf([
+                [f"SHORT OK INCLUDED {filler}"],
+                [f"SHORT OK INCLUDED page two {filler}"],
+            ]))
+            undated_pdf = current_dir / "undated_parish.pdf"
+            _pad(undated_pdf, _make_pdf([
+                [f"UNDATED LONG EXCLUDED {filler}"] for _ in range(5)
+            ]))
+            fresh_pdf = current_dir / "fresh_parish.pdf"
+            fresh_pages = [
+                ["Parish Bulletin 26th April 2026", f"FRESH LONG INCLUDED {filler}"]
+            ]
+            fresh_pages.extend(
+                [[f"FRESH LONG INCLUDED page {i} {filler}"] for i in range(2, 7)]
+            )
+            _pad(fresh_pdf, _make_pdf(fresh_pages))
+            stale_pdf = current_dir / "stale_parish.pdf"
+            _pad(stale_pdf, _make_pdf([
+                ["Parish Bulletin 23rd February 2025", f"STALE LONG EXCLUDED {filler}"]
+            ] + [[f"STALE LONG EXCLUDED page {i} {filler}"] for i in range(2, 8)]))
+
+            results = [
+                FetchResult(
+                    key="short_parish",
+                    display_name="Short Parish",
+                    status="ok",
+                    url="https://short.example.org/",
+                    file_path=short_pdf,
+                    file_type="pdf",
+                ),
+                FetchResult(
+                    key="undated_parish",
+                    display_name="Undated Parish",
+                    status="ok",
+                    url="https://undated.example.org/",
+                    file_path=undated_pdf,
+                    file_type="pdf",
+                ),
+                FetchResult(
+                    key="fresh_parish",
+                    display_name="Fresh Parish",
+                    status="ok",
+                    url="https://fresh.example.org/",
+                    file_path=fresh_pdf,
+                    file_type="pdf",
+                ),
+                FetchResult(
+                    key="stale_parish",
+                    display_name="Stale Parish",
+                    status="ok",
+                    url="https://stale.example.org/",
+                    file_path=stale_pdf,
+                    file_type="pdf",
+                ),
+            ]
+
+            import contextlib
+            import io as _io
+            captured = _io.StringIO()
+            with contextlib.redirect_stdout(captured):
+                stitch_mega_pdf(
+                    results,
+                    current_dir=current_dir,
+                    bulletins_dir=bulletins_dir,
+                    target=target,
+                )
+
+            output = captured.getvalue()
+            self.assertIn("undated_parish", output)
+            self.assertIn("stale_parish", output)
+            self.assertIn("fresh_parish", output)
+            self.assertIn("this week's bulletin", output)
+
+            mega = bulletins_dir / "all_bulletins_2026-04-27.pdf"
+            self.assertTrue(mega.exists())
+            reader = PyPDF2.PdfReader(str(mega))
+            text = "\n".join((page.extract_text() or "") for page in reader.pages)
+            self.assertIn("SHORT OK INCLUDED", text)
+            self.assertIn("FRESH LONG INCLUDED", text)
+            self.assertNotIn("UNDATED LONG EXCLUDED", text)
+            self.assertNotIn("STALE LONG EXCLUDED", text)
+            self.assertNotIn("23rd February 2025", text)
+            self.assertEqual(len(reader.pages), 8)
 
     def test_build_parish_header_pdf_sets_new_window_for_website_link(self) -> None:
         mock_canvas = MagicMock()
