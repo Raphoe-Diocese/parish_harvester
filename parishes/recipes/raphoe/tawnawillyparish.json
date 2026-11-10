@@ -3,32 +3,32 @@
   "parish_key": "tawnawillyparish",
   "display_name": "Tawnawilly",
   "diocese": "raphoe",
-  "start_url": "https://tawnawillyparish.ie/",
-  "site_type": "predicted_dated_pdf",
-  "href_patterns": ["sunday"],
-  "timeout_ms": 45000,
+  "start_url": "https://mcn.live/Camera/donegal-town-tawnawilly-parish-donegal-town",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 171,
+  "timeout_ms": 90000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-09-27",
-  "example_url": "https://tawnawillyparish.ie/wp-content/uploads/Sunday-27th-Sept-26.pdf",
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://mcn.live/Camera/donegal-town-tawnawilly-parish-donegal-town"
+    },
+    {
       "action": "download",
-      "url": "https://tawnawillyparish.ie/wp-content/uploads/Sunday-27th-Sept-26.pdf"
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "Frank 07/09/2026: site is not blocking. Harvest said blocked because it opened /bulletin/ (Cloudflare 403 for Actions). The PDF is open.",
-    "2026-09-06 evening: listing Sunday 6th Sept href is Sunday-Sept-06-26.pdf (HTTP 200). Sunday-6th-Sept.pdf 404s.",
-    "2026-09-18: listing Sunday 13th Sept href is Sunday-13th-Sept-26.pdf (proved in browser). Names flip each week. Predictor must try both Sunday-13th-Sept-26.pdf and Sunday-Sept-13-26.pdf. Never pin Guess's Sunday-29th-Sept.pdf — that is the 2024 archive.",
-    "2026-09-27: this week is Sunday-27th-Sept-26.pdf (HTTP 200). Sunday-Sept-27-26.pdf 404s. Status was stuck on Sept-06 because no successful retest since 18/09.",
-    "25/10/2026: the media library file is Sunday-25th-Oct.-26.pdf. The dot after Oct is part of the name. Sunday-25th-Oct-26.pdf 404s. Do not keep Sunday-18th-Oct-26.pdf.",
-    "site_type:predicted_dated_pdf. Do not use wp-json.",
-    "Never open /bulletin/."
+    "10/11/2026: donegal-town-tawnawilly-parish-donegal-town church_id 171. Latest Bulletin stated 2026-11-08 (Sunday 8th November). St Agatha's Clar (st-agathas-clar-donegal, church_id 518) serves the same file and its camera page links to tawnawillyparish.ie. Harvest once here. Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not set start_url to https://tawnawillyparish.ie/bulletin/ — harvest 403s that listing and reports a false block.",
-    "Do not set use_captured_url on a dated Sunday-*.pdf.",
-    "Do not download GDPR, privacy, wedding, or Order of Mass.",
-    "Do not save a yearless Sunday-29th-Sept.pdf from the 2024/2025 archive."
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not harvest st-agathas-clar-donegal as a second bulletin.",
+    "Do not open https://tawnawillyparish.ie/bulletin/.",
+    "Do not screenshot the camera feed.",
+    "Do not harvest Facebook."
   ]
 }

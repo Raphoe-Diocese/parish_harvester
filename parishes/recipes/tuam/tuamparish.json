@@ -3,32 +3,30 @@
   "parish_key": "tuamparish",
   "display_name": "Tuam (Cathedral Parish)",
   "diocese": "tuam",
-  "start_url": "https://tuamparish.com/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Newsletter",
-    "October",
-    ".pdf"
-  ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 45000,
+  "start_url": "https://mcn.live/Camera/cathedral-of-the-assumption-of-the-blessed-virgin-mary-tuam",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 61,
+  "timeout_ms": 90000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
-      "url": "https://tuamparish.com/"
+      "url": "https://mcn.live/Camera/cathedral-of-the-assumption-of-the-blessed-virgin-mary-tuam"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 281518 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename. Folder /2026/06/ is not the bulletin date. Date is in the filename."
+    "10/11/2026: cathedral-of-the-assumption-of-the-blessed-virgin-mary-tuam church_id 61. Latest Bulletin stated 2026-11-08 (Tuam Parish Newsletter November 8th 2026). Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not screenshot the camera feed.",
     "Do not harvest Facebook."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  ]
 }

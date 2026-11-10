@@ -518,21 +518,15 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/raphoe/tawnawillyparish.json").read_text()
         )
-        pdf = str(recipe.get("example_url") or "")
-        self.assertTrue(pdf.endswith(".pdf"))
-        self.assertIn("/Sunday-", pdf)
-        self.assertNotEqual(recipe["start_url"], "https://tawnawillyparish.ie/bulletin/")
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("sunday", recipe["href_patterns"])
-        self.assertEqual(recipe["example_url"], pdf)
-        self.assertEqual(recipe["steps"][0]["url"], pdf)
-        self.assertEqual(_recipe_recorded_file_urls(recipe), [pdf])
-        # Freshness uses the recipe's recorded Sunday — do not pin last week's URL in the test.
-        recorded = date.fromisoformat(str(recipe.get("recorded_date") or "2026-09-27"))
+        self.assertEqual(recipe["site_type"], "mcn_live_parish_page")
+        self.assertEqual(recipe["mcn_church_id"], 171)
         self.assertEqual(
-            _recipe_fresh_recorded_file_urls(recipe, recorded),
-            [pdf],
+            recipe["start_url"],
+            "https://mcn.live/Camera/donegal-town-tawnawilly-parish-donegal-town",
         )
+        self.assertNotEqual(recipe["start_url"], "https://tawnawillyparish.ie/bulletin/")
+        self.assertNotIn("cloudfront", recipe["start_url"].lower())
+        self.assertNotIn("Sunday-", json.dumps(recipe["steps"]))
 
     def test_recorded_july_pin_is_not_used_for_september(self) -> None:
         recipe = {
@@ -2144,10 +2138,18 @@ class HarvestMissRecipeTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/clogher/monaghanrackwallace.json").read_text()
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("23082026.pdf", recipe["example_url"])
+        self.assertEqual(recipe["site_type"], "mcn_live_parish_page")
+        self.assertEqual(recipe["mcn_church_id"], 152)
+        self.assertEqual(
+            recipe["start_url"],
+            "https://mcn.live/Camera/st-macartans-cathedral-monaghan",
+        )
+        self.assertNotIn("cloudfront", recipe["start_url"].lower())
+        self.assertNotIn("23082026.pdf", json.dumps(recipe))
         predicted = predicted_dated_upload_urls(
-            recipe["example_url"], date(2026, 9, 6), weeks_back=0
+            "https://monaghan-rackwallace.com/wp-content/uploads/2026/08/23082026.pdf",
+            date(2026, 9, 6),
+            weeks_back=0,
         )
         self.assertTrue(any("06092026.pdf" in u for u in predicted), predicted[:8])
 
@@ -2299,13 +2301,18 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("Sunday_Message_20261108.pdf", recipe["start_url"])
         self.assertNotIn("20261101", recipe["start_url"])
 
-    def test_bayside_uses_parish_8_november_pdf_not_mcn(self) -> None:
+    def test_bayside_uses_mcn_camera_not_a_pinned_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/dublin/bayside.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("Newsletter-8-November-2026.pdf", recipe["start_url"])
-        self.assertNotIn("mcn.live", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "mcn_live_parish_page")
+        self.assertEqual(recipe["mcn_church_id"], 453)
+        self.assertEqual(
+            recipe["start_url"],
+            "https://mcn.live/Camera/bayside-parish-church",
+        )
+        self.assertNotIn("cloudfront", recipe["start_url"].lower())
+        self.assertNotIn("Newsletter-8-November-2026.pdf", recipe["start_url"])
 
     def test_marino_uses_weekly_bulletin_not_look_file(self) -> None:
         recipe = json.loads(
@@ -2351,15 +2358,19 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("046_8Nov26-1.pdf", kilmichael["start_url"])
         self.assertNotIn("1Nov26", kilmichael["start_url"])
 
-    def test_castlegregory_uses_8_november_parish_life_pdf(self) -> None:
+    def test_castlegregory_uses_cloghane_mcn_camera(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/kerry/castlegregory.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("Parish-Life-Newsletter-8th-November-2026-A.pdf", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "mcn_live_parish_page")
+        self.assertEqual(recipe["mcn_church_id"], 712)
+        self.assertEqual(
+            recipe["start_url"],
+            "https://mcn.live/Camera/st-brendans-church-cloghane",
+        )
         self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
-        self.assertNotIn("4th-October", recipe["start_url"])
-        self.assertNotIn("October", " ".join(recipe.get("href_patterns") or []))
+        self.assertNotIn("cloudfront", recipe["start_url"].lower())
+        self.assertNotIn("Parish-Life-Newsletter", recipe["start_url"])
 
     def test_athy_and_lucan_south_use_8_november_pdfs(self) -> None:
         athy = json.loads(
@@ -2698,13 +2709,52 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertEqual(int(recipe["weeks_back"]), 0)
         self.assertEqual(int(recipe["weeks_ahead"]), 0)
 
-    def test_falcarragh_uses_numbered_8_november_pdf(self) -> None:
+    def test_falcarragh_uses_mcn_camera_not_a_pinned_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/naomhfionan.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "naomhfionan_numbered_pdf")
-        self.assertIn("Parish-Newsletter-45-for-Sun-A-08112026.pdf", recipe["start_url"])
-        self.assertNotIn("01112026", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "mcn_live_parish_page")
+        self.assertEqual(recipe["mcn_church_id"], 403)
+        self.assertEqual(
+            recipe["start_url"],
+            "https://mcn.live/Camera/falcarragh-parish-church",
+        )
+        self.assertNotIn("cloudfront", recipe["start_url"].lower())
+        self.assertNotIn("08112026", recipe["start_url"])
+        self.assertNotIn("01112026", json.dumps(recipe))
+
+    def test_new_mcn_live_recipes_do_not_pin_cloudfront(self) -> None:
+        cases = {
+            "kerry/dingle.json": (394, "paroiste-naomh-muire-dingle"),
+            "kerry/rathmore.json": (200, "st-josephs-church-rathmore"),
+            "kerry/castletownbere.json": (547, "church-of-the-sacred-heart-1"),
+            "tuam/tuamparish.json": (
+                61,
+                "cathedral-of-the-assumption-of-the-blessed-virgin-mary-tuam",
+            ),
+            "raphoe/inverparish.json": (527, "st-marys-frosses-inver"),
+            "waterford_and_lismore/stpaulswaterford.json": (259, "st-paul-s"),
+            "meath/kilbeggan.json": (248, "st-james-church"),
+            "dublin/donoreavenue.json": (489, "st-therese-of-the-child-jesus"),
+            "achonry/tourlestrane.json": (606, "tourlestrane-parish"),
+        }
+        for rel, (church_id, slug) in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
+            self.assertEqual(recipe["site_type"], "mcn_live_parish_page", rel)
+            self.assertEqual(recipe["mcn_church_id"], church_id, rel)
+            self.assertEqual(recipe["start_url"], f"https://mcn.live/Camera/{slug}", rel)
+            self.assertIn("Do not pin the CloudFront UUID PDF.", recipe["do_not"], rel)
+            blob = json.dumps(recipe)
+            self.assertNotIn("cloudfront.net", blob.lower(), rel)
+            self.assertNotIn("/Uploads/", blob, rel)
+        tourlestrane = json.loads(
+            Path("parishes/recipes/achonry/tourlestrane.json").read_text(encoding="utf-8")
+        )
+        self.assertGreaterEqual(int(tourlestrane["max_bulletin_pages"]), 16)
+        rathmore = json.loads(
+            Path("parishes/recipes/kerry/rathmore.json").read_text(encoding="utf-8")
+        )
+        self.assertNotEqual(rathmore["mcn_church_id"], 620)
 
 
 class CappaghExtensionlessBulletinTests(unittest.TestCase):

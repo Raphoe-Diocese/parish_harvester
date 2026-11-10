@@ -3,37 +3,33 @@
   "parish_key": "tourlestrane",
   "display_name": "Tourlestrane",
   "diocese": "achonry",
-  "start_url": "https://www.kilmactigueparish.com/pages/newsletter.php",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "dlc.php"
-  ],
-  "timeout_ms": 45000,
+  "start_url": "https://mcn.live/Camera/tourlestrane-parish",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 606,
+  "timeout_ms": 90000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-09-27",
-  "example_url": "https://www.kilmactigueparish.com/modules/download_gallery/dlc.php?file=247&id=1790354086&sid=140",
+  "max_bulletin_pages": 16,
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://mcn.live/Camera/tourlestrane-parish"
+    },
+    {
       "action": "download",
-      "url": "https://www.kilmactigueparish.com/modules/download_gallery/dlc.php?file=247&id=1790354086&sid=140"
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "27/09/2026: listing pages/newsletter.php — Joomla download_gallery dlc.php links; label 27th September 2026 returns PDF (HTTP 200).",
-    "Official card Tourlestrane; site brand Kilmactigue.",
-    "site_type:http_scrape_newest_pdf href_patterns dlc.php — score by anchor label date.",
-    "Earlier print_to_pdf failed: Too many pages 8 (max 4).",
-    "28/09/2026: scrape failed until http_scrape allowed dlc.php (no .pdf suffix) and unescaped &amp; in hrefs.",
-    "28/09/2026: real newsletter is 11 pages — max_bulletin_pages=16 (default 4 rejected it after dlc scrape worked)."
+    "10/11/2026: tourlestrane-parish church_id 606. Latest Bulletin stated 2026-11-08 (8th November 2026). The card file is 13 pages, so max_bulletin_pages stays 16. The Church of the Most Holy Rosary, Aclare (the-church-of-the-most-holy-rosary, church_id 607) is the same file. Harvest once here. Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not download Privacy Statement PDF as the bulletin.",
-    "Do not print_to_pdf the whole newsletter.php page (8 pages).",
-    "Do not pin file=247 — ids change each week."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  },
-  "max_bulletin_pages": 16
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not harvest the-church-of-the-most-holy-rosary as a second bulletin.",
+    "Do not pin a dlc.php file id.",
+    "Do not screenshot the camera feed.",
+    "Do not harvest Facebook."
+  ]
 }

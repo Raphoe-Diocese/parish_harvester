@@ -1,36 +1,33 @@
 {
-  "version": 3,
+  "version": 2,
   "parish_key": "bayside",
   "display_name": "Bayside",
   "diocese": "dublin",
-  "start_url": "https://baysideparish.ie/wp-content/uploads/2026/11/Newsletter-8-November-2026.pdf",
-  "site_type": "predicted_dated_pdf",
-  "href_patterns": [
-    "Newsletter-",
-    ".pdf"
-  ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_ahead": 1,
-  "recorded_date": "2026-11-08",
-  "example_url": "https://baysideparish.ie/wp-content/uploads/2026/11/Newsletter-8-November-2026.pdf",
+  "start_url": "https://mcn.live/Camera/bayside-parish-church",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 453,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://mcn.live/Camera/bayside-parish-church"
+    },
+    {
       "action": "download",
-      "url": "https://baysideparish.ie/wp-content/uploads/2026/11/Newsletter-8-November-2026.pdf"
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "08/11/2026: MCN camera page was still on 1 November. Parish media has Newsletter-8-November-2026.pdf, uploaded 06/11/2026, 1258372 bytes. The file text says Church of the Resurrection, Bayside, Sunday 8 November 2026. This IP got HTTP 403 on the PDF. start_url is the PDF so the camera page is skipped."
+    "10/11/2026: bayside-parish-church church_id 453. Latest Bulletin stated 2026-11-08 (Newsletter 8 November 2026). Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not start on mcn.live — that page kept 1 November.",
-    "Do not pin Newsletter-8-November-2026.pdf forever.",
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not pin Newsletter-8-November-2026.pdf.",
     "Do not screenshot the camera feed.",
     "Do not harvest Facebook."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  ]
 }

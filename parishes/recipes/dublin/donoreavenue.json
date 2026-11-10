@@ -3,36 +3,30 @@
   "parish_key": "donoreavenue",
   "display_name": "Donore Avenue",
   "diocese": "dublin",
-  "recorded_date": "2026-11-02",
-  "start_url": "https://donoreavenueparish.ie/parish-news/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
-  "playbook_type": "pdf_download_list",
-  "href_patterns": [
-    "Parish-Newsletter",
-    "Newsletter",
-    ".pdf"
-  ],
-  "max_bulletin_pages": 16,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "example_url": "http://donoreavenueparish.ie/wp-content/uploads/2026/10/Parish-Newsletter-25th-October-2026.pdf",
+  "start_url": "https://mcn.live/Camera/st-therese-of-the-child-jesus",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "mcn_church_id": 489,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
-      "url": "https://donoreavenueparish.ie/parish-news/newsletter/"
+      "url": "https://mcn.live/Camera/st-therese-of-the-child-jesus"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "02/11/2026: homepage scrape failed. Real list is /parish-news/newsletter/. Newest on list is Parish-Newsletter-25th-October-2026.pdf (previous Sunday keep).",
-    "Proved GET application/pdf 383448 bytes %PDF-1.4. No 01/11 file on the list. Do not pin the dated filename."
+    "10/11/2026: st-therese-of-the-child-jesus is St Teresa's Parish, Donore Avenue, church_id 489. Latest Bulletin stated 2026-11-08 (Parish Newsletter 8th Nov. 2026). Do not pin the CloudFront UUID."
   ],
   "do_not": [
-    "Do not pin Parish-Newsletter-25th-October-2026.pdf.",
-    "Do not scrape only the homepage — use /parish-news/newsletter/.",
+    "Do not pin the CloudFront UUID PDF.",
+    "Do not screenshot the camera feed.",
     "Do not harvest Facebook."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  ]
 }
