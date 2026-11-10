@@ -2400,12 +2400,17 @@ def _score_http_scrape_pdf_hrefs(
         # Joomla download_gallery dlc.php (Tourlestrane / Kilmactigue) also
         # returns application/pdf with no .pdf in the path (found 28/09/2026).
         extensionless_ok = bool(
-            re.search(r"/b/\d+/?$", path) or path.endswith("dlc.php")
+            re.search(r"/b/\d+/?$", path)
+            or path.endswith("dlc.php")
+            # Download Monitor (Holy Trinity / Donaghmede) serves the PDF from
+            # /download/8th-november-2026/ with no .pdf in the address.
+            or "/download/" in path
         )
         # Mayo.ie sometimes posts this Sunday as .jpg while older weeks stay .pdf
         # (Balla-Belcarra 25-10-2026.jpg vs 18-10-2026.pdf — proved 29/10/2026).
+        # Our Lady of Victories posts the week as a .webp.
         if (
-            not path.endswith((".pdf", ".docx", ".doc", ".rtf", ".jpg", ".jpeg", ".png"))
+            not path.endswith((".pdf", ".docx", ".doc", ".rtf", ".jpg", ".jpeg", ".png", ".webp"))
             and not extensionless_ok
         ):
             continue
@@ -2709,7 +2714,8 @@ async def _try_http_scrape_newest_pdf(
     is_image = (
         file_body[:3] == b"\xff\xd8\xff"
         or file_body[:8] == b"\x89PNG\r\n\x1a\n"
-        or path_lower.endswith((".jpg", ".jpeg", ".png"))
+        or (len(file_body) > 12 and file_body[:4] == b"RIFF" and file_body[8:12] == b"WEBP")
+        or path_lower.endswith((".jpg", ".jpeg", ".png", ".webp"))
     )
     if not (
         _dropfiles_body_looks_like_file(file_headers, file_body)
