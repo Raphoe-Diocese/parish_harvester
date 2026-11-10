@@ -2,13 +2,14 @@
 
 Promote topic lines that already exist in the text to real headings, and
 insert a visible parish masthead so the reader knows whose bulletin this is.
-Never invent events, names, or times. Never translate Irish/Gaeilge.
+Never invent events, names, times, or a bulletin date. Never translate Irish/Gaeilge.
 """
 
 from __future__ import annotations
 
 import html
 import re
+from datetime import date
 from typing import Iterable
 
 from ocr.reader_pass import parse_printed_label, split_reader_blocks
@@ -373,6 +374,145 @@ def render_parish_masthead(
     )
 
 
+# A printed issue line. Mass lists, memorials, and file-name Sundays are not this.
+_ISSUE_STAMP_RE = re.compile(
+    r"(?i)(?:"
+    r"\b(?:parish\s+)?(?:bulletins?|newsletters?|parishioner|parish\s+news)\b"
+    r"|\bweek\s+beginning\b"
+    r"|\bvol(?:ume)?\.?\b"
+    r"|\ball\s+saints\b"
+    r"|\bsolemnity\b"
+    r"|\bordinary\s+time\b"
+    r"|\bfeast\s+of\b"
+    r")"
+)
+_LEADING_SUNDAY_DATE_RE = re.compile(
+    r"(?i)^(?:sunday|dé\s+domhnaigh|de\s+domhnaigh|domhnach)\b.{0,48}?\b20\d{2}\b"
+)
+# A line that is the date itself: "1 Samhain 2026", "8th November 2026".
+_MOSTLY_DATE_LINE_RE = re.compile(
+    r"(?i)^(?:(?:sunday|saturday|dé\s+domhnaigh|de\s+domhnaigh|domhnach)\s+)?"
+    r"\d{1,2}(?:st|nd|rd|th|ú|u)?(?:\s+of)?\s+"
+    r"[A-Za-zÀ-ÿ][\wÀ-ÿ'’.\-]*"
+    r"(?:\s+[A-Za-zÀ-ÿ][\wÀ-ÿ'’.\-]*){0,3}"
+    r"\s+20\d{2}\s*$"
+)
+_MEMORIAL_DATE_RE = re.compile(
+    r"(?i)\b(?:died|death|anniversar(?:y|ies)|in\s+memory|deceased|\brip\b)\b"
+)
+_WEEK_BEGINNING_NUMERIC_RE = re.compile(
+    r"(?i)\bweek\s+beginning\b\D{0,20}(\d{1,2})[./-](\d{1,2})[./-](20\d{2})"
+)
+
+
+def _line_is_issue_stamp(line: str) -> bool:
+    """True when this line is the paper's own date, not a later notice."""
+    if _MEMORIAL_DATE_RE.search(line):
+        return False
+    if _ISSUE_STAMP_RE.search(line):
+        return True
+    if _MOSTLY_DATE_LINE_RE.match(line):
+        return True
+    if _LEADING_SUNDAY_DATE_RE.search(line):
+        return True
+    return False
+
+
+def _date_on_issue_line(line: str):
+    """A year-bearing date on an issue line, or None.
+
+    The year digits must actually be on the line. "11 a.m." is not 2011.
+    """
+    from harvester.utils import extract_date_from_string
+
+    numeric = _WEEK_BEGINNING_NUMERIC_RE.search(line)
+    parsed = None
+    if numeric:
+        try:
+            parsed = date(int(numeric.group(3)), int(numeric.group(2)), int(numeric.group(1)))
+        except ValueError:
+            parsed = None
+    if parsed is None:
+        parsed = extract_date_from_string(line)
+    if parsed is None:
+        return None
+    if str(parsed.year) not in line:
+        return None
+    if parsed.year < 2020 or parsed.year > 2035:
+        return None
+    return parsed
+
+
+def read_parish_issue_date(text: str) -> str:
+    """ISO date printed on this parish's bulletin, or "" when none is printed.
+
+    Does not guess the harvest Sunday. Irish month names stay as printed
+    in the body; this returns the calendar day only for the masthead label.
+    """
+    lines = [_SPACE_RE.sub(" ", line).strip() for line in (text or "").splitlines()]
+    for line in lines:
+        if not line or not _line_is_issue_stamp(line):
+            continue
+        parsed = _date_on_issue_line(line)
+        if parsed is None:
+            continue
+        return parsed.isoformat()
+    return ""
+
+
+def _masthead_display_name(part: str) -> str:
+    match = re.search(r'data-parish-name="([^"]*)"', part)
+    if match:
+        return html.unescape(match.group(1)).strip()
+    match = re.search(r"ocr-parish-name[^>]*>(.*?)</h2>", part, re.I | re.S)
+    return _plain(match.group(1)) if match else ""
+
+
+def _set_masthead_date(part: str, iso: str) -> str:
+    """Put the printed issue date on the masthead, or leave the date off."""
+    cleaned = re.sub(
+        r"\s*<p class=\"ocr-parish-date\">.*?</p>",
+        "",
+        part,
+        count=1,
+        flags=re.I | re.S,
+    )
+    if not iso:
+        return cleaned
+    label = html.escape(format_uk_date(iso))
+    return cleaned.replace(
+        "</header>",
+        f'<p class="ocr-parish-date">{label}</p></header>',
+        1,
+    )
+
+
+def _stamp_issue_dates_on_mastheads(
+    parts: list[str],
+    prefixes: dict[str, list[str]],
+) -> list[str]:
+    """Each masthead shows the date read from that parish's own text."""
+    indexes = [i for i, part in enumerate(parts) if "ocr-parish-masthead" in part]
+    chosen: dict[int, str] = {}
+    for n, index in enumerate(indexes):
+        nxt = indexes[n + 1] if n + 1 < len(indexes) else len(parts)
+        name = _masthead_display_name(parts[index])
+        forward = "\n".join(_plain(part) for part in parts[index + 1 : nxt])
+        # The body under this header wins. The name line is only a fallback
+        # when that line was the issue date and was not copied into the body.
+        iso = read_parish_issue_date(forward)
+        if not iso:
+            prefix = "\n".join(prefixes.get(name.lower(), []))
+            iso = read_parish_issue_date(prefix)
+        chosen[index] = iso
+    stamped: list[str] = []
+    for index, part in enumerate(parts):
+        if index in chosen:
+            part = _set_masthead_date(part, chosen[index])
+        stamped.append(part)
+    return stamped
+
+
 def _notice_before_trailing_parish(plain: str, display_name: str) -> str | None:
     """If a long notice ends with the parish name, return the leftover prefix.
 
@@ -541,7 +681,14 @@ def structure_ocr_html(
     19, and Tawnawilly's header sat on its Alpha page so its Mass times read
     under the previous parish. With it, headers go on the page the stitcher
     assigned and a name printed outside that span is left as body text.
+
+    The masthead date is the date printed in that parish's bulletin. The
+    harvest Sunday (``bulletin_date``) and ``parish_dates`` from a file name
+    or parish_status are not used. No printed date means no masthead date.
     """
+    # File-name and status dates stamped 08/11/2026 on a paper that says
+    # 1 November. The text below is the only source.
+    del bulletin_date, parish_dates
     source = _reset_reader_markup(fragment or "")
     entries_raw = list(parish_entries or [])
     packed: list[tuple[str, str, list[str], list[str]]] = []
@@ -549,7 +696,8 @@ def structure_ocr_html(
         strong, weak = _name_patterns(display_name)
         packed.append((key, display_name, strong, weak))
     urls = parish_urls or {}
-    dates = parish_dates or {}
+    # Lines swallowed as the parish name can still carry the issue date.
+    issue_prefix: dict[str, list[str]] = {}
     # The stitcher index and the evidence file can spell a parish differently
     # ("Drumholm" vs "Drumholm (Ballintra)"); without this both get a header.
     resolved = {name: _match_entry_name(name, entries_raw) for name in parish_page_spans or {}}
@@ -563,39 +711,20 @@ def structure_ocr_html(
     out: list[str] = []
     current_page = 0
 
-    def date_for(display_name: str, key: str = "") -> str:
-        # Prefer the parish's own bulletin date. Do not stamp the harvest
-        # Sunday on every masthead — Raphoe parish showed 25/10/2026 while
-        # the text still said Sunday 27 September 2026.
-        for token in (key, display_name, (display_name or "").lower()):
-            raw = str(dates.get(token) or "").strip()
-            if raw:
-                return raw
-        return ""
-
     if single_parish_name and "ocr-parish-masthead" not in source:
-        out.append(
-            render_parish_masthead(
-                single_parish_name,
-                date_for(single_parish_name) or bulletin_date,
-            )
-        )
+        out.append(render_parish_masthead(single_parish_name, ""))
         seen_parish.add(single_parish_name.lower())
 
-    def add_masthead(display_name: str, key: str = "") -> None:
+    def add_masthead(display_name: str, key: str = "", source_line: str = "") -> None:
         marker = display_name.lower()
         if marker in seen_parish:
             return
+        if source_line.strip():
+            issue_prefix.setdefault(marker, []).append(source_line.strip())
         seen_parish.add(marker)
         website = urls.get(key) or urls.get(display_name) or ""
-        out.append(
-            render_parish_masthead(
-                display_name,
-                date_for(display_name, key),
-                website="",
-            )
-        )
-        _ = website  # name + date only — grid/PDF already carry the URL
+        out.append(render_parish_masthead(display_name, ""))
+        _ = website  # name only — the date is read from this parish's text
 
     def process_plain_lines(raw_lines: list[str], *, allow_parish: bool) -> None:
         nonlocal current_page
@@ -645,7 +774,7 @@ def structure_ocr_html(
                     if leftover:
                         body.append(html.escape(leftover))
                     flush()
-                    add_masthead(hit[1], hit[0])
+                    add_masthead(hit[1], hit[0], source_line=plain)
                     continue
             if allow_parish and _is_url_only_line(plain) and seen_parish:
                 # Stitcher banner URL already shown as the parish header / grid.
@@ -717,7 +846,7 @@ def structure_ocr_html(
                     leftover = _notice_before_trailing_parish(inner, parish_hit[1])
                     if leftover:
                         out.append(f"<p>{html.escape(leftover)}</p>")
-                    add_masthead(parish_hit[1], parish_hit[0])
+                    add_masthead(parish_hit[1], parish_hit[0], source_line=inner)
                 elif "ocr-parish-name" in (hm.group(2) or ""):
                     out.append(token)
                 elif hm.group(1) == "4":
@@ -755,10 +884,13 @@ def structure_ocr_html(
             out.append(gap)
     from ocr.convert_bulletin import linkify_html
 
+    parts = [
+        part
+        for part in _drop_empty_directory_mastheads(_stick_comma_after_heading(out))
+        if part
+    ]
     return linkify_html(
-        "\n".join(
-            part for part in _drop_empty_directory_mastheads(_stick_comma_after_heading(out)) if part
-        )
+        "\n".join(_stamp_issue_dates_on_mastheads(parts, issue_prefix))
     )
 
 
