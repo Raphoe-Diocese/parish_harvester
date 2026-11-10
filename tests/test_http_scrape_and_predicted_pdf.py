@@ -2183,7 +2183,7 @@ class HarvestMissRecipeTests(unittest.TestCase):
     def test_proved_dc_this_week_examples(self) -> None:
         cases = {
             "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
-            "down_and_connor/glenariffeparish.json": "Feast-of-All-Saints.pdf",
+            "down_and_connor/glenariffeparish.json": "THIRTY-SECOND-SUNDAY-OF-THE-YEAR.pdf",
             "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
             # 29/10/2026 the September pin was removed. Example is 25-Oct-26.pdf.
             "down_and_connor/stoliverplunkettparish.json": "25-Oct-26.pdf",
