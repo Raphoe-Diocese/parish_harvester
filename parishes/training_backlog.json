@@ -2,17 +2,17 @@
   "generated_at": "2026-11-10",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 416,
+    "downloaded": 417,
     "html_links": 0,
-    "skipped": 782,
+    "skipped": 781,
     "failed": 57,
     "stale_rejected": 63
   },
   "action_counts": {
-    "ok": 447,
-    "skip": 777,
+    "ok": 448,
+    "skip": 775,
     "mark_inactive": 4,
-    "investigate": 59,
+    "investigate": 60,
     "verify_autofix": 1,
     "retrain": 1
   },
@@ -2840,28 +2840,27 @@
       "recipe_file": "parishes/recipes/dublin/balally.json",
       "recipe": {
         "start_url": "https://www.balallyparish.ie/category/parish-newsletters/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "html_text_bulletin",
-        "status": "",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "wp_json_newest_media",
+        "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "02/11/2026: homepage http_scrape missed \u2014 PDFs sit on dated posts, not the home page.",
-          "Category /category/parish-newsletters/ top post is balally-parish-newsletter-31st-october-1st-november-2026. PDF Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Proved application/pdf 2551493 bytes %PDF-1.4.",
-          "Date is the later day in the weekend name (1 November). Folder 2020 is not the bulletin year. Do not pin the filename."
+          "10/11/2026: wp-json media since 6 Nov has Newsletter 8th November 2026. GET 200 application/pdf 4093140 bytes magic %PDF-1.4. Front page says Sunday 8th November 2026 and 8 November 2026. Filename date 08/11/2026. The category click still prefers a[href*='balally-parish-newsletter'], which is the 31 Oct / 1 Nov post. The 7-8 Nov post slug is /20781-2/ and has no PDF href on the category page. Use wp_json_newest_media. Folder /uploads/2020/06/ is not the bulletin year. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin Newsletter-31st-October-1st-November.pdf.",
-          "Do not scrape only the homepage \u2014 open the newest balally-parish-newsletter post.",
+          "Do not pin a dated filename.",
+          "Do not pin Newsletter-8th-November-2026.pdf or Newsletter-31st-October-1st-November.pdf.",
           "Do not treat /uploads/2020/06/ as the bulletin date.",
+          "Do not click only a[href*='balally-parish-newsletter'] \u2014 the 8 Nov post slug is /20781-2/.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-02"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -8564,18 +8563,25 @@
       "diocese": "waterford_and_lismore",
       "recipe_file": "parishes/recipes/waterford_and_lismore/cappoquin.json",
       "recipe": {
-        "start_url": "https://www.cappoquin.net",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.cappoquin.net/newsletter/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "wp_json_newest_media",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: /newsletter/ still links July 2026. wp-json media since 6 Nov has 32nd Sun of OT. GET 200 application/pdf 492704 bytes magic %PDF-1.4. 32nd Sunday in Ordinary Time 2026 is 08/11/2026. The scan is that Sunday's readings (Wisdom 6:12-16, 1 Thessalonians 4:13-18, Matthew 25:1-13). No calendar date is printed on the page. Newest sun-ot file wins by the media date. Do not pin the filename. Skip the ministers rota."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not scrape only /newsletter/ \u2014 it still shows July 2026.",
+          "Do not harvest the Eucharistic Ministers rota.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -8583,8 +8589,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "caragh",
@@ -12647,24 +12653,25 @@
       "recipe_file": "parishes/recipes/dublin/confey.json",
       "recipe": {
         "start_url": "https://www.confeyparish.ie/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "pdf_download_list",
+        "site_type": "http_scrape_newest_images",
+        "playbook_type": "http_scrape_newest_images",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "10/11/2026 One-hop: proved image dated 08/11/2026. Scrape the listing page. Do not pin the dated file or a Wix hash."
+          "10/11/2026: /newsletter/ shows two scans in img src and srcset, not PDF hrefs. Filename date 08/11/2026. GET 200 image/jpeg P1 659114 bytes and P2 657535 bytes. Page text says Sunday 8th November 2026. http_scrape_newest_pdf scores no href. http_scrape_newest_images stacks the two full-size sun-ot files and skips resized thumbs. Do not pin the dated filename."
         ],
         "do_not": [
           "Do not pin a dated filename.",
-          "Do not pin a Wix hash."
+          "Do not pin a Wix hash.",
+          "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -21281,17 +21288,25 @@
       "recipe_file": "parishes/recipes/dublin/ionaroad.json",
       "recipe": {
         "start_url": "https://www.ionaroadparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: GET /wp-json/wp/v2/media?per_page=20&after=2026-11-06T00:00:00 returned Parish-Link-Samhain-2026-2-1.pdf. Proved GET 200 application/pdf 317629 bytes, magic %PDF-1.3, 2 pages. WordPress media date 06/11/2026. The file is the Parish Link for Samhain/November 2026 and names Wednesday 4 November 2026. Parish-Link-October-4-2026-copy-2.pdf was uploaded the same evening; the filename date is 04/10/2026. Do not pin the dated filename. Keep Irish as Irish."
+        ],
+        "do_not": [
+          "Do not pin Parish-Link-Samhain-2026-2-1.pdf.",
+          "Do not pin a dated filename.",
+          "Do not take Parish-Link-October-4-2026-copy-2.pdf for this week.",
+          "Do not harvest Facebook.",
+          "Do not translate Irish."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -21299,8 +21314,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "drive-1m6sogz3de",
@@ -31935,9 +31950,9 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/palmerstown.json",
       "recipe": {
-        "start_url": "https://palmerstownparish.com/powerpoints-for-sunday-gospel/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://palmerstownparish.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -31945,22 +31960,28 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename."
+          "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename.",
+          "10/11/2026 media library: GET https://palmerstownparish.com/wp-json/wp/v2/media?per_page=20&after=2026-11-06T00:00:00. The same PDF is in the library. GET 200 application/pdf 563776 bytes, magic %PDF-1.7. PDF text: Parish Bulletin, The Parish of St Philomena, Palmerstown, Saturday 07 Nov and Sunday 08 Nov. The issue token 2-07-08 is not the date. Pattern -No.- is the weekly series (Oct-No, Nov-No). Do not pin the dated filename.",
+          "The same library also has Sunday-08-Nov-26-Thirty-Second-Sunday-in-Ordinary-Time-Year-A.pdf (Getting Ready for Sunday, 11 pages) and Palmerstown-Library-Brochure-November-2026.pdf. Those are not the parish bulletin."
         ],
         "do_not": [
+          "Do not pin Nov-No.-2-07-08-Nov-2026.pdf.",
           "Do not pin a dated filename.",
+          "Do not pin a Wix hash.",
+          "Do not harvest Sunday-08-Nov-26 Getting Ready for Sunday.",
+          "Do not harvest the library brochure.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "wp_json_newest_media+/",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "parkecrimlinturlough",
