@@ -2,18 +2,32 @@
   "parish_key": "shankill",
   "display_name": "Shankill",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-10",
   "start_url": "https://www.stannesparishshankill.com",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "site_type": "image_stack",
+  "playbook_type": "image_stack",
+  "status": "active",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.stannesparishshankill.com"
+    },
+    {
+      "action": "image_stack",
+      "count": 2,
+      "position": "first",
+      "selector": "img[src*='newsletter']",
+      "min_long_side": 600,
+      "min_short_side": 400
     }
   ],
-  "version": 1
+  "version": 1,
+  "operator_notes": [
+    "10/11/2026: homepage heading Newsletter 8th November 2026. Two JPEGs under /images/stories/. Page 1 GET 200 image/jpeg 3207882 bytes. Page 2 GET 200 image/jpeg 3018993 bytes. Take the newsletter images on the homepage. Do not pin the dated filenames."
+  ],
+  "do_not": [
+    "Do not pin the dated /images/stories/ filenames.",
+    "Do not take October_18th page scans while a newsletter image is on the page.",
+    "Do not harvest Facebook."
+  ]
 }

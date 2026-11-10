@@ -4,39 +4,31 @@
   "display_name": "St MacNissi Randalstown",
   "diocese": "down_and_connor",
   "start_url": "https://www.stmacnissirandalstown.com/bulletin",
-  "site_type": "html_text_bulletin",
-  "playbook_type": "wix_html",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
   "timeout_ms": 55000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-11-08",
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.stmacnissirandalstown.com/bulletin"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='_files/ugd/'][href$='.pdf']",
-      "pick_strategy": "newest_dated",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "08/11/2026: old recipe pinned 725b73_bfc24704c114485daa76a5efe5be3d98.pdf (15/08). Bulletin page text has 1st November 2026. Proved current hash 60a4f5_bb76374497784377b9d3ba64bdaab5d5.pdf GET 200 application/pdf 233752 bytes magic %PDF-1.7. pick_strategy newest_dated on the dated link text. Do not pin the hash."
+    "08/11/2026: old recipe pinned 725b73_bfc24704c114485daa76a5efe5be3d98.pdf (15/08). Bulletin page text has 1st November 2026. Proved current hash 60a4f5_bb76374497784377b9d3ba64bdaab5d5.pdf GET 200 application/pdf 233752 bytes magic %PDF-1.7. pick_strategy newest_dated on the dated link text. Do not pin the hash.",
+    "10/11/2026: bulletin page link text is 8th November 2026. The file is a filesusr hash. GET 200 application/pdf 201027 bytes, magic %PDF. Scrape the bulletin page and score the link text. Do not save the hash."
   ],
   "do_not": [
     "Do not pin a hashed Wix PDF — it changes every week.",
-    "Do not keep the 15 August 2026 download URL."
+    "Do not keep the 15 August 2026 download URL.",
+    "Do not pin a Wix or filesusr hash."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "href_patterns": [
+    ".pdf"
+  ]
 }
