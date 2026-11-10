@@ -473,13 +473,19 @@ https://bantry.ie/newsletter</p>
             )
             self.assertEqual(written, ["bantry"])
             html_out = (out_dir / "bantry.html").read_text(encoding="utf-8")
-            self.assertIn("1st November 2026", html_out)
-            self.assertIn("<title>Bantry Bulletin — 01/11/2026</title>", html_out)
+            self.assertIn("There is no bulletin for this Sunday.", html_out)
+            self.assertNotIn("1st November 2026", html_out)
+            self.assertNotIn("FEAST OF ALL SAINTS", html_out)
+            self.assertNotIn("Caheragh", html_out)
+            self.assertNotIn("08/11/2026", html_out)
+            self.assertNotIn("01/11/2026", html_out)
             self.assertNotIn("Bulletin — 08/11/2026", html_out)
-            self.assertIn('class="ocr-parish-date">01/11/2026<', html_out)
-            self.assertNotIn('class="ocr-parish-date">08/11/2026<', html_out)
-            self.assertIn("Latest bulletin we have for Bantry: 01/11/2026", html_out)
+            self.assertNotIn('class="ocr-parish-date"', html_out)
             self.assertNotIn("This week's bulletin", html_out)
+            self.assertNotIn('href="bantry.pdf"', html_out)
+            self.assertIn("height: 850px", html_out)
+            self.assertIn("height: 450px", html_out)
+            self.assertFalse((out_dir / "bantry.pdf").exists())
 
     def test_write_text_strips_nuls_and_leaves_no_tmp(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -499,6 +505,7 @@ class StaleParishCaptionTests(unittest.TestCase):
         )
         self.assertEqual(uk, "01/11/2026")
         self.assertEqual(masthead, "2026-11-01")
+        self.assertIn("Latest bulletin we have for Ardboe: 01/11/2026", meta)
         self.assertIn("not this Sunday 08/11/2026", meta)
         self.assertNotIn("This week's bulletin", meta)
 
@@ -525,13 +532,15 @@ class StaleParishCaptionTests(unittest.TestCase):
         self.assertNotIn("08/11/2026", meta)
         self.assertNotIn("This week's bulletin", meta)
 
-    def test_november_body_does_not_render_as_harvest_sunday(self) -> None:
-        """A 1 November paper whose file name says 8 November is not this Sunday."""
+    def test_november_body_is_not_rendered_as_this_weeks_bulletin_text(self) -> None:
+        """A 1 November paper is not this Sunday's reading, even if the file says 8 November."""
         page = (
             "<html><head><title>Bantry Bulletin — 08/11/2026</title></head><body>"
             "<h1>Bantry Parish Bulletin</h1>"
             '<p class="meta">This week&#x27;s bulletin for Bantry — 08/11/2026. '
             "Part of the Cork and Ross Diocese collated bulletin.</p>"
+            '<a class="download-link-top pdf-force-download" href="bantry.pdf" '
+            'download="bantry.pdf">Download PDF</a>'
             '<div id="ocr-panel"><header class="ocr-parish-masthead" '
             'data-parish-name="Bantry"><h2 class="ocr-parish-name">Bantry</h2>'
             '<p class="ocr-parish-date">08/11/2026</p></header>'
@@ -545,16 +554,28 @@ class StaleParishCaptionTests(unittest.TestCase):
             "Bantry",
             "Cork and Ross Diocese",
         )
-        self.assertEqual(uk, "01/11/2026")
-        self.assertIn("<title>Bantry Bulletin — 01/11/2026</title>", updated)
+        self.assertEqual(uk, "")
+        self.assertIn("<title>Bantry Bulletin</title>", updated)
+        self.assertIn("There is no bulletin for this Sunday.", updated)
+        self.assertIn("Bantry", updated)
+        self.assertNotIn("1st November 2026", updated)
+        self.assertNotIn("FEAST OF ALL SAINTS", updated)
+        self.assertNotIn("Caheragh", updated)
+        self.assertNotIn("08/11/2026", updated)
+        self.assertNotIn("01/11/2026", updated)
         self.assertNotIn("Bulletin — 08/11/2026", updated)
-        self.assertIn('class="ocr-parish-date">01/11/2026<', updated)
-        self.assertNotIn('class="ocr-parish-date">08/11/2026<', updated)
-        self.assertIn("Latest bulletin we have for Bantry: 01/11/2026", updated)
-        self.assertIn("not this Sunday 08/11/2026", updated)
+        self.assertNotIn('class="ocr-parish-date"', updated)
         self.assertNotIn("This week's bulletin", updated)
         self.assertNotIn("This week&#x27;s bulletin", updated)
-        self.assertIn("1st November 2026", updated)
+        self.assertNotIn('href="bantry.pdf"', updated)
+        again, uk_again = parish_pages.refresh_parish_page_html(
+            updated,
+            "2026-11-08",
+            "Bantry",
+            "Cork and Ross Diocese",
+        )
+        self.assertEqual(again, updated)
+        self.assertEqual(uk_again, "")
 
     def test_caption_uses_real_date_not_harvest_sunday(self) -> None:
         meta, note = parish_pages.stale_parish_caption("2026-08-30")

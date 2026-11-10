@@ -2845,13 +2845,14 @@ def render_bulletin_viewer_shell(
 
 
 def restamp_published_viewer_panels() -> list[Path]:
-    """Put each parish's printed date on the diocese viewer pages the site deploys.
+    """Bring the diocese OCR pages the site deploys into line with this Sunday.
 
-    The collated-book title stays the harvest Sunday. Only the masthead date
-    changes. The bulletin text is left as printed.
+    The collated-book title stays the harvest Sunday. A parish whose own
+    text is dated before that week is not left in the reading. The harvest
+    Sunday is not stamped on that body. The collated PDF file is left as it is.
     """
     from harvester.site_builder import OCR_DIOCESE_KEYS
-    from ocr.bulletin_layout import restamp_masthead_dates
+    from ocr.bulletin_layout import restamp_masthead_dates, withhold_stale_issue_bodies
 
     changed: list[Path] = []
 
@@ -2860,6 +2861,7 @@ def restamp_published_viewer_panels() -> list[Path]:
         if not match:
             return None
         fragment = restamp_masthead_dates(match.group(1), not_after=page_date)
+        fragment = withhold_stale_issue_bodies(fragment, page_date)
         if fragment == match.group(1):
             return None
         return raw[: match.start(1)] + fragment + raw[match.end(1) :]

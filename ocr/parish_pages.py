@@ -307,6 +307,8 @@ def parish_page_date_bits(
 
     ``parish_iso`` is the date printed on that bulletin. A different day is
     the latest bulletin we have, not this Sunday. A blank date is left blank.
+    Hiding the body is a separate decision: an English issue date before this
+    harvest week drops the text, and 08/11/2026 is not written onto that body.
     """
     from ocr.generate_bulletin_pages import format_uk_date
 
@@ -566,7 +568,12 @@ def write_parish_pages_for_diocese(
                         f"⚠️ {html.escape(why)}</div>"
                     )
 
-            from ocr.bulletin_layout import read_parish_issue_date, structure_ocr_html
+            from ocr.bulletin_layout import (
+                NO_BULLETIN_THIS_SUNDAY,
+                leading_parish_issue_iso,
+                read_parish_issue_date,
+                structure_ocr_html,
+            )
 
             ocr_fragment = structure_ocr_html(
                 tighten_ocr_paragraphs(ocr_fragment),
@@ -574,17 +581,33 @@ def write_parish_pages_for_diocese(
                 single_parish_name=parish.display_name,
             )
             # The date on the paper, not the file name or the harvest Sunday.
-            printed_iso = read_parish_issue_date(
-                _fragment_to_plain_text(ocr_fragment),
-                not_after=bulletin_date,
-            )
+            # A withheld body no longer contains that date, so read the masthead mark.
+            printed_iso = leading_parish_issue_iso(ocr_fragment)
+            if not printed_iso:
+                printed_iso = read_parish_issue_date(
+                    _fragment_to_plain_text(ocr_fragment),
+                    not_after=bulletin_date,
+                )
             uk_date, base_meta, masthead_iso = parish_page_date_bits(
                 bulletin_date,
                 printed_iso,
                 parish.display_name,
                 config.display_name,
             )
-            if fail_reason:
+            # structure_ocr_html marks an English issue date before this week.
+            # An Irish date line, or no date, is not marked and the body stays.
+            stale_issue = 'data-no-bulletin="1"' in ocr_fragment
+            if stale_issue:
+                uk_date, base_meta, masthead_iso = "", NO_BULLETIN_THIS_SUNDAY, ""
+                meta_line = base_meta
+                pdf_href = ""
+                stale_pdf = out_root / f"{parish.key}.pdf"
+                if stale_pdf.exists():
+                    try:
+                        stale_pdf.unlink()
+                    except OSError:
+                        pass
+            elif fail_reason:
                 meta_line = f"{base_meta} {fail_reason}."
             else:
                 meta_line = base_meta
@@ -618,18 +641,20 @@ def write_parish_pages_for_diocese(
                 ocr_fragment=ocr_fragment,
                 parish_section_heading=f"Other {diocese_label} Parishes",
                 parish_links_html=_render_other_parishes_grid(parishes, parish.key),
-                stale_note=fail_reason,
+                stale_note="" if stale_issue else fail_reason,
             )
+            if stale_issue:
+                page_html = detach_parish_pdf(page_html)
             _write_text(out_root / viewer_filename, page_html)
-            _write_text(
-                out_root / f"{parish.key}-pdf.html",
-                render_pdf_standalone_page(
-                    parish_config,
-                    masthead_iso,
-                    pdf_href=pdf_href,
-                    viewer_href=viewer_filename,
-                ),
+            pdf_page = render_pdf_standalone_page(
+                parish_config,
+                masthead_iso,
+                pdf_href=pdf_href,
+                viewer_href=viewer_filename,
             )
+            if stale_issue:
+                pdf_page = detach_parish_pdf(pdf_page)
+            _write_text(out_root / f"{parish.key}-pdf.html", pdf_page)
             _write_text(
                 out_root / f"{parish.key}-ocr.html",
                 render_ocr_standalone_page(
@@ -718,35 +743,72 @@ def _replace_title_line_date(page_html: str, uk: str) -> str:
     )
 
 
+_PDF_ANCHOR_RE = re.compile(
+    r'<a\b[^>]*\b(?:href="[^"]*\.pdf[^"]*"|class="[^"]*pdf[^"]*")[^>]*>.*?</a>',
+    re.IGNORECASE | re.DOTALL,
+)
+_PDF_ATTR_RE = re.compile(r'(data-pdf-url|data-pdf-src)="[^"]*"', re.IGNORECASE)
+_PDF_PREVIEW_ATTR_RE = re.compile(r'\sdata-pdf-preview="[^"]*"', re.IGNORECASE)
+_PDF_PREVIEW_IMG_RE = re.compile(r'<img class="pdf-first-preview"[^>]*>', re.IGNORECASE)
+_PDF_LOADING_RE = re.compile(
+    r"Loading PDF.+?to open\.",
+    re.DOTALL,
+)
+
+
+def detach_parish_pdf(page_html: str) -> str:
+    """Stop a current-week page from opening a bulletin that is not this Sunday."""
+    from ocr.bulletin_layout import NO_BULLETIN_THIS_SUNDAY
+
+    text = _PDF_ANCHOR_RE.sub("", page_html or "")
+    text = _PDF_ATTR_RE.sub(r'\1=""', text)
+    text = _PDF_PREVIEW_ATTR_RE.sub("", text)
+    text = _PDF_PREVIEW_IMG_RE.sub("", text)
+    text = _PDF_LOADING_RE.sub(NO_BULLETIN_THIS_SUNDAY, text, count=1)
+    return text
+
+
 def refresh_parish_page_html(
     page_html: str,
     harvest_iso: str,
     display_name: str,
     diocese_name: str,
 ) -> tuple[str, str]:
-    """Return the page with the printed bulletin date, and that date as DD/MM/YYYY."""
+    """Return the page for this Sunday. An older body is not left on the page."""
     match = _PANEL_RE.search(page_html or "")
     if not match:
         return page_html, ""
-    from ocr.bulletin_layout import read_parish_issue_date, restamp_masthead_dates
+    from ocr.bulletin_layout import (
+        NO_BULLETIN_THIS_SUNDAY,
+        _html_to_issue_text,
+        body_should_be_hidden,
+        read_parish_issue_date,
+        restamp_masthead_dates,
+        withhold_stale_issue_bodies,
+    )
 
     structured = restamp_masthead_dates(match.group(2), not_after=harvest_iso)
-    text = re.sub(r"<[^>]+>", "\n", structured)
-    text = html.unescape(text)
-    lines = [re.sub(r"\s+", " ", line).strip() for line in text.splitlines()]
-    printed = read_parish_issue_date(
-        "\n".join(line for line in lines if line),
-        not_after=harvest_iso,
+    plain = _html_to_issue_text(structured)
+    printed = read_parish_issue_date(plain, not_after=harvest_iso)
+    already_hidden = (
+        'data-no-bulletin="1"' in structured and NO_BULLETIN_THIS_SUNDAY in plain
     )
-    uk, meta, _iso = parish_page_date_bits(
-        harvest_iso,
-        printed,
-        display_name,
-        diocese_name,
-    )
+    hide = body_should_be_hidden(plain, harvest_iso) or already_hidden
+    if hide:
+        uk, meta = "", NO_BULLETIN_THIS_SUNDAY
+    else:
+        uk, meta, _iso = parish_page_date_bits(
+            harvest_iso,
+            printed,
+            display_name,
+            diocese_name,
+        )
+    structured = withhold_stale_issue_bodies(structured, harvest_iso)
     updated = page_html[: match.start(2)] + structured + page_html[match.end(2) :]
     updated = _replace_meta(updated, meta)
     updated = _replace_title_date(updated, uk)
+    if hide:
+        updated = detach_parish_pdf(updated)
     return updated, uk
 
 
@@ -780,6 +842,7 @@ def restamp_published_parish_pages(
             changed.append(viewer)
         panel = _PANEL_RE.search(updated)
         structured = panel.group(2) if panel else ""
+        stale_page = 'data-no-bulletin="1"' in updated
         for suffix in ("-ocr.html", "-pdf.html"):
             sibling = viewer.with_name(viewer.stem + suffix)
             if not sibling.exists():
@@ -791,6 +854,8 @@ def restamp_published_parish_pages(
                 body = _OCR_BODY_RE.search(new)
                 if body:
                     new = new[: body.start(2)] + structured + new[body.end(2) :]
+            if stale_page and suffix == "-pdf.html":
+                new = detach_parish_pdf(new)
             if new != sib:
                 _write_text(sibling, new)
                 changed.append(sibling)
