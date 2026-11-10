@@ -1,3 +1,5 @@
+## 10/11/2026 21:13 - Stitcher leaves out a paper dated before 02/11/2026
+Harvest Sunday 08/11/2026. A PDF whose own date is 01/11/2026 or older stays out of that Sunday's collated PDF. No printed date is not treated as 08/11/2026. A this-week paper, including Irish, stays in. Page cap stays 4. Not live until the next harvest. Do not edit generated docs HTML in this job.
 ## 08/11/2026 08:35 - A1: Ok 435 Kiltimagh + Glenavy; Loughshore 2025 miss
 Kiltimagh ok 08/11 NEWSLETTER-Nov-8th-1.docx.pdf. Glenavy ok 08/11 Thirty-Second-Sunday 8 November. Ok 435. Dunshaughlin + Kilnamanagh still ok. Loughshore harvest grabbed /2025/11/33rd-Sunday dated 16/11/2025; 2026 32nd Sunday is in /2026/11/ GET 200 903755. St MacNissi pinned 15/08 hash; page now 1 Nov hash 60a4f5 GET 200 233752. Glenariffe All Saints GET 200 400334. Portaferry churchmedia 9ye0o3 GET 200 465417 harvest 42463746623. Honest stale parked: Kilmore 27/09, Malin April, Melmount parishnews has no newsletter text. Not checked on parishpress.ie.
 ## 07/11/2026 18:35 - A1: Ok 427 Beechwood + Bellaghy; Bearna 8 Nov

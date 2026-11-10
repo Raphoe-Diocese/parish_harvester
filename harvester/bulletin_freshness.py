@@ -1091,6 +1091,86 @@ def issue_date_verdict(
     return body_verdict
 
 
+def _printed_issue_stamp_dates(text: str) -> list[date]:
+    """Dates on issue lines (All Saints, week beginning, Sunday date, newsletter).
+
+    A memorial, a cemetery notice, or a bare "2 May 2011" inside the file
+    is not an issue line. No line means no date. This does not fill in the
+    harvest Sunday.
+    """
+    from ocr.bulletin_layout import (
+        _SPACE_RE,
+        _date_on_issue_line,
+        _line_is_issue_stamp,
+    )
+
+    found: list[date] = []
+    seen: set[date] = set()
+    lines = [
+        _SPACE_RE.sub(" ", line).strip()
+        for line in (text or "").splitlines()
+        if line.strip()
+    ]
+    for line in lines:
+        if not _line_is_issue_stamp(line):
+            continue
+        parsed = _date_on_issue_line(line)
+        if parsed is None or parsed in seen:
+            continue
+        seen.add(parsed)
+        found.append(parsed)
+    return found
+
+
+def text_date_before_harvest_week(text: str, target: date) -> date | None:
+    """Issue date that is before this harvest week, or None.
+
+    The week is the harvest Sunday and the six days before it. For Sunday
+    08/11/2026 the week starts on 02/11/2026, so 01/11/2026 is before it.
+    A this-week issue line on the same page keeps the paper. No issue date
+    returns None, and None is not the harvest Sunday.
+    """
+    dates = _printed_issue_stamp_dates(text)
+    if not dates:
+        return None
+    if any(verdict_for_extracted_date(item, target).status == "fresh" for item in dates):
+        return None
+    start, _end = week_window(target)
+    before = [item for item in dates if item < start]
+    if not before:
+        return None
+    return max(before)
+
+
+def pdf_date_before_harvest_week(path: Path, target: date) -> date | None:
+    """Own printed date when this PDF must stay out of the collated book.
+
+    The front page decides. A later page does not replace a front page that
+    is already dated before this week. When the front page has no issue
+    date, a later page can still show that the paper is old. No printed
+    date returns None. The file name and the harvest Sunday are not used.
+    """
+    try:
+        pages = read_pdf_page_texts(Path(path), max_pages=4)
+    except OSError:
+        return None
+    if not pages or not any(page.strip() for page in pages):
+        return None
+    front = text_date_before_harvest_week(pages[0], target)
+    if front is not None:
+        return front
+    if _printed_issue_stamp_dates(pages[0]):
+        # Front page already has a this-week (or later) issue date.
+        return None
+    for page in pages[1:]:
+        found = text_date_before_harvest_week(page, target)
+        if found is not None:
+            return found
+        if _printed_issue_stamp_dates(page):
+            return None
+    return None
+
+
 def freshness_verdict_for_ok_result(
     result: FetchResult,
     target: date,
@@ -1100,9 +1180,14 @@ def freshness_verdict_for_ok_result(
     """URL / report date / PDF-body freshness for one ok download.
 
     Report ``bulletin_date`` or URL date is the first guess. A this-week
-    heading inside the PDF wins. An older date inside the PDF does not
-    replace a newer date written in the link (Inver: file name 4 October
-    2026, text also contains 2 May 2011).
+    heading inside the PDF wins. An older date that is not the paper's own
+    issue line does not replace a newer date written in the link (Inver:
+    file name 4 October 2026, text also contains 2 May 2011).
+
+    The paper's own issue date does. A front page dated before this harvest
+    week stays out of the collated PDF even when the file name says this
+    Sunday. For 08/11/2026 that means a date before 02/11/2026. No printed
+    date is not rewritten as the harvest Sunday.
     """
     url = (result.url or "").strip()
     pdf_path = result.file_path
@@ -1127,6 +1212,9 @@ def freshness_verdict_for_ok_result(
     for path in candidates:
         if not path.exists():
             continue
+        too_old = pdf_date_before_harvest_week(path, target)
+        if too_old is not None:
+            return verdict_for_extracted_date(too_old, target)
         body_verdict = pdf_body_heading_verdict(path, target)
         if body_verdict is None:
             continue
@@ -1341,8 +1429,10 @@ def apply_freshness_safety_net(
     results rebuilt from cache).
 
     Uses ``freshness_verdict_for_ok_result`` so a this-week URL or report date
-    cannot keep a PDF whose body heading (or ancient-only years) is stale.
-    A this-week body heading does not invent ``fresh`` over an unknown URL.
+    cannot keep a PDF whose own issue date is before this harvest week
+    (for 08/11/2026, before 02/11/2026), or whose body is only ancient years.
+    No printed date is not treated as the harvest Sunday. A this-week body
+    heading does not invent ``fresh`` over an unknown URL.
     """
     entries_by_key = entries_by_key or {}
     queue_path = retry_queue_path or _RETRY_QUEUE_PATH

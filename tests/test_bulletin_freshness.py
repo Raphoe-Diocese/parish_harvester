@@ -16,7 +16,9 @@ from harvester.bulletin_freshness import (
     heading_dates_in_text,
     issue_date_verdict,
     mark_result_stale,
+    pdf_date_before_harvest_week,
     suggest_retry_strategy,
+    text_date_before_harvest_week,
     verdict_for_extracted_date,
     week_window,
 )
@@ -864,10 +866,11 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
                 self.TARGET,
                 report_bulletin_date=date(2026, 10, 4),
             )
-            # Link says Sunday 4 October. "Week beginning 13 September" inside
-            # the file must not replace that date.
-            self.assertEqual(verdict.status, "fresh")
-            self.assertEqual(verdict.extracted_date, date(2026, 10, 4))
+            # The link says 4 October. The paper's own date is 13 September,
+            # which is before that harvest week, so the mega gate leaves it out.
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 9, 13))
+            self.assertEqual(verdict.reason, "date_behind_of_target")
 
     def test_safety_net_rejects_dated_url_with_ancient_body_years(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -936,6 +939,89 @@ class IssueDateTests(unittest.TestCase):
         picked = issue_date_verdict(link, notice)
         self.assertEqual(picked.status, "fresh")
         self.assertEqual(picked.extracted_date, date(2026, 10, 18))
+
+
+class HarvestWeekOwnDateTests(unittest.TestCase):
+    """08/11/2026 book: a paper dated before 02/11/2026 stays out."""
+
+    TARGET = date(2026, 11, 8)
+
+    def test_first_november_is_before_the_week_and_blank_is_not_this_sunday(self) -> None:
+        start, end = week_window(self.TARGET)
+        self.assertEqual(start, date(2026, 11, 2))
+        self.assertEqual(end, self.TARGET)
+        stale = text_date_before_harvest_week(
+            "FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45\n"
+            "Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.\n"
+            "Aifrinn na Seachtaine",
+            self.TARGET,
+        )
+        self.assertEqual(stale, date(2026, 11, 1))
+        self.assertIsNone(
+            text_date_before_harvest_week(
+                "Sunday 8th November 2026\nAifrinn na Seachtaine",
+                self.TARGET,
+            )
+        )
+        self.assertIsNone(
+            text_date_before_harvest_week("8 Samhain 2026\nAifrinn na Seachtaine", self.TARGET)
+        )
+        self.assertEqual(
+            text_date_before_harvest_week("1 Samhain 2026\nAifrinn na Seachtaine", self.TARGET),
+            date(2026, 11, 1),
+        )
+        # Monday 02/11/2026 is the start of this week, so it stays.
+        self.assertIsNone(
+            text_date_before_harvest_week("Parish Bulletin 2nd November 2026", self.TARGET)
+        )
+        # No printed date is not rewritten as 08/11/2026.
+        blank = text_date_before_harvest_week("Aifrinn na Seachtaine", self.TARGET)
+        self.assertIsNone(blank)
+        self.assertNotEqual(blank, self.TARGET)
+        # An old date buried in the file is not the paper's own date.
+        self.assertIsNone(
+            text_date_before_harvest_week("The church was built 2 May 2011.", self.TARGET)
+        )
+
+    def test_filename_sunday_does_not_keep_a_first_november_pdf(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "bantry.pdf"
+            pen = canvas.Canvas(str(pdf))
+            pen.drawString(72, 720, "FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45")
+            pen.drawString(72, 700, "Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.")
+            pen.save()
+            self.assertEqual(pdf_date_before_harvest_week(pdf, self.TARGET), date(2026, 11, 1))
+            result = FetchResult(
+                key="bantry-own-date",
+                display_name="Bantry",
+                status="ok",
+                url="https://parish.ie/Newsletter-2026-11-08.pdf",
+                file_path=pdf,
+                file_type="pdf",
+            )
+            verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
+
+    def test_undated_pdf_is_not_stamped_as_this_sunday(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "gortahork.pdf"
+            pen = canvas.Canvas(str(pdf))
+            pen.drawString(72, 720, "Aifrinn na Seachtaine")
+            pen.save()
+            self.assertIsNone(pdf_date_before_harvest_week(pdf, self.TARGET))
+            result = FetchResult(
+                key="gortahork-no-date",
+                display_name="Gortahork",
+                status="ok",
+                url="https://parish.ie/current-newsletter/",
+                file_path=pdf,
+                file_type="pdf",
+            )
+            verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
+            self.assertNotEqual(verdict.status, "fresh")
 
 
 if __name__ == "__main__":
