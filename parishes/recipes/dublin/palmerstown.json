@@ -3,26 +3,42 @@
   "display_name": "Palmerstown",
   "diocese": "dublin",
   "recorded_date": "2026-11-10",
-  "start_url": "https://palmerstownparish.com/powerpoints-for-sunday-gospel/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://palmerstownparish.com/",
+  "site_type": "wp_json_newest_media",
   "href_patterns": [
-    ".pdf"
+    "-No.-"
   ],
-  "playbook_type": "pdf_download_list",
+  "href_skip_patterns": [
+    "jpg",
+    "jpeg",
+    "png",
+    "-300x",
+    "-1024x",
+    "library",
+    "ordinary-time"
+  ],
+  "playbook_type": "direct_download",
   "timeout_ms": 45000,
-  "total_timeout_s": 120,
+  "total_timeout_s": 180,
+  "example_url": "https://palmerstownparish.com/wp-content/uploads/2026/11/Nov-No.-2-07-08-Nov-2026.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://palmerstownparish.com/powerpoints-for-sunday-gospel/"
+      "url": "https://palmerstownparish.com/"
     }
   ],
   "version": 2,
   "operator_notes": [
-    "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename."
+    "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename.",
+    "10/11/2026 media library: GET https://palmerstownparish.com/wp-json/wp/v2/media?per_page=20&after=2026-11-06T00:00:00. The same PDF is in the library. GET 200 application/pdf 563776 bytes, magic %PDF-1.7. PDF text: Parish Bulletin, The Parish of St Philomena, Palmerstown, Saturday 07 Nov and Sunday 08 Nov. The issue token 2-07-08 is not the date. Pattern -No.- is the weekly series (Oct-No, Nov-No). Do not pin the dated filename.",
+    "The same library also has Sunday-08-Nov-26-Thirty-Second-Sunday-in-Ordinary-Time-Year-A.pdf (Getting Ready for Sunday, 11 pages) and Palmerstown-Library-Brochure-November-2026.pdf. Those are not the parish bulletin."
   ],
   "do_not": [
+    "Do not pin Nov-No.-2-07-08-Nov-2026.pdf.",
     "Do not pin a dated filename.",
+    "Do not pin a Wix hash.",
+    "Do not harvest Sunday-08-Nov-26 Getting Ready for Sunday.",
+    "Do not harvest the library brochure.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {

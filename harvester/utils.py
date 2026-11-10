@@ -534,7 +534,24 @@ def extract_date_from_string(text: str) -> date | None:
             pass
         plausible_dashed = [c for c in dashed if _is_plausible_bulletin_year(c.year)]
         if plausible_dashed:
-            return max(plausible_dashed, key=lambda d: (d.year, d.month, d.day))
+            dashed_date = max(plausible_dashed, key=lambda d: (d.year, d.month, d.day))
+            # Palmerstown 10/11/2026: Nov-No.-2-07-08-Nov-2026.pdf. The issue
+            # token 2-07-08 is a real 02/07/2008 and used to hide Sunday
+            # 08/11/2026. Same shape: Oct-No.-2-10-11-Oct-2026.pdf was
+            # 02/10/2011. Keep a two-digit dashed date when it is the only
+            # date (16-8-26, 26-08-23). Prefer the month-name date when its
+            # four-digit year is written in the name and the dashed year is
+            # an old two-digit misread.
+            slug_date = extract_date_from_slug(text)
+            if (
+                slug_date is not None
+                and dashed_date.year < 2016
+                and slug_date.year >= 2016
+                and str(slug_date.year) in (text or "")
+                and str(dashed_date.year) not in (text or "")
+            ):
+                return slug_date
+            return dashed_date
 
     # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
     # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
