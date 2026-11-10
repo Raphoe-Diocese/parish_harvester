@@ -2,18 +2,37 @@
   "parish_key": "fairview",
   "display_name": "Fairview",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.fairviewparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "recorded_date": "2026-11-10",
+  "start_url": "https://fairviewparish.ie/news-events/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.fairviewparish.ie"
+      "url": "https://fairviewparish.ie/news-events/"
     }
   ],
-  "version": 1
+  "version": 2,
+  "href_patterns": [
+    "Parish-Newsletter"
+  ],
+  "post_slug_patterns": [
+    "sermon/"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "operator_notes": [
+    "10/11/2026: /news-events/ lists sermon posts. The 8 November post links Sunday-8th-November-2026-Parish-Newsletter.pdf. Follow the newest dated sermon, then the PDF. Do not pin the dated filename or the sermon slug."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not pin the sermon slug.",
+    "Do not harvest Facebook."
+  ]
 }

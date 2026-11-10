@@ -2,18 +2,34 @@
   "parish_key": "sandymount",
   "display_name": "Sandymount",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.stmarysstaroftheseasandymount.com",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "recorded_date": "2026-11-10",
+  "start_url": "https://www.stmarysstaroftheseasandymount.com/parish-newsletters.html",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stmarysstaroftheseasandymount.com"
+      "url": "https://www.stmarysstaroftheseasandymount.com/parish-newsletters.html"
     }
   ],
-  "version": 1
+  "version": 2,
+  "href_patterns": [
+    "sunday_"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "operator_notes": [
+    "10/11/2026: /parish-newsletters.html lists sunday_8th_november_2026.pdf.rev.pdf on this site. Scrape that list. Do not pin the dated filename. Do not pin an img1.wsimg.com hash."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not pin an img1.wsimg.com hash.",
+    "Do not harvest Facebook."
+  ]
 }

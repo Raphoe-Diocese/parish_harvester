@@ -2520,15 +2520,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
         termon = json.loads(
             Path("parishes/recipes/armagh/termonmaguirc.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(termon["site_type"], "predicted_dated_pdf")
-        self.assertIn(
+        self.assertEqual(termon["site_type"], "http_scrape_newest_pdf")
+        self.assertIn("/bulletins/", termon["start_url"])
+        self.assertNotIn(
             "Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
             termon["start_url"],
         )
         self.assertNotIn("Twenty-Sixth", termon["start_url"])
-        self.assertNotIn("1-November", termon["start_url"])
-        self.assertEqual(int(termon["weeks_back"]), 0)
-        self.assertEqual(int(termon["weeks_ahead"]), 0)
+        self.assertNotIn(".pdf", termon["start_url"].lower())
+        self.assertEqual(termon["steps"][0]["action"], "goto")
         bree = json.loads(
             Path("parishes/recipes/ferns/bree.json").read_text(encoding="utf-8")
         )
@@ -2563,10 +2563,9 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("Oct", foxford.get("href_patterns") or [])
         self.assertNotIn("Sept", foxford.get("href_patterns") or [])
 
-    def test_sandyford_milltown_dkr_use_8_november_pdfs(self) -> None:
+    def test_sandyford_and_dkr_keep_8_november_pdfs(self) -> None:
         cases = {
             "dublin/sandyford.json": "Newsletter-2026-11-08.pdf",
-            "dublin/milltowndublin.json": "Weekly-Bulletin-Sunday-November-8th-2026.pdf",
             "limerick/donaghmoreknockearoxboro.json": "Newsletter-2026-11-08.pdf",
         }
         for rel, needle in cases.items():
@@ -2584,6 +2583,71 @@ class HarvestMissRecipeTests(unittest.TestCase):
         )
         self.assertIn("/2026/11/", dkr["start_url"])
         self.assertNotIn("/2026/10/", dkr["start_url"])
+
+    def test_nov8_hits_scrape_listing_not_pinned_pdf(self) -> None:
+        cases = {
+            "armagh/termonmaguirc.json": (
+                "https://www.termonmaguircparish.com/bulletins/",
+                "Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
+                None,
+            ),
+            "dromore/donaghmore.json": (
+                "https://donaghmoreparish.org",
+                "Donaghmore-Bulletin-8th-November-2026.pdf",
+                None,
+            ),
+            "dromore/mayobridge.json": (
+                "https://www.mayobridgeparish.com/parish-newsletter/",
+                "Parish-Bulletin-8-November-2026.pdf",
+                None,
+            ),
+            "down_and_connor/stjohnsfallsroad.json": (
+                "https://stjohnsfallsroad.org/index.php/bulletin/",
+                "Sunday-8th-Nov-2026-ws.pdf",
+                None,
+            ),
+            "dublin/fairview.json": (
+                "https://fairviewparish.ie/news-events/",
+                "Sunday-8th-November-2026-Parish-Newsletter.pdf",
+                "sermon/",
+            ),
+            "dublin/milltowndublin.json": (
+                "https://milltownparish.ie/newsletter/",
+                "Weekly-Bulletin-Sunday-November-8th-2026.pdf",
+                None,
+            ),
+            "dublin/sandymount.json": (
+                "https://www.stmarysstaroftheseasandymount.com/parish-newsletters.html",
+                "sunday_8th_november_2026.pdf",
+                None,
+            ),
+            "dublin/maynooth.json": (
+                "https://www.maynoothparish.org",
+                "Parish-Newsletter-8th-November-2026.pdf",
+                "notices/parish-newsletter",
+            ),
+            "dublin/wicklow.json": (
+                "https://www.stmantan.ie/newsletters/parish/wicklow_rathnew/",
+                "ww-news-08.11.26.pdf",
+                None,
+            ),
+            "meath/drumconrath.json": (
+                "https://drumconrathparish.ie/",
+                "8th-november-2026",
+                "parish-bulletin",
+            ),
+        }
+        for rel, (listing, pin, post_slug) in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
+            self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf", rel)
+            self.assertEqual(recipe["start_url"].rstrip("/"), listing.rstrip("/"), rel)
+            self.assertNotEqual(recipe.get("skip"), True, rel)
+            self.assertNotIn(pin, recipe["start_url"], rel)
+            self.assertNotIn(pin, str(recipe.get("example_url") or ""), rel)
+            self.assertEqual(recipe["steps"][0]["action"], "goto", rel)
+            self.assertNotIn(pin, recipe["steps"][0].get("url") or "", rel)
+            if post_slug:
+                self.assertIn(post_slug, recipe.get("post_slug_patterns") or [], rel)
 
     def test_portmarnock_uses_8_november_pdf(self) -> None:
         recipe = json.loads(
