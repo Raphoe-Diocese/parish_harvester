@@ -1,44 +1,33 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "glenavyandkilleadparish",
   "display_name": "Glenavy and Killead",
   "diocese": "down_and_connor",
   "start_url": "https://www.glenavyandkilleadparish.com/bulletins/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-11-10",
   "steps": [
     {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.glenavyandkilleadparish.com/app/uploads/2026/09/2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
-      "text": "Twenty Fourth Sunday in Ordinary Time 13/09/2026",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.glenavyandkilleadparish.com/app/uploads/2026/09/2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf"
+      "action": "goto",
+      "url": "https://www.glenavyandkilleadparish.com/bulletins/"
     }
   ],
-  "observed_load_ms": 18077,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "10/11/2026: the bulletins page links Thirty-Second-Sunday-in-Ordinary-Time-8-November-2026.pdf. Proved GET 200 application/pdf 469768 bytes. PDF text: Thirty Second Sunday in Ordinary Time 8 November 2026. Scrape the listing. Do not pin the dated filename or the liturgical week name."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin a dated filename.",
+    "Do not pin Thirty-Second or any other one-week liturgical name.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  },
-  "recorded_date": "2026-09-14"
+  }
 }
