@@ -20,10 +20,13 @@ from harvester.fetcher import (
     HTML_RENDER_MIN_BYTES,
     ParishEntry,
     classify_page_capped_pdf,
+    extract_pdf_bulletin_date,
     freshness_after_unknown_url,
+    _fresh_five_page_heading_date,
     _is_real_pdf,
     _reject_if_oversized,
     _retry_pdf_still_stale,
+    _unlink_rejected_download,
     recipe_max_bulletin_pages,
 )
 from harvester.config import MAX_BULLETIN_PAGES, MIN_PDF_BYTES
@@ -140,6 +143,8 @@ class ClassifyPageCappedPdfTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             pdf = Path(tmp) / "160826.pdf"
             self._long_pdf(pdf, "Bulletin 16th August 2026")
+            # 6 pages, and the heading date really is this Sunday. Still a fail.
+            self.assertEqual(extract_pdf_bulletin_date(pdf), date(2026, 8, 16))
             result = classify_page_capped_pdf(
                 pdf,
                 key="holycrossparishbelfast",
@@ -153,7 +158,100 @@ class ClassifyPageCappedPdfTests(unittest.TestCase):
             assert result is not None
             self.assertFalse(result.is_stale)
             self.assertIn("Too many pages", result.error)
+            self.assertIn("6 pages", result.error)
             self.assertNotEqual(result.status, "ok")
+
+    def test_five_page_fresh_heading_is_ok(self) -> None:
+        """5 pages plus a fresh heading date is kept. The global cap stays 4."""
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "160826.pdf"
+            self._long_pdf(pdf, "Bulletin 16th August 2026", pages=5)
+            self.assertEqual(MAX_BULLETIN_PAGES, 4)
+            self.assertEqual(extract_pdf_bulletin_date(pdf), date(2026, 8, 16))
+            self.assertEqual(_fresh_five_page_heading_date(pdf, date(2026, 8, 16)), date(2026, 8, 16))
+            self.assertFalse(_is_real_pdf(pdf))
+            result = classify_page_capped_pdf(
+                pdf,
+                key="foxfordparish",
+                display_name="Foxford",
+                url="https://foxfordparish.com/newsletter-1",
+                target=date(2026, 8, 16),
+                entry=self._entry(),
+                max_pages=4,
+            )
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertEqual(result.status, "ok")
+            self.assertFalse(result.is_stale)
+            self.assertEqual(result.error, "")
+            self.assertEqual(result.file_path, pdf)
+            self.assertEqual(result.file_type, "pdf")
+            self.assertTrue(pdf.exists())
+
+    def test_five_page_stale_heading_stays_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "160826.pdf"
+            self._long_pdf(pdf, "Bulletin 11th & 12th July 2026", pages=5)
+            self.assertIsNone(_fresh_five_page_heading_date(pdf, date(2026, 8, 16)))
+            result = classify_page_capped_pdf(
+                pdf,
+                key="foxfordparish",
+                display_name="Foxford",
+                url="https://foxfordparish.com/newsletter-1",
+                target=date(2026, 8, 16),
+                entry=self._entry(),
+                max_pages=4,
+            )
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertTrue(result.is_stale)
+            self.assertNotEqual(result.status, "ok")
+            self.assertIn("Stale bulletin rejected", result.error)
+            self.assertIn("2026-07-12", result.error)
+            self.assertNotIn("Too many pages", result.error)
+
+    def test_five_page_without_heading_date_stays_fail(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "160826.pdf"
+            self._long_pdf(pdf, "Bulletin", pages=5)
+            self.assertIsNone(extract_pdf_bulletin_date(pdf))
+            result = classify_page_capped_pdf(
+                pdf,
+                key="foxfordparish",
+                display_name="Foxford",
+                url="https://foxfordparish.com/newsletter-1",
+                target=date(2026, 8, 16),
+                entry=self._entry(),
+                max_pages=4,
+            )
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertFalse(result.is_stale)
+            self.assertIn("Too many pages: 5 pages", result.error)
+            self.assertNotEqual(result.status, "ok")
+
+    def test_fetch_finally_keeps_fresh_five_pages_and_deletes_six(self) -> None:
+        """The _fetch_entry finally-block must not delete a fresh 5-page PDF."""
+        target = date(2026, 8, 16)
+        with tempfile.TemporaryDirectory() as tmp:
+            fresh_five = Path(tmp) / "five.pdf"
+            fresh_six = Path(tmp) / "six.pdf"
+            stale_five = Path(tmp) / "stale.pdf"
+            undated_five = Path(tmp) / "undated.pdf"
+            self._long_pdf(fresh_five, "Bulletin 16th August 2026", pages=5)
+            self._long_pdf(fresh_six, "Bulletin 16th August 2026", pages=6)
+            self._long_pdf(stale_five, "Bulletin 11th & 12th July 2026", pages=5)
+            self._long_pdf(undated_five, "Bulletin", pages=5)
+
+            _unlink_rejected_download(fresh_five, "foxfordparish", max_pages=4, target=target)
+            _unlink_rejected_download(fresh_six, "foxfordparish", max_pages=4, target=target)
+            _unlink_rejected_download(stale_five, "foxfordparish", max_pages=4, target=target)
+            _unlink_rejected_download(undated_five, "foxfordparish", max_pages=4, target=target)
+
+            self.assertTrue(fresh_five.exists())
+            self.assertFalse(fresh_six.exists())
+            self.assertFalse(stale_five.exists())
+            self.assertFalse(undated_five.exists())
 
     def test_missing_file_returns_none(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

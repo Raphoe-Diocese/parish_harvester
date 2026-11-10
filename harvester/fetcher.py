@@ -467,6 +467,60 @@ def extract_pdf_bulletin_date(path: Path) -> date | None:
     return extract_bulletin_date_from_text("\n".join(chunks))
 
 
+# Global MAX_BULLETIN_PAGES stays 4. Exactly 5 pages is kept only when the
+# heading date is already fresh. Six or more pages stay a fail unless the
+# recipe sets max_bulletin_pages.
+_FRESH_FIVE_PAGE_COUNT = 5
+
+
+def _fresh_five_page_heading_date(path: Path, target: date) -> date | None:
+    """Return the heading date when *path* is a fresh 5-page bulletin.
+
+    The date is ``extract_pdf_bulletin_date`` checked with
+    ``verdict_for_extracted_date``. None means: not exactly 5 pages, no
+    heading date, or the heading date is not fresh. This does not invent a
+    date, and a stale date is not returned.
+    """
+    if not path.exists() or not is_valid_pdf(path):
+        return None
+    try:
+        if path.stat().st_size < MIN_PDF_BYTES:
+            return None
+        page_count = len(PdfReader(str(path)).pages)
+    except Exception:
+        return None
+    if page_count != _FRESH_FIVE_PAGE_COUNT:
+        return None
+    body_date = extract_pdf_bulletin_date(path)
+    if body_date is None:
+        return None
+    verdict = verdict_for_extracted_date(body_date, target)
+    if verdict.status != "fresh":
+        return None
+    return body_date
+
+
+def _unlink_rejected_download(
+    dest: Path,
+    key: str,
+    *,
+    max_pages: int,
+    target: date,
+) -> None:
+    """Delete a replay download that failed the bulletin checks.
+
+    ``_fetch_entry`` calls this from ``finally``, which also runs after an
+    early return. A fresh 5-page file fails ``_is_real_pdf`` because the
+    global cap is 4, so this must leave that file in place.
+    """
+    if not dest.exists():
+        return
+    if _fresh_five_page_heading_date(dest, target) is not None:
+        return
+    if not _is_real_pdf(dest, key, max_pages=max_pages):
+        dest.unlink(missing_ok=True)
+
+
 def classify_page_capped_pdf(
     dest: Path,
     *,
@@ -477,7 +531,13 @@ def classify_page_capped_pdf(
     entry: ParishEntry,
     max_pages: int,
 ) -> FetchResult | None:
-    """If *dest* is a real PDF rejected only for page count, return stale or an honest fail.
+    """If *dest* is over the page cap, return ok, stale, or an honest fail.
+
+    Exactly 5 pages whose heading date is fresh for *target* is ok. The
+    date comes from ``extract_pdf_bulletin_date``; a missing date is not
+    treated as fresh. A stale heading date stays stale, including at 5
+    pages. Six or more pages, when *max_pages* does not already allow them,
+    are "Too many pages".
 
     Holy Cross Belfast (and similar) serve a genuine PDF that is still last
     month's bulletin padded to 13 pages. ``_is_real_pdf`` then returns False
@@ -517,6 +577,21 @@ def classify_page_capped_pdf(
                 file_type="pdf",
             )
             return mark_result_stale(result, verdict, entry=entry)
+
+    kept_date = _fresh_five_page_heading_date(dest, target)
+    if kept_date is not None:
+        print(
+            f"  {key}: keeping 5-page bulletin — heading date "
+            f"{kept_date.isoformat()} is fresh for {target.isoformat()}"
+        )
+        return FetchResult(
+            key=key,
+            display_name=display_name,
+            status="ok",
+            url=url,
+            file_path=dest,
+            file_type="pdf",
+        )
 
     return FetchResult(
         key=key,
@@ -2380,8 +2455,15 @@ async def _fetch_entry(
             recipe_error = f"Recipe replay failed: {exc}"
             print(f"  ↩️  {key}: recipe replay failed: {exc}")
         finally:
-            if dest.exists() and not _is_real_pdf(dest, key, max_pages=recipe_page_limit):
-                dest.unlink(missing_ok=True)
+            # A fresh 5-page bulletin is over the global cap, so _is_real_pdf
+            # is false. classify_page_capped_pdf may already have returned ok.
+            # This finally still runs on that return — do not delete the file.
+            _unlink_rejected_download(
+                dest,
+                key,
+                max_pages=recipe_page_limit,
+                target=target,
+            )
 
         if trained_recipe:
             print(f"  ⛔ {key}: trained recipe failed — skipping legacy fallbacks")
