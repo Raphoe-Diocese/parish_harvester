@@ -467,29 +467,27 @@ def extract_pdf_bulletin_date(path: Path) -> date | None:
     return extract_bulletin_date_from_text("\n".join(chunks))
 
 
-# Global MAX_BULLETIN_PAGES stays 4. Exactly 5 pages is kept only when the
-# heading date is already fresh. Six or more pages stay a fail unless the
-# recipe sets max_bulletin_pages.
-_FRESH_FIVE_PAGE_COUNT = 5
+# Global MAX_BULLETIN_PAGES stays 4 for undated or unproved files. A heading
+# date that is fresh for the harvest Sunday is this week's bulletin at any
+# length (Frank, 10/11/2026): 5, 6, 13, 24, whatever. No heading date, over
+# the cap, stays "Too many pages". A stale heading date stays stale.
 
 
 def _fresh_five_page_heading_date(path: Path, target: date) -> date | None:
-    """Return the heading date when *path* is a fresh 5-page bulletin.
+    """Return the heading date when it is fresh for *target*.
 
+    The name is from the old 5-page exception. Page count is not checked.
     The date is ``extract_pdf_bulletin_date`` checked with
-    ``verdict_for_extracted_date``. None means: not exactly 5 pages, no
-    heading date, or the heading date is not fresh. This does not invent a
-    date, and a stale date is not returned.
+    ``verdict_for_extracted_date``. None means no heading date, or the
+    heading date is not fresh. This does not invent a date, and a stale
+    date is not returned.
     """
     if not path.exists() or not is_valid_pdf(path):
         return None
     try:
         if path.stat().st_size < MIN_PDF_BYTES:
             return None
-        page_count = len(PdfReader(str(path)).pages)
-    except Exception:
-        return None
-    if page_count != _FRESH_FIVE_PAGE_COUNT:
+    except OSError:
         return None
     body_date = extract_pdf_bulletin_date(path)
     if body_date is None:
@@ -510,8 +508,9 @@ def _unlink_rejected_download(
     """Delete a replay download that failed the bulletin checks.
 
     ``_fetch_entry`` calls this from ``finally``, which also runs after an
-    early return. A fresh 5-page file fails ``_is_real_pdf`` because the
-    global cap is 4, so this must leave that file in place.
+    early return. A file with a fresh heading date fails ``_is_real_pdf``
+    when it is over the global cap of 4, so this must leave that file in
+    place. A stale or undated over-cap file is still deleted.
     """
     if not dest.exists():
         return
@@ -533,17 +532,18 @@ def classify_page_capped_pdf(
 ) -> FetchResult | None:
     """If *dest* is over the page cap, return ok, stale, or an honest fail.
 
-    Exactly 5 pages whose heading date is fresh for *target* is ok. The
-    date comes from ``extract_pdf_bulletin_date``; a missing date is not
-    treated as fresh. A stale heading date stays stale, including at 5
-    pages. Six or more pages, when *max_pages* does not already allow them,
-    are "Too many pages".
+    Any page count whose heading date is fresh for *target* is ok. The date
+    comes from ``extract_pdf_bulletin_date``; a missing date is not treated
+    as fresh. A stale heading date stays stale, including a long file such
+    as Saint Malachy's February 2025 bulletin or a July body under an August
+    filename. Over the cap with no heading date is "Too many pages".
 
     Holy Cross Belfast (and similar) serve a genuine PDF that is still last
     month's bulletin padded to 13 pages. ``_is_real_pdf`` then returns False
     and harvest used to report the default "No valid content found" — which
     looks like an empty download. A dated filename such as ``160826.pdf``
-    would also pass URL freshness, so we must not raise the page cap.
+    would also pass URL freshness, so we must not raise the page cap for an
+    undated or stale file.
     """
     if not dest.exists() or not is_valid_pdf(dest):
         return None
@@ -581,7 +581,7 @@ def classify_page_capped_pdf(
     kept_date = _fresh_five_page_heading_date(dest, target)
     if kept_date is not None:
         print(
-            f"  {key}: keeping 5-page bulletin — heading date "
+            f"  {key}: keeping {page_count}-page bulletin — heading date "
             f"{kept_date.isoformat()} is fresh for {target.isoformat()}"
         )
         return FetchResult(
@@ -2455,9 +2455,10 @@ async def _fetch_entry(
             recipe_error = f"Recipe replay failed: {exc}"
             print(f"  ↩️  {key}: recipe replay failed: {exc}")
         finally:
-            # A fresh 5-page bulletin is over the global cap, so _is_real_pdf
-            # is false. classify_page_capped_pdf may already have returned ok.
-            # This finally still runs on that return — do not delete the file.
+            # A fresh heading date is this week's bulletin even over the global
+            # cap, so _is_real_pdf is false. classify_page_capped_pdf may
+            # already have returned ok. This finally still runs on that
+            # return — do not delete the file.
             _unlink_rejected_download(
                 dest,
                 key,

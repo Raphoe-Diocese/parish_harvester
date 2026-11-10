@@ -43,11 +43,11 @@ _ERROR_PAGE_PATTERN = re.compile(
     r"i['\u2019]?m not a robot|unusual traffic|checking your browser|captcha)"
 )
 _ERROR_PAGE_MAX_CHARS = 1500
-# Parish bulletins are never longer than 4 pages by default.  Any PDF with more
-# pages is almost certainly a full document (parish magazine, booklet, etc.)
-# that was accidentally downloaded instead of the weekly bulletin. Individual
-# recipes may raise this via ``max_bulletin_pages`` (e.g. Ardmore's normal
-# 9-page weekly PDF).
+# Undated or unproved PDFs longer than 4 pages stay out of the mega PDF.
+# A heading date that is fresh for the harvest Sunday is this week's bulletin
+# and is included however many pages it has. Recipes may still raise the cap
+# via ``max_bulletin_pages`` for undated files (e.g. Ardmore's normal 9-page
+# weekly PDF).
 _MAX_BULLETIN_PAGES = 4
 
 
@@ -269,12 +269,22 @@ def stitch_mega_pdf(
                 page_count = len(reader.pages)
                 page_limit = _max_bulletin_pages_for_parish(parish_key)
                 if page_count > page_limit:
+                    # Local import: fetcher imports nothing from stitcher, but
+                    # keep the date rule in one place.
+                    from .fetcher import _fresh_five_page_heading_date
+
+                    fresh_heading = _fresh_five_page_heading_date(pdf_path, target)
+                    if fresh_heading is None:
+                        print(
+                            f"    ⚠️  Skipping {parish_key}: {page_count} pages exceeds "
+                            f"the {page_limit}-page bulletin limit (likely a full document)"
+                        )
+                        missing_entries.append((display_name, parish_url, website))
+                        continue
                     print(
-                        f"    ⚠️  Skipping {parish_key}: {page_count} pages exceeds "
-                        f"the {page_limit}-page bulletin limit (likely a full document)"
+                        f"    ✓ {parish_key}: {page_count} pages, heading date "
+                        f"{fresh_heading.isoformat()} is this week's bulletin"
                     )
-                    missing_entries.append((display_name, parish_url, website))
-                    continue
                 start_page = len(merger.pages) + 1
                 for idx, page in enumerate(reader.pages):
                     if idx == 0:
