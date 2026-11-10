@@ -4,6 +4,7 @@ import html
 import unittest
 
 from ocr.bulletin_layout import (
+    NO_BULLETIN_THIS_SUNDAY,
     _is_url_only_line,
     classify_heading_line,
     read_parish_issue_date,
@@ -322,50 +323,44 @@ class BulletinLayoutTests(unittest.TestCase):
             parish_dates={"drive-1jmslbrliw": "2026-09-28"},
             parish_page_spans={"Raphoe": (1, 1)},
         )
-        self.assertIn('class="ocr-parish-date">27/09/2026<', html_out)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, html_out)
+        self.assertIn("Raphoe", html_out)
+        self.assertNotIn("RAPHOE PARISH NEWSLETTER", html_out)
+        self.assertNotIn("27 September 2026", html_out)
         self.assertNotIn("25/10/2026", html_out)
         self.assertNotIn("28/09/2026", html_out)
-        undated = structure_ocr_html(
-            "<p>Page 1</p><p>Sunday 27 September 2026 RAPHOE PARISH NEWSLETTER</p>",
-            parish_entries=[("drive-1jmslbrliw", "Raphoe")],
-            bulletin_date="2026-10-25",
-            parish_dates={},
-            parish_page_spans={"Raphoe": (1, 1)},
-        )
-        self.assertIn('class="ocr-parish-date">27/09/2026<', undated)
-        self.assertNotIn("25/10/2026", undated)
-        self.assertNotIn("28/09/2026", undated)
+        self.assertNotIn('class="ocr-parish-date"', html_out)
 
     def test_masthead_uses_the_date_printed_in_that_bulletin(self) -> None:
-        """Harvest Sunday 08/11/2026 must not replace the date in the text."""
+        """A 1 November body is not rendered as the 8 November bulletin."""
         harvest = "2026-11-08"
         samples = {
             "Ovens": (
                 "<p>Sunday 01-November-2026 THE PARISHIONER Ovens and Farran Parish</p>",
-                "01/11/2026",
+                "01-November-2026",
             ),
             "Bantry": (
                 "<p>FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45</p>"
                 "<p>Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.</p>"
                 "<p>Tuesday 3rd November 2026 at 8 p.m. in the Bantry Primary Care Centre</p>"
                 "<p>died on 9th July 2023 RIP</p>",
-                "01/11/2026",
+                "FEAST OF ALL SAINTS",
             ),
             "Glenfin": (
                 "<p>Dé Domhnaigh Sunday Leitir-Bric</p>"
                 "<p>Sunday November 8th 11 a.m. Molly Harkin 1st anniversary</p>"
                 "<p>All Saints Day - Sunday Year A — November 1st 2026</p>",
-                "01/11/2026",
+                "Molly Harkin",
             ),
             "St Eugene's": (
                 "<p>Sunday 8th November, beginning at 4pm.</p>"
                 "<p>Thursday 12th November 2026. Derry Diocesan Trust is an Equal Opportunities Employer.</p>"
                 "<p>Parish Pilgrimage from 24-31 May 2027.</p>"
                 "<p>Vol 54 No 43 Solemnity of All Saints 1st November 2026</p>",
-                "01/11/2026",
+                "Equal Opportunities",
             ),
         }
-        for name, (body, expect) in samples.items():
+        for name, (body, forbidden) in samples.items():
             with self.subTest(parish=name):
                 html_out = structure_ocr_html(
                     body,
@@ -373,26 +368,29 @@ class BulletinLayoutTests(unittest.TestCase):
                     bulletin_date=harvest,
                     parish_dates={name: harvest},
                 )
-                self.assertIn(f'class="ocr-parish-date">{expect}<', html_out)
-                self.assertNotIn('class="ocr-parish-date">08/11/2026<', html_out)
+                self.assertIn(NO_BULLETIN_THIS_SUNDAY, html_out)
                 self.assertIn(html.escape(name), html_out)
-        self.assertIn("Dé Domhnaigh", structure_ocr_html(
+                self.assertNotIn(forbidden, html_out)
+                self.assertNotIn("08/11/2026", html_out)
+                self.assertNotIn('class="ocr-parish-date"', html_out)
+        glenfin = structure_ocr_html(
             samples["Glenfin"][0],
             single_parish_name="Glenfin",
             bulletin_date=harvest,
-        ))
-        self.assertIn("Molly Harkin", structure_ocr_html(
-            samples["Glenfin"][0],
-            single_parish_name="Glenfin",
-            bulletin_date=harvest,
-        ))
+        )
+        self.assertNotIn("Dé Domhnaigh", glenfin)
+        self.assertNotIn("Molly Harkin", glenfin)
 
         this_sunday = structure_ocr_html(
-            "<p>Sunday 8th November 2026 Parish Newsletter</p>",
+            "<p>Sunday 8th November 2026 Parish Newsletter</p>"
+            "<p>All Saints was 1st November 2026.</p>",
             single_parish_name="This Sunday",
             bulletin_date=harvest,
         )
         self.assertIn('class="ocr-parish-date">08/11/2026<', this_sunday)
+        self.assertIn("Parish Newsletter", this_sunday)
+        self.assertIn("1st November 2026", this_sunday)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, this_sunday)
 
         older = structure_ocr_html(
             "<p>Week beginning 18th October 2026</p>",
@@ -400,7 +398,8 @@ class BulletinLayoutTests(unittest.TestCase):
             bulletin_date=harvest,
             parish_dates={"Older week": harvest},
         )
-        self.assertIn('class="ocr-parish-date">18/10/2026<', older)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, older)
+        self.assertNotIn("18th October 2026", older)
         self.assertNotIn("08/11/2026", older)
 
         numeric = structure_ocr_html(
@@ -409,8 +408,9 @@ class BulletinLayoutTests(unittest.TestCase):
             single_parish_name="Week beginning",
             bulletin_date=harvest,
         )
-        self.assertIn('class="ocr-parish-date">01/11/2026<', numeric)
-        self.assertIn("31/10/2026", numeric)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, numeric)
+        self.assertNotIn("31/10/2026", numeric)
+        self.assertNotIn("01/11/2026", numeric)
         smashed = structure_ocr_html(
             "<p>Sunday 01-November-2026 THE PARISHIONER "
             "Next Sunday’s Readings 08-November-2026 Wis. 6:12-16.</p>"
@@ -418,9 +418,10 @@ class BulletinLayoutTests(unittest.TestCase):
             single_parish_name="Kilmurry",
             bulletin_date=harvest,
         )
-        self.assertIn('class="ocr-parish-date">01/11/2026<', smashed)
-        self.assertNotIn('class="ocr-parish-date">08/11/2026<', smashed)
-        self.assertIn("Next Sunday", smashed)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, smashed)
+        self.assertNotIn("Next Sunday", smashed)
+        self.assertNotIn("08/11/2026", smashed)
+        self.assertNotIn('class="ocr-parish-date"', smashed)
         doors = structure_ocr_html(
             "<p>Sunday 1st November: Feast of All Saints</p>"
             "<p>Sunday 8th November 2026. Doors open: 7.30 p.m. Curtain: 8.00 p.m.</p>",
@@ -430,6 +431,7 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn('class="ocr-parish-date">08/11/2026<', doors)
         self.assertNotIn("08/11/2026", doors)
         self.assertIn("Feast of All Saints", doors)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, doors)
         commemoration = structure_ocr_html(
             "<p>SOLEMNITY OF ALL SAINTS</p>"
             "<p>Sunday 8th November 2026 at 11am, Market Square, Longford. All welcome.</p>",
@@ -439,14 +441,16 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn('class="ocr-parish-date">08/11/2026<', commemoration)
         self.assertIn("Market Square", commemoration)
         self.assertIn("SOLEMNITY OF ALL SAINTS", commemoration)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, commemoration)
         future_course = structure_ocr_html(
             "<p>Sunday 01-November-2026 THE PARISHIONER</p>"
             "<p>Pre-Marriage courses 26-28 Feb 2027.</p>",
             single_parish_name="Kiltimagh",
             bulletin_date=harvest,
         )
-        self.assertIn('class="ocr-parish-date">01/11/2026<', future_course)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, future_course)
         self.assertNotIn("28/02/2027", future_course)
+        self.assertNotIn("08/11/2026", future_course)
         only_future = structure_ocr_html(
             "<p>Parish newsletter Pre-Marriage courses 26-28 Feb 2027.</p>",
             single_parish_name="Kiltimagh",
@@ -455,8 +459,7 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn("ocr-parish-date", only_future)
         self.assertNotIn("08/11/2026", only_future)
         self.assertIn("Feb 2027", only_future)
-        self.assertNotIn('class="ocr-parish-date">31/10/2026<', numeric)
-        self.assertNotIn('class="ocr-parish-date">08/11/2026<', numeric)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, only_future)
 
         blank = structure_ocr_html(
             "<p>Copyright 2026 Diocese of Cork and Ross</p>"
@@ -466,18 +469,51 @@ class BulletinLayoutTests(unittest.TestCase):
             parish_dates={"Gurranabraher": "2026-10-24"},
         )
         self.assertIn("Gurranabraher", blank)
+        self.assertIn("10:30am", blank)
         self.assertNotIn("ocr-parish-date", blank)
         self.assertNotIn("08/11/2026", blank)
         self.assertNotIn("24/10/2026", blank)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, blank)
 
         irish = structure_ocr_html(
             "<p>1 Samhain 2026</p><p>Aifrinn na Seachtaine</p>",
             single_parish_name="Gaoth Dobhair",
             bulletin_date=harvest,
         )
-        self.assertIn('class="ocr-parish-date">01/11/2026<', irish)
-        self.assertIn("Samhain", irish)
-        self.assertIn("Aifrinn na Seachtaine", irish)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, irish)
+        self.assertNotIn("Aifrinn na Seachtaine", irish)
+        self.assertNotIn("Samhain", irish)
+        self.assertNotIn("November", irish)
+        irish_now = structure_ocr_html(
+            "<p>8 Samhain 2026</p><p>Aifrinn na Seachtaine</p><p>Dé Domhnaigh</p>",
+            single_parish_name="Gaoth Dobhair",
+            bulletin_date=harvest,
+        )
+        self.assertIn("Aifrinn na Seachtaine", irish_now)
+        self.assertIn("Dé Domhnaigh", irish_now)
+        self.assertIn("Samhain", irish_now)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, irish_now)
+
+        glued = structure_ocr_html(
+            "<p>Anniversaries: Joe RIP. WEEKLY NEWSLETTER 01st November 2026 "
+            "Solemnity of All Saints</p>"
+            "<p>Sunday 8th November at 11am Rory McCullagh 1st Anniversary Mass</p>",
+            single_parish_name="Milford",
+            bulletin_date=harvest,
+        )
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, glued)
+        self.assertNotIn("01st November 2026", glued)
+        self.assertNotIn("Rory McCullagh", glued)
+        self.assertNotIn("08/11/2026", glued)
+        current_glued = structure_ocr_html(
+            "<p>Sunday 8th November 2026 Parish Newsletter. Anniversaries: Mary died in 2020.</p>"
+            "<p>Aifrinn na Seachtaine</p>",
+            single_parish_name="Gaoth Dobhair",
+            bulletin_date=harvest,
+        )
+        self.assertIn("Aifrinn na Seachtaine", current_glued)
+        self.assertIn("8th November 2026", current_glued)
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, current_glued)
 
         self.assertEqual(read_parish_issue_date("died on 9th July 2023 RIP"), "")
         self.assertEqual(
@@ -496,9 +532,11 @@ class BulletinLayoutTests(unittest.TestCase):
         bantry_at = both.index('data-parish-name="Bantry"')
         older_at = both.index('data-parish-name="Older Parish"')
         self.assertLess(bantry_at, older_at)
-        self.assertIn('class="ocr-parish-date">01/11/2026<', both[:older_at])
-        self.assertIn('class="ocr-parish-date">18/10/2026<', both[older_at:])
-        self.assertNotIn('class="ocr-parish-date">08/11/2026<', both)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, both[:older_at])
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, both[older_at:])
+        self.assertNotIn("1st November 2026", both)
+        self.assertNotIn("18th October 2026", both)
+        self.assertNotIn("08/11/2026", both)
 
         once = structure_ocr_html(
             samples["Ovens"][0],
@@ -510,9 +548,11 @@ class BulletinLayoutTests(unittest.TestCase):
             single_parish_name="Ovens",
             bulletin_date=harvest,
         )
-        self.assertEqual(once.count("ocr-parish-date"), 1)
-        self.assertEqual(twice.count("ocr-parish-date"), 1)
-        self.assertIn('class="ocr-parish-date">01/11/2026<', twice)
+        self.assertNotIn("01-November-2026", once)
+        self.assertNotIn("01-November-2026", twice)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, once)
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, twice)
+        self.assertEqual(once.count(NO_BULLETIN_THIS_SUNDAY), twice.count(NO_BULLETIN_THIS_SUNDAY))
 
     def test_convert_bulletin_promotes_plain_topic_lines(self) -> None:
         from ocr.convert_bulletin import render_markdown_lines

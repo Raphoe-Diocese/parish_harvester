@@ -412,8 +412,16 @@ _NEXT_ISSUE_SPLIT_RE = re.compile(r"(?i)\bnext\s+(?:sunday|week)\b")
 
 
 def _line_is_issue_stamp(line: str) -> bool:
-    """True when this line is the paper's own date, not a later notice."""
-    if _MEMORIAL_DATE_RE.search(line):
+    """True when this line is the paper's own date, not a later notice.
+
+    A memorial word glued onto the same OCR line does not hide a real
+    newsletter or All Saints date.
+    """
+    line = _tidy_issue_source(line)
+    has_issue = bool(
+        _ISSUE_STAMP_RE.search(line) or _LEADING_SUNDAY_DATE_RE.search(line)
+    )
+    if _MEMORIAL_DATE_RE.search(line) and not has_issue:
         return False
     if _EVENT_NOT_ISSUE_RE.search(line) and not _ISSUE_STAMP_RE.search(line):
         return False
@@ -426,14 +434,36 @@ def _line_is_issue_stamp(line: str) -> bool:
     return False
 
 
+def _tidy_issue_source(line: str) -> str:
+    """Drop OCR quotes that sit on a day number. 1” November is 1 November."""
+    text = (line or "").replace("’", "'").replace("‘", "'")
+    text = re.sub(r"[“”„]", " ", text)
+    text = re.sub(r"(\d)\s*[*]+\s*", r"\1 ", text)
+    return text
+
+
 def _issue_line_for_date(line: str) -> str:
-    """Keep the paper's date when next Sunday's readings are glued on."""
-    if not _ISSUE_STAMP_RE.search(line):
-        return line
-    head = _NEXT_ISSUE_SPLIT_RE.split(line, maxsplit=1)[0].strip()
+    """Keep the paper's date when next Sunday's readings are glued on.
+
+    A death notice glued in front of the newsletter line is not the issue date.
+    """
+    text = _tidy_issue_source(line)
+    if _MEMORIAL_DATE_RE.search(text):
+        starts = []
+        stamp = _ISSUE_STAMP_RE.search(text)
+        lead = _LEADING_SUNDAY_DATE_RE.search(text)
+        if stamp:
+            starts.append(stamp.start())
+        if lead:
+            starts.append(lead.start())
+        if starts:
+            text = text[min(starts) :]
+    if not _ISSUE_STAMP_RE.search(text):
+        return text
+    head = _NEXT_ISSUE_SPLIT_RE.split(text, maxsplit=1)[0].strip()
     if head and _ISSUE_STAMP_RE.search(head):
         return head
-    return line
+    return text
 
 
 def _first_parsed_date(source: str):
@@ -504,6 +534,126 @@ def read_parish_issue_date(text: str, *, not_after: str = "") -> str:
             continue
         return parsed.isoformat()
     return ""
+
+
+# Shown instead of a bulletin dated before this harvest week.
+# Not a translation of the parish's own text.
+NO_BULLETIN_THIS_SUNDAY = "There is no bulletin for this Sunday."
+
+
+def printed_issue_is_before_this_week(printed_iso: str, harvest_iso: str) -> bool:
+    """True when the paper's own date is older than this harvest week.
+
+    The week is the harvest Sunday and the six days before it. 01/11/2026 is
+    before the week of Sunday 08/11/2026. A blank date is not treated as old.
+    """
+    raw_printed = (printed_iso or "").strip()[:10]
+    raw_harvest = (harvest_iso or "").strip()[:10]
+    if not raw_printed or not raw_harvest:
+        return False
+    try:
+        printed = date.fromisoformat(raw_printed)
+        harvest = date.fromisoformat(raw_harvest)
+    except ValueError:
+        return False
+    from harvester.bulletin_freshness import week_window
+
+    start, _end = week_window(harvest)
+    return printed < start
+
+
+def _html_to_issue_text(fragment: str) -> str:
+    """Plain lines for the issue-date reader. Tags become line breaks."""
+    text = _TAG_RE.sub("\n", fragment or "")
+    text = html.unescape(text)
+    lines = [_SPACE_RE.sub(" ", line).strip() for line in text.splitlines()]
+    return "\n".join(line for line in lines if line)
+
+
+def _masthead_issue_iso(header: str, body: str, harvest_iso: str) -> str:
+    """Issue date for one parish block. The body wins. The masthead is a fallback."""
+    printed = read_parish_issue_date(_html_to_issue_text(body), not_after=harvest_iso)
+    if printed:
+        return printed
+    match = re.search(
+        r'data-issue-iso="(\d{4}-\d{2}-\d{2})"',
+        header or "",
+    )
+    if match:
+        return match.group(1)
+    uk = re.search(
+        r'class="ocr-parish-date">(\d{2})/(\d{2})/(\d{4})<',
+        header or "",
+    )
+    if not uk:
+        return ""
+    return f"{uk.group(3)}-{uk.group(2)}-{uk.group(1)}"
+
+
+def _mark_withheld_header(header: str, iso: str) -> str:
+    """Drop the visible date. Keep the issue date on the tag for the generator."""
+    cleaned = _set_masthead_date(header, "")
+    extra = ""
+    if "data-issue-iso=" not in cleaned:
+        extra += f' data-issue-iso="{iso}"'
+    if "data-no-bulletin=" not in cleaned:
+        extra += ' data-no-bulletin="1"'
+    if not extra:
+        return cleaned
+    return cleaned.replace("<header", "<header" + extra, 1)
+
+
+def withhold_stale_issue_bodies(fragment: str, harvest_iso: str) -> str:
+    """Drop a parish body whose own date is before this harvest week.
+
+    The parish name stays. The page says there is no bulletin for this Sunday.
+    The harvest Sunday is not stamped onto that body. Irish in a current
+    bulletin is left as printed.
+    """
+    harvest = (harvest_iso or "").strip()[:10]
+    source = fragment or ""
+    if not harvest or not source:
+        return source
+    note = (
+        '<p class="stale-note" data-no-bulletin="1">'
+        f"{html.escape(NO_BULLETIN_THIS_SUNDAY)}</p>"
+    )
+    parts = re.split(r"(?=<header\b[^>]*\bocr-parish-masthead\b)", source, flags=re.I)
+    out: list[str] = []
+    for part in parts:
+        if not part:
+            continue
+        if not re.match(r"<header\b[^>]*\bocr-parish-masthead\b", part, flags=re.I):
+            printed = read_parish_issue_date(_html_to_issue_text(part), not_after=harvest)
+            if printed_issue_is_before_this_week(printed, harvest):
+                out.append(note)
+            else:
+                out.append(part)
+            continue
+        end = part.lower().find("</header>")
+        if end < 0:
+            out.append(part)
+            continue
+        end += len("</header>")
+        header, body = part[:end], part[end:]
+        printed = _masthead_issue_iso(header, body, harvest)
+        if not printed_issue_is_before_this_week(printed, harvest):
+            out.append(part)
+            continue
+        out.append(_mark_withheld_header(header, printed) + "\n" + note)
+    return "".join(out)
+
+
+def leading_parish_issue_iso(fragment: str) -> str:
+    """Issue date of the first parish masthead, including a withheld one."""
+    match = re.search(
+        r"<header\b[^>]*ocr-parish-masthead[\s\S]*?</header>",
+        fragment or "",
+        flags=re.I,
+    )
+    if not match:
+        return ""
+    return _masthead_issue_iso(match.group(0), "", "")
 
 
 def _masthead_display_name(part: str) -> str:
@@ -777,6 +927,10 @@ def structure_ocr_html(
     harvest Sunday (``bulletin_date``) is only a ceiling: a later notice is
     not this paper. ``parish_dates`` from a file name are not used. No
     printed date means no masthead date.
+
+    A printed date before this harvest week is not this Sunday's reading.
+    That parish's body is replaced with a line that there is no bulletin for
+    this Sunday. The harvest Sunday is not written onto that body.
     """
     del parish_dates
     source = _reset_reader_markup(fragment or "")
@@ -980,7 +1134,7 @@ def structure_ocr_html(
         if part
     ]
     parts = _drop_name_repeat_before_masthead(parts)
-    return linkify_html(
+    linked = linkify_html(
         "\n".join(
             _stamp_issue_dates_on_mastheads(
                 parts,
@@ -989,6 +1143,10 @@ def structure_ocr_html(
             )
         )
     )
+    harvest = (bulletin_date or "").strip()[:10]
+    if not harvest:
+        return linked
+    return withhold_stale_issue_bodies(linked, harvest)
 
 
 def _stick_comma_after_heading(parts: list[str]) -> list[str]:
