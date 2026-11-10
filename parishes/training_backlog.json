@@ -2,17 +2,17 @@
   "generated_at": "2026-11-10",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 400,
+    "downloaded": 401,
     "html_links": 0,
-    "skipped": 797,
-    "failed": 51,
+    "skipped": 795,
+    "failed": 52,
     "stale_rejected": 69
   },
   "action_counts": {
-    "ok": 438,
-    "skip": 801,
+    "ok": 439,
+    "skip": 796,
     "mark_inactive": 4,
-    "investigate": 44,
+    "investigate": 48,
     "verify_autofix": 1,
     "retrain": 1
   },
@@ -14652,7 +14652,7 @@
       "recipe_file": "parishes/recipes/dromore/donaghmore.json",
       "recipe": {
         "start_url": "https://donaghmoreparish.org",
-        "site_type": "wp_json_newest_media",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
@@ -14661,13 +14661,15 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "07/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 02/10/2026. Do not pin https://donaghmoreparish.org/wp-content/uploads/2026/10/service@riceoffice.com_20261002_122109.pdf."
+          "07/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 02/10/2026. Do not pin https://donaghmoreparish.org/wp-content/uploads/2026/10/service@riceoffice.com_20261002_122109.pdf.",
+          "10/11/2026: homepage links Donaghmore-Bulletin-8th-November-2026.pdf. Scrape the homepage. Do not pin the dated filename. Do not take the service@riceoffice hash PDF. armagh/donaghmore.json uses the same parish_key and is loaded first."
         ],
         "do_not": [
           "Do not pin a dated filename.",
-          "Do not harvest Facebook."
+          "Do not harvest Facebook.",
+          "Do not take the service@riceoffice hash PDF."
         ],
-        "recorded_date": "2026-10-07"
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
@@ -15675,17 +15677,22 @@
       "recipe_file": "parishes/recipes/meath/drumconrath.json",
       "recipe": {
         "start_url": "https://drumconrathparish.ie/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: homepage links /newsletters/parish-bulletin-08-11-26/ which links the 8 November parish newsletter PDF. Follow the newest dated parish-bulletin post. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -15693,8 +15700,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No this-week PDF or JPEG proved on 03/10/2026. Do not invent a Facebook PDF."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "drumcree",
@@ -17794,18 +17801,24 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/fairview.json",
       "recipe": {
-        "start_url": "https://www.fairviewparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://fairviewparish.ie/news-events/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: /news-events/ lists sermon posts. The 8 November post links Sunday-8th-November-2026-Parish-Newsletter.pdf. Follow the newest dated sermon, then the PDF. Do not pin the dated filename or the sermon slug."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not pin the sermon slug.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -17813,8 +17826,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "fairymount",
@@ -21414,10 +21427,10 @@
       "learned_pattern": "saved_link_only",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "johnstown",
@@ -28040,17 +28053,23 @@
       "recipe_file": "parishes/recipes/dublin/maynooth.json",
       "recipe": {
         "start_url": "https://www.maynoothparish.org",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: homepage lists /notices/parish-newsletter-8th-november-2026/ which links Parish-Newsletter-8th-November-2026.pdf. /newsletters/ is an old archive. /current-newsletter/ redirects to a March youth PDF. Follow the newest dated notice. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not use /current-newsletter/ \u2014 it redirects to a March youth PDF.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -28058,8 +28077,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "meadowbrook",
@@ -28543,26 +28562,26 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/milltowndublin.json",
       "recipe": {
-        "start_url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf",
-        "site_type": "predicted_dated_pdf",
+        "start_url": "https://milltownparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "08/11/2026: recipe already pointed at Weekly-Bulletin-Sunday-November-8th-2026.pdf. Harvest predicted miss because weeks_ahead 1 tries 15 November first. Proved GET 206 application/pdf magic %PDF, full size 557095 bytes. weeks_back 0 weeks_ahead 0 so only the 8 November file is tried."
+          "08/11/2026: recipe already pointed at Weekly-Bulletin-Sunday-November-8th-2026.pdf. Harvest predicted miss because weeks_ahead 1 tries 15 November first. Proved GET 206 application/pdf magic %PDF, full size 557095 bytes. weeks_back 0 weeks_ahead 0 so only the 8 November file is tried.",
+          "10/11/2026: /newsletter/ lists Weekly-Bulletin-Sunday-November-8th-2026.pdf and older weeks. Scrape the listing. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not set start_url to /newsletter/ \u2014 scrape then brain hangs.",
-          "Do not pin November-8th forever \u2014 predicted rewrites the date.",
-          "Do not harvest Facebook."
+          "Do not harvest Facebook.",
+          "Do not pin the dated Weekly-Bulletin filename."
         ],
-        "recorded_date": "2026-11-08"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -34438,18 +34457,24 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/sandymount.json",
       "recipe": {
-        "start_url": "https://www.stmarysstaroftheseasandymount.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.stmarysstaroftheseasandymount.com/parish-newsletters.html",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: /parish-newsletters.html lists sunday_8th_november_2026.pdf.rev.pdf on this site. Scrape that list. Do not pin the dated filename. Do not pin an img1.wsimg.com hash."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not pin an img1.wsimg.com hash.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -34457,8 +34482,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "saulandballeeparish",
@@ -35730,20 +35755,22 @@
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
           "29/09/2026: /index.php/bulletin/ lists Sunday-27th-Sept-2026-ws.pdf (GET 200 application/pdf 349,446 bytes). Files sit under a stale /uploads/2022/06/ folder \u2014 filename date (Sept abbreviation) is the real date.",
           "site_type:http_scrape_newest_pdf \u2014 score listing hrefs by filename date.",
-          "29/09/2026 harvest 36580498188: all 3 attempts hit the 190s budget on GitHub Actions while the same scrape takes 0.5s from Ireland \u2014 stjohnsfallsroad.org appears to stall GitHub runner IPs (WAF). Do not raise timeouts; needs a proxy/alternate source or the Trainer Send & test from Frank PC."
+          "29/09/2026 harvest 36580498188: all 3 attempts hit the 190s budget on GitHub Actions while the same scrape takes 0.5s from Ireland \u2014 stjohnsfallsroad.org appears to stall GitHub runner IPs (WAF). Do not raise timeouts; needs a proxy/alternate source or the Trainer Send & test from Frank PC.",
+          "10/11/2026: /index.php/bulletin/ lists Sunday-8th-Nov-2026-ws.pdf beside Sunday-1st-Nov-2026-ws.pdf. Steps no longer download a pinned file. GitHub runners still stall on this host."
         ],
         "do_not": [
           "Do not pin 27th-Sept-2026.",
           "Do not read the /2022/06/ folder as the bulletin date.",
-          "Do not download Fr-Jobin / Vocations PDFs."
+          "Do not download Fr-Jobin / Vocations PDFs.",
+          "Do not pin Sunday-8th-Nov-2026-ws.pdf."
         ],
-        "recorded_date": "2026-09-29"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -36550,18 +36577,23 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/mayobridge.json",
       "recipe": {
-        "start_url": "http://www.mayobridgeparish.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.mayobridgeparish.com/parish-newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-02"
+        "operator_notes": [
+          "10/11/2026: /parish-newsletter/ lists Parish-Bulletin-8-November-2026.pdf. Scrape that list. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -36569,8 +36601,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No this-week (27/09/2026) bulletin file proved yet on 02/10/2026 \u2014 official table / kitchen-sink still open. Do not invent Facebook PDFs."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "stpaulslimerick",
@@ -38259,27 +38291,27 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/termonmaguirc.json",
       "recipe": {
-        "start_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
-        "site_type": "predicted_dated_pdf",
+        "start_url": "https://www.termonmaguircparish.com/bulletins/",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "09/11/2026: Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf rewrite becomes Twenty-Sixth ... 8-November and 404s. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 206 application/pdf magic %PDF, 683554 bytes. start_url is the PDF so /bulletins/ challenge is skipped."
+          "09/11/2026: Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf rewrite becomes Twenty-Sixth ... 8-November and 404s. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 206 application/pdf magic %PDF, 683554 bytes. start_url is the PDF so /bulletins/ challenge is skipped.",
+          "10/11/2026: /bulletins/ lists Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf with the older Sunday files. Scrape that listing. Do not pin the Sunday ordinal filename. Plain HTTP on 10/11/2026 returned the PDF links."
         ],
         "do_not": [
-          "Do not set start_url to /bulletins/ \u2014 listing challenge hangs.",
           "Do not keep Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf.",
-          "Do not invent a Sunday ordinal \u2014 use the live filename.",
-          "Do not harvest Facebook."
+          "Do not harvest Facebook.",
+          "Do not pin the Sunday ordinal filename."
         ],
-        "recorded_date": "2026-11-09"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -39814,8 +39846,8 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/wicklow.json",
       "recipe": {
-        "start_url": "https://www.stmantan.ie",
-        "site_type": "wp_json_newest_media",
+        "start_url": "https://www.stmantan.ie/newsletters/parish/wicklow_rathnew/",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
@@ -39824,23 +39856,25 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "09/11/2026 Parish scan: proved pdf dated 08/11/2026. Do not pin https://www.stmantan.ie/wp-content/uploads/Share2026Newsletter.pdf."
+          "09/11/2026 Parish scan: proved pdf dated 08/11/2026. Do not pin https://www.stmantan.ie/wp-content/uploads/Share2026Newsletter.pdf.",
+          "10/11/2026: /newsletters/parish/wicklow_rathnew/ lists ww-news-08.11.26.pdf (filename date 08/11/2026). Scrape that list. Do not pin the dated filename. Do not take Share2026Newsletter.pdf."
         ],
         "do_not": [
           "Do not pin a dated filename.",
           "Do not harvest Facebook.",
-          "Do not rescrape the homepage when the permanent newsletter link is stale."
+          "Do not rescrape the homepage when the permanent newsletter link is stale.",
+          "Do not take Share2026Newsletter.pdf."
         ],
-        "recorded_date": "2026-11-09"
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Too many pages: 8 pages (max 4)",
       "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_reason": "Too many pages: 8 pages (max 4)"
     },
     {
       "parish_key": "willington",
