@@ -578,7 +578,7 @@ def test_saved_pdf_with_no_date_in_the_name_gets_the_heading_date(tmp_path, monk
     pdf.write_bytes(b"%PDF-1.4")
     monkeypatch.setattr(
         "harvester.bulletin_freshness.heading_date_in_pdf",
-        lambda path, target=None: date(2026, 11, 8),
+        lambda path, target=None, url=None: date(2026, 11, 8),
     )
     fields = _bulletin_date_fields("https://exampleparish.ie/bulletin.pdf", pdf_path=pdf)
     assert fields["bulletin_date"] == "2026-11-08"

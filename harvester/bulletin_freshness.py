@@ -647,28 +647,250 @@ _BODY_YEAR_RE = re.compile(r"\b(20\d{2})\b")
 _ANCIENT_BODY_YEAR_GAP = 3
 
 
+# "Sunday 8 November 10am" is a Mass time. The existing parser reads the
+# "10" as the year 2010. That is not an issue date, and it is not this Sunday.
+_CLOCK_RE = re.compile(
+    r"(?i)(?<!\d)(?:[01]?\d|2[0-3])"
+    r"(?:[:.][0-5]\d)?\s*(?:a\.?\s*m\.?|p\.?\s*m\.?|noon)\b"
+    r"|(?<!\d)(?:[01]?\d|2[0-3])[:.][0-5]\d\b"
+)
+_SUNDAY_WORD_RE = re.compile(r"(?i)\bsunday\b")
+_ORDINARY_SUNDAY_RE = re.compile(
+    r"\b(\d{1,2})(?:st|nd|rd|th)? sunday in ordinary time\b"
+)
+
+
+def _front_page_lines(text: str) -> list[str]:
+    lines = _nonempty_text_lines(text)[:40]
+    if not lines and text:
+        lines = [text[:500]]
+    return lines
+
+
+def _clock_stole_the_year(line: str, parsed: date) -> bool:
+    """True when the year digits are the Mass clock, not a printed year."""
+    if not _CLOCK_RE.search(line or ""):
+        return False
+    printed = {int(year) for year in _FULL_YEAR_RE.findall(line or "")}
+    return parsed.year not in printed
+
+
+def _line_issue_date(line: str) -> date | None:
+    """A date on this line. Memorials and clock-years stay None."""
+    if _ADJACENT_BODY_PARAGRAPH_RE.search(line or ""):
+        return None
+    parsed = extract_date_from_string(line)
+    if parsed is None or _clock_stole_the_year(line, parsed):
+        return None
+    return parsed
+
+
+def _adjacent_issue_date(line: str) -> date | None:
+    parsed = _parse_short_adjacent_date_line(line)
+    if parsed is None or _clock_stole_the_year(line, parsed):
+        return None
+    return parsed
+
+
+def _front_page_issue_dates(text: str) -> list[date]:
+    """Every issue date in the first 40 front-page lines, any week."""
+    found: list[date] = []
+    for line in _front_page_lines(text):
+        parsed = _line_issue_date(line)
+        if parsed is not None:
+            found.append(parsed)
+    return found
+
+
+def _pick_in_week(found: list[date], target: date) -> date | None:
+    week_start, week_end = week_window(target)
+    in_week = [item for item in found if week_start <= item <= week_end]
+    if not in_week:
+        return None
+    if target in in_week:
+        return target
+    return max(in_week)
+
+
 def front_page_issue_date(text: str, target: date) -> date | None:
     """This week's date on the front page. The word newsletter is not required.
 
     "Sunday 8th November 2026" counts. "died on 9th July 2023" does not.
     A photo of a page has no text, so this returns nothing.
     """
-    week_start, week_end = week_window(target)
+    return _pick_in_week(_front_page_issue_dates(text), target)
+
+
+def _later_page_issue_dates(text: str) -> list[date]:
+    """Issue-style dates on one later page.
+
+    A Sunday line, a newsletter/bulletin heading, or a liturgical masthead
+    with a year. A Mass clock is not a year. A memorial line is not an issue.
+    """
+    lines = _nonempty_text_lines(text)
     found: list[date] = []
-    lines = _nonempty_text_lines(text)[:40]
-    if not lines and text:
-        lines = [text[:500]]
-    for line in lines:
+    seen: set[date] = set()
+
+    def add(parsed: date | None) -> None:
+        if parsed is not None and parsed not in seen:
+            seen.add(parsed)
+            found.append(parsed)
+
+    for index, line in enumerate(lines):
+        if _SUNDAY_WORD_RE.search(line):
+            add(_line_issue_date(line))
+        if _BULLETIN_HEADING_RE.search(line):
+            add(_line_issue_date(line))
+            for offset in _ADJACENT_DATE_LINE_OFFSETS:
+                neighbour = index + offset
+                if 0 <= neighbour < len(lines):
+                    add(_adjacent_issue_date(lines[neighbour]))
+        if not _LITURGICAL_MASTHEAD_RE.search(line):
+            continue
         if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
             continue
-        parsed = extract_date_from_string(line)
-        if parsed is not None and week_start <= parsed <= week_end:
-            found.append(parsed)
-    if not found:
+        if _FULL_YEAR_RE.search(line):
+            add(_line_issue_date(line))
+        for offset in _ADJACENT_DATE_LINE_OFFSETS:
+            neighbour = index + offset
+            if 0 <= neighbour < len(lines) and _FULL_YEAR_RE.search(lines[neighbour]):
+                add(_adjacent_issue_date(lines[neighbour]))
+    return found
+
+
+def _text_without_memorial_lines(text: str) -> str:
+    kept: list[str] = []
+    for line in (text or "").splitlines():
+        if line.strip() and _ADJACENT_BODY_PARAGRAPH_RE.search(line):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
+
+
+def _liturgical_date_in_week(page: str, target: date) -> date | None:
+    """Map a liturgical Sunday on this page onto the year printed on this page.
+
+    Thirty-Second Sunday in Ordinary Time plus 2026 is 08/11/2026.
+    A bare "32nd Sunday", or a year that is not 2026, does not become that Sunday.
+    """
+    from .liturgical import liturgical_date_from_text, normalize_liturgical_phrase
+
+    text = _text_without_memorial_lines(page)
+    years = {int(year) for year in _FULL_YEAR_RE.findall(text)}
+    if not years:
         return None
-    if target in found:
-        return target
-    return max(found)
+    needle = normalize_liturgical_phrase(text)
+    weeks = [int(match.group(1)) for match in _ORDINARY_SUNDAY_RE.finditer(needle)]
+    if not weeks:
+        return None
+    found: list[date] = []
+    for number in weeks:
+        phrase = f"{number} Sunday in Ordinary Time"
+        for year in years:
+            parsed = liturgical_date_from_text(phrase, year)
+            if parsed is not None:
+                found.append(parsed)
+    return _pick_in_week(found, target)
+
+
+def issue_date_from_pages(
+    pages: list[str],
+    target: date,
+    *,
+    url: str | None = None,
+) -> tuple[date | None, str]:
+    """Issue date for one saved bulletin, in the agreed order.
+
+    1. Front page, this week.
+    2. Later pages, this week, only when the front page has no issue date.
+       An issue date already on the front page and outside this week stays
+       the fact. A later Mass time does not replace it.
+    3. The file URL, when the PDF text has no issue date and the existing
+       parser reads a date inside this week. 09-11-08.pdf stays 2009-11-08.
+    4. Liturgical name plus the year printed on that same page.
+    Returns (None, "front_outside") when the front page is dated outside
+    this week, so the caller does not keep looking.
+    """
+    front = pages[0] if pages else ""
+    front_dates = _front_page_issue_dates(front)
+    in_week = _pick_in_week(front_dates, target)
+    if in_week is not None:
+        return in_week, "front_page"
+    if front_dates:
+        return None, "front_outside"
+    for page in pages[1:]:
+        later = _pick_in_week(_later_page_issue_dates(page), target)
+        if later is not None:
+            return later, "later_page"
+    if url:
+        parsed = extract_bulletin_date(url)
+        if parsed is not None and _pick_in_week([parsed], target) is not None:
+            return parsed, "url"
+    for page in pages:
+        liturgical = _liturgical_date_in_week(page, target)
+        if liturgical is not None:
+            return liturgical, "liturgical"
+    return None, ""
+
+
+def _pdf_page_texts(reader: object, max_pages: int | None) -> list[str]:
+    pages = getattr(reader, "pages", [])
+    chosen = pages if max_pages is None else pages[:max_pages]
+    chunks: list[str] = []
+    for page in chosen:
+        try:
+            chunks.append(page.extract_text() or "")
+        except Exception:
+            chunks.append("")
+    return chunks
+
+
+def _ocr_first_page_text(path: Path) -> str:
+    """First page only, and only when the tesseract binary is on PATH."""
+    import shutil
+
+    if shutil.which("tesseract") is None:
+        return ""
+    try:
+        from ocr.sparse_page_ocr import ocr_pdf_page_lines
+
+        lines = ocr_pdf_page_lines(path, 0)
+    except Exception:
+        return ""
+    return "\n".join(lines or [])
+
+
+def saved_bulletin_issue_date(
+    path: Path,
+    *,
+    target: date | None = None,
+    url: str | None = None,
+) -> tuple[date | None, str]:
+    """Date a saved PDF. The second value names which way fired.
+
+    Image-only PDFs are OCR'd on the first page when tesseract is installed.
+    A date from that OCR text is kept only when it falls inside the harvest week.
+    No paid API and no Gemini call.
+    """
+    if target is None:
+        text = read_pdf_text_head(path, max_pages=2)
+        if not text.strip():
+            return None, ""
+        found = _date_from_pdf_text(text, None)
+        return found, "legacy" if found is not None else ""
+    pages = read_pdf_page_texts(path)
+    found, way = issue_date_from_pages(pages, target, url=url)
+    if found is not None or way == "front_outside":
+        return found, way
+    if any(page.strip() for page in pages):
+        return None, ""
+    ocr_text = _ocr_first_page_text(path)
+    if not ocr_text.strip():
+        return None, ""
+    ocr_found, ocr_way = issue_date_from_pages([ocr_text], target, url=None)
+    if ocr_found is not None and ocr_way in {"front_page", "liturgical"}:
+        return ocr_found, "ocr"
+    return None, ""
 
 
 def _date_from_pdf_text(text: str, target: date | None) -> date | None:
@@ -685,11 +907,19 @@ def _date_from_pdf_text(text: str, target: date | None) -> date | None:
     return None
 
 
-def heading_date_in_pdf_bytes(data: bytes, *, max_pages: int = 2, target: date | None = None) -> date | None:
+def heading_date_in_pdf_bytes(
+    data: bytes,
+    *,
+    max_pages: int = 2,
+    target: date | None = None,
+    url: str | None = None,
+) -> date | None:
     """Date from the heading text inside a PDF. Empty when the PDF is a photo scan.
 
     Photo scans have no embedded text. This does not invent a date from a
     memorial line. The caller decides whether the date is this Sunday.
+    With a harvest Sunday, later pages, the URL, and a liturgical name are
+    read the same way as a file on disk. Bytes are not sent to OCR.
     """
     if not data or not data.startswith(b"%PDF"):
         return None
@@ -701,21 +931,41 @@ def heading_date_in_pdf_bytes(data: bytes, *, max_pages: int = 2, target: date |
         reader = PdfReader(BytesIO(data))
     except Exception:
         return None
-    chunks: list[str] = []
-    for page in reader.pages[:max_pages]:
-        try:
-            chunks.append(page.extract_text() or "")
-        except Exception:
-            chunks.append("")
-    return _date_from_pdf_text("\n".join(chunks), target)
+    if target is None:
+        return _date_from_pdf_text("\n".join(_pdf_page_texts(reader, max_pages)), None)
+    found, _way = issue_date_from_pages(
+        _pdf_page_texts(reader, None),
+        target,
+        url=url,
+    )
+    return found
 
 
-def heading_date_in_pdf(path: Path, *, target: date | None = None) -> date | None:
-    """Date from the first pages of a PDF already saved on disk."""
-    text = read_pdf_text_head(path, max_pages=2)
-    if not text.strip():
-        return None
-    return _date_from_pdf_text(text, target)
+def read_pdf_page_texts(path: Path, max_pages: int | None = None) -> list[str]:
+    """Embedded text of each page, in order. Empty when the PDF cannot be read."""
+    try:
+        from PyPDF2 import PdfReader
+
+        reader = PdfReader(str(path))
+    except Exception:
+        return []
+    return _pdf_page_texts(reader, max_pages)
+
+
+def heading_date_in_pdf(
+    path: Path,
+    *,
+    target: date | None = None,
+    url: str | None = None,
+) -> date | None:
+    """Date from a PDF already saved on disk.
+
+    With a harvest Sunday this is the shared reader: front page, later pages,
+    the file URL, the liturgical name, then first-page OCR when the PDF has
+    no embedded text.
+    """
+    found, _way = saved_bulletin_issue_date(path, target=target, url=url)
+    return found
 
 
 def read_pdf_text_head(path: Path, max_pages: int = 4) -> str:
