@@ -2293,10 +2293,13 @@ def _extract_matching_href_texts(
             continue
         seen.add(absolute)
         out.append((absolute, ""))
+    # PDF Embedder writes &#038; between query args. Unescape before the
+    # iframe / url= search or the real PDF never scores (Terenure 10/11/2026).
+    plain = unescape(html or "")
     extra_raw: list[str] = []
-    extra_raw.extend(_IFRAME_OR_EMBED_SRC_RE.findall(html or ""))
-    extra_raw.extend(_OBJECT_DATA_RE.findall(html or ""))
-    extra_raw.extend(_QUERY_URL_PARAM_RE.findall(html or ""))
+    extra_raw.extend(_IFRAME_OR_EMBED_SRC_RE.findall(plain))
+    extra_raw.extend(_OBJECT_DATA_RE.findall(plain))
+    extra_raw.extend(_QUERY_URL_PARAM_RE.findall(plain))
     for raw in extra_raw:
         file_url = _listing_src_to_file_url(raw, base_url)
         if not file_url:

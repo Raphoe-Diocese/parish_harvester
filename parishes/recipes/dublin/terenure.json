@@ -1,50 +1,38 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "terenure",
   "display_name": "Terenure",
   "diocese": "dublin",
-  "recorded_date": "2026-11-02",
-  "start_url": "https://stjosephsterenure.com/",
-  "site_type": "http_scrape_newest_images",
-  "playbook_type": "html_text_bulletin",
-  "max_bulletin_pages": 16,
-  "timeout_ms": 90000,
-  "total_timeout_s": 250,
-  "example_url": "https://stjosephsterenure.com/wp-content/uploads/2026/10/IMG_20261025_123738_resized_20261025_123814477.jpg",
+  "recorded_date": "2026-11-10",
+  "start_url": "https://stjosephsterenure.com/category/newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "direct_download",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "post_slug_patterns": [
+    "sunday"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
   "steps": [
     {
       "action": "goto",
-      "url": "https://stjosephsterenure.com/"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='newsletter-sunday-']",
-      "pick_strategy": "first_match",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href*='newsletter-sunday']"
-      ]
-    },
-    {
-      "action": "image_stack",
-      "count": 1,
-      "prefer": "largest",
-      "selector": "img[src*='/uploads/2026/']",
-      "min_long_side": 400
+      "url": "https://stjosephsterenure.com/category/newsletter/"
     }
   ],
   "operator_notes": [
-    "02/11/2026: was stale on 18/10 NL PDF via wp-json. Site now posts photo newsletters. Top home link newsletter-sunday-25th-october-2026.",
-    "Proved IMG_20261025… full JPEG GET 200 image/jpeg 556641 bytes. Previous Sunday keep. Do not pin the image name. Skip diocese safeguarding PDFs."
+    "02/11/2026: was stale on 18/10 NL PDF via wp-json. October posts were photo newsletters.",
+    "10/11/2026: /category/newsletter/ lists the Sunday posts. The 8 November post embeds NL2026-11-08.pdf. Proved GET 200 application/pdf, 639086 bytes. The page heading is Sun 8th November '26. Follow the newest Sunday post, then the embedded PDF. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not pin IMG_20261025….jpg.",
-    "Do not harvest diocese safeguarding / CSPS PDFs from the homepage.",
-    "Do not keep wp_json NL*.pdf while the Sunday posts are photo bulletins."
+    "Do not pin the dated filename.",
+    "Do not pin the dated post slug.",
+    "Do not harvest diocese safeguarding / CSPS PDFs.",
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
-    "strategy": "first_match",
+    "strategy": "newest_dated",
     "position": "top"
-  },
-  "bulletin_format": "image_stack"
+  }
 }
