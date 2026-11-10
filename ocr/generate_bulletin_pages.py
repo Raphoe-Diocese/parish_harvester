@@ -665,15 +665,14 @@ def prepare_ocr_fragment(
     prepends a failure banner when OCR produced nothing usable at all for
     any known parish this week.
     """
-    # The harvest Sunday is the diocese edition, not each parish's paper.
-    # structure_ocr_html reads the date printed in that parish's text.
-    del bulletin_date
+    # The harvest Sunday is a ceiling only. It is not copied onto a masthead.
     cleaned = tighten_ocr_paragraphs(_flatten_legacy_parish_accordions(ocr_fragment or ""))
     entries = _load_parish_entries(diocese, parish_links or []) if parish_links else []
     url_by_name = {name: url for name, url in (parish_links or [])}
     structured = structure_ocr_html(
         cleaned,
         parish_entries=entries,
+        bulletin_date=bulletin_date,
         parish_urls=url_by_name,
         parish_page_spans=_parish_page_spans(diocese),
     )
@@ -889,13 +888,15 @@ def render_ocr_standalone_page(
 ) -> str:
     """Mobile-friendly OCR-only page for opening bulletin text in a new tab."""
     diocese_label = _diocese_label(config.display_name)
-    uk_bulletin_date = format_uk_date(bulletin_date)
+    uk_bulletin_date = html.escape(format_uk_date(bulletin_date))
+    title_date = f" — {uk_bulletin_date}" if uk_bulletin_date else ""
+    line_date = f" · {uk_bulletin_date}" if uk_bulletin_date else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>{html.escape(config.display_name)} Text Bulletin — {html.escape(uk_bulletin_date)}</title>
+  <title>{html.escape(config.display_name)} Text Bulletin{title_date}</title>
   {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -1009,7 +1010,7 @@ def render_ocr_standalone_page(
     <div class="top" id="ocr-top">
       <div class="top-left">
         <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
-        <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
+        <span class="title-line">{html.escape(diocese_label)} Text Bulletin{line_date}</span>
       </div>
     </div>
     <div class="ocr-sticky-chrome">
@@ -1615,14 +1616,16 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
 def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_href: str, viewer_href: str) -> str:
     """Distraction-free, chrome-free full-page PDF view — mirrors render_ocr_standalone_page."""
     diocese_label = _diocese_label(config.display_name)
-    uk_bulletin_date = format_uk_date(bulletin_date)
+    uk_bulletin_date = html.escape(format_uk_date(bulletin_date))
+    title_date = f" — {uk_bulletin_date}" if uk_bulletin_date else ""
+    line_date = f" · {uk_bulletin_date}" if uk_bulletin_date else ""
     safe_pdf = html.escape(pdf_href, quote=True)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{html.escape(config.display_name)} PDF — {html.escape(uk_bulletin_date)}</title>
+  <title>{html.escape(config.display_name)} PDF{title_date}</title>
   {favicon_link_tags()}
   {pdf_first_page_preload_tag(pdf_href)}
   <style>
@@ -1668,7 +1671,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
   <div class="top" id="pdf-top">
     <div class="top-left">
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
-      <span class="title-line">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</span>
+      <span class="title-line">{html.escape(diocese_label)}{line_date}</span>
     </div>
     <a class="download-link" href="{safe_pdf}">Open PDF</a>
   </div>
@@ -2839,6 +2842,66 @@ def render_bulletin_viewer_shell(
 </body>
 </html>
 """
+
+
+def restamp_published_viewer_panels() -> list[Path]:
+    """Put each parish's printed date on the diocese viewer pages the site deploys.
+
+    The collated-book title stays the harvest Sunday. Only the masthead date
+    changes. The bulletin text is left as printed.
+    """
+    from harvester.site_builder import OCR_DIOCESE_KEYS
+    from ocr.bulletin_layout import restamp_masthead_dates
+
+    changed: list[Path] = []
+
+    def _swap(raw: str, pattern: re.Pattern[str], page_date: str) -> str | None:
+        match = pattern.search(raw)
+        if not match:
+            return None
+        fragment = restamp_masthead_dates(match.group(1), not_after=page_date)
+        if fragment == match.group(1):
+            return None
+        return raw[: match.start(1)] + fragment + raw[match.end(1) :]
+
+    newest: dict[str, tuple[str, Path]] = {}
+    if BULLETINS_DIR.exists():
+        for path in BULLETINS_DIR.glob("*.html"):
+            match = VIEWER_FILE_PATTERN.match(path.name)
+            if not match or match.group(1) not in DIOCESES:
+                continue
+            diocese, page_date = match.group(1), match.group(2)
+            prev = newest.get(diocese)
+            if prev is None or page_date > prev[0]:
+                newest[diocese] = (page_date, path)
+    for diocese, (page_date, path) in sorted(newest.items()):
+        raw = path.read_text(encoding="utf-8")
+        updated = _swap(raw, OCR_PANEL_PATTERN, page_date)
+        if updated is not None:
+            path.write_text(updated, encoding="utf-8")
+            changed.append(path)
+        ocr_path = path.with_name(f"{diocese}-{page_date}-ocr.html")
+        if not ocr_path.exists():
+            continue
+        ocr_raw = ocr_path.read_text(encoding="utf-8")
+        ocr_updated = _swap(ocr_raw, OCR_STANDALONE_BODY_PATTERN, page_date)
+        if ocr_updated is not None:
+            ocr_path.write_text(ocr_updated, encoding="utf-8")
+            changed.append(ocr_path)
+    for folder, ocr_key in OCR_DIOCESE_KEYS.items():
+        found = newest.get(ocr_key)
+        if not found:
+            continue
+        page_date, _bulletin = found
+        index = DOCS_DIR / "dioceses" / folder / "index.html"
+        if not index.is_file():
+            continue
+        raw = index.read_text(encoding="utf-8")
+        updated = _swap(raw, OCR_PANEL_PATTERN, page_date)
+        if updated is not None:
+            index.write_text(updated, encoding="utf-8")
+            changed.append(index)
+    return changed
 
 
 def regenerate_viewer_from_existing(existing_path: Path) -> Path:
