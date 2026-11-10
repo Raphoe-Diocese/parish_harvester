@@ -2,25 +2,37 @@
   "parish_key": "ashford",
   "display_name": "Ashford",
   "diocese": "dublin",
-  "recorded_date": "2026-11-09",
-  "start_url": "http://stmantan.ie/parish/ashford_glenealy",
-  "site_type": "wp_json_newest_media",
+  "recorded_date": "2026-11-10",
+  "start_url": "https://www.stmantan.ie/newsletters/parish/ashford_glenealy/",
+  "site_type": "http_scrape_newest_pdf",
   "playbook_type": "direct_download",
   "status": "active",
   "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "http://stmantan.ie/parish/ashford_glenealy"
+      "url": "https://www.stmantan.ie/newsletters/parish/ashford_glenealy/"
     }
   ],
-  "version": 1,
+  "version": 2,
   "operator_notes": [
-    "09/11/2026 Parish scan: proved pdf dated 08/11/2026. Do not pin https://www.stmantan.ie/wp-content/uploads/Share2026Newsletter.pdf."
+    "09/11/2026 Parish scan: proved pdf dated 08/11/2026. Do not pin https://www.stmantan.ie/wp-content/uploads/Share2026Newsletter.pdf.",
+    "10/11/2026: /newsletters/parish/ashford_glenealy/ returned HTTP 200 and lists af-news-08.11.26.pdf (HTTP 206, application/pdf, bytes 0-7/1565889, magic %PDF-1.7) and older af-news-01.11.26.pdf. Scrape that list with href af-news. Do not pin the dated filename. Do not take ww-news. Do not take Share2026Newsletter.pdf."
   ],
   "do_not": [
     "Do not pin a dated filename.",
     "Do not harvest Facebook.",
-    "Do not rescrape the homepage when the permanent newsletter link is stale."
-  ]
+    "Do not rescrape the homepage when the permanent newsletter link is stale.",
+    "Do not take Share2026Newsletter.pdf.",
+    "Do not take ww-news."
+  ],
+  "href_patterns": [
+    "af-news"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
