@@ -2,15 +2,15 @@
   "generated_at": "2026-11-10",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 407,
+    "downloaded": 410,
     "html_links": 0,
-    "skipped": 790,
+    "skipped": 788,
     "failed": 52,
-    "stale_rejected": 68
+    "stale_rejected": 67
   },
   "action_counts": {
-    "ok": 444,
-    "skip": 794,
+    "ok": 446,
+    "skip": 792,
     "mark_inactive": 4,
     "investigate": 45,
     "verify_autofix": 1,
@@ -5050,10 +5050,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballyheigue",
@@ -10372,10 +10372,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "charlestown",
@@ -11273,26 +11273,25 @@
       "recipe_file": "parishes/recipes/clogher/parishofroslea.json",
       "recipe": {
         "start_url": "https://parishofroslea.com/category/parish-bulletin/",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 4,
-        "click_count": 3,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "10/11/2026: category page lists the bulletin posts. The 08/11/2026 post links Bulletin-Sunday-8th-November-2026.pdf. GET 200 application/pdf 181663 bytes. Filename date 08/11/2026. PDF heading Sunday 8th November 2026. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin a dated filename.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-09-14"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": {
         "total_timeout_s": 490,
@@ -17508,14 +17507,15 @@
         "has_terminal": false,
         "operator_notes": [
           "29/10/2026: Homepage lists Newsletter-10-25-2026.pdf (HEAD 200). Filenames are US MM-DD-YYYY \u2014 10-25 is 25/10/2026. Old recipe pinned Sept download; status had misread 10-25 as 10/10.",
-          "site_type:http_scrape_newest_pdf. Date scorer picks MM-DD vs DD-MM nearer harvest Sunday for Newsletter-MM-DD-YYYY."
+          "site_type:http_scrape_newest_pdf. Date scorer picks MM-DD vs DD-MM nearer harvest Sunday for Newsletter-MM-DD-YYYY.",
+          "10/11/2026: homepage lists Newsletter-11-08-2026.pdf. GET 200, 244245 bytes. PDF text line is 8th November 2026. Filename 11-08 is 08/11/2026. Do not pin the dated filename."
         ],
         "do_not": [
           "Do not pin Newsletter-09-20-2026.pdf or Newsletter-10-25-2026.pdf.",
           "Do not download Altar-Servers or Cookies-Policy PDFs.",
           "Do not read Newsletter-10-04-2026 as 10 April \u2014 it is 04/10/2026."
         ],
-        "recorded_date": "2026-10-29"
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -17673,6 +17673,7 @@
           "errigaltruparish.com is dead DNS. Live site is truaghparish.com.",
           "Homepage 'Click here for Errigal Truagh Parish Bulletin' is a Wix hashed PDF.",
           "Proved 22/08/2026: HTTP 200, 319760 bytes, PDF text Sunday 23 August 2026.",
+          "10/11/2026: same Parish Bulletin link. GET 200, 386626 bytes. PDF text Sunday 8 November 2026. Do not pin the Wix _files/ugd hash.",
           "Do not pin the hash. Do not harvest the Vocations or church-history PDFs."
         ],
         "do_not": [
@@ -17681,7 +17682,7 @@
           "Do not download the Year of Vocations PDF or the church-history docx.",
           "Do not use http_scrape_newest_pdf \u2014 hashed filenames have no date."
         ],
-        "recorded_date": "2026-08-22"
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -21340,13 +21341,14 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "05/10/2026 cloud leftover hunt: mayo.ie Islandeady Glenisland listing. Proved Islandeady-Glenisland-04-10-2026.pdf GET 200 application/pdf 458477 bytes magic %PDF. Link text October 4th 2026. PDF text Sun 04th Oct. Official islandeady.ie only had Nov 2022 PDF. Do not pin the getmedia GUID."
+          "05/10/2026 cloud leftover hunt: mayo.ie Islandeady Glenisland listing. Proved Islandeady-Glenisland-04-10-2026.pdf GET 200 application/pdf 458477 bytes magic %PDF. Link text October 4th 2026. PDF text Sun 04th Oct. Official islandeady.ie only had Nov 2022 PDF. Do not pin the getmedia GUID.",
+          "10/11/2026: same listing has Islandeady-Glenisland-08-11-2026.pdf. GET 200, 395307 bytes. PDF text Sunday 08th November 2026. Do not pin the getmedia GUID or the dated filename."
         ],
         "do_not": [
           "Do not pin the getmedia GUID or dated filename.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-05"
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "Mayo County Council parish-newsletters",
@@ -27262,17 +27264,22 @@
       "recipe_file": "parishes/recipes/dublin/loughlinstown.json",
       "recipe": {
         "start_url": "https://loughlinstownparish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: homepage lists Nov-8th.pdf. GET 200 application/pdf 304825 bytes, magic %PDF-1.7. Filename date 08/11/2026. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -27280,8 +27287,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "loughmorecastleiney",
@@ -31815,18 +31822,23 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/palmerstown.json",
       "recipe": {
-        "start_url": "https://www.dublindiocese.ie/parish/palmerstown/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://palmerstownparish.com/powerpoints-for-sunday-gospel/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -31834,8 +31846,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "No parish website on the official card, or kitchen-sink host not proved. No this-week PDF or JPEG."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "parkecrimlinturlough",
@@ -32281,27 +32293,28 @@
       "diocese": "kildare_and_leighlin",
       "recipe_file": "parishes/recipes/kildare_and_leighlin/portlaoise.json",
       "recipe": {
-        "start_url": "https://www.portlaoiseparish.ie/current-newsletter/",
-        "site_type": "permanent_redirect_document",
-        "playbook_type": "direct_download",
+        "start_url": "https://www.portlaoiseparish.ie/newsletters/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
           "03/10/2026: /current-newsletter/ redirects to the current dated PDF. Do not pin the dated file.",
-          "29/10/2026: redirect is 30115-Nov-1st-online.pdf (All Saints week). Harvest failed Too many pages 24 (max 4) \u2014 set max_bulletin_pages 28."
+          "29/10/2026: redirect was a 24-page file. Harvest failed Too many pages (max 4). Keep max_bulletin_pages 28.",
+          "10/11/2026: /newsletters/ lists Nov-8th-online.pdf. GET 200 application/pdf 10535417 bytes. Filename date 08/11/2026. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin the dated PDF.",
-          "Do not keep the default 4-page cap \u2014 this week is 24 pages.",
+          "Do not pin a dated filename.",
+          "Do not leave max_bulletin_pages at 4. This bulletin is 24 pages.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-29"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -38246,27 +38259,28 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/terenure.json",
       "recipe": {
-        "start_url": "https://stjosephsterenure.com/",
-        "site_type": "http_scrape_newest_images",
-        "playbook_type": "html_text_bulletin",
+        "start_url": "https://stjosephsterenure.com/category/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "02/11/2026: was stale on 18/10 NL PDF via wp-json. Site now posts photo newsletters. Top home link newsletter-sunday-25th-october-2026.",
-          "Proved IMG_20261025\u2026 full JPEG GET 200 image/jpeg 556641 bytes. Previous Sunday keep. Do not pin the image name. Skip diocese safeguarding PDFs."
+          "02/11/2026: was stale on 18/10 NL PDF via wp-json. October posts were photo newsletters.",
+          "10/11/2026: /category/newsletter/ lists the Sunday posts. The 8 November post embeds NL2026-11-08.pdf. Proved GET 200 application/pdf, 639086 bytes. The page heading is Sun 8th November '26. Follow the newest Sunday post, then the embedded PDF. Do not pin the dated filename."
         ],
         "do_not": [
-          "Do not pin IMG_20261025\u2026.jpg.",
-          "Do not harvest diocese safeguarding / CSPS PDFs from the homepage.",
-          "Do not keep wp_json NL*.pdf while the Sunday posts are photo bulletins."
+          "Do not pin the dated filename.",
+          "Do not pin the dated post slug.",
+          "Do not harvest diocese safeguarding / CSPS PDFs.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-02"
+        "recorded_date": "2026-11-10"
       },
-      "bulletin_format": "image_stack",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "Dublin leftover parish-host listings after the 03/10 LIVE hunt",
       "host_profile": null,
       "has_extension_diagnosis": false,
