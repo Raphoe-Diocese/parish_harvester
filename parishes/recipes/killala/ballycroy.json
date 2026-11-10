@@ -2,18 +2,30 @@
   "parish_key": "ballycroy",
   "display_name": "Ballycroy",
   "diocese": "killala",
-  "recorded_date": "2026-10-02",
+  "recorded_date": "2026-11-10",
   "start_url": "https://www.mayo.ie/en-ie/parish-newsletters/ballycroy-parish-newsletter",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "04/10/2026 file on the Mayo County Council page is a PNG (GET 200 image/png 143365 bytes, PNG magic), not a PDF or JPEG. Link text: Ballycroy Parish Newsletter October 4th 2026. Not a harvestable recipe.",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
+  "href_patterns": [
+    "ballycroy"
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://www.mayo.ie/en-ie/parish-newsletters/ballycroy-parish-newsletter"
     }
   ],
-  "version": 1
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "version": 2,
+  "operator_notes": [
+    "10/11/2026: the Mayo page lists Ballycroy-08-11-2026.png. Proved GET 200 image/png 140064 bytes. Parser date 08/11/2026. The getmedia id changes every week. Recipe scrapes this listing and does not pin the id."
+  ],
+  "do_not": [
+    "Do not pin the getmedia UUID.",
+    "Do not pin a dated filename.",
+    "Do not harvest Facebook."
+  ]
 }

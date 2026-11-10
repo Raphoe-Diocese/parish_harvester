@@ -2,18 +2,29 @@
   "parish_key": "baldoyle",
   "display_name": "Baldoyle",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.baldoyleparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "recorded_date": "2026-11-10",
+  "start_url": "https://www.baldoyleparish.ie/parish-newsletter",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
+  "href_patterns": [
+    "newsletter"
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.baldoyleparish.ie"
+      "url": "https://www.baldoyleparish.ie/parish-newsletter"
     }
   ],
-  "version": 1
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "version": 2,
+  "operator_notes": [
+    "10/11/2026: /parish-newsletter lists /s/Newsletter-8th-November.pdf. That link redirects to Squarespace and proved GET 200 application/pdf 226097 bytes %PDF-1.4. Parser date 08/11/2026 from the link text 8th November 2026. Recipe scrapes the newsletter page. Do not pin the Squarespace hash."
+  ],
+  "do_not": [
+    "Do not pin a Squarespace static hash or a dated filename.",
+    "Do not harvest Facebook."
+  ]
 }
