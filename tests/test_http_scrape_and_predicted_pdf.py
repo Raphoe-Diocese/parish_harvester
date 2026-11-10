@@ -2649,6 +2649,45 @@ class HarvestMissRecipeTests(unittest.TestCase):
             if post_slug:
                 self.assertIn(post_slug, recipe.get("post_slug_patterns") or [], rel)
 
+    def test_ashford_and_kilbride_scrape_own_stmantan_listings(self) -> None:
+        cases = {
+            "dublin/ashford.json": (
+                "https://www.stmantan.ie/newsletters/parish/ashford_glenealy/",
+                "af-news",
+            ),
+            "dublin/kilbrideandbarndarrig.json": (
+                "https://www.stmantan.ie/newsletters/parish/kbb/",
+                "kbb-news",
+            ),
+        }
+        for rel, (listing, pattern) in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
+            self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf", rel)
+            self.assertEqual(recipe["start_url"].rstrip("/"), listing.rstrip("/"), rel)
+            self.assertEqual(recipe["status"], "active", rel)
+            self.assertNotEqual(recipe.get("skip"), True, rel)
+            self.assertEqual(recipe.get("href_patterns"), [pattern], rel)
+            self.assertNotIn("ww-news", recipe["start_url"], rel)
+            self.assertNotIn("Share2026Newsletter.pdf", recipe["start_url"], rel)
+            self.assertNotIn(f"{pattern}-08.11.26.pdf", recipe["start_url"], rel)
+            self.assertEqual(recipe["steps"][0]["action"], "goto", rel)
+            self.assertEqual(
+                (recipe["steps"][0].get("url") or "").rstrip("/"),
+                listing.rstrip("/"),
+                rel,
+            )
+            steps = json.dumps(recipe["steps"])
+            self.assertNotIn("ww-news", steps, rel)
+            self.assertNotIn("Share2026Newsletter.pdf", steps, rel)
+            self.assertNotIn(f"{pattern}-08.11.26.pdf", steps, rel)
+        kilbride = json.loads(
+            Path("parishes/recipes/dublin/kilbrideandbarndarrig.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertNotIn("af-news", kilbride["start_url"])
+        self.assertNotIn("af-news", json.dumps(kilbride["steps"]))
+
     def test_portmarnock_uses_8_november_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/dublin/portmarnock.json").read_text(encoding="utf-8")
