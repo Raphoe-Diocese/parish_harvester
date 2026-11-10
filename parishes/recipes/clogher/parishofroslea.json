@@ -1,56 +1,36 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofroslea",
   "display_name": "clogher",
   "diocese": "clogher",
   "start_url": "https://parishofroslea.com/category/parish-bulletin/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "post_slug_patterns": [
+    "bulletin-sunday"
+  ],
+  "playbook_type": "pdf_download_list",
+  "timeout_ms": 55000,
+  "total_timeout_s": 180,
   "steps": [
     {
-      "action": "click",
-      "href": "https://parishofroslea.com/parish-bulletin/bulletin-sunday-13th-september-2026/",
-      "selector": "article#post-3889 > h2 > a",
-      "text": "Bulletin Sunday 13th September 2026 | Bulletin Sunday 13th S"
-    },
-    {
-      "action": "click",
-      "href": "https://parishofroslea.com/parish-bulletin/bulletin-sunday-13th-september-2026/",
-      "selector": "html > body > a",
-      "text": ""
-    },
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://parishofroslea.com/wp-content/uploads/2026/09/Bulletin-Sunday-13th-September-2026.pdf",
-      "text": "Bulletin Sunday 13th September 2026 Sep 11, 2026 | Parish Bu",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "bottom",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://parishofroslea.com/wp-content/uploads/2026/09/Bulletin-Sunday-13th-September-2026.pdf"
+      "action": "goto",
+      "url": "https://parishofroslea.com/category/parish-bulletin/"
     }
   ],
-  "observed_load_ms": 2395.60009765625,
-  "timeout_ms": 55000,
-  "total_timeout_s": 490,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "10/11/2026: category page lists the bulletin posts. The 08/11/2026 post links Bulletin-Sunday-8th-November-2026.pdf. GET 200 application/pdf 181663 bytes. Filename date 08/11/2026. PDF heading Sunday 8th November 2026. Do not pin the dated filename."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin a dated filename.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
-    "position": "bottom"
+    "position": "top"
   },
-  "recorded_date": "2026-09-14"
+  "recorded_date": "2026-11-10"
 }
