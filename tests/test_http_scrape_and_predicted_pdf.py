@@ -2082,23 +2082,25 @@ class LoughshoreRecipeTests(unittest.TestCase):
 class HarvestMissRecipeTests(unittest.TestCase):
     """Recipes for this-week files the 07/09/2026 harvest raised away."""
 
-    def test_annagry_uses_the_permanent_bulletin(self) -> None:
+    def test_annagry_scrapes_the_newsletter_listing(self) -> None:
         recipe = json.loads(
-            Path("parishes/recipes/raphoe/annagryparish.json").read_text()
+            Path("parishes/recipes/raphoe/annagryparish.json").read_text(
+                encoding="utf-8"
+            )
         )
-        public = "https://annagryparish.ie/bulletin/raphoe/annagry"
-        weekly = (
-            "https://annagryparish.ie/wp-content/uploads/"
-            "parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf"
+        listing = "https://annagryparish.ie/newsletter-2/"
+        steps = json.dumps(recipe.get("steps") or [])
+        fallbacks = json.dumps(recipe.get("fallback_document_urls") or [])
+        self.assertEqual(recipe["start_url"], listing)
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["steps"][0]["url"], listing)
+        self.assertNotIn("081126.pdf", steps)
+        self.assertNotIn("/bulletin/raphoe/annagry", recipe["start_url"])
+        self.assertNotIn(
+            "parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf",
+            steps + fallbacks + recipe["start_url"],
         )
-        self.assertEqual(recipe["start_url"], public)
-        self.assertEqual(recipe["site_type"], "permanent_redirect_document")
-        self.assertEqual(recipe["steps"][0]["url"], weekly)
-        self.assertTrue(recipe["steps"][0].get("use_target_url"))
-        self.assertIn(weekly, recipe.get("fallback_document_urls") or [])
-        self.assertNotIn("newsletter-2", json.dumps(recipe["steps"]))
-        self.assertNotIn("unassigned", weekly)
-        self.assertNotIn("?t=", weekly)
+        self.assertNotEqual(recipe["site_type"], "permanent_redirect_document")
 
     def test_waterside_allows_five_page_weekly(self) -> None:
         recipe = json.loads(
