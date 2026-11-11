@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-11-10",
+  "generated_at": "2026-11-11",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 417,
+    "downloaded": 301,
     "html_links": 0,
-    "skipped": 781,
-    "failed": 57,
-    "stale_rejected": 63
+    "skipped": 779,
+    "failed": 55,
+    "stale_rejected": 183
   },
   "action_counts": {
-    "ok": 448,
+    "ok": 452,
     "skip": 775,
-    "mark_inactive": 4,
-    "investigate": 60,
+    "mark_inactive": 2,
+    "investigate": 58,
     "verify_autofix": 1,
     "retrain": 1
   },
@@ -294,7 +294,7 @@
         "recorded_date": "2026-10-29"
       },
       "bulletin_format": "html",
-      "learned_pattern": "",
+      "learned_pattern": "html_text_bulletin+/NEWS.aspx/",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -1183,27 +1183,38 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/annagryparish.json",
       "recipe": {
-        "start_url": "https://annagryparish.ie/bulletin/raphoe/annagry",
-        "site_type": "permanent_redirect_document",
-        "playbook_type": "direct_download",
+        "start_url": "https://annagryparish.ie/newsletter-2/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 3,
+        "click_count": 2,
         "has_terminal": true,
         "operator_notes": [
-          "26/10/2026: the newsletter page no longer links 251025.pdf. The permanent link is https://annagryparish.ie/bulletin/raphoe/annagry.",
-          "That link opens bulletin.pdf under parish-bulletins/raphoe/raphoe/annagry/. Proved application/pdf. The server last changed it on 24/10/2026. The unassigned folder is 404."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "29/10/2026 Baldoyle/Ballinteer: pinned 18 Oct downloads went stale while 25 Oct files were already listed \u2014 prefer http_scrape_newest_pdf; never pin the download URL.",
+          "01/11/2026: keep last Sunday's file for the whole target week. The Sunday-only clock check still dropped 42 Dublin and Tuam files dated 25/10/2026. Two weeks behind stays stale. When both Sundays are listed, this Sunday still wins. A distance of 0 days was treated as missing, so last Sunday was picked instead.",
+          "02/11/2026 Knocklyon: /news/weekly-newsletters/ lists Sunday rows. The PDF is /download/media/NNNN/ with no date in the path. Newest is at the top. Content-Disposition carries Sunday 1st November.pdf. Do not pin the media id.",
+          "02/11/2026 Dromod: dromodparish.ie/churches/parish-newsletter/ has Dromod-1st-November-Newsletter.pdf. Certificate expired \u2014 ignore_https_errors. Do not pin the dated name or the old Kerry diocese 4 October file.",
+          "02/11/2026 Balally: open /category/parish-newsletters/ then the top balally-parish-newsletter post. PDF name is Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Later day wins. Folder year is junk.",
+          "02/11/2026 Killarney: killarneyparish.com/parish-newsletter/ has Newsletter-November-2nd-2026.pdf. Do not pin. Prefer the parish site over the Kerry diocese card.",
+          "10/11/2026: a bulletin dated this Sunday is kept however many pages it has. A long file with no date is not this week. A stale date is not this week."
         ],
         "do_not": [
-          "Do not scrape https://annagryparish.ie/newsletter-2/.",
-          "Do not keep 181026.pdf.",
-          "Do not pin 251025.pdf.",
-          "Do not use the unassigned folder.",
-          "Do not add a ?t= cache-buster on bulletin.pdf."
+          "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) \u2014 it breaks next week.",
+          "Do not drop this Sunday's dated bulletin because it has many pages.",
+          "Do not keep a long file with no date as this week.",
+          "Do not keep a stale date as this week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+          "Do not pin /download/media/NNNN/ on Knocklyon.",
+          "Do not leave Dromod on the Kerry diocese card while dromodparish.ie has a newer newsletter.",
+          "Do not scrape only Balally homepage \u2014 PDFs are on the dated posts.",
+          "Do not leave Killarney on a pinned Kerry diocese October file."
         ],
-        "recorded_date": "2026-10-26"
+        "recorded_date": "2026-11-11"
       },
       "bulletin_format": "download",
       "learned_pattern": "News page with PDF links",
@@ -7156,10 +7167,10 @@
       "learned_pattern": "Mayo County Council parish-newsletters",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://achonrydiocese.org/parishes/mayo/bonniconlon/",
-      "suggested_action": "mark_inactive",
-      "suggested_reason": "non-automatable source"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "bonnybrook",
@@ -8587,10 +8598,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "caragh",
@@ -10451,10 +10462,10 @@
       "learned_pattern": "Mayo County Council parish-newsletters",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://achonrydiocese.org/parishes/mayo/charlestown-3/",
-      "suggested_action": "mark_inactive",
-      "suggested_reason": "non-automatable source"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "charleville",
@@ -12792,7 +12803,7 @@
         "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "mcn_live_parish_page+/Camera/sacred-heart-and-st-joseph-church-coolaney/",
       "host_profile": {
         "navigation_timeout_ms": 90000,
         "wait_after_load_ms": 8000,
@@ -21683,7 +21694,7 @@
         "recorded_date": "2026-09-27"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "http_scrape_newest_pdf+/newsletters/",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -25292,7 +25303,7 @@
         "recorded_date": "2026-10-29"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "http_scrape_newest_pdf+/",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -31950,9 +31961,9 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/palmerstown.json",
       "recipe": {
-        "start_url": "https://palmerstownparish.com/powerpoints-for-sunday-gospel/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://palmerstownparish.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -31960,22 +31971,28 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename."
+          "10/11/2026: newsletter page lists Nov-No.-2-07-08-Nov-2026.pdf. GET 200 application/pdf 563776 bytes. Slug date 08/11/2026. PDF heading 08/11/2026, Parish Bulletin of St Philomena. Do not pin the dated filename.",
+          "10/11/2026 media library: GET https://palmerstownparish.com/wp-json/wp/v2/media?per_page=20&after=2026-11-06T00:00:00. The same PDF is in the library. GET 200 application/pdf 563776 bytes, magic %PDF-1.7. PDF text: Parish Bulletin, The Parish of St Philomena, Palmerstown, Saturday 07 Nov and Sunday 08 Nov. The issue token 2-07-08 is not the date. Pattern -No.- is the weekly series (Oct-No, Nov-No). Do not pin the dated filename.",
+          "The same library also has Sunday-08-Nov-26-Thirty-Second-Sunday-in-Ordinary-Time-Year-A.pdf (Getting Ready for Sunday, 11 pages) and Palmerstown-Library-Brochure-November-2026.pdf. Those are not the parish bulletin."
         ],
         "do_not": [
+          "Do not pin Nov-No.-2-07-08-Nov-2026.pdf.",
           "Do not pin a dated filename.",
+          "Do not pin a Wix hash.",
+          "Do not harvest Sunday-08-Nov-26 Getting Ready for Sunday.",
+          "Do not harvest the library brochure.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "wp_json_newest_media+/",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "parkecrimlinturlough",
