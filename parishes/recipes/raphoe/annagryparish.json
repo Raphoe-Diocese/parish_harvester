@@ -1,69 +1,33 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "annagryparish",
   "display_name": "Annagry",
   "diocese": "raphoe",
-  "start_url": "https://annagryparish.ie/newsletter-2/",
-  "site_type": "pdf_link_list",
-  "playbook_type": "pdf_download_list",
-  "recorded_date": "2026-11-11",
-  "timeout_ms": 55000,
-  "total_timeout_s": 370,
+  "start_url": "https://annagryparish.ie/bulletin/raphoe/annagry",
+  "site_type": "permanent_redirect_document",
+  "playbook_type": "direct_download",
+  "recorded_date": "2026-10-26",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
   "fallback_document_urls": [
     "https://annagryparish.ie/wp-content/uploads/parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf"
   ],
   "steps": [
     {
-      "action": "click",
-      "selector": "a:has-text(\"This Weeks Newsletter\")",
-      "href": "https://annagryparish.ie/bulletin/raphoe/annagry",
-      "text": "This Weeks Newsletter",
-      "fallback_selectors": [
-        "div > div > div:nth-of-type(2) > div > p > a:nth-of-type(1)"
-      ]
-    },
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://annagryparish.ie/wp-content/uploads/2026/11/081126.pdf",
-      "text": "08:11:26",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
       "action": "download",
-      "url": "https://annagryparish.ie/wp-content/uploads/2026/11/081126.pdf"
+      "url": "https://annagryparish.ie/wp-content/uploads/parish-bulletins/raphoe/raphoe/annagry/bulletin.pdf",
+      "use_target_url": true
     }
   ],
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "29/10/2026 Baldoyle/Ballinteer: pinned 18 Oct downloads went stale while 25 Oct files were already listed — prefer http_scrape_newest_pdf; never pin the download URL.",
-    "01/11/2026: keep last Sunday's file for the whole target week. The Sunday-only clock check still dropped 42 Dublin and Tuam files dated 25/10/2026. Two weeks behind stays stale. When both Sundays are listed, this Sunday still wins. A distance of 0 days was treated as missing, so last Sunday was picked instead.",
-    "02/11/2026 Knocklyon: /news/weekly-newsletters/ lists Sunday rows. The PDF is /download/media/NNNN/ with no date in the path. Newest is at the top. Content-Disposition carries Sunday 1st November.pdf. Do not pin the media id.",
-    "02/11/2026 Dromod: dromodparish.ie/churches/parish-newsletter/ has Dromod-1st-November-Newsletter.pdf. Certificate expired — ignore_https_errors. Do not pin the dated name or the old Kerry diocese 4 October file.",
-    "02/11/2026 Balally: open /category/parish-newsletters/ then the top balally-parish-newsletter post. PDF name is Newsletter-31st-October-1st-November.pdf under recycled /uploads/2020/06/. Later day wins. Folder year is junk.",
-    "02/11/2026 Killarney: killarneyparish.com/parish-newsletter/ has Newsletter-November-2nd-2026.pdf. Do not pin. Prefer the parish site over the Kerry diocese card.",
-    "10/11/2026: a bulletin dated this Sunday is kept however many pages it has. A long file with no date is not this week. A stale date is not this week."
+    "26/10/2026: the newsletter page no longer links 251025.pdf. The permanent link is https://annagryparish.ie/bulletin/raphoe/annagry.",
+    "That link opens bulletin.pdf under parish-bulletins/raphoe/raphoe/annagry/. Proved application/pdf. The server last changed it on 24/10/2026. The unassigned folder is 404."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector or download step (e.g. Newsletter-18th-October.pdf) — it breaks next week.",
-    "Do not drop this Sunday's dated bulletin because it has many pages.",
-    "Do not keep a long file with no date as this week.",
-    "Do not keep a stale date as this week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
-    "Do not pin /download/media/NNNN/ on Knocklyon.",
-    "Do not leave Dromod on the Kerry diocese card while dromodparish.ie has a newer newsletter.",
-    "Do not scrape only Balally homepage — PDFs are on the dated posts.",
-    "Do not leave Killarney on a pinned Kerry diocese October file."
-  ],
-  "observed_load_ms": 3559.39990234375,
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+    "Do not scrape https://annagryparish.ie/newsletter-2/.",
+    "Do not keep 181026.pdf.",
+    "Do not pin 251025.pdf.",
+    "Do not use the unassigned folder.",
+    "Do not add a ?t= cache-buster on bulletin.pdf."
+  ]
 }
