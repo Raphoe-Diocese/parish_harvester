@@ -6,8 +6,8 @@ hint_for_url() is click-memory: one proved host must suggest the same
 recipe shape for the next similar URL. remember_win() writes the trick
 back into parishes/site_patterns.json.
 
-A harvest calls remember_harvest_results() only when the result is outcome
-ok and the bulletin date is the target Sunday.
+The harvest does not call this. The brain is for teaching a technique and
+for finding a new bulletin, not for rewriting memory during a harvest.
 """
 from __future__ import annotations
 
