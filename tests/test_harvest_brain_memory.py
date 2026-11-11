@@ -292,6 +292,6 @@ def test_miss_and_facebook_are_not_remembered(tmp_path: Path) -> None:
     )
 
 
-def test_harvest_calls_memory_after_results_are_final() -> None:
+def test_harvest_does_not_write_the_brain() -> None:
     source = Path("main.py").read_text(encoding="utf-8")
-    assert "remember_harvest_results(all_results, target)" in source
+    assert "remember_harvest_results" not in source
