@@ -15,6 +15,11 @@ Covered paths (this harvest wins):
 Source files such as ``parishes/recipes/**`` and ``harvester/*.py`` are never
 auto-overwritten.
 
+``parishes/newsletter_brain.json`` and ``parishes/site_patterns.json`` are
+rewritten by every diocese. On conflict the copy already on main is kept
+(rebase: ``--ours``) so parallel diocese pushes do not die on those files
+and do not replace main.
+
 Rebase vs merge (git's ours/theirs is reversed):
 
 * rebase / pull --rebase: ``--theirs`` is the replayed harvest commit
@@ -76,6 +81,15 @@ PROTECTED_SOURCE_PREFIXES = (
     "tests/",
     "extension/",
     ".github/",
+)
+
+# Shared memory. Parallel diocese harvests rewrite both files and then
+# conflict. Keep the copy already on main (rebase: --ours), not the diocese.
+KEEP_MAIN_ON_CONFLICT = frozenset(
+    {
+        "parishes/newsletter_brain.json",
+        "parishes/site_patterns.json",
+    }
 )
 
 
@@ -418,6 +432,28 @@ def resolve_harvest_output_conflicts(
     )
 
 
+def resolve_main_copy_conflicts(repo: Path) -> list[str]:
+    """Stage the copy already on main for shared memory files.
+
+    During rebase, main is ``--ours``. A diocese rewrite of
+    ``parishes/newsletter_brain.json`` or ``parishes/site_patterns.json``
+    must not win, and must not leave the rebase conflicted.
+    """
+    unresolved = unmerged_paths(repo)
+    matched = [
+        path
+        for path in unresolved
+        if _normalize_repo_path(path) in KEEP_MAIN_ON_CONFLICT
+    ]
+    if not matched:
+        return []
+    flag = upstream_side_flag(repo)
+    for path in matched:
+        _run_git(repo, ["checkout", flag, "--", path])
+        _run_git(repo, ["add", "--", path])
+    return matched
+
+
 def continue_git_integration(repo: Path) -> None:
     """Finish the in-progress rebase or merge without opening an editor."""
     editor_env = {"GIT_EDITOR": "true", "GIT_SEQUENCE_EDITOR": "true"}
@@ -475,21 +511,30 @@ def rebase_keeping_harvest_megas(
         resolved, leftover = resolve_harvest_output_conflicts(
             repo, snapshot_dir, target_parish=target_parish, parish_keys=parish_keys
         )
+        kept_main = resolve_main_copy_conflicts(repo)
+        if kept_main:
+            kept = set(kept_main)
+            leftover = [path for path in leftover if path not in kept]
         if leftover:
             abort_git_integration(repo)
             raise RuntimeError(
                 "Rebase conflicted on source files that cannot be auto-resolved: "
                 + ", ".join(leftover)
             )
-        if not resolved:
+        if not resolved and not kept_main:
             abort_git_integration(repo)
             raise RuntimeError(
                 "Rebase failed without generated harvest-output conflicts to resolve"
             )
-        print(
-            "Resolved harvest output conflicts in favor of this harvest: "
-            + ", ".join(resolved)
-        )
+        if resolved:
+            print(
+                "Resolved harvest output conflicts in favor of this harvest: "
+                + ", ".join(resolved)
+            )
+        if kept_main:
+            print(
+                "Kept the copy already on main: " + ", ".join(kept_main)
+            )
         continue_git_integration(repo)
         restore_parked_outputs(repo, snapshot_dir, parked)
     finally:

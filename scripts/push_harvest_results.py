@@ -6,6 +6,9 @@ diocese HTML pages, and harvest JSON cannot always merge; add/add or content
 conflicts on those generated paths take this harvest's files and continue.
 Recipes and harvester source are not auto-overwritten.
 
+``parishes/newsletter_brain.json`` and ``parishes/site_patterns.json`` keep
+the copy already on main when a diocese rebase conflicts on them.
+
 Usage:
   python scripts/push_harvest_results.py
   python scripts/push_harvest_results.py --remote origin --branch main
