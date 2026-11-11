@@ -84,6 +84,8 @@ class GeneratedHarvestOutputPathTests(unittest.TestCase):
         self.assertFalse(is_generated_harvest_output("extension/sidepanel.js"))
         self.assertFalse(is_generated_harvest_output(".github/workflows/harvest.yml"))
         self.assertFalse(is_generated_harvest_output("notes.txt"))
+        self.assertFalse(is_generated_harvest_output("parishes/newsletter_brain.json"))
+        self.assertFalse(is_generated_harvest_output("parishes/site_patterns.json"))
 
 
 class MegaPdfGitConflictTests(unittest.TestCase):
@@ -532,6 +534,82 @@ class MegaPdfGitConflictTests(unittest.TestCase):
         with self.assertRaises(RuntimeError) as ctx:
             rebase_keeping_harvest_megas(self.root, "main")
         self.assertIn("parishes/recipes/raphoe/bangorparish.json", str(ctx.exception))
+
+    def _write_shared_memory(self, marker: str) -> None:
+        folder = self.root / "parishes"
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "newsletter_brain.json").write_text(
+            f'{{"source": "{marker}"}}\n', encoding="utf-8"
+        )
+        (folder / "site_patterns.json").write_text(
+            f'{{"source": "{marker}"}}\n', encoding="utf-8"
+        )
+
+    def test_rebase_keeps_main_copy_of_brain_and_site_patterns(self) -> None:
+        # Run 42919396741: diocese rebases died on these two shared files.
+        self._write_shared_memory("SHARED")
+        page = self.root / "docs" / "dioceses" / "derry" / "index.html"
+        page.parent.mkdir(parents=True, exist_ok=True)
+        page.write_text("<html>SHARED</html>\n", encoding="utf-8")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "shared memory")
+
+        _git(self.root, "checkout", "-b", "harvest")
+        self._write_shared_memory("HARVEST")
+        page.write_text("<html>HARVEST-NEW</html>\n", encoding="utf-8")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "harvest memory")
+
+        _git(self.root, "checkout", "main")
+        self._write_shared_memory("MAIN")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "main memory")
+
+        _git(self.root, "checkout", "harvest")
+        rebase_keeping_harvest_megas(self.root, "main")
+        self.assertFalse(in_rebase(self.root))
+
+        brain = (self.root / "parishes" / "newsletter_brain.json").read_text(
+            encoding="utf-8"
+        )
+        patterns = (self.root / "parishes" / "site_patterns.json").read_text(
+            encoding="utf-8"
+        )
+        page_text = page.read_text(encoding="utf-8")
+        self.assertIn("MAIN", brain)
+        self.assertNotIn("HARVEST", brain)
+        self.assertIn("MAIN", patterns)
+        self.assertNotIn("HARVEST", patterns)
+        self.assertIn("HARVEST-NEW", page_text)
+
+    def test_rebase_only_memory_files_still_finishes_on_main_copy(self) -> None:
+        # Those two files can be the only conflict. Taking main makes the
+        # replayed commit empty; the rebase must still finish.
+        self._write_shared_memory("SHARED")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "shared memory")
+
+        _git(self.root, "checkout", "-b", "harvest")
+        self._write_shared_memory("HARVEST")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "harvest memory")
+
+        _git(self.root, "checkout", "main")
+        self._write_shared_memory("MAIN")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "main memory")
+
+        _git(self.root, "checkout", "harvest")
+        rebase_keeping_harvest_megas(self.root, "main")
+        self.assertFalse(in_rebase(self.root))
+        brain = (self.root / "parishes" / "newsletter_brain.json").read_text(
+            encoding="utf-8"
+        )
+        patterns = (self.root / "parishes" / "site_patterns.json").read_text(
+            encoding="utf-8"
+        )
+        self.assertEqual(brain, '{"source": "MAIN"}\n')
+        self.assertEqual(patterns, '{"source": "MAIN"}\n')
 
     def test_snapshot_includes_diocese_pages_and_status(self) -> None:
         path = self.root / "docs" / "dioceses" / "derry" / "index.html"
