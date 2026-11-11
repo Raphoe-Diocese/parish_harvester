@@ -125,6 +125,12 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
     # parishofhannahstown, after replay.py started returning the real Wix
     # file URL instead of the listing page — see _download_source_url).
     text = unquote(url_or_text or "")
+    mcn_date = re.search(r"[?&]bulletin_date=(20\d{2}-\d{2}-\d{2})(?:&|$)", text)
+    if mcn_date:
+        try:
+            return date.fromisoformat(mcn_date.group(1))
+        except ValueError:
+            pass
 
     # WordPress media folders are authoritative: /uploads/2026/06/file.pdf
     wp_uploads = re.search(r"/uploads/(20\d{2})/(0?\d{1,2})/", text, re.I)
@@ -810,6 +816,10 @@ def issue_date_from_pages(
     4. Liturgical name plus the year printed on that same page.
     Returns (None, "front_outside") when the front page is dated outside
     this week, so the caller does not keep looking.
+    A this-week file name still wins when the front page only has a leftover
+    date older than last Sunday (Cathedral 8th November.pdf with
+    week beginning 25 October). Last Sunday's own paper (1 November when
+    harvest Sunday is 8 November) still stays out.
     """
     front = pages[0] if pages else ""
     front_dates = _front_page_issue_dates(front)
@@ -817,6 +827,16 @@ def issue_date_from_pages(
     if in_week is not None:
         return in_week, "front_page"
     if front_dates:
+        if url:
+            parsed = extract_bulletin_date(url)
+            url_in_week = (
+                _pick_in_week([parsed], target) if parsed is not None else None
+            )
+            last_sunday = target - timedelta(days=7)
+            if url_in_week is not None and all(
+                item < last_sunday for item in front_dates
+            ):
+                return url_in_week, "url"
         return None, "front_outside"
     for page in pages[1:]:
         later = _pick_in_week(_later_page_issue_dates(page), target)
@@ -1214,6 +1234,15 @@ def freshness_verdict_for_ok_result(
             continue
         too_old = pdf_date_before_harvest_week(path, target)
         if too_old is not None:
+            url_date = extract_bulletin_date(url) if url else None
+            week_start, week_end = week_window(target)
+            last_sunday = target - timedelta(days=7)
+            if (
+                url_date is not None
+                and week_start <= url_date <= week_end
+                and too_old < last_sunday
+            ):
+                return verdict_for_extracted_date(url_date, target)
             return verdict_for_extracted_date(too_old, target)
         body_verdict = pdf_body_heading_verdict(path, target)
         if body_verdict is None:
