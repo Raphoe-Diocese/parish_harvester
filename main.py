@@ -500,16 +500,6 @@ def main() -> int:
         except Exception as exc:
             print(f"  ⚠️  Late stale reclassify failed (non-fatal): {exc}")
 
-    print("\n── Brain memory ────────────────────────────────────────────")
-    try:
-        from harvester.recipe_brain import remember_harvest_results
-
-        # Outcome ok and bulletin date == target Sunday only.
-        remembered = remember_harvest_results(all_results, target)
-        print(f"  🧠 Remembered  : {len(remembered)}")
-    except Exception as exc:
-        print(f"  ⚠️  Brain memory failed (non-fatal): {exc}")
-
     print("\n── Parish status ───────────────────────────────────────────")
     skip_status = os.environ.get("HARVEST_SKIP_STATUS", "0").strip().lower() in {
         "1",
