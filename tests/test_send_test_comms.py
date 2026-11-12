@@ -88,7 +88,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.48"', text)
+        self.assertIn('"version": "1.61.49"', text)
         memory = (REPO / "extension" / "site_memory.js").read_text(encoding="utf-8")
         self.assertIn("/newsletters/parish/wicklow_rathnew/", memory)
         self.assertIn("ww-news", memory)

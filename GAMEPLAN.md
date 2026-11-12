@@ -1,3 +1,6 @@
+## 12/11/2026 22:40 - Step 8 accordion in flight. Raphoe still empty. Dublin harvests running
+Extension hints wall of words → closed details/summary Hints for this page (N). Manifest 1.61.49. Raphoe permanent page still No bulletin available — cannot harvest. Next Dublin: Howth Mount Argus Clontarf Swords. Steps 4-7 not started. Not live.
+
 ## 12/11/2026 17:25 - Raphoe parish permanent weekly link. No file uploaded yet
 Frank: https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe is the weekly path. Browser proved the page. It says No bulletin available. bulletin.pdf is 404. Recipe drive-1jmslbrliw now matches Kilbarron/Newtown. Old Drive pin retired. Mega exclude removed. Do not harvest until Frank uploads this week's PDF. Not live.
 
