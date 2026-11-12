@@ -77,7 +77,16 @@ def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
 
 
 def _recipe_is_inactive(meta: dict | None) -> bool:
+    """True when harvest should not run the recipe at all.
+
+    A missed-week row (no this-week file yet) stays runnable. Volunteers go
+    on holiday. Facebook-only and no-website rows stay skipped.
+    """
     if not isinstance(meta, dict):
+        return False
+    from .recipe_brain import missed_week_should_retry
+
+    if missed_week_should_retry(meta):
         return False
     status = str(meta.get("status", "")).strip().lower()
     return bool(meta.get("skip")) or status in {"dead_url", "inactive"}

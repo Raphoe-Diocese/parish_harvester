@@ -832,10 +832,11 @@ def _http_get(
 
 
 def missed_week_should_retry(meta: dict) -> bool:
-    """A parish that had no file this week is tried again next Sunday.
+    """A parish that had no file this week is tried again every Sunday.
 
-    Facebook-only and no-website rows stay skipped. A late upload is not a
-    permanent stop.
+    Volunteers go on holiday and forget. The recipe stays in the harvest.
+    A late or old file is stale, not a skip. Stale stays off the website.
+    Facebook-only and no-website rows stay skipped.
     """
     reason = " ".join(
         str(meta.get(key) or "") for key in ("reason", "dead_reason")

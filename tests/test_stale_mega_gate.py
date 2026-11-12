@@ -137,6 +137,7 @@ class BuildMegaStitchResultsTests(unittest.TestCase):
             self.assertEqual(report["downloaded"], [])
             self.assertEqual(report["stale_rejected"][0]["parish"], "aghyaran")
             self.assertFalse(pdf.exists())
+            self.assertTrue((current.parent / "stale" / pdf.name).exists())
 
 
 class SafetyNetEmptyUrlTests(unittest.TestCase):
@@ -163,7 +164,7 @@ class SafetyNetEmptyUrlTests(unittest.TestCase):
             )
             self.assertTrue(result.is_stale)
             self.assertEqual(len(payload["rejected_from_mega"]), 1)
-            self.assertFalse(pdf.exists())
+            self.assertTrue(pdf.exists())
             self.assertTrue(queue.exists())
             data = json.loads(queue.read_text(encoding="utf-8"))
             self.assertEqual(data["rejected_from_mega"][0]["key"], "castlederg")

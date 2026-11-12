@@ -1,3 +1,7 @@
+## 12/11/2026 14:30 - Keep-weekly Step 1 PR 575. CI failed, keep-file tests fixed
+https://github.com/Raphoe-Diocese/parish_harvester/pull/575
+CI failed on two stale-mega tests that still expected the PDF to be deleted. The file is now kept and moved to the stale folder, not the mega PDF. Not merged. Not live.
+
 ## 10/11/2026 21:13 - Stitcher leaves out a paper dated before 02/11/2026
 Harvest Sunday 08/11/2026. A PDF whose own date is 01/11/2026 or older stays out of that Sunday's collated PDF. No printed date is not treated as 08/11/2026. A this-week paper, including Irish, stays in. Page cap stays 4. Not live until the next harvest. Do not edit generated docs HTML in this job.
 ## 08/11/2026 08:35 - A1: Ok 435 Kiltimagh + Glenavy; Loughshore 2025 miss

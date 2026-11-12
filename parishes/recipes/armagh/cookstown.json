@@ -2,18 +2,35 @@
   "parish_key": "cookstown",
   "display_name": "Cookstown (Desertcreight & Derryloran)",
   "diocese": "armagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://cookstownparish.com/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Website found (https://cookstownparish.com/) but no this-week PDF proved on 29/09/2026 kitchen-sink \u2014 link only until bulletin URL proved.",
+  "recorded_date": "2026-11-12",
+  "start_url": "https://cookstownparish.com/parish-news/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "status": "active",
+  "skip": false,
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 8,
   "steps": [
     {
       "action": "goto",
-      "url": "https://cookstownparish.com/"
+      "url": "https://cookstownparish.com/parish-news/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "12/11/2026: cookstownparish.com opens in a normal browser. There is no bot wall. WebSearch showed a checker page; that was the search tool, not the parish site.",
+    "Weekly bulletin is overwritten HTML on /parish-news/. Visible heading Sunday 8th November 2026 - Thirty-Second Sunday in Ordinary Time, Recently Deceased, Anniversaries.",
+    "print_to_pdf + skip_listing_nav. Same as Kiltubrid /news/. Do not invent a PDF file. Do not harvest Facebook."
+  ],
+  "do_not": [
+    "Do not pin a dated slug. There is only /parish-news/.",
+    "Do not call this a bot wall.",
+    "Do not harvest Facebook.",
+    "Do not remove skip_listing_nav.",
+    "Do not scrape First Cookstown Presbyterian."
+  ]
 }

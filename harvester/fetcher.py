@@ -2326,18 +2326,14 @@ async def _fetch_entry(
                         file_path=dest,
                         file_type="pdf",
                     )
-                print(f"  {key}: no bulletin for this Sunday yet. Will try again next Sunday.")
-                return FetchResult(
-                    key=key,
-                    display_name=entry.display_name,
-                    status="skipped",
-                    url=start,
-                    file_type="skipped",
-                    error=(
-                        "No bulletin on the website for this Sunday. "
-                        "Will try again next Sunday."
-                    ),
+                # Volunteers go on holiday. Keep the parish in the weekly
+                # run. HTML and images still become PDFs. A stale file
+                # stays off the public website.
+                print(
+                    f"  {key}: no cheap HTTP file this Sunday. "
+                    "Running the saved recipe anyway."
                 )
+                should_skip = False
         if should_skip or needs_retraining:
             reason = (
                 str(
