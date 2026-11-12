@@ -4899,10 +4899,45 @@
             memoryEl = document.createElement("div");
             memoryEl.dataset.phMemory = "1";
             memoryEl.style.cssText =
-              "font-size:9px;color:#a5b4fc;line-height:1.45;background:#1e1b4b;border:1px solid #4338ca;border-radius:6px;padding:6px 8px;margin-top:6px;white-space:pre-wrap;";
+              "font-size:9px;color:#a5b4fc;line-height:1.45;background:#1e1b4b;border:1px solid #4338ca;border-radius:6px;padding:6px 8px;margin-top:6px;";
             playbookPanel.appendChild(memoryEl);
           }
-          memoryEl.textContent = window.ph_site_memory.formatHintBlock(mem);
+          // Closed accordion — wall of words stays out of the way (Frank 12/11/2026).
+          const notes = Array.isArray(mem.operator_notes) ? mem.operator_notes : [];
+          const donts = Array.isArray(mem.do_not) ? mem.do_not : [];
+          const hintCount = notes.length + donts.length;
+          memoryEl.replaceChildren();
+          if (hintCount === 0) {
+            memoryEl.style.display = "none";
+          } else {
+            memoryEl.style.display = "";
+            const details = document.createElement("details");
+            details.style.cssText = "margin:0;";
+            const summary = document.createElement("summary");
+            summary.style.cssText =
+              "cursor:pointer;font-weight:600;list-style-position:outside;";
+            summary.textContent = `Hints for this page (${hintCount})`;
+            details.appendChild(summary);
+            const addSection = (title, lines) => {
+              if (!lines.length) return;
+              const heading = document.createElement("div");
+              heading.style.cssText = "margin-top:6px;font-weight:600;";
+              heading.textContent = title;
+              details.appendChild(heading);
+              const list = document.createElement("ul");
+              list.style.cssText =
+                "margin:2px 0 0 14px;padding:0;line-height:1.45;white-space:normal;";
+              for (const line of lines) {
+                const item = document.createElement("li");
+                item.textContent = String(line || "");
+                list.appendChild(item);
+              }
+              details.appendChild(list);
+            };
+            addSection("Remember", notes);
+            addSection("Avoid", donts);
+            memoryEl.appendChild(details);
+          }
         }
       }
       if (pinLinkBtn) {
