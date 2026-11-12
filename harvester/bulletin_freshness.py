@@ -624,12 +624,9 @@ def mark_result_stale(
         "stale_reason": verdict.reason,
         "recipe_worked": True,
     }
-    if result.file_path and result.file_path.exists():
-        try:
-            result.file_path.unlink()
-        except OSError:
-            pass
-    result.file_path = None
+    # Keep the file. generate_report copies it to the stale folder and
+    # leaves it out of the public this-week set. Do not delete a volunteer
+    # bulletin just because it is last week's.
     return result
 
 

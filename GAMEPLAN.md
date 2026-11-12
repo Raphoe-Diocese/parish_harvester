@@ -1,3 +1,6 @@
+## 12/11/2026 14:20 - Keep-weekly Step 1 in flight (one PR, no Harvest all)
+Missed-week skip now runs the saved recipe every Sunday. Stale file is kept in the stale folder, not on the website. Facebook-only and no-website stay skipped. Cookstown is html_text_bulletin print_to_pdf on /parish-news/. Not merged. Not live. Copy this row to Dropbox Harvester GAMEPLAN.md after merge.
+
 ## 10/11/2026 21:13 - Stitcher leaves out a paper dated before 02/11/2026
 Harvest Sunday 08/11/2026. A PDF whose own date is 01/11/2026 or older stays out of that Sunday's collated PDF. No printed date is not treated as 08/11/2026. A this-week paper, including Irish, stays in. Page cap stays 4. Not live until the next harvest. Do not edit generated docs HTML in this job.
 ## 08/11/2026 08:35 - A1: Ok 435 Kiltimagh + Glenavy; Loughshore 2025 miss

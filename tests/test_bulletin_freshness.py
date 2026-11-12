@@ -387,6 +387,29 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(marked.status, "error")
         self.assertEqual(marked.retry_strategy, "rescrape_bulletin_page")
 
+    def test_mark_result_stale_keeps_the_downloaded_file(self) -> None:
+        target = date(2026, 6, 14)
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as handle:
+            handle.write(b"%PDF-1.4 stale volunteer bulletin")
+            path = Path(handle.name)
+        result = FetchResult(
+            key="testparish",
+            display_name="Test Parish",
+            status="ok",
+            url="https://example.com/bulletin_010526.pdf",
+            file_path=path,
+        )
+        try:
+            marked = mark_result_stale(
+                result,
+                check_bulletin_freshness(result.url, target),
+            )
+            self.assertTrue(marked.is_stale)
+            self.assertTrue(path.exists())
+            self.assertEqual(marked.file_path, path)
+        finally:
+            path.unlink(missing_ok=True)
+
     def test_drive_download_is_not_opened_in_the_browser_again(self) -> None:
         entry = ParishEntry(
             key="drive-1kna8f6t54",

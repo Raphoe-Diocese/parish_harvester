@@ -539,12 +539,68 @@ def test_missed_week_is_tried_again_and_facebook_stays_skipped() -> None:
             )
         }
     )
+    assert missed_week_should_retry(
+        {
+            "reason": (
+                "Website found (https://cookstownparish.com/) but no this-week "
+                "PDF proved on 29/09/2026 kitchen-sink — link only until "
+                "bulletin URL proved."
+            )
+        }
+    )
     assert not missed_week_should_retry(
         {"reason": "Official card / search is Facebook-only — cannot scrape Facebook."}
     )
     assert not missed_week_should_retry(
         {"reason": "No parish website on the official card. No this-week PDF or JPEG."}
     )
+
+
+def test_recipe_is_inactive_missed_week_stays_runnable() -> None:
+    from harvester.report import _recipe_is_inactive
+
+    assert not _recipe_is_inactive(
+        {
+            "skip": True,
+            "status": "inactive",
+            "reason": (
+                "Website found (https://cookstownparish.com/) but no this-week "
+                "PDF proved on 29/09/2026 kitchen-sink — link only until "
+                "bulletin URL proved."
+            ),
+        }
+    )
+    assert _recipe_is_inactive(
+        {
+            "skip": True,
+            "status": "inactive",
+            "reason": (
+                "Official card / search is Facebook-only — cannot scrape Facebook."
+            ),
+        }
+    )
+    assert _recipe_is_inactive(
+        {
+            "skip": True,
+            "status": "inactive",
+            "reason": (
+                "No parish website on the official card. No this-week PDF or JPEG."
+            ),
+        }
+    )
+
+
+def test_cookstown_html_bulletin_recipe_is_active() -> None:
+    recipe = json.loads(
+        (Path("parishes/recipes/armagh/cookstown.json")).read_text(encoding="utf-8")
+    )
+    assert recipe["skip"] is False
+    assert recipe["status"] == "active"
+    assert recipe["start_url"] == "https://cookstownparish.com/parish-news/"
+    assert recipe["site_type"] == "html_text_bulletin"
+    assert recipe["steps"][0]["action"] == "goto"
+    assert recipe["steps"][1]["action"] == "print_to_pdf"
+    assert recipe["steps"][1]["skip_listing_nav"] is True
 
 
 def test_undated_pdf_name_uses_the_date_inside_the_file(monkeypatch) -> None:
