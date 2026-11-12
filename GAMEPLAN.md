@@ -1,3 +1,6 @@
+## 12/11/2026 17:25 - Raphoe parish permanent weekly link. No file uploaded yet
+Frank: https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe is the weekly path. Browser proved the page. It says No bulletin available. bulletin.pdf is 404. Recipe drive-1jmslbrliw now matches Kilbarron/Newtown. Old Drive pin retired. Mega exclude removed. Do not harvest until Frank uploads this week's PDF. Not live.
+
 ## 12/11/2026 14:30 - Keep-weekly Step 1 PR 575. CI failed, keep-file tests fixed
 https://github.com/Raphoe-Diocese/parish_harvester/pull/575
 CI failed on two stale-mega tests that still expected the PDF to be deleted. The file is now kept and moved to the stale folder, not the mega PDF. Not merged. Not live.

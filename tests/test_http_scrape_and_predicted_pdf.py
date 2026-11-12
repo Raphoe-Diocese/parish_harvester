@@ -2132,9 +2132,23 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("uploads/2025/06", recipe["start_url"])
         self.assertTrue(any("homepage" in line.lower() for line in recipe.get("do_not") or []))
 
-    def test_raphoe_parish_is_excluded_from_mega_until_newer_file(self) -> None:
+    def test_raphoe_parish_uses_permanent_weekly_link(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/drive-1jmslbrliw.json").read_text()
+        )
+        url = "https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe"
+        weekly = (
+            "https://parishofraphoe.ie/wp-content/uploads/"
+            "parish-bulletins/unassigned/raphoe/test-parishraphoe/bulletin.pdf"
+        )
+        self.assertEqual(recipe["start_url"], url)
+        self.assertEqual(recipe["site_type"], "permanent_redirect_document")
+        self.assertEqual(recipe["steps"][0]["url"], weekly)
+        self.assertTrue(recipe["steps"][0].get("use_target_url"))
+        self.assertNotIn("1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5", json.dumps(recipe["steps"]))
+        self.assertIn(weekly, recipe.get("fallback_document_urls") or [])
         excludes = json.loads(Path("parishes/mega_excludes.json").read_text())
-        self.assertIn("drive-1jmslbrliw", excludes)
+        self.assertNotIn("drive-1jmslbrliw", excludes)
 
     def test_monaghan_has_dated_example(self) -> None:
         recipe = json.loads(
