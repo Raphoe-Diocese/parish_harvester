@@ -1322,15 +1322,9 @@ def reclassify_stale_downloaded_in_report(
                 pdf_path.replace(dest)
                 kept_name = dest.name
             except OSError:
-                try:
-                    pdf_path.unlink()
-                except OSError:
-                    pass
+                kept_name = pdf_path.name
         elif pdf_path is not None and pdf_path.exists():
-            try:
-                pdf_path.unlink()
-            except OSError:
-                pass
+            kept_name = pdf_path.name
 
         stale_row = {
             "parish": key,
@@ -1431,6 +1425,16 @@ def build_mega_stitch_results(
         if date_str and date_str != "unknown":
             stale_row["bulletin_date"] = date_str
             stale_row["bulletin_date_uk"] = format_uk_date(str(date_str))
+        if result.file_path and Path(result.file_path).exists():
+            stale_dir = current_dir.parent / "stale"
+            stale_dir.mkdir(parents=True, exist_ok=True)
+            dest = stale_dir / Path(result.file_path).name
+            try:
+                Path(result.file_path).replace(dest)
+                stale_row["file"] = dest.name
+                result.file_path = dest
+            except OSError:
+                stale_row["file"] = Path(result.file_path).name
         _remove_parish_from_sections(report, result.key)
         if not isinstance(report.get("stale_rejected"), list):
             report["stale_rejected"] = []
