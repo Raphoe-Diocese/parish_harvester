@@ -1,22 +1,35 @@
 {
+  "version": 3,
   "parish_key": "drive-1jmslbrliw",
   "display_name": "Raphoe",
   "diocese": "raphoe",
-  "site_type": "google_drive_static",
+  "start_url": "https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe",
+  "site_type": "permanent_redirect_document",
   "playbook_type": "direct_download",
-  "recorded_date": "2026-06-27",
-  "start_url": "https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view",
-  "auto_fixed": true,
-  "operator_notes": [
-    "Permanent Google Drive file — parish replaces the PDF in the same link each week.",
-    "Train on the /view page in the extension, not the usercontent download URL."
+  "recorded_date": "2026-11-12",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "fallback_document_urls": [
+    "https://parishofraphoe.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/test-parishraphoe/bulletin.pdf"
   ],
   "steps": [
     {
       "action": "download",
-      "url": "https://drive.usercontent.google.com/download?id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&export=download",
-      "use_captured_url": true
+      "url": "https://parishofraphoe.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/test-parishraphoe/bulletin.pdf",
+      "use_target_url": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "12/11/2026: Frank: https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe is the permanent weekly link. Same path every week.",
+    "Opened in browser 12/11/2026: page exists. Text is No bulletin available / The weekly bulletin has not yet been uploaded. bulletin.pdf GET 404. Do not invent a this-week file.",
+    "Same pattern as Kilbarron and Newtown Killea. Download bulletin.pdf first. use_target_url keeps the permanent path as-is.",
+    "Old Google Drive pin 1jmslbrliw is retired. Do not harvest that Drive file."
+  ],
+  "do_not": [
+    "Do not pin the old Google Drive file 1jmslbrliw.",
+    "Do not set start_url to https://parishofraphoe.ie/bulletin/ or /newsletter/.",
+    "Do not pin a dated wp-content/uploads/YYYY/MM/ filename.",
+    "Do not add a ?t= cache-buster on bulletin.pdf.",
+    "Do not print the empty No bulletin available page as a PDF."
+  ]
 }
