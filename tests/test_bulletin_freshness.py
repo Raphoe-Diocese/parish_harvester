@@ -847,8 +847,8 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
             pdf = Path(tmp) / "ardara.pdf"
             self._heading_pdf(
                 pdf,
-                "Twenty-fourth Sunday in Ordinary Time "
-                "Week beginning: 13th September 2026",
+                "Twenty-sixth Sunday in Ordinary Time "
+                "Week beginning: 27th September 2026",
             )
             result = FetchResult(
                 key="ardara",
@@ -866,10 +866,9 @@ class BodyBeatsUrlFreshnessTests(unittest.TestCase):
                 self.TARGET,
                 report_bulletin_date=date(2026, 10, 4),
             )
-            # The link says 4 October. The paper's own date is 13 September,
-            # which is before that harvest week, so the mega gate leaves it out.
+            # Last Sunday's own paper, even with a 4 October link, stays out.
             self.assertEqual(verdict.status, "stale")
-            self.assertEqual(verdict.extracted_date, date(2026, 9, 13))
+            self.assertEqual(verdict.extracted_date, date(2026, 9, 27))
             self.assertEqual(verdict.reason, "date_behind_of_target")
 
     def test_safety_net_rejects_dated_url_with_ancient_body_years(self) -> None:
@@ -1022,6 +1021,37 @@ class HarvestWeekOwnDateTests(unittest.TestCase):
             verdict = freshness_verdict_for_ok_result(result, self.TARGET)
             self.assertNotEqual(verdict.extracted_date, self.TARGET)
             self.assertNotEqual(verdict.status, "fresh")
+
+    def test_eighth_november_filename_beats_two_week_old_week_beginning(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "cathedral.pdf"
+            pen = canvas.Canvas(str(pdf))
+            pen.drawString(72, 720, "Week beginning: 25th October 2026")
+            pen.drawString(72, 700, "St Eunan's Cathedral Newsletter")
+            pen.save()
+            result = FetchResult(
+                key="steunanscathedral",
+                display_name="Cathedral",
+                status="ok",
+                url=(
+                    "https://www.steunanscathedral.ie/wp-content/uploads/"
+                    "2026/11/Newsletter-8th-November-2026.pdf"
+                ),
+                file_path=pdf,
+                file_type="pdf",
+            )
+            verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "fresh")
+            self.assertEqual(verdict.extracted_date, self.TARGET)
+
+    def test_mcn_bulletin_date_query_is_this_sunday(self) -> None:
+        self.assertEqual(
+            extract_bulletin_date(
+                "https://d3gxiup807zlof.cloudfront.net/live/Uploads/527/"
+                "NewsLetter/65009bec.pdf?bulletin_date=2026-11-08"
+            ),
+            self.TARGET,
+        )
 
 
 if __name__ == "__main__":

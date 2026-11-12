@@ -875,8 +875,10 @@ class OcrBulletinPageTests(unittest.TestCase):
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
         docs = Path(__file__).resolve().parent.parent / "docs"
         html_live = (docs / "parishes" / "raphoe" / "gort-a-choirce.html").read_text(encoding="utf-8")
-        # Irish heading may be title-case after OCR cleanup (Aifrinn na Seachtaine).
-        self.assertRegex(html_live, r"(?i)Aifrinn\s+na\s+Seachtaine")
+        # Mega OCR sentences change every harvest. Do not pin last week's
+        # "Aifrinn na Seachtaine". Keep a real OCR body and the 850px boxes.
+        self.assertIn('id="ocr-panel"', html_live)
+        self.assertGreater(html_live.count("<p>"), 8)
         self.assertIn("Gortahork", html_live)
         # Printed Irish date changes every harvest — do not pin last week's.
         self.assertRegex(html_live, r"\d{1,2}ú [A-Za-zÁÉÍÓÚáéíóú ]+ 20\d{2}|\d{1,2}/\d{2}/20\d{2}|20\d{2}")
