@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 590,
+    "downloaded": 591,
     "html_links": 0,
-    "skipped": 484,
+    "skipped": 483,
     "failed": 159,
     "stale_rejected": 85
   },
   "action_counts": {
-    "ok": 466,
+    "ok": 467,
     "skip": 749,
     "mark_inactive": 18,
-    "investigate": 55,
+    "investigate": 54,
     "retrain": 1
   },
   "parishes": [
@@ -14726,34 +14726,6 @@
     {
       "parish_key": "donaghmore",
       "display_name": "Donaghmore",
-      "diocese": "armagh",
-      "recipe_file": "parishes/recipes/armagh/donaghmore.json",
-      "recipe": {
-        "start_url": "https://www.armagharchdiocese.org/parishes/parish-details/?page=ddb_parish_details&parishID=26",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
-        "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
-      },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "wp_json+direct_download",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official card / search is Facebook-only \u2014 cannot scrape Facebook (checked 29/09/2026)."
-    },
-    {
-      "parish_key": "donaghmore",
-      "display_name": "Donaghmore",
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/donaghmore.json",
       "recipe": {
@@ -14768,12 +14740,14 @@
         "has_terminal": false,
         "operator_notes": [
           "07/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 02/10/2026. Do not pin https://donaghmoreparish.org/wp-content/uploads/2026/10/service@riceoffice.com_20261002_122109.pdf.",
-          "10/11/2026: homepage links Donaghmore-Bulletin-8th-November-2026.pdf. Scrape the homepage. Do not pin the dated filename. Do not take the service@riceoffice hash PDF. armagh/donaghmore.json uses the same parish_key and is loaded first."
+          "10/11/2026: homepage links Donaghmore-Bulletin-8th-November-2026.pdf. Scrape the homepage. Do not pin the dated filename. Do not take the service@riceoffice hash PDF.",
+          "13/11/2026: Armagh Facebook-only skip renamed to donaghmorearmagh so this active recipe loads. recipe_path_for prefers active over skip."
         ],
         "do_not": [
           "Do not pin a dated filename.",
           "Do not harvest Facebook.",
-          "Do not take the service@riceoffice hash PDF."
+          "Do not take the service@riceoffice hash PDF.",
+          "Do not reuse parish_key donaghmore for the Armagh Facebook-only parish."
         ],
         "recorded_date": "2026-11-10"
       },
@@ -14781,10 +14755,43 @@
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "donaghmorearmagh",
+      "display_name": "Donaghmore (Armagh / Facebook-only)",
+      "diocese": "armagh",
+      "recipe_file": "parishes/recipes/armagh/donaghmorearmagh.json",
+      "recipe": {
+        "start_url": "https://www.armagharchdiocese.org/parishes/parish-details/?page=ddb_parish_details&parishID=26",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "13/11/2026: parish_key was donaghmore and sorted before dromore/donaghmore.json, so harvest always loaded this skip. Renamed to donaghmorearmagh."
+        ],
+        "do_not": [
+          "Do not reuse parish_key donaghmore \u2014 that is Dromore donaghmoreparish.org.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Official card / search is Facebook-only \u2014 cannot scrape Facebook (checked 29/09/2026). Renamed from donaghmore so Dromore Donaghmore can harvest."
     },
     {
       "parish_key": "donaghmoreknockearoxboro",
