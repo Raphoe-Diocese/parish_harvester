@@ -38,21 +38,18 @@ class Nov8TimeoutPinTests(unittest.TestCase):
         self.assertFalse(recipe["skip"])
 
     def test_churchtown_pins_proved_hash_pdf(self) -> None:
-        from harvester.recipe_brain import missed_week_should_retry
-
         recipe = _recipe("parishes/recipes/dublin/churchtown.json")
         self.assertIn(
             "/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
-            recipe.get("example_url") or "",
+            recipe["start_url"],
         )
+        self.assertEqual(recipe.get("example_url"), recipe["start_url"])
         self.assertNotIn("/newsletter/", recipe["start_url"])
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertNotEqual(recipe["site_type"], "wp_json_newest_media")
         self.assertEqual(recipe["playbook_type"], "direct_download")
-        self.assertTrue(recipe.get("skip"))
-        self.assertEqual(recipe.get("status"), "inactive")
-        self.assertFalse(missed_week_should_retry(recipe))
-        self.assertIn("403", (recipe.get("reason") or ""))
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotEqual(str(recipe.get("status") or "").lower(), "inactive")
         self.assertTrue((recipe.get("steps") or [])[-1].get("skip_listing_nav"))
 
     def test_direct_download_pdf_does_not_open_browser_after_http_miss(self) -> None:

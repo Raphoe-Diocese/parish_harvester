@@ -2847,7 +2847,7 @@ class CappaghExtensionlessBulletinTests(unittest.TestCase):
 
 
 class ChurchtownWpJsonRecipeTests(unittest.TestCase):
-    """Hashed churchtown-auto PDF. GitHub/datacenter IPs get 403/401; park, do not Playwright."""
+    """Hashed churchtown-auto PDF. Stays active. GitHub 403 is a failed harvest, not skip."""
 
     AUTO_PDF = (
         "https://churchtownparish.com/wp-content/uploads/2026/11/"
@@ -2859,8 +2859,6 @@ class ChurchtownWpJsonRecipeTests(unittest.TestCase):
     )
 
     def test_recipe_uses_wp_json_not_predicted_pin(self) -> None:
-        from harvester.recipe_brain import missed_week_should_retry
-
         recipe = json.loads(
             Path("parishes/recipes/dublin/churchtown.json").read_text(encoding="utf-8")
         )
@@ -2868,16 +2866,16 @@ class ChurchtownWpJsonRecipeTests(unittest.TestCase):
         self.assertEqual(recipe["playbook_type"], "direct_download")
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertNotEqual(recipe["site_type"], "wp_json_newest_media")
-        self.assertTrue(recipe.get("skip"))
-        self.assertEqual(recipe.get("status"), "inactive")
-        self.assertFalse(missed_week_should_retry(recipe))
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotEqual(str(recipe.get("status") or "").lower(), "inactive")
+        self.assertEqual(recipe["start_url"], self.AUTO_PDF)
         self.assertEqual(recipe.get("example_url"), self.AUTO_PDF)
         self.assertNotIn("newsletter-2026-11-01", recipe["start_url"])
         self.assertNotIn("/newsletter/", recipe["start_url"])
         self.assertTrue((recipe.get("steps") or [])[-1].get("skip_listing_nav"))
         do_not = " ".join(recipe.get("do_not") or []).lower()
         self.assertIn("newsletter-2026-11-01", do_not)
-        self.assertIn("pin the same", do_not)
+        self.assertIn("skip true", do_not)
 
     def test_media_date_beats_last_week_filename(self) -> None:
         import asyncio
