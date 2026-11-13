@@ -1420,6 +1420,99 @@ def _fetch_short_ua_hit(
     return None
 
 
+def _http_body_is_html(body: bytes, headers: dict[str, str]) -> bool:
+    """True for a 200 HTML page. PDFs and empty bodies are not printable HTML."""
+    if not body or body[:5] == b"%PDF-":
+        return False
+    ctype = (headers.get("content-type") or "").lower()
+    stripped = body.lstrip()[:64].lower()
+    if "html" in ctype:
+        return True
+    return stripped.startswith(b"<!doctype html") or stripped.startswith(b"<html")
+
+
+def _inject_html_base_href(html: str, url: str) -> str:
+    """Keep the fetched HTML. Add a base href so relative URLs resolve locally."""
+    href = (url or "").replace("&", "&amp;").replace('"', "&quot;")
+    base = f'<base href="{href}">'
+    if re.search(r"<head\b", html, re.I):
+        return re.sub(r"(<head\b[^>]*>)", r"\1" + base, html, count=1, flags=re.I)
+    return f"<!DOCTYPE html><html><head>{base}</head><body>{html}</body></html>"
+
+
+def _recipe_http_first_html(recipe: dict) -> bool:
+    """Pinned HTML post: GET over HTTP/1.1, then print. Do not Playwright goto."""
+    if not recipe.get("http_first"):
+        return False
+    for step in reversed(recipe.get("steps") or []):
+        if not isinstance(step, dict):
+            continue
+        action = str(step.get("action") or "").strip()
+        if action in {"print_to_pdf", "html"}:
+            return True
+        if action:
+            return False
+    return False
+
+
+def _recipe_print_skip_listing_nav(recipe: dict) -> bool:
+    for step in reversed(recipe.get("steps") or []):
+        if not isinstance(step, dict):
+            continue
+        if str(step.get("action") or "").strip() in {"print_to_pdf", "html"}:
+            return bool(step.get("skip_listing_nav", True))
+    return True
+
+
+async def _try_http_first_html_print(
+    url: str,
+    dest: Path,
+    browser: Browser,
+    target_date: date | None,
+    recipe: dict,
+) -> tuple[str, str] | None:
+    """GET HTML with Mozilla/5.0 then curl/8.5.0, then print_to_pdf.
+
+    Chromium Page.goto of magherafeltparish.org hits ERR_HTTP2_PROTOCOL_ERROR.
+    urllib is HTTP/1.1. Fail-fast if the GET misses — do not goto the live URL.
+    Abort page subresources so print does not reopen HTTP2.
+    """
+    hit = await asyncio.to_thread(_fetch_short_ua_hit, url, 20)
+    if not hit:
+        return None
+    body, headers = hit
+    if not _http_body_is_html(body, headers):
+        return None
+    html = _inject_html_base_href(body.decode("utf-8", "ignore"), url)
+    context = await browser.new_context(accept_downloads=True)
+    page = await context.new_page()
+    try:
+
+        async def _abort_network(route):
+            try:
+                await route.abort()
+            except Exception:
+                pass
+
+        try:
+            await page.route("**/*", _abort_network)
+        except Exception:
+            pass
+        await page.set_content(html, wait_until="domcontentloaded")
+        print_target = target_date if target_date is not None else date.today()
+        await _smart_print_page_to_pdf(
+            page,
+            dest,
+            print_target,
+            wait_ms=400,
+            skip_listing_nav=_recipe_print_skip_listing_nav(recipe),
+            max_pages=recipe.get("max_bulletin_pages"),
+        )
+        return url, "print_to_pdf"
+    finally:
+        await context.close()
+
+
 def _fetch_sunday_pdf_bytes(url: str) -> bytes | None:
     """One Sunday upload. 404 is a miss. A 403 page gets one Chrome GET."""
     status, body = _fetch_pdf_short_ua(url, 12)
@@ -5747,6 +5840,20 @@ async def replay_recipe(
                 return dest, found[1], found[0]
         raise RecipeReplayError(
             f"HTTP download failed for {start_url} (browser was not opened)"
+        )
+
+    # Magherafelt 13/11/2026: Chromium goto hits ERR_HTTP2_PROTOCOL_ERROR on
+    # the pinned HTML post. GET that same URL over HTTP/1.1 (Mozilla/5.0 then
+    # curl/8.5.0) and print_to_pdf from the fetched HTML. Fail-fast — do not
+    # Playwright goto the live URL.
+    if _recipe_http_first_html(recipe) and start_url:
+        found = await _try_http_first_html_print(
+            start_url, dest, browser, target_date, recipe
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"HTTP HTML failed for {start_url} (browser was not opened)"
         )
 
     context_opts: dict = {"accept_downloads": True}
