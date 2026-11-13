@@ -1,28 +1,32 @@
 {
-  "version": 5,
+  "version": 6,
   "parish_key": "churchtown",
   "display_name": "Churchtown",
   "diocese": "dublin",
-  "start_url": "https://churchtownparish.com/newsletter/",
-  "site_type": "wp_json_newest_media",
+  "start_url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "timeout_ms": 30000,
   "total_timeout_s": 90,
-  "recorded_date": "2026-11-09",
+  "recorded_date": "2026-11-13",
   "example_url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://churchtownparish.com/newsletter/"
+      "url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf"
     }
   ],
   "operator_notes": [
-    "09/11/2026: predicted rewrite of newsletter-2026-11-01.pdf to 2026-11-08 404. wp-json media has churchtown-auto HASH.pdf dated 06/11/2026 GET 206 application/pdf 1381831 bytes magic %PDF-1.7. Hash changes each week. Use wp_json_newest_media so next Sunday's auto file wins by media date. Do not pin the hash.",
-    "06/11/2026: wp_json + homepage hung 17m52s then cancelled. /newsletter/ is HTML. Folder is /2026/10/. start_url was the PDF so listing challenge is skipped."
+    "13/11/2026: source page https://churchtownparish.com/newsletter/ returned 401. File churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf GET 200 application/pdf 1381831 bytes magic %PDF-1.7 (long Chrome token). Page heading 8th November 2026. PDF CreationDate 06/11/2026. Two pages."
   ],
   "do_not": [
-    "Do not pin churchtown-auto-*.pdf — the hash changes each week.",
+    "Do not open /newsletter/. It is 401 and the old scrape hangs.",
+    "Do not use predicted_dated_pdf or wp_json_newest_media. The media API is 401.",
     "Do not pin newsletter-2026-11-01.pdf.",
-    "Do not Playwright-scrape the homepage — it hangs.",
     "Do not harvest Facebook."
   ],
   "href_patterns": [
