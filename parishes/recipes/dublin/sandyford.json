@@ -1,26 +1,32 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "sandyford",
   "display_name": "Sandyford",
   "diocese": "dublin",
   "start_url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf",
-  "site_type": "predicted_dated_pdf",
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-08",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf",
   "steps": [
     {
-      "action": "download",
+      "action": "goto",
       "url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "08/11/2026: start_url was still Newsletter-2026-11-01.pdf. Proved Newsletter-2026-11-08.pdf GET 206 application/pdf magic %PDF, full size 423870 bytes. Text is 8 November 2026, Share Appeal Sunday, St Mary's Sandyford. weeks_ahead 1 tries 15 November first and misses."
+    "13/11/2026: parish_status still failed predicted_dated_pdf miss on Newsletter-2026-11-08.pdf for 08/11/2026. last_tested_at 08/11/2026. This cloud IP StackProtect 403/401. Do not use predicted. Browser goto/download of the pinned PDF.",
+    "08/11/2026: proved Newsletter-2026-11-08.pdf GET 206 application/pdf magic %PDF, full size 423870 bytes. Text is 8 November 2026, Share Appeal Sunday, St Mary's Sandyford."
   ],
   "do_not": [
+    "Do not use predicted_dated_pdf — urllib misses the pinned file.",
     "Do not set start_url to the homepage — scrape then newsletter_brain hangs.",
     "Do not keep Newsletter-2026-11-01.pdf.",
     "Do not harvest Facebook."

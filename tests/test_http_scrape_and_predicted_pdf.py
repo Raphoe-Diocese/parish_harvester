@@ -2082,6 +2082,17 @@ class LoughshoreRecipeTests(unittest.TestCase):
 class HarvestMissRecipeTests(unittest.TestCase):
     """Recipes for this-week files the 07/09/2026 harvest raised away."""
 
+    def _assert_wordpress_direct_download(self, recipe: dict, needle: str) -> None:
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertIn(needle, recipe["start_url"])
+        self.assertEqual(recipe["steps"][0]["action"], "goto")
+        self.assertEqual(recipe["steps"][1]["action"], "download")
+        self.assertIn(needle, recipe["steps"][0]["url"])
+        self.assertIn(needle, recipe["steps"][1]["url"])
+        self.assertTrue(recipe["steps"][1].get("use_captured_url"))
+
     def test_annagry_scrapes_the_newsletter_listing(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/annagryparish.json").read_text(
@@ -2466,11 +2477,8 @@ class HarvestMissRecipeTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/killaloe/doonbeg.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("2026_11_08+Newsletter.pdf", recipe["start_url"])
+        self._assert_wordpress_direct_download(recipe, "2026_11_08+Newsletter.pdf")
         self.assertNotIn("2026_11_01", recipe["start_url"])
-        self.assertEqual(int(recipe["weeks_back"]), 0)
-        self.assertEqual(int(recipe["weeks_ahead"]), 0)
         example = (
             "https://irp.cdn-website.com/8e819f4b/files/uploaded/"
             "2026_11_01+Newsletter.pdf"
@@ -2493,19 +2501,17 @@ class HarvestMissRecipeTests(unittest.TestCase):
         donnybrook = json.loads(
             Path("parishes/recipes/dublin/donnybrook.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(donnybrook["site_type"], "predicted_dated_pdf")
-        self.assertIn("Notices-8th-November-2026.pdf", donnybrook["start_url"])
+        self._assert_wordpress_direct_download(
+            donnybrook, "Notices-8th-November-2026.pdf"
+        )
         self.assertNotIn("1st-November", donnybrook["start_url"])
-        self.assertEqual(int(donnybrook["weeks_back"]), 0)
-        self.assertEqual(int(donnybrook["weeks_ahead"]), 0)
         newmarket = json.loads(
             Path("parishes/recipes/cloyne/newmarkettaur.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(newmarket["site_type"], "predicted_dated_pdf")
-        self.assertIn("Newsletter-Sunday-8th-November-2026.pdf", newmarket["start_url"])
+        self._assert_wordpress_direct_download(
+            newmarket, "Newsletter-Sunday-8th-November-2026.pdf"
+        )
         self.assertNotIn("1st-November", newmarket["start_url"])
-        self.assertEqual(int(newmarket["weeks_back"]), 0)
-        self.assertEqual(int(newmarket["weeks_ahead"]), 0)
 
     def test_parishes_together_use_8_november_pdfs(self) -> None:
         cases = {
@@ -2567,11 +2573,8 @@ class HarvestMissRecipeTests(unittest.TestCase):
         kilmoremoy = json.loads(
             Path("parishes/recipes/killala/kilmoremoy.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(kilmoremoy["site_type"], "predicted_dated_pdf")
-        self.assertIn("newsletter-62.pdf", kilmoremoy["start_url"])
+        self._assert_wordpress_direct_download(kilmoremoy, "newsletter-62.pdf")
         self.assertNotIn("newsletter-61.pdf", kilmoremoy["start_url"])
-        self.assertEqual(int(kilmoremoy["weeks_back"]), 0)
-        self.assertEqual(int(kilmoremoy["weeks_ahead"]), 0)
 
     def test_dromod_and_foxford_allow_8_november(self) -> None:
         dromod = json.loads(
@@ -2591,25 +2594,27 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("Sept", foxford.get("href_patterns") or [])
 
     def test_sandyford_and_dkr_keep_8_november_pdfs(self) -> None:
-        cases = {
-            "dublin/sandyford.json": "Newsletter-2026-11-08.pdf",
-            "limerick/donaghmoreknockearoxboro.json": "Newsletter-2026-11-08.pdf",
-        }
-        for rel, needle in cases.items():
-            recipe = json.loads((Path("parishes/recipes") / rel).read_text(encoding="utf-8"))
-            self.assertEqual(recipe["site_type"], "predicted_dated_pdf", rel)
-            self.assertIn(needle, recipe["start_url"], rel)
-            self.assertNotIn("2026-11-01", recipe["start_url"], rel)
-            self.assertNotIn("November-1st", recipe["start_url"], rel)
-            self.assertEqual(int(recipe["weeks_back"]), 0, rel)
-            self.assertEqual(int(recipe["weeks_ahead"]), 0, rel)
+        sandyford = json.loads(
+            Path("parishes/recipes/dublin/sandyford.json").read_text(encoding="utf-8")
+        )
+        self._assert_wordpress_direct_download(
+            sandyford, "Newsletter-2026-11-08.pdf"
+        )
+        self.assertNotIn("2026-11-01", sandyford["start_url"])
+        self.assertNotIn("November-1st", sandyford["start_url"])
         dkr = json.loads(
             Path("parishes/recipes/limerick/donaghmoreknockearoxboro.json").read_text(
                 encoding="utf-8"
             )
         )
+        # DKR harvest just ran; parked 403 list — leave predicted pin as-is.
+        self.assertEqual(dkr["site_type"], "predicted_dated_pdf")
+        self.assertIn("Newsletter-2026-11-08.pdf", dkr["start_url"])
         self.assertIn("/2026/11/", dkr["start_url"])
         self.assertNotIn("/2026/10/", dkr["start_url"])
+        self.assertNotIn("2026-11-01", dkr["start_url"])
+        self.assertEqual(int(dkr["weeks_back"]), 0)
+        self.assertEqual(int(dkr["weeks_ahead"]), 0)
 
     def test_nov8_hits_scrape_listing_not_pinned_pdf(self) -> None:
         # termonmaguirc / mayobridge / donaghmore moved to predicted PDF pins (listing hangs).

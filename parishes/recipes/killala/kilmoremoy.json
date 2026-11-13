@@ -1,30 +1,36 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "kilmoremoy",
   "display_name": "Kilmoremoy",
   "diocese": "killala",
   "start_url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-62.pdf",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "href_patterns": [
     "newsletter",
     ".pdf"
   ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-09",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-62.pdf",
   "steps": [
     {
-      "action": "download",
+      "action": "goto",
       "url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-62.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://ballinaparish.org/wp-content/uploads/2026/11/newsletter-62.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "09/11/2026: newsletter-61.pdf has no day so predicted rewrite for 08/11 404s. Live file is newsletter-62.pdf uploaded 08/11/2026, wp-json filesize 2625027. start_url is the PDF so /bulletin/ scrape is skipped. This IP RemoteDisconnected on GET; GitHub already reached ballinaparish.org."
+    "13/11/2026: predicted_dated_pdf urllib miss on newsletter-62.pdf for 08/11/2026. Filename has no day so predicted rewrite 404s. Do not use predicted. Browser goto/download of the pinned PDF.",
+    "09/11/2026: newsletter-61.pdf has no day. Live file is newsletter-62.pdf uploaded 08/11/2026, wp-json filesize 2625027."
   ],
   "do_not": [
+    "Do not use predicted_dated_pdf — it rewrites or misses newsletter-62.pdf.",
     "Do not set start_url to /bulletin/ — scrape hangs.",
     "Do not keep newsletter-61.pdf.",
     "Do not pin newsletter-62.pdf forever — the number ticks each week.",

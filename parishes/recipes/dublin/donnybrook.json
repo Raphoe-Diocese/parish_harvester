@@ -1,26 +1,32 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "donnybrook",
   "display_name": "Donnybrook",
   "diocese": "dublin",
   "start_url": "https://donnybrookparish.ie/wp-content/uploads/Notices-8th-November-2026.pdf",
-  "site_type": "predicted_dated_pdf",
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-09",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://donnybrookparish.ie/wp-content/uploads/Notices-8th-November-2026.pdf",
   "steps": [
     {
-      "action": "download",
+      "action": "goto",
       "url": "https://donnybrookparish.ie/wp-content/uploads/Notices-8th-November-2026.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://donnybrookparish.ie/wp-content/uploads/Notices-8th-November-2026.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "09/11/2026: 1 November Notices PDF is 3MB and harvest timed out. Live file is Notices-8th-November-2026.pdf uploaded 07/11/2026, wp-json filesize 1137688, mime application/pdf. This IP RemoteDisconnected on Range GET. weeks_ahead 1 is off so predicted does not burn the sibling budget. start_url is the PDF so listing challenge is skipped."
+    "13/11/2026: predicted_dated_pdf urllib miss on Notices-8th-November-2026.pdf for 08/11/2026. parish_status last_tested_at 09/11/2026. This PC HEAD 200 1137688. This cloud IP SiteGround sgcaptcha 202 HTML. Do not use predicted. Browser goto/download of the pinned PDF.",
+    "09/11/2026: 1 November Notices PDF is 3MB and harvest timed out."
   ],
   "do_not": [
+    "Do not use predicted_dated_pdf — urllib misses or rewrites the pinned file.",
     "Do not set start_url to the homepage — wp-json then newsletter_brain hangs.",
     "Do not keep Notices-1st-November-2026.pdf.",
     "Do not harvest Facebook."
