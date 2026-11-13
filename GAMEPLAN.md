@@ -1,3 +1,6 @@
+## 13/11/2026 01:52 - PR 581 merged. Harvests running. Next Armagh + Ashbourne
+581 merged 89156308. Harvests: mayobridge 43347610567, termonmaguirc 43347615285, milltowndublin 43347620331, mohill 43347626296. Donaghmore already ok from 580. Next pins: Armagh /2026/11/8th-November.pdf (not /09/ 404). Ashbourne 32nd-sunday-a-2026.pdf under /2025/08/. Portmarnock URL is 8 Nov but dated 07/10 leftover — parked. Not live.
+
 ## 13/11/2026 01:45 - PR 581 Step 5/6 pins. 580 green. Donaghmore ok
 580 merged. Donaghmore harvest 43342340968 ok on clash fix. PR 581 https://github.com/Raphoe-Diocese/parish_harvester/pull/581 pins Termonmaguirc/Mayobridge/Donaghmore PDFs + Milltown PDF + Mohill newsletter-7th-november-2026 (8th slug 404). CI re-running. Not merged. Not live.
 
