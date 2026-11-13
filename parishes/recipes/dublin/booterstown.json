@@ -1,42 +1,51 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "booterstown",
   "display_name": "Booterstown",
   "diocese": "dublin",
-  "start_url": "https://booterstownparish.ie/wp-content/uploads/2026/10/Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf",
-  "site_type": "predicted_dated_pdf",
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_ahead": 1,
-  "recorded_date": "2026-11-06",
-  "example_url": "https://booterstownparish.ie/wp-content/uploads/2026/10/Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf",
+  "start_url": "https://booterstownparish.ie/wp-content/uploads/2026/11/bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://booterstownparish.ie/wp-content/uploads/2026/11/bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf",
+  "href_patterns": [
+    "bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf",
+    ".pdf"
+  ],
   "steps": [
     {
+      "action": "goto",
+      "url": "https://booterstownparish.ie/wp-content/uploads/2026/11/bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf"
+    },
+    {
       "action": "download",
-      "url": "https://booterstownparish.ie/wp-content/uploads/2026/10/Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf"
+      "url": "https://booterstownparish.ie/wp-content/uploads/2026/11/bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "06/11/2026: two harvests green then row still Total timeout exceeded. wp_json + homepage newsletter_brain hangs. Proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1134965 bytes magic %PDF-1.4. start_url is the PDF. Sun-8-November is a hash PDF; do not pin the hash."
+    "13/11/2026 leftover FAILED: harvest Total timeout exceeded. Old recipe was predicted_dated_pdf of Sun-1-November-2026. This week is the hashed upload bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf. wp-json media title bfecaa62bd5afda6-Sun-8-November-2026-Booterstown-Weekly-Newsletter, date 2026-11-06T13:03:20. curl/8.5.0 GET 200 application/pdf 1190154 bytes magic %PDF-1.4 Last-Modified Fri 06/11/2026 13:03:20 GMT. Mozilla/5.0 403. PDF text Church of the Assumption, Booterstown / Sunday 8th November – Thirty Second. Source post https://booterstownparish.ie/parish-newsletter-2026-11-08/ title Parish Newsletter 8th November 2026. Pin wordpress + direct_download. Do not use predicted. Do not pin the 15 November hash."
   ],
   "do_not": [
-    "Do not set start_url to the homepage — newsletter_brain hangs.",
-    "Do not pin Sun-1-November-2026 forever — predicted_dated_pdf rewrites the date.",
-    "Do not pin the Sun-8 hash PDF.",
-    "Do not harvest Facebook.",
-    "Do not take newsletter-front PNG instead of the PDF."
-  ],
-  "href_patterns": [
-    ".pdf",
-    "Newsletter"
+    "Do not use predicted_dated_pdf — it rewrites this hash into Sun-1-November-2026.",
+    "Do not pin Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf.",
+    "Do not pin bp-0611d240bb7681346828101bc4cec82058339cdddf272ea30b9d9f2af68d9c5f.pdf — that media title is Sun-15-November-2026.",
+    "Do not pin bp-babb21616eacec4f1d0084b7ccad62ec55905d779e5e12e04b2eccf0d06e16d0.png — PNG is the preview, not the PDF.",
+    "Do not set start_url to the homepage or /category/newsletter/ — listing hangs.",
+    "Do not harvest Facebook."
   ],
   "href_skip_patterns": [
     "jpg",
     "jpeg",
     "png",
-    "-300x",
-    "-1024x",
-    "-150x"
+    "Sun-1-November",
+    "Sun-15-November",
+    "0611d240bb768134"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

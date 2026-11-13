@@ -1,49 +1,48 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "blessington",
   "display_name": "Blessington",
   "diocese": "dublin",
-  "recorded_date": "2026-11-06",
-  "start_url": "https://blessingtonparish.ie/newsletters/",
-  "site_type": "html_text_bulletin",
-  "playbook_type": "html_text_bulletin",
+  "start_url": "https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "status": "active",
   "skip": false,
-  "timeout_ms": 60000,
-  "total_timeout_s": 180,
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
   "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf",
+  "href_patterns": [
+    "Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf",
+    "8th-Nov-2026",
+    ".pdf"
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://blessingtonparish.ie/newsletters/"
+      "url": "https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf"
     },
     {
-      "action": "click",
-      "selector": "a[href*='newsletter-']",
-      "pick_strategy": "first_match",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "h3 a",
-        "a:has-text('Newsletter')"
-      ]
-    },
-    {
-      "action": "print_to_pdf",
-      "skip_listing_nav": true
+      "action": "download",
+      "url": "https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
-    "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
-    "Do not pin /2026/11/05/newsletter-november-8th-2026/."
+    "13/11/2026 leftover FAILED: harvest said recipe outdated on /newsletters/. HTML post /2026/11/05/newsletter-november-8th-2026/ is a DearFlip wrapper (og:description [/dflip), not the paper. File https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf curl/8.5.0 GET 200 application/pdf 1131024 bytes magic %PDF-1.7 Last-Modified Thu 05/11/2026 11:15:54 GMT. Mozilla/5.0 long Chrome token 403. PDF text SATURDAY 7th November / SUNDAY 8th November / Community Diary Issue 1578 8th Nov 2026 / 10am Mass St. Joseph's Church, Valleymount. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Valleymount is the same paper — harvest once here. Do not print the HTML post. Do not open /newsletters/."
   ],
   "do_not": [
-    "Do not pin a dated newsletter slug.",
-    "Do not rely on wp-json media alone — host can 403.",
+    "Do not set start_url to https://blessingtonparish.ie/newsletters/ — listing timed out and is not the PDF.",
+    "Do not print_to_pdf /2026/11/05/newsletter-november-8th-2026/ — that page is a DearFlip wrapper, not the paper.",
+    "Do not pin Newsletter-4th-Oct-2026-NEWGraohic2-.pdf.",
+    "Do not pin a 1st November or 15th November newsletter.",
+    "Do not use predicted_dated_pdf.",
+    "Do not use http_scrape_newest_html — scrape intercepts the PDF pin.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
-    "strategy": "first_match",
+    "strategy": "newest_dated",
     "position": "top"
   }
 }

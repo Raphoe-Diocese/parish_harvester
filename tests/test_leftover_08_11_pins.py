@@ -332,6 +332,99 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotIn("366f88e3f30e7d6de57c562a15ce3910", recipe["start_url"])
         self.assertNotIn("dromorediocese.org", recipe["start_url"])
 
+    def test_blessington_pins_8th_nov_pdf_not_listing(self) -> None:
+        recipe = _recipe("parishes/recipes/dublin/blessington.json")
+        self._assert_wordpress_direct(
+            recipe, "Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf"
+        )
+        self.assertFalse(recipe.get("skip"))
+        self.assertIn("/2026/11/", recipe["start_url"])
+        self.assertNotIn("newsletters", recipe["start_url"])
+        self.assertNotIn("newsletter-november-8th-2026", recipe["start_url"])
+        self.assertNotIn("4th-Oct", recipe["start_url"])
+        self.assertNotIn("1st-Nov", recipe["start_url"])
+        self.assertNotIn("15th-Nov", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "html_text_bulletin")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://blessingtonparish.ie"
+        )
+        verdict = check_bulletin_freshness(recipe["start_url"], date(2026, 11, 8))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+
+    def test_valleymount_aliases_blessington_8_nov_pdf(self) -> None:
+        recipe = _recipe("parishes/recipes/dublin/valleymount.json")
+        blessington = _recipe("parishes/recipes/dublin/blessington.json")
+        self.assertTrue(recipe.get("skip"))
+        self.assertEqual(recipe.get("alias_of"), "blessington")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertIn("blessingtonparish.ie", recipe["start_url"])
+        self.assertIn(
+            "Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf",
+            recipe.get("example_url") or "",
+        )
+        self.assertFalse(blessington.get("skip"))
+        self.assertEqual(blessington["playbook_type"], "direct_download")
+        self.assertNotIn("4th-Oct", recipe.get("example_url") or "")
+        self.assertNotIn("1st-Nov", recipe.get("example_url") or "")
+        self.assertNotIn("15th-Nov", recipe.get("example_url") or "")
+
+    def test_booterstown_pins_8_nov_hash_pdf_not_1st_or_15th(self) -> None:
+        recipe = _recipe("parishes/recipes/dublin/booterstown.json")
+        self._assert_wordpress_direct(
+            recipe, "bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf"
+        )
+        self.assertFalse(recipe.get("skip"))
+        self.assertIn("/2026/11/", recipe["start_url"])
+        self.assertNotIn("Sun-1-November", recipe["start_url"])
+        self.assertNotIn("0611d240bb768134", recipe["start_url"])
+        self.assertNotIn("Sun-15-November", recipe["start_url"])
+        self.assertNotIn("babb21616eacec4f1d0084b7ccad62ec55905d779e5e12e04b2eccf0d06e16d0", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://booterstownparish.ie"
+        )
+        verdict = check_bulletin_freshness(
+            "Sun-8-November-2026-Booterstown-Weekly-Newsletter.pdf",
+            date(2026, 11, 8),
+        )
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+
+    def test_moyraverty_pins_8_nov_wix_pdf_not_october_button(self) -> None:
+        recipe = _recipe("parishes/recipes/dromore/moyraverty.json")
+        self._assert_wordpress_direct(
+            recipe, "a352bf_d2b0e355c1804e3c911420345dd28207.pdf"
+        )
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotIn("ec73f0cc2f09497c9e8b00c82f78527a", recipe["start_url"])
+        self.assertNotIn("dromorediocese.org", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "link_only")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://www.moyravertyparish.com"
+        )
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"),
+            "https://www.stanthonyscraigavon.org/moyravertyparish",
+        )
+
+    def test_seagoe_aliases_moyraverty_same_08_11_file(self) -> None:
+        recipe = _recipe("parishes/recipes/dromore/seagoe.json")
+        self.assertEqual(recipe["alias_of"], "moyraverty")
+        self.assertTrue(recipe.get("skip"))
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotIn("dromorediocese.org", recipe["start_url"])
+        self.assertIn(
+            "a352bf_d2b0e355c1804e3c911420345dd28207.pdf",
+            recipe.get("example_url") or "",
+        )
+        self.assertNotIn("ec73f0cc2f09497c9e8b00c82f78527a", recipe.get("example_url") or "")
+        self.assertNotIn("a352bf_d2b0e355c1804e3c911420345dd28207.pdf", recipe["start_url"])
+
     def test_togher_pins_8th_november_pdf_not_diocese_card(self) -> None:
         recipe = _recipe("parishes/recipes/armagh/togher.json")
         self._assert_wordpress_direct(
