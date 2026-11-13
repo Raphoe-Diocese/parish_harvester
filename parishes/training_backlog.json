@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 600,
+    "downloaded": 601,
     "html_links": 0,
     "skipped": 487,
-    "failed": 146,
+    "failed": 145,
     "stale_rejected": 85
   },
   "action_counts": {
-    "ok": 476,
+    "ok": 477,
     "skip": 749,
     "mark_inactive": 18,
-    "investigate": 46,
+    "investigate": 45,
     "retrain": 1
   },
   "parishes": [
@@ -10700,9 +10700,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "Recipe replay failed: HTTP 403 for https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf; headful fallback: Recipe replay failed: APIRequestContext.get: ",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: HTTP 403 for https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05ef"
     },
     {
       "parish_key": "churchtownliscarroll",
@@ -30977,10 +30977,10 @@
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.newmarketparish.com/wp-content/uploads/2026/10/Newsletter-Sunday-8th-November-2026.pdf for 2026-11-08 did not resolve to a real file (listing page was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.newmarketparish.com/wp-content/uploads/2026/10/Newsletter-Sunday-8th-November-2026.pdf for 202"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "newmarketonfergus",
@@ -33005,7 +33005,7 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/drive-1jmslbrliw.json",
       "recipe": {
-        "start_url": "https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe",
+        "start_url": "https://parishofraphoe.ie/bulletin/raphoe/test-parish",
         "site_type": "permanent_redirect_document",
         "playbook_type": "direct_download",
         "status": "",
@@ -33015,19 +33015,21 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "12/11/2026: Frank: https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe is the permanent weekly link. Same path every week.",
-          "Opened in browser 12/11/2026: page exists. Text is No bulletin available / The weekly bulletin has not yet been uploaded. bulletin.pdf GET 404. Do not invent a this-week file.",
+          "13/11/2026: test-parishraphoe 404. This Week's Bulletin is test-parish. GET 200 433490 bytes Sunday 8 November 2026.",
+          "https://parishofraphoe.ie/bulletin/raphoe/test-parish 301/302 to bulletin.pdf. GET 200 application/pdf 433490 bytes magic %PDF-1.7. Last-Modified Thu, 12 Nov 2026 15:55:42 GMT.",
+          "Also pin https://parishofraphoe.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/test-parish/bulletin.pdf. No ?t= on the download URL.",
           "Same pattern as Kilbarron and Newtown Killea. Download bulletin.pdf first. use_target_url keeps the permanent path as-is.",
           "Old Google Drive pin 1jmslbrliw is retired. Do not harvest that Drive file."
         ],
         "do_not": [
           "Do not pin the old Google Drive file 1jmslbrliw.",
+          "Do not use https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe. That slug is 404.",
           "Do not set start_url to https://parishofraphoe.ie/bulletin/ or /newsletter/.",
           "Do not pin a dated wp-content/uploads/YYYY/MM/ filename.",
           "Do not add a ?t= cache-buster on bulletin.pdf.",
-          "Do not print the empty No bulletin available page as a PDF."
+          "Do not print an empty No bulletin available page as a PDF."
         ],
-        "recorded_date": "2026-11-12"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
