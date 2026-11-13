@@ -4,7 +4,8 @@ Ok 592 on GitHub 03:02. Ashbourne Donaghmore Mohill ok. Armagh Termon Mayobridge
 ## 13/11/2026 03:00 - 584 merged. Termon Mayobridge Bree GitHub 403 parked
 584 merged 1b552f6a wait confirm harvest armaghparish. 583 harvests failed: Termon 403 on Thirty-Second PDF then chrome-error; Mayobridge 403; Bree socket hang up. Same GitHub WAF as Milltown. Two tries each. Park. Ashbourne Mohill Donaghmore ok. Not live.
 
-## 13/11/2026 10:15 - Predicted dated PDF misses off urllib. Donnybrook Doonbeg Sandyford
+## 13/11/2026 10:15 - PR 586 predicted dated PDF misses off urllib
+https://github.com/Raphoe-Diocese/parish_harvester/pull/586
 Harvest Sunday 08/11/2026. parish_status.json: donnybrook/doonbeg/sandyford still failed Predicted dated PDF. Also kilmoremoy + newmarkettaur same error. milltown Meath ok. milltowndublin GitHub 403 parked. Parked 403 list not touched: armaghparish termonmaguirc mayobridge milltowndublin bree donaghmoyne roslea donaghmoreknockearoxboro. foxrock miss is 01/11 not 08/11 — no 8 Nov PDF found, parked. Recipes now wordpress + playbook_type direct_download + goto/download of the exact URL. Doonbeg proved this turn GET 200 application/pdf 256842 %PDF-1.7. Donnybrook this PC HEAD 200 1137688; this cloud IP SiteGround 202. Sandyford this cloud 403/401. Not live. No harvest this turn.
 
 ## 13/11/2026 02:30 - 583 merged. Ashbourne ok. Armagh predicted miss. Milltown GitHub 403 parked
