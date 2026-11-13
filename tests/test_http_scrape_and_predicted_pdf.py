@@ -2547,23 +2547,22 @@ class HarvestMissRecipeTests(unittest.TestCase):
         termon = json.loads(
             Path("parishes/recipes/armagh/termonmaguirc.json").read_text(encoding="utf-8")
         )
-        # Listing /bulletins/ hangs; pin the proved Thirty-Second PDF (not Twenty-Sixth rewrite).
-        self.assertEqual(termon["site_type"], "predicted_dated_pdf")
+        # Listing /bulletins/ hangs; predicted rewrote Thirty-Second into dead Twenty-Sixth.
+        self.assertNotEqual(termon["site_type"], "predicted_dated_pdf")
+        self.assertEqual(termon["playbook_type"], "direct_download")
         self.assertIn(
             "Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
             termon["start_url"],
         )
         self.assertNotIn("Twenty-Sixth", termon["start_url"])
         self.assertNotIn("/bulletins/", termon["start_url"])
-        self.assertEqual(termon["steps"][0]["action"], "download")
         bree = json.loads(
             Path("parishes/recipes/ferns/bree.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(bree["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(bree["site_type"], "predicted_dated_pdf")
+        self.assertEqual(bree["playbook_type"], "direct_download")
         self.assertIn("Newsletter-3745-Nov-7th-8th.pdf", bree["start_url"])
         self.assertNotIn("3744", bree["start_url"])
-        self.assertEqual(int(bree["weeks_back"]), 0)
-        self.assertEqual(int(bree["weeks_ahead"]), 0)
         kilmoremoy = json.loads(
             Path("parishes/recipes/killala/kilmoremoy.json").read_text(encoding="utf-8")
         )
