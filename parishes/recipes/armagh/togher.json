@@ -1,22 +1,48 @@
 {
+  "version": 2,
   "parish_key": "togher",
   "display_name": "Togher",
   "diocese": "armagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://familyofparishes.ie/parishes/togher",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
+  "start_url": "https://togherparish.com/wp-content/uploads/2026/11/bulletin-32nd-ord-a-8th-november-2026.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "status": "active",
   "skip": false,
-  "reason": "Website found (https://familyofparishes.ie/parishes/togher) but no this-week PDF proved on 29/09/2026 kitchen-sink — link only until bulletin URL proved.",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://togherparish.com/wp-content/uploads/2026/11/bulletin-32nd-ord-a-8th-november-2026.pdf",
+  "href_patterns": [
+    "bulletin-32nd-ord-a-8th-november-2026.pdf",
+    "8th-november-2026",
+    ".pdf"
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://familyofparishes.ie/parishes/togher"
+      "url": "https://togherparish.com/wp-content/uploads/2026/11/bulletin-32nd-ord-a-8th-november-2026.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://togherparish.com/wp-content/uploads/2026/11/bulletin-32nd-ord-a-8th-november-2026.pdf",
+      "use_captured_url": true
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "12/11/2026 Step 4: unskipped missed-week recipe. Keep-weekly already retries these. Facebook-only and no-website stay skipped."
-  ]
+    "13/11/2026 leftover FAILED: harvest saved the Armagh diocese card (parishID=66) and the old recipe pointed at Cork familyofparishes.ie/parishes/togher (notices, not this week's paper). Armagh Togher own-site listing /parish-bulletins/ link text 32nd Sunday in Ordinary Time (8th November). File https://togherparish.com/wp-content/uploads/2026/11/bulletin-32nd-ord-a-8th-november-2026.pdf GET 200 application/pdf 3148919 bytes magic %PDF-1.3. urllib Mozilla/5.0 HTTP/1.1 200 (harvest download UA). Full Chrome UA 403 on this host. One-page scan, no extractable PDF text. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Do not open the listing, familyofparishes.ie, or armagharchdiocese.org."
+  ],
+  "do_not": [
+    "Do not pin bulletin-all-saints-a-1st-november-2026.pdf. 01/11 is not 08/11.",
+    "Do not set start_url to https://togherparish.com/ or /parish-bulletins/ — listing also has 1st November.",
+    "Do not scrape https://familyofparishes.ie/parishes/togher — that is Cork Togher notices, not this Armagh paper.",
+    "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
+    "Do not use predicted_dated_pdf.",
+    "Do not use http_scrape_newest_pdf — that can pick 1st November from the listing.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
