@@ -1,4 +1,4 @@
-"""HTML-capture fails 13/11/2026: Ardfinnan this-week HTML pin; four honest stale."""
+"""HTML-capture fails 13/11/2026: St Carlo HTML pin; four honest stale."""
 from __future__ import annotations
 
 import json
@@ -13,18 +13,36 @@ def _recipe(rel: str) -> dict:
 
 
 class HtmlCaptureFailPinsTests(unittest.TestCase):
-    def test_ardfinnan_pins_7th_8th_html_not_invented_8th(self) -> None:
-        recipe = _recipe("parishes/recipes/waterford_and_lismore/ardfinnan.json")
-        self.assertIn("newsletter-7th-8th-november-2026", recipe["start_url"])
+    def _assert_st_carlo_wordpress_print(self, rel: str, parish_key: str) -> None:
+        recipe = _recipe(rel)
+        page = "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/"
+        self.assertEqual(recipe["parish_key"], parish_key)
+        self.assertEqual(recipe["start_url"], page)
+        self.assertEqual(recipe["steps"][0]["url"], page)
         self.assertNotIn("newsletter-8th-november-2026", recipe["start_url"])
         self.assertNotIn("newsletter-7th-november-2026/", recipe["start_url"])
         self.assertNotIn("31st-october-1st-november", recipe["start_url"])
+        self.assertNotIn("newsletter-14th-15th-november-2026", recipe["start_url"])
+        self.assertNotIn("category/newsletters", recipe["start_url"])
         self.assertFalse(recipe.get("skip"))
         self.assertEqual(recipe["site_type"], "wordpress")
         self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
         self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
         self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
-        self.assertNotIn("newsletter-14th-15th-november-2026", recipe["start_url"])
+
+    def test_ardfinnan_pins_7th_8th_html_not_invented_8th(self) -> None:
+        self._assert_st_carlo_wordpress_print(
+            "parishes/recipes/waterford_and_lismore/ardfinnan.json", "ardfinnan"
+        )
+
+    def test_st_carlo_twins_pin_same_7th_8th_html(self) -> None:
+        self._assert_st_carlo_wordpress_print(
+            "parishes/recipes/waterford_and_lismore/newcastlefourmilewater.json",
+            "newcastlefourmilewater",
+        )
+        self._assert_st_carlo_wordpress_print(
+            "parishes/recipes/waterford_and_lismore/touraneena.json", "touraneena"
+        )
 
     def test_abbeyknockmoy_is_honest_stale_all_saints_not_8th(self) -> None:
         recipe = _recipe("parishes/recipes/tuam/abbeyknockmoy.json")

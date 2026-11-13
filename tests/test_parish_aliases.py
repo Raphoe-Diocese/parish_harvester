@@ -44,6 +44,8 @@ class ParishAliasTests(unittest.TestCase):
                 "grangepark": "edenmore",
                 "moone": "narraghmore",
                 "butlerstown": "stpaulswaterford",
+                "newcastlefourmilewater": "ardfinnan",
+                "touraneena": "ardfinnan",
             },
         )
 
@@ -267,6 +269,44 @@ class ParishAliasTests(unittest.TestCase):
         self.assertEqual(legan.get("alias_of"), "ardaghandmoydow")
         self.assertTrue(legan.get("skip"))
         self.assertNotEqual(host.get("skip"), True)
+
+    def test_st_carlo_twins_alias_ardfinnan_same_html_pin(self) -> None:
+        root = REPO_ROOT / "parishes" / "recipes" / "waterford_and_lismore"
+        ardfinnan = json.loads((root / "ardfinnan.json").read_text(encoding="utf-8"))
+        newcastle = json.loads(
+            (root / "newcastlefourmilewater.json").read_text(encoding="utf-8")
+        )
+        touraneena = json.loads((root / "touraneena.json").read_text(encoding="utf-8"))
+        page = "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/"
+        self.assertEqual(ardfinnan["start_url"], page)
+        self.assertFalse(ardfinnan.get("skip"))
+        self.assertFalse(is_alias_key("ardfinnan"))
+        for recipe, key in (
+            (newcastle, "newcastlefourmilewater"),
+            (touraneena, "touraneena"),
+        ):
+            self.assertEqual(recipe["parish_key"], key)
+            self.assertEqual(recipe["start_url"], page)
+            self.assertEqual(recipe["site_type"], "wordpress")
+            self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
+            self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+            self.assertFalse(recipe.get("skip"))
+            self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
+            self.assertEqual(canonical_key(key), "ardfinnan")
+            self.assertTrue(is_alias_key(key))
+        self.assertEqual(
+            combined_display_name("ardfinnan"),
+            "Ardfinnan (Newcastle & Fourmilewater, Touraneena)",
+        )
+        collapsed = collapse_named_links(
+            [
+                ("Ardfinnan", page),
+                ("Newcastle & Fourmilewater", page),
+                ("Touraneena", page),
+            ]
+        )
+        names = [name for name, _url in collapsed]
+        self.assertEqual(names, ["Ardfinnan (Newcastle & Fourmilewater, Touraneena)"])
 
 
 if __name__ == "__main__":
