@@ -1,31 +1,44 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "headford",
   "display_name": "Headford-Claran (Killursa & Killower)",
   "diocese": "tuam",
-  "start_url": "https://headfordchurch.com/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Newsletter",
-    "September",
-    ".pdf"
-  ],
+  "start_url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-13",
+  "example_url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://headfordchurch.com/"
+      "url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 4319094 bytes magic %PDF. File date 27/09/2026. Do not pin the dated filename."
+    "13/11/2026 leftover FAILED: http_scrape of headfordchurch.com still had September href_patterns and newest WP media was Newsletter-26th-27th-September-2026.pdf. Kitchen-sink: ChurchTV stores Killursa & Killower sheets under /wp-content/uploads/2021/02/. GET 200 application/pdf Newsletter-7th-8th-November-2026.pdf 4338649 bytes magic %PDF-1.7. Freshness in_bulletin_week 08/11/2026. PDF streams include mailto:info@headfordchurch.com and info@headfordns.ie. The 2021/02 folder is ChurchTV's store, not the Sunday. Do not scrape headfordchurch.com. Do not pin Newsletter-14th-15th-November-2026.pdf (GET 200, also Headford, next weekend; ChurchTV /headford/ currently links that one)."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
+    "Do not pin Newsletter-14th-15th-November-2026.pdf — that is 14/15 November.",
+    "Do not pin Newsletter-31st-October-1st-November-2026.pdf — All Saints 01/11 is stale.",
+    "Do not invent Newsletter-8th-November-2026.pdf — that path redirects to the ChurchTV homepage.",
+    "Do not scrape headfordchurch.com or keep September in href_patterns.",
+    "Do not use predicted_dated_pdf.",
+    "Do not date-rewrite the 2021/02 folder.",
     "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    "Newsletter-7th-8th-November-2026",
+    ".pdf"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

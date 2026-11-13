@@ -1,19 +1,45 @@
 {
+  "version": 2,
   "parish_key": "bekan",
   "display_name": "Bekan",
   "diocese": "tuam",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.bekan-parish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://bekan-parish.ie/wp-content/uploads/2026/11/bpn8nov26.png",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "status": "active",
+  "skip": false,
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://bekan-parish.ie/wp-content/uploads/2026/11/bpn8nov26.png",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.bekan-parish.ie"
+      "url": "https://bekan-parish.ie/wp-content/uploads/2026/11/bpn8nov26.png"
+    },
+    {
+      "action": "download",
+      "url": "https://bekan-parish.ie/wp-content/uploads/2026/11/bpn8nov26.png",
+      "use_captured_url": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "13/11/2026 leftover FAILED: skip recipe was link_only on http://www.bekan-parish.ie and harvest saved an error page. Homepage lists Bekan Parish Newsletter 8th November 2026. Same-name .jpg is 404. The sheet is bpn8nov26.png. GET 200 image/png 507255 bytes magic PNG. Last-Modified Sun 08/11/2026 19:09:42 GMT. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download of the PNG. Do not open the homepage. Do not pin the 1st November PNG."
+  ],
+  "do_not": [
+    "Do not pin bekanparishnewsletter01nov26.png — that is 01/11.",
+    "Do not invent bpn8nov26.jpg — that path 404s.",
+    "Do not print_to_pdf the homepage. The logged-out HTML is empty of Mass text; the bulletin is the PNG.",
+    "Do not use predicted_dated_pdf.",
+    "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    "bpn8nov26",
+    ".png"
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
