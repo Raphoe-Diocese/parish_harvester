@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 621,
+    "downloaded": 623,
     "html_links": 0,
     "skipped": 487,
-    "failed": 124,
+    "failed": 122,
     "stale_rejected": 86
   },
   "action_counts": {
-    "ok": 498,
-    "skip": 745,
-    "mark_inactive": 16,
-    "investigate": 30,
+    "ok": 500,
+    "skip": 744,
+    "mark_inactive": 14,
+    "investigate": 31,
     "retrain": 1
   },
   "parishes": [
@@ -10580,10 +10580,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://cloynediocese.ie/parishes/charleville",
-      "suggested_action": "mark_inactive",
-      "suggested_reason": "non-automatable source"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "cherryorchard",
@@ -13671,29 +13671,36 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/crossmaglen.json",
       "recipe": {
-        "start_url": "https://www.uppercreggan.co.uk/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
+        "start_url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "12/11/2026 Step 4: unskipped missed-week recipe. Keep-weekly already retries these. Facebook-only and no-website stay skipped."
+          "13/11/2026 leftover FAILED: harvest saved the Armagh diocese card. Own-site news.php lists 8th NOV 2026.pdf under 15th. GET 200 application/pdf 237278 bytes magic %PDF-1.7. Two pages. Text: Par\u00f3iste an Chreagain Uachtair / Parish of Upper Creggan. SUNDAY 8TH NOV 2026 32ND ORDINARY. Anniversaries St Patrick's Sat 7th/Sun 8th Nov. Irish name stays Irish. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Do not open news.php or armagharchdiocese.org."
         ],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
+        "do_not": [
+          "Do not pin 15th NOV 2026.pdf \u2014 that is 15/11 (grace-fresh, not 08/11). This Sunday is listed.",
+          "Do not pin 1st NOV 2026.pdf. 01/11 is not 08/11.",
+          "Do not set start_url to https://www.uppercreggan.co.uk/ or /news.php \u2014 listing has 15th above 8th.",
+          "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
+          "Do not use predicted_dated_pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.armagharchdiocese.org/parishes/parish-details/?parishID=23",
-      "suggested_action": "mark_inactive",
-      "suggested_reason": "non-automatable source"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "crossmolina",
@@ -15707,27 +15714,37 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/dromoreparish.json",
       "recipe": {
-        "start_url": "http://www.stcolmans.org",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "http://www.stcolmans.org/get_pdf.php?do=archive&id=1277",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-02"
+        "has_terminal": true,
+        "operator_notes": [
+          "13/11/2026 leftover FAILED: harvest saved the Dromore diocese card. Own-site listing /bulletins.php labels archive id=1277 Sun 8th Nov 2026. GET 200 application/pdf 606692 bytes magic %PDF-1.7. Two pages. Text: PARISH OF DROMORE. Thirty Second Sunday in Ordinary Time 8th November 2026. Sunday masses All Saints, Ballela 9.45am; St Colman's, Dromore 11.00am. Remembrance Sunday 8th November. HTTPS cert is not valid for www.stcolmans.org \u2014 pin http. Pin wordpress + direct_download of id=1277. Do not open bulletins.php or dromorediocese.org."
+        ],
+        "do_not": [
+          "Do not pin get_pdf.php?do=latest \u2014 that listing is Sun 15th Nov 2026.",
+          "Do not pin archive id=1275 \u2014 that is Sun 1st Nov 2026.",
+          "Do not set start_url to http://www.stcolmans.org or /bulletins.php \u2014 the listing also has 15th above 8th.",
+          "Do not scrape https://www.dromorediocese.org/parishes/.",
+          "Do not switch this pin to https://www.stcolmans.org \u2014 TLS hostname mismatch.",
+          "Do not use predicted_dated_pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dromorediocese.org/parishes/",
-      "suggested_action": "skip",
-      "suggested_reason": "No this-week (27/09/2026) bulletin file proved yet on 02/10/2026 \u2014 official table / kitchen-sink still open. Do not invent Facebook PDFs."
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "dromorewest",
@@ -28094,9 +28111,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.armagharchdiocese.org/parishes/parish-details/?parishID=50",
-      "suggested_action": "mark_inactive",
-      "suggested_reason": "non-automatable source"
+      "last_error": "Recipe replay failed: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.magherafeltparish.org/bulletin-8th-of-november-2026/\nCall log:\n  - navigating to \"https://www.magherafeltparish.org/bulletin-8th-of-november-2026/\", waiting until",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.magherafeltparish.org/bulletin-8th-of-november-2026/\nCall log:\n  - navigating to \""
     },
     {
       "parish_key": "magheralin",
