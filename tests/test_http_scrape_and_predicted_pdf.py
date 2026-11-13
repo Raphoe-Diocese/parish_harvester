@@ -2624,11 +2624,6 @@ class HarvestMissRecipeTests(unittest.TestCase):
                 "Sunday-8th-November-2026-Parish-Newsletter.pdf",
                 "sermon/",
             ),
-            "dublin/milltowndublin.json": (
-                "https://milltownparish.ie/newsletter/",
-                "Weekly-Bulletin-Sunday-November-8th-2026.pdf",
-                None,
-            ),
             "dublin/sandymount.json": (
                 "https://www.stmarysstaroftheseasandymount.com/parish-newsletters.html",
                 "sunday_8th_november_2026.pdf",

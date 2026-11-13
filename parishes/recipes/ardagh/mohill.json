@@ -1,23 +1,23 @@
 {
-  "version": 5,
+  "version": 6,
   "parish_key": "mohill",
   "display_name": "Mohill (includes Fenagh & Gortletteragh)",
   "diocese": "ardagh",
-  "start_url": "https://mohillparish.ie/wp-json/wp/v2/pages?per_page=15&search=newsletter&orderby=date&order=desc",
+  "start_url": "https://mohillparish.ie/newsletter-7th-november-2026/",
   "site_type": "http_scrape_newest_html",
   "playbook_type": "html_text_bulletin",
   "post_slug_patterns": [
     "newsletter-"
   ],
-  "timeout_ms": 60000,
-  "total_timeout_s": 180,
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
   "max_bulletin_pages": 8,
-  "recorded_date": "2026-11-02",
-  "example_url": "https://mohillparish.ie/newsletter-1st-november-2026/",
+  "recorded_date": "2026-11-13",
+  "example_url": "https://mohillparish.ie/newsletter-7th-november-2026/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://mohillparish.ie/newsletter/"
+      "url": "https://mohillparish.ie/newsletter-7th-november-2026/"
     },
     {
       "action": "print_to_pdf",
@@ -25,14 +25,14 @@
     }
   ],
   "operator_notes": [
-    "02/11/2026: /newsletter/ HTML archive still tops out at 25 Oct. WP pages API already has newsletter-1st-november-2026 (published 02/11). Prefer wp-json pages search as start_url; http_scrape_newest_html accepts JSON.",
-    "29/10/2026: Playwright click on /newsletter/ timed out. Plain HTTP listing lagged. print_to_pdf + skip_listing_nav. max_bulletin_pages 8.",
+    "13/11/2026: wp-json newest is newsletter-7th-november-2026 (published 10/11). newsletter-8th-november-2026 is 404. Pin the 7th HTML page + print_to_pdf so listing/print hang loses.",
+    "02/11/2026: /newsletter/ HTML archive lagged. WP pages API is truth.",
     "Page text includes Mohill + Fenagh + Gortletteragh — harvest once here."
   ],
   "do_not": [
     "Do not harvest Fenagh or Gortletteragh separately from this file.",
-    "Do not pin newsletter-25th-october-2026 or newsletter-1st-november-2026.",
-    "Do not rely on the /newsletter/ HTML archive alone — it lags the WP pages API.",
+    "Do not invent newsletter-8th-november-2026 — that slug 404s.",
+    "Do not pin newsletter-1st-november-2026 or older.",
     "Do not remove skip_listing_nav."
   ],
   "bulletin_layout": {

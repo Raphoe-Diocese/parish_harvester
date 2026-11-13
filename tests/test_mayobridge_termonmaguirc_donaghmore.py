@@ -38,6 +38,27 @@ class PasteHitRecipePinsTests(unittest.TestCase):
         self.assertTrue(recipe.get("ignore_https_errors"))
         self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
 
+    def test_milltown_pins_8_november_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/dublin/milltowndublin.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        self.assertIn(
+            "Weekly-Bulletin-Sunday-November-8th-2026.pdf", recipe["start_url"]
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotIn("/newsletter/", recipe["start_url"])
+
+    def test_mohill_pins_7th_november_html(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/ardagh/mohill.json").read_text(encoding="utf-8-sig")
+        )
+        self.assertIn("newsletter-7th-november-2026", recipe["start_url"])
+        self.assertNotIn("newsletter-8th-november", recipe["start_url"])
+        self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
+        self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+
 
 if __name__ == "__main__":
     unittest.main()
