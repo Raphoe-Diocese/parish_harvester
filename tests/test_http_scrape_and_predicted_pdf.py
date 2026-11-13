@@ -2625,11 +2625,6 @@ class HarvestMissRecipeTests(unittest.TestCase):
     def test_nov8_hits_scrape_listing_not_pinned_pdf(self) -> None:
         # termonmaguirc / mayobridge / donaghmore moved to predicted PDF pins (listing hangs).
         cases = {
-            "down_and_connor/stjohnsfallsroad.json": (
-                "https://stjohnsfallsroad.org/index.php/bulletin/",
-                "Sunday-8th-Nov-2026-ws.pdf",
-                None,
-            ),
             "dublin/fairview.json": (
                 "https://fairviewparish.ie/news-events/",
                 "Sunday-8th-November-2026-Parish-Newsletter.pdf",

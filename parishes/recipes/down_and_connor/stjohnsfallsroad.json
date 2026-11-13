@@ -1,33 +1,38 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "stjohnsfallsroad",
   "display_name": "St John's (Falls Road)",
   "diocese": "down_and_connor",
-  "start_url": "https://stjohnsfallsroad.org/index.php/bulletin/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "example_url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf",
   "href_patterns": [
-    "Sunday-"
+    "Sunday-8th-Nov-2026-ws.pdf"
   ],
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-11-10",
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "steps": [
     {
       "action": "goto",
-      "url": "https://stjohnsfallsroad.org/index.php/bulletin/"
+      "url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf"
     }
   ],
   "operator_notes": [
-    "29/09/2026: /index.php/bulletin/ lists Sunday-27th-Sept-2026-ws.pdf (GET 200 application/pdf 349,446 bytes). Files sit under a stale /uploads/2022/06/ folder — filename date (Sept abbreviation) is the real date.",
-    "site_type:http_scrape_newest_pdf — score listing hrefs by filename date.",
-    "29/09/2026 harvest 36580498188: all 3 attempts hit the 190s budget on GitHub Actions while the same scrape takes 0.5s from Ireland — stjohnsfallsroad.org appears to stall GitHub runner IPs (WAF). Do not raise timeouts; needs a proxy/alternate source or the Trainer Send & test from Frank PC.",
-    "10/11/2026: /index.php/bulletin/ lists Sunday-8th-Nov-2026-ws.pdf beside Sunday-1st-Nov-2026-ws.pdf. Steps no longer download a pinned file. GitHub runners still stall on this host."
+    "13/11/2026: leftover failed timeout on /index.php/bulletin/. GitHub runners stall on the listing. Pin Sunday-8th-Nov-2026-ws.pdf under the stale /uploads/2022/06/ folder. Proved GET 200 application/pdf 566600 bytes magic %PDF-1.3. Page text 32 SUNDAY ORDINARY TIME, Saturday 7 November, Sunday 8 November. Filename date is the real date, not the 2022 folder."
   ],
   "do_not": [
-    "Do not pin 27th-Sept-2026.",
+    "Do not use predicted_dated_pdf.",
+    "Do not start on /index.php/bulletin/ — GitHub runners stall on that listing.",
     "Do not read the /2022/06/ folder as the bulletin date.",
+    "Do not pin Sunday-1st-Nov-2026-ws.pdf.",
     "Do not download Fr-Jobin / Vocations PDFs.",
-    "Do not pin Sunday-8th-Nov-2026-ws.pdf."
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

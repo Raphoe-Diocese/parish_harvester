@@ -1,30 +1,37 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "salthill",
   "display_name": "Salthill",
   "diocese": "galway",
-  "start_url": "https://salthillparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://salthillparish.ie/wp-content/uploads/2026/11/Parish-News-Nov-8th-2026-1.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "example_url": "https://salthillparish.ie/wp-content/uploads/2026/11/Parish-News-Nov-8th-2026-1.pdf",
   "href_patterns": [
-    "Newsletter",
+    "Parish-News",
+    "Nov-8th",
     ".pdf"
   ],
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-25",
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "steps": [
     {
       "action": "goto",
-      "url": "https://salthillparish.ie/"
+      "url": "https://salthillparish.ie/wp-content/uploads/2026/11/Parish-News-Nov-8th-2026-1.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://salthillparish.ie/wp-content/uploads/2026/11/Parish-News-Nov-8th-2026-1.pdf"
     }
   ],
   "operator_notes": [
-    "25/10/2026: the homepage link named Newsletter is Newsletter-25th-Oct-1.pdf. Proved application/pdf. The 1 is the page, not the day.",
-    "The same page also links Newsletter-Oct-25th-1.pdf. Both names are 25/10/2026. Do not take the September file. Do not pin either name. Do not harvest Facebook."
+    "13/11/2026: leftover failed timeout on homepage scrape. Homepage links Parish-News-Nov-8th-2026-1.pdf. Proved GET 200 application/pdf 7320559 bytes magic %PDF-1.4. Page heading SALTHILL PARISH NEWS Sunday November 8th 2026. Same bytes as Parish-News-Nov-8th-2026.pdf without -1. wp-json 404 on this host."
   ],
   "do_not": [
-    "Do not pin the dated filename.",
-    "Do not take the September file while an October newsletter is this Sunday.",
+    "Do not use predicted_dated_pdf.",
+    "Do not start on the homepage — harvest times out on the listing.",
+    "Do not take Parish-News-September-13th-2026-1.pdf.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {
