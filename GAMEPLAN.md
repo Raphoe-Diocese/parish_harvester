@@ -1,3 +1,6 @@
+## 13/11/2026 10:25 - Timeout PDF pins: Churchtown + Ballyfermot + Cloyne. Three honest stale
+Harvest Sunday 08/11/2026. Churchtown auto hash PDF GET 200 1381831 %PDF printed 8th November 2026. Ballyfermot 32nd-Sunday-OT-2026-1.pdf GET 200 163037 %PDF 32nd Sunday. Cloyne Newsletter-8th-November-2026-All-Saints.pdf GET 200 235862 %PDF printed SUNDAY 8th NOVEMBER 2026. HONEST STALE no this-week PDF: Booterstown 8 Nov is PNG 989246; Ballymun Road 8 Nov is webp 371352; Claregalway 8 Nov is JPEG 634910. Do not pin 01/11 All Saints. Not live.
+
 ## 13/11/2026 09:20 - Donaghmoyne + Roslea pins. GitHub 403 cluster parked
 Ok 592 on GitHub 03:02. Ashbourne Donaghmore Mohill ok. Armagh Termon Mayobridge Milltown Bree GitHub 403/hang parked (two tries). Last this-week URL fails: Donaghmoyne predicted rewrite to 21st 500; Roslea listing timeout. Pin 32nd-All-Saints-08th and Bulletin-Sunday-8th-November. Not live.
 
