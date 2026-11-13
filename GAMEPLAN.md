@@ -1,3 +1,7 @@
+## 13/11/2026 10:50 - Ardfinnan 7th-8th HTML pin. Four honest stale
+Ardfinnan GET 200 https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/ print_to_pdf skip_listing_nav. 8th-only and 7th-only slugs 404. All Saints 31 Oct/1 Nov not used.
+Honest stale: abbeyknockmoy current-newsletter is 01.11.26 All Saints GET 200 385861 %PDF (08.11.26 404); ballyphehane churchmedia 6m368b is 29.01.2023; dennkilmore parishofdenn.com parked garden page; doneraileparish.ie newsletter Composer 500. Key is doneraile not doneraileparish. Skip reasons omit "no this-week" so harvest does not HTML-capture homepages again. Not live.
+
 ## 13/11/2026 09:20 - Donaghmoyne + Roslea pins. GitHub 403 cluster parked
 Ok 592 on GitHub 03:02. Ashbourne Donaghmore Mohill ok. Armagh Termon Mayobridge Milltown Bree GitHub 403/hang parked (two tries). Last this-week URL fails: Donaghmoyne predicted rewrite to 21st 500; Roslea listing timeout. Pin 32nd-All-Saints-08th and Bulletin-Sunday-8th-November. Not live.
 
