@@ -1,3 +1,16 @@
+## 13/11/2026 10:20 - Raphoe leftovers hunt. No this-week file. No PR
+Harvest Sunday 08/11/2026. Kitchen-sink only. No local harvest. No mega PDF. No recipe change.
+
+1) kincasslagh HONEST STALE. parish_status stale 01/10/2026. Listing newest is 24th Oct-1st Nov → Oct-24th-1st-Nov-compressed.pdf GET 200 application/pdf 303049 %PDF-1.7 Last-Modified 26/10/2026. No November 2026 row. wp-json media after 01/10/2026 = 0 items. Guessed /app/uploads/2026/11/ names (20261108.pdf, Newsletter-Nov-8th.pdf, 8th-November.pdf, …) GET 200 text/html <!doctype not %PDF. Do not pin 01/11. Recipe unchanged.
+
+2) newtownkilleaparish HONEST STALE. bulletin.pdf GET 200 application/pdf 233221 %PDF-1.7 Last-Modified 30/10/2026. Heading WEEKLY NEWSLETTER 01st November 2026 Solemnity of All Saints. Body says next Sunday (08th Nov). Not 08/11. Not a 2024 leftover. Recipe unchanged.
+
+3) raphoe / drive-1jmslbrliw EMPTY. https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe → 301 then HTTP 404. Visible text: No bulletin available / The weekly bulletin has not yet been uploaded. bulletin.pdf GET 404 text/html. Do not harvest. Recipe unchanged.
+
+4) Gortahork OCR mixing Glenties PARKED. Not started.
+
+Dropbox Harvester GAMEPLAN not on this VM. Not live.
+
 ## 13/11/2026 02:30 - 583 merged. Ashbourne ok. Armagh predicted miss. Milltown GitHub 403 parked
 583 merged 1b552f6a. Harvests: termonmaguirc 43352682365, mayobridge 43352686918, bree 43352691278. Ashbourne ok 32nd Sunday. Armagh 43349964493 GitHub predicted miss on /2026/11/8th-November.pdf. Milltown 43349973681 GitHub 403 even in browser — parked. Mohill Donaghmore ok. Not live.
 
