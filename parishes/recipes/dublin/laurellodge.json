@@ -2,32 +2,35 @@
   "parish_key": "laurellodge",
   "display_name": "Laurel Lodge",
   "diocese": "dublin",
-  "recorded_date": "2026-11-10",
-  "start_url": "https://www.laurellodgeparish.ie/",
-  "site_type": "http_scrape_newest_pdf",
+  "recorded_date": "2026-11-13",
+  "start_url": "https://www.laurellodgeparish.ie/images/Newsletter/newsletter.pdf",
+  "site_type": "wordpress",
   "playbook_type": "direct_download",
+  "example_url": "https://www.laurellodgeparish.ie/images/Newsletter/newsletter.pdf",
   "status": "active",
   "skip": false,
   "href_patterns": [
-    ".pdf",
-    "newsletter"
+    "newsletter.pdf"
   ],
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
+  "total_timeout_s": 120,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.laurellodgeparish.ie/"
+      "url": "https://www.laurellodgeparish.ie/images/Newsletter/newsletter.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://www.laurellodgeparish.ie/images/Newsletter/newsletter.pdf"
     }
   ],
-  "version": 2,
+  "version": 3,
   "operator_notes": [
-    "09/11/2026 Parish scan: homepage link text Current Newsletter opens /images/Newsletter/newsletter.pdf.",
-    "10/11/2026 inside read: homepage link Current Newsletter. File newsletter.pdf has no date in the name. GET 200 application/pdf 380954 bytes. Front page says Saturday/Sunday 7th-8th November 2026. Date 08/11/2026. Scrape the homepage. Do not pin the filename."
+    "13/11/2026: HTTP-scrape of the homepage missed newsletter.pdf (no date in the filename). Proved GET 200 application/pdf 380954 bytes magic %PDF-1.7. PDF text Saturday/Sunday 7th-8th November 2026 / grave blessing Sunday 8th. heading_date 08/11/2026. CreationDate 06/11/2026. Pin the PDF. Do not start on the homepage."
   ],
   "do_not": [
-    "Do not pin the filename.",
-    "Do not pin a dated filename.",
+    "Do not start on https://www.laurellodgeparish.ie/ — HTTP-scrape looks for a dated filename and misses newsletter.pdf.",
+    "Do not use predicted_dated_pdf.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {

@@ -4,6 +4,9 @@ Ok 592 on GitHub 03:02. Ashbourne Donaghmore Mohill ok. Armagh Termon Mayobridge
 ## 13/11/2026 03:00 - 584 merged. Termon Mayobridge Bree GitHub 403 parked
 584 merged 1b552f6a wait confirm harvest armaghparish. 583 harvests failed: Termon 403 on Thirty-Second PDF then chrome-error; Mayobridge 403; Bree socket hang up. Same GitHub WAF as Milltown. Two tries each. Park. Ashbourne Mohill Donaghmore ok. Not live.
 
+## 13/11/2026 10:20 - HTTP-scrape listing pins. Headford honest stale
+parish_status.json target_date 2026-11-08. Failed HTTP-scrape after parked 403 skips: laurellodge mulhuddart stjohnscathedral headford (roslea skipped). Laurel Lodge newsletter.pdf GET 200 380954 %PDF-1.7 date 08/11/2026. Mulhuddart homepage ugd 664f57 GET 200 109476 %PDF-1.5 Saturday/Sunday 7th/8th. St John's Cathedral fileID E2080F83 GET 200 2322335 %PDF-1.5 Newsletter Sunday 8th November 2026. Headford wp-json newest 26th-27th September 2026; Oct/Nov 404. Homepage of limerickcathedral.com hangs — not used. Not live.
+
 ## 13/11/2026 02:30 - 583 merged. Ashbourne ok. Armagh predicted miss. Milltown GitHub 403 parked
 583 merged 1b552f6a. Harvests: termonmaguirc 43352682365, mayobridge 43352686918, bree 43352691278. Ashbourne ok 32nd Sunday. Armagh 43349964493 GitHub predicted miss on /2026/11/8th-November.pdf. Milltown 43349973681 GitHub 403 even in browser — parked. Mohill Donaghmore ok. Not live.
 

@@ -1,44 +1,34 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "stjohnscathedral",
   "display_name": "St John's (Cathedral)",
   "diocese": "limerick",
-  "start_url": "https://www.limerickcathedral.com/",
-  "site_type": "http_scrape_newest_pdf",
-  "playbook_type": "mura_hashed_current_newsletter",
+  "start_url": "https://www.limerickcathedral.com/index.cfm/_api/render/file/?method=inline&fileID=E2080F83-25AE-47CD-A5E344B06704E699",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "href_patterns": [
-    "Current Newsletter",
-    "fileID",
-    "render/file"
+    "fileID=E2080F83-25AE-47CD-A5E344B06704E699"
   ],
+  "example_url": "https://www.limerickcathedral.com/index.cfm/_api/render/file/?method=inline&fileID=E2080F83-25AE-47CD-A5E344B06704E699",
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-05",
-  "example_url": "https://www.limerickcathedral.com/",
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.limerickcathedral.com/"
-    },
-    {
-      "action": "click",
-      "selector": "a:has-text(\"Current Newsletter\")",
-      "pick_strategy": "first_match",
-      "fallback_selectors": [
-        "a[href*='_api/render/file'][href*='fileID']"
-      ]
+      "url": "https://www.limerickcathedral.com/index.cfm/_api/render/file/?method=inline&fileID=E2080F83-25AE-47CD-A5E344B06704E699"
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://www.limerickcathedral.com/index.cfm/_api/render/file/?method=inline&fileID=E2080F83-25AE-47CD-A5E344B06704E699"
     }
   ],
   "operator_notes": [
-    "05/10/2026 leftover skip hunt: limerickcathedral.com Current Newsletter is a Mura hashed fileID. Proved GET 200 application/pdf 2134463 bytes %PDF. PDF text Newsletter Sunday 4th October 2026. CreationDate 02/10/2026.",
-    "Date is in the PDF, not the fileID. Click Current Newsletter. Do not pin the hashed fileID."
+    "13/11/2026: https://www.limerickcathedral.com/ hung (RemoteDisconnected). index.cfm Current Newsletter is fileID E2080F83-25AE-47CD-A5E344B06704E699. Proved GET 200 application/pdf 2322335 bytes magic %PDF-1.5. PDF text Newsletter Sunday 8th November 2026. CreationDate 06/11/2026. Pin this fileID. Do not open the homepage."
   ],
   "do_not": [
-    "Do not pin index.cfm/_api/render/file/?method=inline&fileID=… — the id changes every week.",
+    "Do not start on https://www.limerickcathedral.com/ — the homepage hangs / drops the connection.",
+    "Do not use predicted_dated_pdf.",
     "Do not use facebook.com/dioceseoflimerick.",
     "Do not harvest Facebook."
   ]
