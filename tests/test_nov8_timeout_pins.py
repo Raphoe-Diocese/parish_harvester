@@ -43,10 +43,60 @@ class Nov8TimeoutPinTests(unittest.TestCase):
             "/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
             recipe["start_url"],
         )
+        self.assertEqual(recipe.get("example_url"), recipe["start_url"])
         self.assertNotIn("/newsletter/", recipe["start_url"])
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertNotEqual(recipe["site_type"], "wp_json_newest_media")
         self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotEqual(str(recipe.get("status") or "").lower(), "inactive")
+        self.assertTrue((recipe.get("steps") or [])[-1].get("skip_listing_nav"))
+
+    def test_direct_download_pdf_does_not_open_browser_after_http_miss(self) -> None:
+        import asyncio
+        import tempfile
+        from unittest.mock import AsyncMock, patch
+
+        from harvester.replay import RecipeReplayError, replay_recipe
+
+        auto = (
+            "https://churchtownparish.com/wp-content/uploads/2026/11/"
+            "churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf"
+        )
+
+        class BoomBrowser:
+            async def new_context(self, **_kwargs):
+                raise AssertionError("Playwright must not open for a WAF-blocked PDF")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            recipe_path = root / "churchtown.json"
+            dest = root / "out.pdf"
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "playbook_type": "direct_download",
+                        "start_url": auto,
+                        "example_url": auto,
+                        "steps": [
+                            {
+                                "action": "download",
+                                "url": auto,
+                                "skip_listing_nav": True,
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with patch(
+                "harvester.replay._try_http_document_url",
+                new_callable=AsyncMock,
+                return_value=None,
+            ):
+                with self.assertRaises(RecipeReplayError) as ctx:
+                    asyncio.run(replay_recipe(recipe_path, dest, BoomBrowser()))
+        self.assertIn("browser was not opened", str(ctx.exception).lower())
 
     def test_claregalway_stacks_both_8_november_pages(self) -> None:
         recipe = _recipe("parishes/recipes/galway/claregalway.json")
