@@ -4,15 +4,15 @@
   "summary": {
     "downloaded": 628,
     "html_links": 0,
-    "skipped": 489,
-    "failed": 115,
+    "skipped": 491,
+    "failed": 113,
     "stale_rejected": 86
   },
   "action_counts": {
     "ok": 505,
     "skip": 742,
-    "mark_inactive": 12,
-    "investigate": 30,
+    "mark_inactive": 13,
+    "investigate": 29,
     "retrain": 1
   },
   "parishes": [
@@ -22,28 +22,30 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/blessington.json",
       "recipe": {
-        "start_url": "https://blessingtonparish.ie/newsletters/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "html_text_bulletin",
+        "start_url": "https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 2,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: /newsletters/ lists Newsletter November 8th 2026 at top (HTML post, not a PDF).",
-          "wp_json media from homepage timed out / 403. Click newest Newsletter-* post and print_to_pdf. Covers Valleymount too (shared parish site).",
-          "Do not pin /2026/11/05/newsletter-november-8th-2026/."
+          "13/11/2026 leftover FAILED: harvest said recipe outdated on /newsletters/. HTML post /2026/11/05/newsletter-november-8th-2026/ is a DearFlip wrapper (og:description [/dflip), not the paper. File https://blessingtonparish.ie/wp-content/uploads/2026/11/Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf curl/8.5.0 GET 200 application/pdf 1131024 bytes magic %PDF-1.7 Last-Modified Thu 05/11/2026 11:15:54 GMT. Mozilla/5.0 long Chrome token 403. PDF text SATURDAY 7th November / SUNDAY 8th November / Community Diary Issue 1578 8th Nov 2026 / 10am Mass St. Joseph's Church, Valleymount. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Valleymount is the same paper \u2014 harvest once here. Do not print the HTML post. Do not open /newsletters/."
         ],
         "do_not": [
-          "Do not pin a dated newsletter slug.",
-          "Do not rely on wp-json media alone \u2014 host can 403.",
+          "Do not set start_url to https://blessingtonparish.ie/newsletters/ \u2014 listing timed out and is not the PDF.",
+          "Do not print_to_pdf /2026/11/05/newsletter-november-8th-2026/ \u2014 that page is a DearFlip wrapper, not the paper.",
+          "Do not pin Newsletter-4th-Oct-2026-NEWGraohic2-.pdf.",
+          "Do not pin a 1st November or 15th November newsletter.",
+          "Do not use predicted_dated_pdf.",
+          "Do not use http_scrape_newest_html \u2014 scrape intercepts the PDF pin.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -7286,26 +7288,27 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/booterstown.json",
       "recipe": {
-        "start_url": "https://booterstownparish.ie/wp-content/uploads/2026/10/Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
-        "status": "",
+        "start_url": "https://booterstownparish.ie/wp-content/uploads/2026/11/bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
+        "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: two harvests green then row still Total timeout exceeded. wp_json + homepage newsletter_brain hangs. Proved Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf GET 200 application/pdf 1134965 bytes magic %PDF-1.4. start_url is the PDF. Sun-8-November is a hash PDF; do not pin the hash."
+          "13/11/2026 leftover FAILED: harvest Total timeout exceeded. Old recipe was predicted_dated_pdf of Sun-1-November-2026. This week is the hashed upload bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf. wp-json media title bfecaa62bd5afda6-Sun-8-November-2026-Booterstown-Weekly-Newsletter, date 2026-11-06T13:03:20. curl/8.5.0 GET 200 application/pdf 1190154 bytes magic %PDF-1.4 Last-Modified Fri 06/11/2026 13:03:20 GMT. Mozilla/5.0 403. PDF text Church of the Assumption, Booterstown / Sunday 8th November \u2013 Thirty Second. Source post https://booterstownparish.ie/parish-newsletter-2026-11-08/ title Parish Newsletter 8th November 2026. Pin wordpress + direct_download. Do not use predicted. Do not pin the 15 November hash."
         ],
         "do_not": [
-          "Do not set start_url to the homepage \u2014 newsletter_brain hangs.",
-          "Do not pin Sun-1-November-2026 forever \u2014 predicted_dated_pdf rewrites the date.",
-          "Do not pin the Sun-8 hash PDF.",
-          "Do not harvest Facebook.",
-          "Do not take newsletter-front PNG instead of the PDF."
+          "Do not use predicted_dated_pdf \u2014 it rewrites this hash into Sun-1-November-2026.",
+          "Do not pin Sun-1-November-2026-Booterstown-Weekly-Newsletter.pdf.",
+          "Do not pin bp-0611d240bb7681346828101bc4cec82058339cdddf272ea30b9d9f2af68d9c5f.pdf \u2014 that media title is Sun-15-November-2026.",
+          "Do not pin bp-babb21616eacec4f1d0084b7ccad62ec55905d779e5e12e04b2eccf0d06e16d0.png \u2014 PNG is the preview, not the PDF.",
+          "Do not set start_url to the homepage or /category/newsletter/ \u2014 listing hangs.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
       "learned_pattern": "booterstown_sunday_pdf+direct_download",
@@ -30139,27 +30142,35 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/moyraverty.json",
       "recipe": {
-        "start_url": "https://www.moyravertyparish.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.stanthonyscraigavon.org/_files/ugd/a352bf_d2b0e355c1804e3c911420345dd28207.pdf",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-02"
+        "has_terminal": true,
+        "operator_notes": [
+          "13/11/2026 leftover FAILED: harvest saved the Dromore diocese card. Live twin https://www.stanthonyscraigavon.org/moyravertyparish (moyravertyparish.com redirects here). Archive link text 8th November 2026 is https://www.stanthonyscraigavon.org/_files/ugd/a352bf_d2b0e355c1804e3c911420345dd28207.pdf Mozilla/5.0 GET 200 application/pdf 168264 bytes magic %PDF-1.4 Last-Modified Thu 12/11/2026 13:33:09 GMT. PDF text SUNDAY 8 NOVEMBER 2026 THIRTY-SECOND SUNDAY IN ORDINARY TIME. Collections named Moyraverty Parish and Seagoe Parish. Sunday 15th November 2026 in the notes is a Warrenpoint remembrance service, not next week's paper. Pin wordpress + direct_download. Seagoe is the same file \u2014 harvest once here. Do not pin the featured Bulletin 8th November 2026 button a352bf_ec73f0cc2f09497c9e8b00c82f78527a.pdf \u2014 that file Last-Modified 17/10/2026 and PDF text is October."
+        ],
+        "do_not": [
+          "Do not pin a352bf_ec73f0cc2f09497c9e8b00c82f78527a.pdf \u2014 button label says 8th November 2026 but the PDF is October.",
+          "Do not scrape https://www.dromorediocese.org/parishes/.",
+          "Do not start on https://www.moyravertyparish.com \u2014 it redirects to the Wix hub.",
+          "Do not use predicted_dated_pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dromorediocese.org/parishes/",
-      "suggested_action": "skip",
-      "suggested_reason": "No this-week (27/09/2026) bulletin file proved yet on 02/10/2026 \u2014 official table / kitchen-sink still open. Do not invent Facebook PDFs."
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "moyvane",
@@ -35102,12 +35113,12 @@
     },
     {
       "parish_key": "seagoe",
-      "display_name": "Seagoe (Derrymacash)",
+      "display_name": "Seagoe (bulletin with Moyraverty)",
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/seagoe.json",
       "recipe": {
-        "start_url": "https://www.dromorediocese.org/parishes/",
-        "site_type": "link_only",
+        "start_url": "https://www.stanthonyscraigavon.org/moyravertyparish",
+        "site_type": "wordpress",
         "playbook_type": "link_only",
         "status": "inactive",
         "skip": true,
@@ -35115,18 +35126,26 @@
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-02"
+        "operator_notes": [
+          "13/11/2026 leftover FAILED: harvest saved the Dromore diocese card. Same 08/11 Wix PDF as Moyraverty. File a352bf_d2b0e355c1804e3c911420345dd28207.pdf GET 200 application/pdf 168264 bytes magic %PDF-1.4. PDF text SUNDAY 8 NOVEMBER 2026. Offertory Sunday 1 November cheques payable to Seagoe Parish. Harvest once under moyraverty. Do not pin the dated hash onto seagoe."
+        ],
+        "do_not": [
+          "Do not pin a352bf_d2b0e355c1804e3c911420345dd28207.pdf onto seagoe \u2014 that harvests the Moyraverty file twice.",
+          "Do not scrape https://www.dromorediocese.org/parishes/.",
+          "Do not pin the October featured button hash a352bf_ec73f0cc2f09497c9e8b00c82f78527a.pdf.",
+          "Do not use predicted_dated_pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.dromorediocese.org/parishes/",
+      "harvest_status": "skipped",
+      "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "No this-week (27/09/2026) bulletin file proved yet on 02/10/2026 \u2014 official table / kitchen-sink still open. Do not invent Facebook PDFs."
+      "suggested_reason": "Same weekly PDF as Moyraverty on stanthonyscraigavon.org. Collections named Seagoe Parish and Moyraverty Parish. Harvest once under moyraverty."
     },
     {
       "parish_key": "seanmcdermottstreet",
@@ -40060,36 +40079,38 @@
     },
     {
       "parish_key": "valleymount",
-      "display_name": "Valleymount",
+      "display_name": "Valleymount (bulletin with Blessington)",
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/valleymount.json",
       "recipe": {
-        "start_url": "https://blessingtonparish.ie",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "direct_download",
-        "status": "active",
-        "skip": false,
+        "start_url": "https://blessingtonparish.ie/",
+        "site_type": "wordpress",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "09/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 04/10/2026. Do not pin https://blessingtonparish.ie/wp-content/uploads/2026/09/Newsletter-4th-Oct-2026-NEWGraohic2-.pdf."
+          "13/11/2026 leftover FAILED: harvest timed out on blessingtonparish.ie homepage wp_json. Same 08/11 paper as Blessington. File Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf GET 200 application/pdf 1131024 bytes magic %PDF-1.7. PDF text SUNDAY 8th November 10am Mass St. Joseph's Church, Valleymount. Harvest once under blessington. Do not pin the dated PDF onto valleymount."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
+          "Do not pin Newsletter-8th-Nov-2026-NEWGraohic-AA.pdf onto valleymount \u2014 that harvests the Blessington file twice.",
+          "Do not start on https://blessingtonparish.ie \u2014 homepage wp_json timed out.",
+          "Do not use predicted_dated_pdf.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-09"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "skipped",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same weekly PDF as Blessington. Header names 10am Mass St. Joseph's Church, Valleymount. Harvest once under blessington."
     },
     {
       "parish_key": "walkinstown",
