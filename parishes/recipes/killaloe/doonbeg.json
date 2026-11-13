@@ -1,30 +1,36 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "doonbeg",
   "display_name": "Doonbeg (Killard)",
   "diocese": "killaloe",
   "start_url": "https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_08+Newsletter.pdf",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "href_patterns": [
     "Newsletter",
     ".pdf"
   ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-08",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_08+Newsletter.pdf",
   "steps": [
     {
-      "action": "download",
+      "action": "goto",
       "url": "https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_08+Newsletter.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_08+Newsletter.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "08/11/2026: rewrite_date_url does not change 2026_11_01+Newsletter.pdf, so predicted never tried 2026_11_08+Newsletter.pdf. Proved GET 206 application/pdf magic %PDF, full size 256842 bytes. Listing /churches shows both files. weeks_back 0 so only the 8 November file is tried. Do not scrape killaloediocese.ie."
+    "13/11/2026: predicted_dated_pdf urllib miss on 2026_11_08+Newsletter.pdf for 08/11/2026. This cloud GET 200 application/pdf 256842 bytes magic %PDF-1.7. rewrite_date_url does not change 2026_11_01 into 2026_11_08. Do not use predicted. Browser goto/download of the pinned PDF.",
+    "08/11/2026: Listing /churches shows both files."
   ],
   "do_not": [
+    "Do not use predicted_dated_pdf — urllib misses the CDN file and rewrite leaves 2026_11_01 unchanged.",
     "Do not keep 2026_11_01+Newsletter.pdf.",
     "Do not scrape killaloediocese.ie/parish/doonbeg-killard/.",
     "Do not use wp-json media on the diocese card.",
