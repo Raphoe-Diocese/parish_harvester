@@ -2,27 +2,37 @@
   "parish_key": "mulhuddart",
   "display_name": "Mulhuddart",
   "diocese": "dublin",
-  "recorded_date": "2026-11-10",
-  "start_url": "https://www.stlukesparishd15.com",
-  "site_type": "http_scrape_newest_pdf",
-  "playbook_type": "pdf_download_list",
+  "recorded_date": "2026-11-13",
+  "start_url": "https://www.stlukesparishd15.com/_files/ugd/a0b31f_664f57d81a59457ca7a9501409534181.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "example_url": "https://www.stlukesparishd15.com/_files/ugd/a0b31f_664f57d81a59457ca7a9501409534181.pdf",
   "status": "active",
   "skip": false,
+  "href_patterns": [
+    "a0b31f_664f57d81a59457ca7a9501409534181.pdf"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stlukesparishd15.com"
+      "url": "https://www.stlukesparishd15.com/_files/ugd/a0b31f_664f57d81a59457ca7a9501409534181.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://www.stlukesparishd15.com/_files/ugd/a0b31f_664f57d81a59457ca7a9501409534181.pdf"
     }
   ],
-  "version": 1,
-  "href_patterns": [
-    ".pdf"
-  ],
+  "version": 2,
   "operator_notes": [
-    "10/11/2026 One-hop: proved PDF dated 08/11/2026. Scrape the listing page. Do not pin the dated file or a Wix hash."
+    "13/11/2026: leftover failed HTTP-scrape on homepage found no dated .pdf href. Pin homepage ugd a0b31f_664f57d81a59457ca7a9501409534181.pdf. Proved GET 200 application/pdf 109476 bytes magic %PDF-1.5. PDF text Saturday/Sunday 7th/8th 32nd Sunday in Ordinary Time Year A."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not pin a Wix hash."
+    "Do not use predicted_dated_pdf.",
+    "Do not start on https://www.stlukesparishd15.com — HTTP-scrape finds no dated filename.",
+    "Do not start on /newsletter — those hashes are January-December monthlies, not 08/11/2026.",
+    "Do not pin a0b31f_a0c910c14cd24a82a76b7d04c457e12f.pdf — that file is Newsletter November 2026 monthly, not the weekly 08/11 sheet.",
+    "Do not harvest Facebook."
   ]
 }
