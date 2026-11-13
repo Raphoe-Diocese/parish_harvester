@@ -14831,24 +14831,25 @@
       "recipe_file": "parishes/recipes/clogher/donaghmoyne.json",
       "recipe": {
         "start_url": "https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "08/11/2026: start_url was still the 1 November file. Proved 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf GET 206 application/pdf magic %PDF, full size 297112 bytes, uploaded 06/11/2026. Do not open the homepage \u2014 HTTP2 hang.",
-          "Harvest 42499804185 still tried 21st-of-Ordinary-Time-Sunday-8th-November-2026.pdf (rewrite of the old 1 November name). weeks_back 0 weeks_ahead 0 so only the 08th file is tried."
+          "13/11/2026: predicted rewrote this into 21st-of-Ordinary-Time-Sunday-8th-November-2026.pdf which HEAD 500s. Live file is 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf GET 200 application/pdf 297112. Browser download. Do not open the homepage.",
+          "08/11/2026: Harvest still tried the 21st rewrite of the old 1 November name."
         ],
         "do_not": [
-          "Do not set start_url to the homepage or /category/parish-bulletin/ \u2014 HTTP2 / brain hang.",
+          "Do not use predicted_dated_pdf \u2014 it rewrites 32nd-All-Saints-08th into a 500 URL.",
+          "Do not set start_url to the homepage or /category/parish-bulletin/ \u2014 HTTP2 hang.",
           "Do not keep 21st-of-Ordinary-Time-Sunday-1st-November-2026.pdf.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-08"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
       "learned_pattern": "News page with PDF links",
@@ -14859,9 +14860,9 @@
       },
       "has_extension_diagnosis": true,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf for 2026-11-08 did not resolve to a real file (listing page was not open",
+      "last_error": "Recipe replay failed: APIRequestContext.get: socket hang up\nCall log:\n  - \u2192 GET https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf\n  -     - user-agent: Mozilla/5.0 (X11; Linux ",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2"
+      "suggested_reason": "Recipe replay failed: APIRequestContext.get: socket hang up\nCall log:\n  - \u2192 GET https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Sai"
     },
     {
       "parish_key": "doneraile",
@@ -34029,28 +34030,28 @@
       "diocese": "clogher",
       "recipe_file": "parishes/recipes/clogher/roslea.json",
       "recipe": {
-        "start_url": "https://parishofroslea.com/category/parish-bulletin/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-8th-November-2026.pdf",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "Newest on 22/08/2026 is Bulletin-Sunday-23rd-August-2026.pdf (HTTP 200, 148359 bytes).",
-          "site_type:predicted_dated_pdf. Harvest 07/09 wp-json / homepage 403'd; predicted must try Sept and September. Do not pin only September.",
-          "10/11/2026: category page lists Bulletin-Sunday-8th-November-2026.pdf. GET 200 application/pdf. Filename date 08/11/2026. Scrape the category page. Do not pin the dated filename."
+          "13/11/2026: /category/parish-bulletin/ scrape timed out. Proved Bulletin-Sunday-8th-November-2026.pdf GET 200 application/pdf 181663. Pin the PDF. Do not use predicted.",
+          "10/11/2026: category page listed this file."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
+          "Do not start on /category/parish-bulletin/ \u2014 scrape times out.",
+          "Do not use predicted_dated_pdf.",
           "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
           "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
         ],
-        "recorded_date": "2026-11-10"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": {
         "total_timeout_s": 490,
