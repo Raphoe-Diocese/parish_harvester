@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 591,
+    "downloaded": 592,
     "html_links": 0,
     "skipped": 483,
-    "failed": 159,
+    "failed": 158,
     "stale_rejected": 85
   },
   "action_counts": {
-    "ok": 467,
+    "ok": 468,
     "skip": 749,
     "mark_inactive": 18,
-    "investigate": 54,
+    "investigate": 53,
     "retrain": 1
   },
   "parishes": [
@@ -14729,29 +14729,27 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/donaghmore.json",
       "recipe": {
-        "start_url": "https://donaghmoreparish.org",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "07/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 02/10/2026. Do not pin https://donaghmoreparish.org/wp-content/uploads/2026/10/service@riceoffice.com_20261002_122109.pdf.",
-          "10/11/2026: homepage links Donaghmore-Bulletin-8th-November-2026.pdf. Scrape the homepage. Do not pin the dated filename. Do not take the service@riceoffice hash PDF.",
-          "13/11/2026: Armagh Facebook-only skip renamed to donaghmorearmagh so this active recipe loads. recipe_path_for prefers active over skip."
+          "13/11/2026: homepage scrape can hang. Proved PDF Donaghmore-Bulletin-8th-November-2026.pdf GET 200 %PDF with ignore_https_errors (expired cert). start_url is the PDF.",
+          "Armagh Facebook-only parish is donaghmorearmagh."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
-          "Do not harvest Facebook.",
+          "Do not pin forever \u2014 predicted rewrites the date.",
           "Do not take the service@riceoffice hash PDF.",
-          "Do not reuse parish_key donaghmore for the Armagh Facebook-only parish."
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-10"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -28775,26 +28773,26 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/milltowndublin.json",
       "recipe": {
-        "start_url": "https://milltownparish.ie/newsletter/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "08/11/2026: recipe already pointed at Weekly-Bulletin-Sunday-November-8th-2026.pdf. Harvest predicted miss because weeks_ahead 1 tries 15 November first. Proved GET 206 application/pdf magic %PDF, full size 557095 bytes. weeks_back 0 weeks_ahead 0 so only the 8 November file is tried.",
-          "10/11/2026: /newsletter/ lists Weekly-Bulletin-Sunday-November-8th-2026.pdf and older weeks. Scrape the listing. Do not pin the dated filename."
+          "13/11/2026: /newsletter/ scrape failed again. Proved Weekly-Bulletin-Sunday-November-8th-2026.pdf GET 200 application/pdf 557095. Pin the PDF.",
+          "08/11/2026: weeks_ahead 1 tried 15 November first. weeks_back 0 weeks_ahead 0."
         ],
         "do_not": [
           "Do not harvest Facebook.",
-          "Do not pin the dated Weekly-Bulletin filename."
+          "Do not start on /newsletter/ \u2014 scrape fails on GitHub."
         ],
-        "recorded_date": "2026-11-10"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -29025,7 +29023,7 @@
       "diocese": "ardagh",
       "recipe_file": "parishes/recipes/ardagh/mohill.json",
       "recipe": {
-        "start_url": "https://mohillparish.ie/wp-json/wp/v2/pages?per_page=15&search=newsletter&orderby=date&order=desc",
+        "start_url": "https://mohillparish.ie/newsletter-7th-november-2026/",
         "site_type": "http_scrape_newest_html",
         "playbook_type": "html_text_bulletin",
         "status": "",
@@ -29035,26 +29033,26 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "02/11/2026: /newsletter/ HTML archive still tops out at 25 Oct. WP pages API already has newsletter-1st-november-2026 (published 02/11). Prefer wp-json pages search as start_url; http_scrape_newest_html accepts JSON.",
-          "29/10/2026: Playwright click on /newsletter/ timed out. Plain HTTP listing lagged. print_to_pdf + skip_listing_nav. max_bulletin_pages 8.",
+          "13/11/2026: wp-json newest is newsletter-7th-november-2026 (published 10/11). newsletter-8th-november-2026 is 404. Pin the 7th HTML page + print_to_pdf so listing/print hang loses.",
+          "02/11/2026: /newsletter/ HTML archive lagged. WP pages API is truth.",
           "Page text includes Mohill + Fenagh + Gortletteragh \u2014 harvest once here."
         ],
         "do_not": [
           "Do not harvest Fenagh or Gortletteragh separately from this file.",
-          "Do not pin newsletter-25th-october-2026 or newsletter-1st-november-2026.",
-          "Do not rely on the /newsletter/ HTML archive alone \u2014 it lags the WP pages API.",
+          "Do not invent newsletter-8th-november-2026 \u2014 that slug 404s.",
+          "Do not pin newsletter-1st-november-2026 or older.",
           "Do not remove skip_listing_nav."
         ],
-        "recorded_date": "2026-11-02"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape HTML listing https://mohillparish.ie/wp-json/wp/v2/pages?per_page=15&search=newsletter&orderby=date&order=desc \u2014 no dated newsletter page matching ['newsletter-']",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape HTML listing https://mohillparish.ie/wp-json/wp/v2/pages?per_page=15&search=newsletter&orderby=date&order=desc \u2014 no dated news"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "monagea",
@@ -36835,25 +36833,27 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/mayobridge.json",
       "recipe": {
-        "start_url": "https://www.mayobridgeparish.com/parish-newsletter/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "10/11/2026: /parish-newsletter/ lists Parish-Bulletin-8-November-2026.pdf. Scrape that list. Do not pin the dated filename."
+          "13/11/2026: /parish-newsletter/ scrape timed out. Browser shows Parish Bulletin 8 November 2026 \u2192 Parish-Bulletin-8-November-2026.pdf under /uploads/2014/07/. start_url is that PDF so the listing is skipped.",
+          "Plain urllib from this PC gets 403; harvest browser download should still get it."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
+          "Do not start on /parish-newsletter/ \u2014 it times out.",
+          "Do not pin forever \u2014 predicted rewrites the date.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-10"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -38559,27 +38559,27 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/termonmaguirc.json",
       "recipe": {
-        "start_url": "https://www.termonmaguircparish.com/bulletins/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "09/11/2026: Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf rewrite becomes Twenty-Sixth ... 8-November and 404s. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 206 application/pdf magic %PDF, 683554 bytes. start_url is the PDF so /bulletins/ challenge is skipped.",
-          "10/11/2026: /bulletins/ lists Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf with the older Sunday files. Scrape that listing. Do not pin the Sunday ordinal filename. Plain HTTP on 10/11/2026 returned the PDF links."
+          "13/11/2026: /bulletins/ times out or rewrites Twenty-Sixth-1-November into a bad Twenty-Sixth-8-November URL. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 200 application/pdf magic %PDF. start_url is that PDF.",
+          "Do not start on /bulletins/ until Cloudflare/timeout is fixed."
         ],
         "do_not": [
-          "Do not keep Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf.",
+          "Do not rewrite Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf to 8-November.",
           "Do not harvest Facebook.",
-          "Do not pin the Sunday ordinal filename."
+          "Do not open /bulletins/ first \u2014 it hangs the harvest."
         ],
-        "recorded_date": "2026-11-10"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
