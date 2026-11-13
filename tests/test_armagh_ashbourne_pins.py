@@ -19,6 +19,24 @@ class ArmaghAshbournePinTests(unittest.TestCase):
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertEqual(recipe["playbook_type"], "direct_download")
 
+    def test_donaghmoyne_pins_32nd_allsaints_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/clogher/donaghmoyne.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        self.assertIn("32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf", recipe["start_url"])
+        self.assertNotIn("21st-of-Ordinary-Time", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+
+    def test_roslea_pins_8_november_pdf(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/clogher/roslea.json").read_text(encoding="utf-8-sig")
+        )
+        self.assertIn("Bulletin-Sunday-8th-November-2026.pdf", recipe["start_url"])
+        self.assertNotIn("category/parish-bulletin", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+
     def test_ashbourne_pins_32nd_sunday_pdf(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/meath/ashbourne.json").read_text(

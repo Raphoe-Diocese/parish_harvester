@@ -2435,11 +2435,12 @@ class HarvestMissRecipeTests(unittest.TestCase):
         donaghmoyne = json.loads(
             Path("parishes/recipes/clogher/donaghmoyne.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(donaghmoyne["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(donaghmoyne["site_type"], "predicted_dated_pdf")
+        self.assertEqual(donaghmoyne["playbook_type"], "direct_download")
         self.assertIn("08th-November-2026.pdf", donaghmoyne["start_url"])
+        self.assertIn("32nd-of-Ordinary-Time-All-Saints", donaghmoyne["start_url"])
         self.assertNotIn("1st-November", donaghmoyne["start_url"])
-        self.assertEqual(int(donaghmoyne["weeks_back"]), 0)
-        self.assertEqual(int(donaghmoyne["weeks_ahead"]), 0)
+        self.assertNotIn("21st-of-Ordinary-Time", donaghmoyne["start_url"])
 
     def test_weeks_back_zero_is_not_eight(self) -> None:
         self.assertEqual(_recipe_week_span({"weeks_back": 0, "weeks_ahead": 0}), (0, 0))
