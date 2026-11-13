@@ -3,7 +3,10 @@ from __future__ import annotations
 
 import json
 import unittest
+from datetime import date
 from pathlib import Path
+
+from harvester.bulletin_freshness import check_bulletin_freshness
 
 
 def _recipe(path: str) -> dict:
@@ -184,6 +187,53 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotEqual(
             recipe["start_url"].rstrip("/"), "https://bekan-parish.ie"
         )
+
+    def test_magherafelt_print_to_pdf_is_wordpress_not_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/armagh/magherafelt.json")
+        self.assertIn("bulletin-8th-of-november-2026", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertFalse(recipe.get("skip"))
+        self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
+        self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://www.magherafeltparish.org"
+        )
+        self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
+
+    def test_charleville_pins_8th_november_doc_not_15th_or_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/cloyne/charleville.json")
+        self._assert_wordpress_direct(
+            recipe, "8th-November-2026-CHARLEVILLE-PARISH-NEWSLETTER.doc"
+        )
+        self.assertIn("wpdmdl=6240", recipe["start_url"])
+        self.assertNotIn("wpdmdl=6241", recipe["start_url"])
+        self.assertNotIn("15th-november", recipe["start_url"])
+        self.assertNotIn("1st-november", recipe["start_url"])
+        self.assertNotIn("newsletters-2026", recipe["start_url"])
+        self.assertNotIn("cloynediocese.ie", recipe["start_url"])
+        verdict = check_bulletin_freshness(
+            recipe["start_url"], date(2026, 11, 8)
+        )
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+
+    def test_dungannon_print_to_pdf_is_this_week_post_not_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/armagh/dungannon.json")
+        self.assertIn("a_id=903", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertFalse(recipe.get("skip"))
+        self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
+        self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+        self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "http://parishofdungannon.com"
+        )
+        self.assertNotIn("imagews?id=1443", recipe["start_url"])
+
 
 
 if __name__ == "__main__":
