@@ -332,6 +332,29 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotIn("366f88e3f30e7d6de57c562a15ce3910", recipe["start_url"])
         self.assertNotIn("dromorediocese.org", recipe["start_url"])
 
+    def test_togher_pins_8th_november_pdf_not_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/armagh/togher.json")
+        self._assert_wordpress_direct(
+            recipe, "bulletin-32nd-ord-a-8th-november-2026.pdf"
+        )
+        self.assertFalse(recipe.get("skip"))
+        self.assertEqual(recipe.get("status"), "active")
+        self.assertIn("/2026/11/", recipe["start_url"])
+        self.assertNotIn("1st-november", recipe["start_url"])
+        self.assertNotIn("all-saints", recipe["start_url"])
+        self.assertNotIn("parish-bulletins", recipe["start_url"])
+        self.assertNotIn("familyofparishes.ie", recipe["start_url"])
+        self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertNotEqual(recipe["site_type"], "link_only")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://togherparish.com"
+        )
+        verdict = check_bulletin_freshness(recipe["start_url"], date(2026, 11, 8))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+
 
 if __name__ == "__main__":
     unittest.main()
