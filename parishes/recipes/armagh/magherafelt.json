@@ -1,22 +1,44 @@
 {
+  "version": 2,
   "parish_key": "magherafelt",
   "display_name": "Magherafelt",
   "diocese": "armagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://www.magherafeltparish.org",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
+  "start_url": "https://www.magherafeltparish.org/bulletin-8th-of-november-2026/",
+  "site_type": "wordpress",
+  "playbook_type": "html_text_bulletin",
   "status": "active",
   "skip": false,
-  "reason": "Website found (https://www.magherafeltparish.org) but no this-week PDF proved on 29/09/2026 kitchen-sink — link only until bulletin URL proved.",
+  "post_slug_patterns": [
+    "bulletin-"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://www.magherafeltparish.org/bulletin-8th-of-november-2026/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.magherafeltparish.org"
+      "url": "https://www.magherafeltparish.org/bulletin-8th-of-november-2026/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "12/11/2026 Step 4: unskipped missed-week recipe. Keep-weekly already retries these. Facebook-only and no-website stay skipped."
-  ]
+    "13/11/2026 leftover: harvest saved the Armagh diocese card. wp-json/HTML post Bulletin 8th of November 2026. GET 200 text/html on /bulletin-8th-of-november-2026/. Title Bulletin 8th of November 2026. Body: Masses Saturday Vigil 6.15pm Magherafelt; Sunday 9am Castledawson, 11.30am Magherafelt. Anniversaries Sat. 7 Nov. and Sun. 8 Nov. No PDF in the post. Pin wordpress + print_to_pdf skip_listing_nav. Do not open the homepage or armagharchdiocese.org."
+  ],
+  "do_not": [
+    "Do not set start_url to https://www.magherafeltparish.org — that is the homepage, not this week's post.",
+    "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
+    "Do not use predicted_dated_pdf.",
+    "Do not use http_scrape_newest_html — scrape intercepts the print_to_pdf pin.",
+    "Do not remove skip_listing_nav.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
