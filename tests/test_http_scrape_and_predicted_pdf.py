@@ -2501,11 +2501,21 @@ class HarvestMissRecipeTests(unittest.TestCase):
         newmarket = json.loads(
             Path("parishes/recipes/cloyne/newmarkettaur.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(newmarket["site_type"], "predicted_dated_pdf")
-        self.assertIn("Newsletter-Sunday-8th-November-2026.pdf", newmarket["start_url"])
+        self.assertEqual(newmarket["site_type"], "wordpress")
+        self.assertEqual(newmarket["playbook_type"], "direct_download")
+        self.assertNotEqual(newmarket["site_type"], "predicted_dated_pdf")
+        self.assertIn(
+            "/2026/10/Newsletter-Sunday-8th-November-2026.pdf",
+            newmarket["start_url"],
+        )
+        self.assertNotIn("/2026/11/", newmarket["start_url"])
         self.assertNotIn("1st-November", newmarket["start_url"])
-        self.assertEqual(int(newmarket["weeks_back"]), 0)
-        self.assertEqual(int(newmarket["weeks_ahead"]), 0)
+        download_urls = [
+            step.get("url")
+            for step in newmarket["steps"]
+            if step.get("action") == "download"
+        ]
+        self.assertEqual(download_urls, [newmarket["start_url"]])
 
     def test_parishes_together_use_8_november_pdfs(self) -> None:
         cases = {
@@ -2567,11 +2577,18 @@ class HarvestMissRecipeTests(unittest.TestCase):
         kilmoremoy = json.loads(
             Path("parishes/recipes/killala/kilmoremoy.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(kilmoremoy["site_type"], "predicted_dated_pdf")
+        self.assertEqual(kilmoremoy["site_type"], "wordpress")
+        self.assertEqual(kilmoremoy["playbook_type"], "direct_download")
+        self.assertNotEqual(kilmoremoy["site_type"], "predicted_dated_pdf")
         self.assertIn("newsletter-62.pdf", kilmoremoy["start_url"])
         self.assertNotIn("newsletter-61.pdf", kilmoremoy["start_url"])
-        self.assertEqual(int(kilmoremoy["weeks_back"]), 0)
-        self.assertEqual(int(kilmoremoy["weeks_ahead"]), 0)
+        self.assertNotIn("newsletter-63.pdf", kilmoremoy["start_url"])
+        download_urls = [
+            step.get("url")
+            for step in kilmoremoy["steps"]
+            if step.get("action") == "download"
+        ]
+        self.assertEqual(download_urls, [kilmoremoy["start_url"]])
 
     def test_dromod_and_foxford_allow_8_november(self) -> None:
         dromod = json.loads(

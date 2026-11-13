@@ -1,10 +1,11 @@
 {
-  "version": 5,
+  "version": 6,
   "parish_key": "newmarkettaur",
   "display_name": "Newmarket & Taur",
   "diocese": "cloyne",
   "start_url": "https://www.newmarketparish.com/wp-content/uploads/2026/10/Newsletter-Sunday-8th-November-2026.pdf",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "href_patterns": [
     "Newsletter",
     ".pdf"
@@ -14,25 +15,28 @@
     "jpeg",
     "png"
   ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-09",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://www.newmarketparish.com/wp-content/uploads/2026/10/Newsletter-Sunday-8th-November-2026.pdf",
   "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.newmarketparish.com/wp-content/uploads/2026/10/Newsletter-Sunday-8th-November-2026.pdf"
+    },
     {
       "action": "download",
       "url": "https://www.newmarketparish.com/wp-content/uploads/2026/10/Newsletter-Sunday-8th-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "09/11/2026: recipe already knew Newsletter-Sunday-8th-November-2026.pdf in /2026/10/ but start_url stayed on 1st and weeks_ahead 1. Pin the 8th file. wp-json mime application/pdf. This IP RemoteDisconnected on Range GET. start_url is the PDF so listing challenge is skipped."
+    "13/11/2026: predicted_dated_pdf missed Newsletter-Sunday-8th-November-2026.pdf in /2026/10/ (listing page was not opened). Homepage calls that URL Latest Newsletter. Proved GET 200 application/pdf 593032 bytes, magic %PDF, Last-Modified Fri, 06 Nov 2026 13:28:12 GMT. The same name under /2026/11/ is 404. Browser download of this exact URL. Do not open the homepage."
   ],
   "do_not": [
-    "Do not set start_url to the homepage — newsletter_brain hangs.",
-    "Do not keep Newsletter-Sunday-1st-November-2026.pdf.",
-    "Do not require September/October in href_patterns — that misses November.",
+    "Do not use predicted_dated_pdf. GitHub urllib misses this file.",
+    "Do not set start_url to the homepage. newsletter_brain hangs.",
+    "Do not keep Newsletter-Sunday-1st-November-2026.pdf. 01/11/2026 is not this week.",
+    "Do not move this file into /2026/11/. That URL is 404.",
     "Do not harvest the Éala Horgan photo.",
     "Do not harvest Facebook."
   ],
