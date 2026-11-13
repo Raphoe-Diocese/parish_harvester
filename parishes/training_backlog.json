@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 605,
+    "downloaded": 604,
     "html_links": 0,
     "skipped": 487,
-    "failed": 141,
+    "failed": 142,
     "stale_rejected": 85
   },
   "action_counts": {
-    "ok": 481,
+    "ok": 480,
     "skip": 749,
     "mark_inactive": 18,
-    "investigate": 41,
+    "investigate": 42,
     "retrain": 1
   },
   "parishes": [
@@ -18740,32 +18740,34 @@
       "recipe_file": "parishes/recipes/dublin/foxrock.json",
       "recipe": {
         "start_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "06/11/2026: homepage scrape still timed out. Proved Newsletter-November-1st-2026.pdf GET 200 application/pdf 567718 bytes magic %PDF-1.7. start_url is the PDF so listing challenge is skipped."
+          "13/11/2026: predicted rewrite of Newsletter-November-1st-2026.pdf became Newsletter-November-8th-2026.pdf. That 8 November parish file 404s in /2026/10/ and /2026/11/. Homepage and search still show Parish Newsletter November 1st. WebFetch of the 1st file is All Saints 01/11/2026. Notices-08.11.26-Share2026Newsletter.pdf HEAD/GET 200 application/pdf 2351993 bytes magic %PDF-1.4 is the diocesan SHARE newsletter for 7/8 November, not the Foxrock parish newsletter. wordpress+direct_download of the 01/11 parish PDF with use_captured_url so harvest does not rewrite to the 404. 01/11 is stale for harvest Sunday 08/11/2026."
         ],
         "do_not": [
+          "Do not use predicted_dated_pdf \u2014 it rewrites November-1st into November-8th which 404s.",
+          "Do not pin Notices-08.11.26-Share2026Newsletter.pdf \u2014 that is diocesan Share, not the parish newsletter.",
+          "Do not treat Newsletter-November-1st-2026.pdf as 08/11/2026 \u2014 All Saints is stale.",
           "Do not set start_url to the homepage \u2014 scrape then newsletter_brain hangs.",
-          "Do not pin Newsletter-November-1st-2026.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf for 2026-11-01 did not resolve to a real file (listing page was not opened)",
+      "last_error": "Recipe replay failed: HTTP download failed for https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf (browser was not opened)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf for 2026-11-01 did no"
+      "suggested_reason": "Recipe replay failed: HTTP download failed for https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf (browser was not opened)"
     },
     {
       "parish_key": "francisstreet",
@@ -20460,10 +20462,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "gurteen",
@@ -30171,10 +30173,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.stlukesparishd15.com \u2014 no dated bulletin PDF matching ['.pdf'] (not a selector problem; parish may not have posted)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.stlukesparishd15.com \u2014 no dated bulletin PDF matching ['.pdf'] (not a selector problem; parish may not hav"
     },
     {
       "parish_key": "mullagh",
@@ -34754,10 +34756,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "sandyford",
@@ -34775,6 +34777,7 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
+          "13/11/2026 later: this cloud HEAD 200 application/pdf 423870, GET 200 application/pdf 423870 bytes magic %PDF-1.7. Text: SANDYFORD PARISH NEWSLETTER 8th November 2026, St Mary's Sandyford. Short Mozilla/5.0. Homepage still 403. Do not use predicted. Browser goto/download of the pinned PDF.",
           "13/11/2026: parish_status still failed predicted_dated_pdf miss on Newsletter-2026-11-08.pdf for 08/11/2026. last_tested_at 08/11/2026. This cloud IP StackProtect 403/401. Do not use predicted. Browser goto/download of the pinned PDF.",
           "08/11/2026: proved Newsletter-2026-11-08.pdf GET 206 application/pdf magic %PDF, full size 423870 bytes. Text is 8 November 2026, Share Appeal Sunday, St Mary's Sandyford."
         ],
@@ -34790,10 +34793,10 @@
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf for 2026-11-08 did not resolve to a real file (listing page was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://sandyfordparish.org/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf for 2026-11-08 did not re"
     },
     {
       "parish_key": "sandymount",
