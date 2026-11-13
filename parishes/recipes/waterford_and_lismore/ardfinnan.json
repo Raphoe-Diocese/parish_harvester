@@ -1,19 +1,41 @@
 {
+  "version": 6,
   "parish_key": "ardfinnan",
-  "display_name": "Ardfinnan",
+  "display_name": "Ardfinnan (Newcastle & Fourmilewater, Touraneena)",
   "diocese": "waterford_and_lismore",
-  "recorded_date": "2026-10-03",
-  "start_url": "http://www.stcarloacutisparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/",
+  "site_type": "http_scrape_newest_html",
+  "playbook_type": "html_text_bulletin",
+  "post_slug_patterns": [
+    "newsletter-"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.stcarloacutisparish.ie"
+      "url": "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "13/11/2026: HTTP 200 text/html. Title and heading are Newsletter 7th & 8th November 2026. Newest newsletter- slug on that page. newsletter-31st-october-1st-november-2026 is the previous week.",
+    "One pastoral newsletter covers Ardfinnan, Newcastle, Fourmilewater and Touraneena (also Ballybacon, Grange and the Nire, which have no separate recipe key). Harvest once under ardfinnan."
+  ],
+  "do_not": [
+    "Do not open /category/newsletters/.",
+    "Do not harvest Newcastle & Fourmilewater or Touraneena separately.",
+    "Do not pin newsletter-31st-october-1st-november-2026 or older.",
+    "Do not remove skip_listing_nav."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

@@ -44,6 +44,8 @@ class ParishAliasTests(unittest.TestCase):
                 "grangepark": "edenmore",
                 "moone": "narraghmore",
                 "butlerstown": "stpaulswaterford",
+                "newcastlefourmilewater": "ardfinnan",
+                "touraneena": "ardfinnan",
             },
         )
 
@@ -267,6 +269,44 @@ class ParishAliasTests(unittest.TestCase):
         self.assertEqual(legan.get("alias_of"), "ardaghandmoydow")
         self.assertTrue(legan.get("skip"))
         self.assertNotEqual(host.get("skip"), True)
+
+    def test_st_carlo_pins_7th_8th_november_html(self) -> None:
+        from datetime import date
+
+        from harvester.report import _recipe_is_inactive
+        from harvester.utils import extract_date_from_slug
+
+        root = REPO_ROOT / "parishes" / "recipes" / "waterford_and_lismore"
+        ardfinnan = json.loads((root / "ardfinnan.json").read_text(encoding="utf-8"))
+        newcastle = json.loads(
+            (root / "newcastlefourmilewater.json").read_text(encoding="utf-8")
+        )
+        touraneena = json.loads((root / "touraneena.json").read_text(encoding="utf-8"))
+        page = "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/"
+        self.assertEqual(ardfinnan["start_url"], page)
+        self.assertEqual(ardfinnan["steps"][0]["url"], page)
+        self.assertEqual(ardfinnan["site_type"], "http_scrape_newest_html")
+        self.assertEqual(ardfinnan["steps"][-1]["action"], "print_to_pdf")
+        self.assertTrue(ardfinnan["steps"][-1].get("skip_listing_nav"))
+        self.assertNotIn("category/newsletters", ardfinnan["start_url"])
+        self.assertNotIn("31st-october", ardfinnan["start_url"])
+        self.assertEqual(
+            extract_date_from_slug("newsletter-7th-8th-november-2026"),
+            date(2026, 11, 8),
+        )
+        self.assertFalse(_recipe_is_inactive(ardfinnan))
+        for alias in (newcastle, touraneena):
+            self.assertEqual(alias.get("alias_of"), "ardfinnan")
+            self.assertTrue(alias.get("skip"))
+            self.assertEqual(alias["start_url"], page)
+            self.assertTrue(_recipe_is_inactive(alias))
+            self.assertNotIn("no this-week", alias.get("reason", "").lower())
+        self.assertEqual(canonical_key("newcastlefourmilewater"), "ardfinnan")
+        self.assertEqual(canonical_key("touraneena"), "ardfinnan")
+        self.assertEqual(
+            combined_display_name("ardfinnan"),
+            "Ardfinnan (Newcastle & Fourmilewater, Touraneena)",
+        )
 
 
 if __name__ == "__main__":
