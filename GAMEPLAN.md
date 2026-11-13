@@ -1,3 +1,6 @@
+## 13/11/2026 00:30 - PRs 578+579 merged. Step 6 Donaghmore clash + Step 5 hits next
+578 guard and 579 unskip 25 on main. Fixing donaghmore key clash so Dromore active recipe loads. Paste hits Mayobridge + Termonmaguirc need re-harvest after. Raphoe still empty. Not live.
+
 ## 12/11/2026 22:40 - Step 8 accordion in flight. Raphoe still empty. Dublin harvests running
 Extension hints wall of words → closed details/summary Hints for this page (N). Manifest 1.61.49. Raphoe permanent page still No bulletin available — cannot harvest. Next Dublin: Howth Mount Argus Clontarf Swords. Steps 4-7 not started. Not live.
 

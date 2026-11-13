@@ -887,16 +887,39 @@ def recipe_path_for(parish_key: str, parishes_dir: Path = PARISHES_DIR) -> Path:
     Searches diocese subfolders (derry/, down_and_connor/, unknown/, and any
     other subdirectory) before falling back to the legacy flat path so that
     both old flat layouts and the new subfolder layout work transparently.
+
+    When two dioceses share the same parish_key (Donaghmore: armagh skip vs
+    dromore active), prefer an active recipe over skip/inactive.
     """
     recipes_dir = parishes_dir / "recipes"
-    # Search existing subdirectories first (new layout)
+    candidates: list[Path] = []
     for sub in sorted(recipes_dir.iterdir()) if recipes_dir.exists() else []:
         if sub.is_dir():
             candidate = sub / f"{parish_key}.json"
             if candidate.exists():
-                return candidate
-    # Fall back to flat path (legacy layout or file not yet moved)
-    return recipes_dir / f"{parish_key}.json"
+                candidates.append(candidate)
+    flat = recipes_dir / f"{parish_key}.json"
+    if flat.exists() and flat not in candidates:
+        candidates.append(flat)
+    if not candidates:
+        return flat
+
+    def _is_active(path: Path) -> bool:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
+        except Exception:
+            return False
+        if not isinstance(data, dict):
+            return False
+        status = str(data.get("status", "")).strip().lower()
+        if data.get("skip") or status in {"dead_url", "inactive"}:
+            return False
+        return True
+
+    for candidate in candidates:
+        if _is_active(candidate):
+            return candidate
+    return candidates[0]
 
 
 def load_recipe(path: Path) -> dict:
