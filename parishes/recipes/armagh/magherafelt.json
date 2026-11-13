@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "magherafelt",
   "display_name": "Magherafelt",
   "diocese": "armagh",
@@ -8,6 +8,7 @@
   "playbook_type": "html_text_bulletin",
   "status": "active",
   "skip": false,
+  "http_first": true,
   "post_slug_patterns": [
     "bulletin-"
   ],
@@ -27,6 +28,7 @@
     }
   ],
   "operator_notes": [
+    "13/11/2026 leftover harvest: Page.goto net::ERR_HTTP2_PROTOCOL_ERROR on /bulletin-8th-of-november-2026/. This cloud GET 200 text/html 59910 bytes HTTP/1.1 Mozilla/5.0 and curl/8.5.0. Title Bulletin 8th of November 2026. Body: Masses Saturday Vigil 6.15pm Magherafelt; Sunday 9am Castledawson, 11.30am Magherafelt. Anniversaries Sat. 7 Nov. and Sun. 8 Nov. No PDF in the post. http_first: urllib short UA then print_to_pdf from fetched HTML. Do not Playwright goto (Chromium HTTP2).",
     "13/11/2026 leftover: harvest saved the Armagh diocese card. wp-json/HTML post Bulletin 8th of November 2026. GET 200 text/html on /bulletin-8th-of-november-2026/. Title Bulletin 8th of November 2026. Body: Masses Saturday Vigil 6.15pm Magherafelt; Sunday 9am Castledawson, 11.30am Magherafelt. Anniversaries Sat. 7 Nov. and Sun. 8 Nov. No PDF in the post. Pin wordpress + print_to_pdf skip_listing_nav. Do not open the homepage or armagharchdiocese.org."
   ],
   "do_not": [
@@ -34,7 +36,9 @@
     "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
     "Do not use predicted_dated_pdf.",
     "Do not use http_scrape_newest_html — scrape intercepts the print_to_pdf pin.",
+    "Do not Playwright goto this URL — Chromium HTTP2 fails.",
     "Do not remove skip_listing_nav.",
+    "Do not pin a different week's post.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {

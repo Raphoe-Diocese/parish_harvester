@@ -192,6 +192,8 @@ class Leftover0811PinTests(unittest.TestCase):
         recipe = _recipe("parishes/recipes/armagh/magherafelt.json")
         self.assertIn("bulletin-8th-of-november-2026", recipe["start_url"])
         self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "html_text_bulletin")
+        self.assertTrue(recipe.get("http_first"))
         self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertFalse(recipe.get("skip"))
@@ -201,6 +203,8 @@ class Leftover0811PinTests(unittest.TestCase):
             recipe["start_url"].rstrip("/"), "https://www.magherafeltparish.org"
         )
         self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
+        self.assertNotIn("1st-of-november", recipe["start_url"])
+        self.assertNotIn("15th-of-november", recipe["start_url"])
 
     def test_charleville_pins_8th_november_doc_not_15th_or_diocese_card(self) -> None:
         recipe = _recipe("parishes/recipes/cloyne/charleville.json")
