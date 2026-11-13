@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 613,
+    "downloaded": 618,
     "html_links": 0,
     "skipped": 487,
-    "failed": 132,
+    "failed": 127,
     "stale_rejected": 86
   },
   "action_counts": {
-    "ok": 490,
-    "skip": 747,
+    "ok": 495,
+    "skip": 746,
     "mark_inactive": 17,
-    "investigate": 35,
+    "investigate": 31,
     "retrain": 1
   },
   "parishes": [
@@ -6486,27 +6486,35 @@
       "diocese": "tuam",
       "recipe_file": "parishes/recipes/tuam/bekan.json",
       "recipe": {
-        "start_url": "http://www.bekan-parish.ie",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://bekan-parish.ie/wp-content/uploads/2026/11/bpn8nov26.png",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "has_terminal": true,
+        "operator_notes": [
+          "13/11/2026 leftover FAILED: skip recipe was link_only on http://www.bekan-parish.ie and harvest saved an error page. Homepage lists Bekan Parish Newsletter 8th November 2026. Same-name .jpg is 404. The sheet is bpn8nov26.png. GET 200 image/png 507255 bytes magic PNG. Last-Modified Sun 08/11/2026 19:09:42 GMT. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download of the PNG. Do not open the homepage. Do not pin the 1st November PNG."
+        ],
+        "do_not": [
+          "Do not pin bekanparishnewsletter01nov26.png \u2014 that is 01/11.",
+          "Do not invent bpn8nov26.jpg \u2014 that path 404s.",
+          "Do not print_to_pdf the homepage. The logged-out HTML is empty of Mass text; the bulletin is the PNG.",
+          "Do not use predicted_dated_pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "investigate",
+      "suggested_reason": "Downloaded file looks like a website error/security page, not a bulletin PDF"
     },
     {
       "parish_key": "bellaghyparish",
@@ -18141,22 +18149,31 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/faughart.json",
       "recipe": {
-        "start_url": "https://www.faughartparish.ie/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
+        "start_url": "https://www.faughartparish.ie/2026/11/08/newsboard-08-11-2026/",
+        "site_type": "wordpress",
+        "playbook_type": "html_text_bulletin",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "12/11/2026 Step 4: unskipped missed-week recipe. Keep-weekly already retries these. Facebook-only and no-website stay skipped."
+          "13/11/2026 leftover FAILED: harvest scraped the Armagh diocese card. wp-json newest post is Newsboard 08/11/2026, published 08/11/2026 16:50. GET 200 text/html on /2026/11/08/newsboard-08-11-2026/. Title Newsboard 08/11/2026. Body: Faughart Parish Newsboard \u2013 Sunday 8th November 2026. Mass times and intentions for Saturday 7th and Sunday 8th November. Remembrance Mass on Sunday 15th November is an event inside this week's notes, not next week's bulletin. No PDF in media. Pin wordpress + print_to_pdf skip_listing_nav. Do not scrape the homepage or the Armagh card."
         ],
-        "do_not": [],
-        "recorded_date": "2026-09-29"
+        "do_not": [
+          "Do not pin /2026/10/30/1335/ \u2014 that Newsboard is 01/11/2026.",
+          "Do not pin a 15th November newsboard. The 15th Mass in this week's notes is not next week's paper.",
+          "Do not use http_scrape_newest_html \u2014 scrape intercepts the print_to_pdf pin.",
+          "Do not print_to_pdf the homepage, /newsboard/ listing, or armagharchdiocese.org parish card.",
+          "Do not remove skip_listing_nav.",
+          "Do not invent a Newsboard PDF \u2014 media only has 2019 Newsboard.pdf.",
+          "Do not use predicted_dated_pdf.",
+          "Do not harvest Facebook."
+        ],
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "print_to_pdf",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -20754,32 +20771,37 @@
       "diocese": "tuam",
       "recipe_file": "parishes/recipes/tuam/headford.json",
       "recipe": {
-        "start_url": "https://headfordchurch.com/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "",
-        "status": "",
+        "start_url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
+        "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "03/10/2026 cloud hunt: proved GET 200 pdf 4319094 bytes magic %PDF. File date 27/09/2026. Do not pin the dated filename."
+          "13/11/2026 leftover FAILED: http_scrape of headfordchurch.com still had September href_patterns and newest WP media was Newsletter-26th-27th-September-2026.pdf. Kitchen-sink: ChurchTV stores Killursa & Killower sheets under /wp-content/uploads/2021/02/. GET 200 application/pdf Newsletter-7th-8th-November-2026.pdf 4338649 bytes magic %PDF-1.7. Freshness in_bulletin_week 08/11/2026. PDF streams include mailto:info@headfordchurch.com and info@headfordns.ie. The 2021/02 folder is ChurchTV's store, not the Sunday. Do not scrape headfordchurch.com. Do not pin Newsletter-14th-15th-November-2026.pdf (GET 200, also Headford, next weekend; ChurchTV /headford/ currently links that one)."
         ],
         "do_not": [
-          "Do not pin a dated filename or Wix hash.",
+          "Do not pin Newsletter-14th-15th-November-2026.pdf \u2014 that is 14/15 November.",
+          "Do not pin Newsletter-31st-October-1st-November-2026.pdf \u2014 All Saints 01/11 is stale.",
+          "Do not invent Newsletter-8th-November-2026.pdf \u2014 that path redirects to the ChurchTV homepage.",
+          "Do not scrape headfordchurch.com or keep September in href_patterns.",
+          "Do not use predicted_dated_pdf.",
+          "Do not date-rewrite the 2021/02 folder.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-10-03"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://headfordchurch.com/ \u2014 no dated bulletin PDF matching ['newsletter', 'september', '.pdf'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://headfordchurch.com/ \u2014 no dated bulletin PDF matching ['newsletter', 'september', '.pdf'] (not a selector probl"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "holycrossparishbelfast",
@@ -30923,10 +30945,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
-      "suggested_action": "investigate",
-      "suggested_reason": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "newcastledublin",
