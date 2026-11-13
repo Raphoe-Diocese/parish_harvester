@@ -2244,9 +2244,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
         self.assertIn("crossmolinaparish.com", recipe["start_url"])
         self.assertNotIn("churchtv.ie", recipe["start_url"])
+        self.assertIn(
+            "8th-November-Crossmolina-Parish-Newsletter.pdf",
+            recipe["start_url"],
+        )
+        self.assertNotIn("15th-November", recipe["start_url"])
         self.assertIn(
             "8th-November-Crossmolina-Parish-Newsletter.pdf",
             recipe.get("example_url") or "",
@@ -2791,7 +2797,7 @@ class CappaghExtensionlessBulletinTests(unittest.TestCase):
 
 
 class ChurchtownWpJsonRecipeTests(unittest.TestCase):
-    """Hashed churchtown-auto PDF has no day in the filename; wp-json media date wins."""
+    """Hashed churchtown-auto PDF. 13/11/2026 the media API is 401, so the proved file is pinned."""
 
     AUTO_PDF = (
         "https://churchtownparish.com/wp-content/uploads/2026/11/"
@@ -2806,21 +2812,14 @@ class ChurchtownWpJsonRecipeTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/dublin/churchtown.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
-        self.assertTrue(recipe["start_url"].startswith("https://churchtownparish.com/"))
-        self.assertFalse(recipe["start_url"].endswith(".pdf"))
-        self.assertIn(".pdf", recipe.get("href_patterns") or [])
-        steps = recipe.get("steps") or []
-        self.assertFalse(
-            any(
-                str(step.get("url") or "").lower().endswith(".pdf")
-                for step in steps
-                if isinstance(step, dict)
-            ),
-            "pinned PDF step would 404 when the auto hash changes",
-        )
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["start_url"], self.AUTO_PDF)
+        self.assertNotIn("newsletter-2026-11-01", recipe["start_url"])
+        self.assertNotIn("/newsletter/", recipe["start_url"])
         do_not = " ".join(recipe.get("do_not") or []).lower()
-        self.assertIn("pin", do_not)
+        self.assertIn("newsletter-2026-11-01", do_not)
 
     def test_media_date_beats_last_week_filename(self) -> None:
         import asyncio

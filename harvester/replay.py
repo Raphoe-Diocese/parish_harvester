@@ -1610,9 +1610,11 @@ def _fetch_bytes_with_retries(
                     url, per_attempt_timeout_s, want_file
                 )
         except Exception as exc:
+            cert_error = _is_certificate_verify_error(exc)
             # SiteGround sometimes drops the long Chrome token (RemoteDisconnected)
             # instead of returning the 202 page. One short token, same as 202.
-            if not tried_short_ua:
+            # Do not do that on an expired certificate: the next try is unverified TLS.
+            if not cert_error and not tried_short_ua:
                 tried_short_ua = True
                 short_hit = _fetch_short_ua_hit(url, per_attempt_timeout_s, None)
                 if short_hit and (
@@ -1620,7 +1622,7 @@ def _fetch_bytes_with_retries(
                     or _dropfiles_body_looks_like_file(short_hit[1], short_hit[0])
                 ):
                     return short_hit
-            if prefer_unverified or not _is_certificate_verify_error(exc):
+            if prefer_unverified or not cert_error:
                 continue
             # Expired leaf (limavadyparish.org) or missing intermediate
             # (mucknoparish.ie). Retry this URL once without verify.
