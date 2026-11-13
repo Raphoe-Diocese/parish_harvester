@@ -283,6 +283,30 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
+    def test_dromara_pins_8_nov_nebula_not_15th(self) -> None:
+        recipe = _recipe("parishes/recipes/dromore/dromara.json")
+        self._assert_wordpress_direct(recipe, "345cac9267121d452bf093c40184c0ca")
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotIn("366f88e3f30e7d6de57c562a15ce3910", recipe["start_url"])
+        self.assertNotIn("9baacf34b2c04679a933099d5093fd93", recipe["start_url"])
+        self.assertNotIn("6eed6dbb6454a17ae5ab6399b3d59c2d", recipe["start_url"])
+        self.assertNotIn("bulletins-1.html", recipe["start_url"])
+        self.assertNotIn("dromorediocese.org", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "http://www.dromaradgooland.org"
+        )
+
+    def test_drumgooland_aliases_dromara_same_08_11_file(self) -> None:
+        recipe = _recipe("parishes/recipes/dromore/drumgooland.json")
+        self.assertEqual(recipe["alias_of"], "dromara")
+        self.assertTrue(recipe.get("skip"))
+        self.assertEqual(recipe["site_type"], "link_only")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotIn("345cac9267121d452bf093c40184c0ca", recipe["start_url"])
+        self.assertNotIn("366f88e3f30e7d6de57c562a15ce3910", recipe["start_url"])
+        self.assertNotIn("dromorediocese.org", recipe["start_url"])
+
 
 if __name__ == "__main__":
     unittest.main()
