@@ -1394,24 +1394,30 @@ def _fetch_short_ua_hit(
     timeout_s: float,
     cookie_jar: CookieJar | None = None,
 ) -> tuple[bytes, dict[str, str]] | None:
-    """One short-token GET. SiteGround's long Chrome token often stays on 202.
+    """Short-token GET. SiteGround's long Chrome token often stays on 202.
 
     13/11/2026: Assumption Ballyfermot, Cloyne, and Crossmolina returned the
     PDF to ``Mozilla/5.0`` and an sgcaptcha page to the long Chrome token.
+    Foxrock's WAF 403s that same short browser token from some cloud IPs and
+    still returns the PDF to ``curl/8.5.0``.
     """
-    request = Request(
-        quote_http_url(url),
-        headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"},
-    )
-    try:
-        with _urlopen_ipv4(
-            request,
-            timeout=timeout_s,
-            cookie_jar=cookie_jar,
-        ) as response:
-            return _ok_http_body(response)
-    except Exception:
-        return None
+    for user_agent in ("Mozilla/5.0", "curl/8.5.0"):
+        request = Request(
+            quote_http_url(url),
+            headers={"User-Agent": user_agent, "Accept": "*/*"},
+        )
+        try:
+            with _urlopen_ipv4(
+                request,
+                timeout=timeout_s,
+                cookie_jar=cookie_jar,
+            ) as response:
+                hit = _ok_http_body(response)
+                if hit:
+                    return hit
+        except Exception:
+            continue
+    return None
 
 
 def _fetch_sunday_pdf_bytes(url: str) -> bytes | None:
@@ -5732,6 +5738,13 @@ async def replay_recipe(
     # Playwright goto of the same URL hangs GitHub on WAF 403 then chrome-error.
     playbook = str(recipe.get("playbook_type") or "").strip().lower()
     if playbook == "direct_download" and _looks_like_direct_document_url(start_url):
+        # Last-week filename (Foxrock Newsletter-November-1st-2026.pdf vs
+        # harvest Sunday 08/11) is stale, so it is not in fresh_files.
+        # Still GET it so parish_status can be stale, not failed.
+        if start_url not in fresh_files:
+            found = await _try_http_document_url(start_url, dest)
+            if found:
+                return dest, found[1], found[0]
         raise RecipeReplayError(
             f"HTTP download failed for {start_url} (browser was not opened)"
         )
