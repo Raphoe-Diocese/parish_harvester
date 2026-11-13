@@ -1,3 +1,8 @@
+## 13/11/2026 11:10 - In-week filename kept when the PDF heading has no date
+Harvest Sunday 08/11/2026. A report row was throwing away a filename date inside 02/11-08/11 when the PDF was opened and the heading had no date. That date now stays. A this-week filename still beats leftover text older than last Sunday. Last Sunday's own paper (01/11) stays 01/11 and stale. No filename date and no heading stays blank. 08/11 is not filled in.
+
+Undated ok PDFs already go into the mega PDF and the diocese-card count. The stitcher skips only is_stale (harvester/stitcher.py 227-229) and a printed date before this week (pdf_date_before_harvest_week, lines 273-281). No printed date is not skipped and is not rewritten as 08/11, so the file is stitched when its pages have text. A photo page with under 30 characters of embedded text is dropped as a blank page (line 323). That is separate from the date. Diocese cards count every outcome ok, blank date included (harvester/diocese_intro.py 285-286). Not checked on parishpress.ie this turn. Not live.
+
 ## 13/11/2026 10:44 - HTTP-scrape pins: Laurel Lodge + St John's Cathedral
 Laurel Lodge newsletter.pdf HEAD/GET 200 application/pdf 380954 %PDF-1.7. Text Saturday/Sunday 7th-8th NOVEMBER 2026. St John's fileID E2080F83 HEAD/GET 200 application/pdf 2322335 %PDF-1.5. Text Newsletter Sunday 8th November 2026. wordpress + direct_download. Sandyford already pinned on main (Newsletter-2026-11-08.pdf GET 200 423870). Honest stale: foxrock parish newsletter still 01/11 (Share PDF is the diocesan appeal, not the parish paper); mulhuddart Newsletter November 2026 has no date in 02/11-08/11 (collections to 18/10); headford page is 24/25 October 2026. Roslea and the 403 list not touched. Not live.
 

@@ -192,7 +192,7 @@ def _bulletin_date_fields(
     pdf_path: Path | None = None,
     target: date | None = None,
 ) -> dict[str, str]:
-    """ISO + UK bulletin date from diagnosis, the URL, or the PDF heading. Never invent."""
+    """ISO + UK bulletin date from diagnosis, the URL or filename, or the PDF. Never invent."""
     iso = ""
     if isinstance(diagnosis, dict):
         raw = str(diagnosis.get("bulletin_date") or "").strip()
@@ -210,16 +210,30 @@ def _bulletin_date_fields(
         extracted = heading_date_in_pdf(pdf_file, target=target, url=url or None)
         if extracted is not None:
             iso = extracted.isoformat()
-    if not iso and url:
-        from .bulletin_freshness import extract_bulletin_date, week_window
+    if not iso and (url or has_pdf):
+        from datetime import timedelta
 
-        extracted = extract_bulletin_date(url)
+        from .bulletin_freshness import (
+            extract_bulletin_date,
+            pdf_date_before_harvest_week,
+            week_window,
+        )
+
+        extracted = extract_bulletin_date(url) if url else None
+        if extracted is None and has_pdf:
+            extracted = extract_bulletin_date(pdf_file.name)
         if extracted is not None and has_pdf and target is not None:
             week_start, week_end = week_window(target)
-            # The shared reader already took an in-week URL, or left it
-            # alone because the PDF already has an issue date.
             if week_start <= extracted <= week_end:
-                extracted = None
+                # A blank heading keeps an in-week filename. Leftover text
+                # older than last Sunday also loses to that filename.
+                # Last Sunday's own paper (01/11 when harvest Sunday is
+                # 08/11) stays out. Do not fill the harvest Sunday in.
+                proved = pdf_date_before_harvest_week(pdf_file, target)
+                last_sunday = target - timedelta(days=7)
+                if proved is not None and proved >= last_sunday:
+                    iso = proved.isoformat()
+                    extracted = None
         if extracted is not None:
             iso = extracted.isoformat()
     if not iso:

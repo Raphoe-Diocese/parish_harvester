@@ -4,15 +4,18 @@ from __future__ import annotations
 import json
 from datetime import date
 from pathlib import Path
+from types import SimpleNamespace
 
 from reportlab.pdfgen import canvas
 
 from harvester.bulletin_freshness import (
     extract_bulletin_date,
+    freshness_verdict_for_ok_result,
     heading_date_in_pdf,
     issue_date_from_pages,
     saved_bulletin_issue_date,
 )
+from harvester.report import _bulletin_date_fields
 from scripts.date_saved_bulletins import apply_saved_dates
 
 SUNDAY = date(2026, 11, 8)
@@ -243,3 +246,99 @@ def test_script_writes_only_a_date_inside_the_week(tmp_path: Path) -> None:
     none = apply_saved_dates(untouched, bulletins)
     assert none["dated"] == 0
     assert untouched.read_text(encoding="utf-8") == before
+
+
+def test_filename_8th_november_kept_when_heading_has_no_date(tmp_path: Path, monkeypatch) -> None:
+    pdf = tmp_path / "8th-November-2026.pdf"
+    _pdf(pdf, ["Parish notices"])
+    url = "https://parish.ie/files/8th-November-2026.pdf"
+    fields = _bulletin_date_fields(url, pdf_path=pdf, target=SUNDAY)
+    assert fields["bulletin_date"] == "2026-11-08"
+    assert fields["bulletin_date_uk"] == "08/11/2026"
+
+    # The shared reader can return nothing. The in-week filename still stays.
+    monkeypatch.setattr(
+        "harvester.bulletin_freshness.heading_date_in_pdf",
+        lambda path, target=None, url=None: None,
+    )
+    kept = _bulletin_date_fields(url, pdf_path=pdf, target=SUNDAY)
+    assert kept["bulletin_date"] == "2026-11-08"
+
+    named_only = tmp_path / "saved" / "8th-November-2026.pdf"
+    named_only.parent.mkdir()
+    _pdf(named_only, ["Parish notices"])
+    from_name = _bulletin_date_fields(
+        "https://parish.ie/current-newsletter/",
+        pdf_path=named_only,
+        target=SUNDAY,
+    )
+    assert from_name["bulletin_date"] == "2026-11-08"
+
+    leftover = tmp_path / "cathedral.pdf"
+    _pdf(leftover, ["Week beginning: 25th October 2026", "St Eunan's Cathedral Newsletter"])
+    # Heading reader is mocked to None above, so this also checks the fallback.
+    beat = _bulletin_date_fields(url, pdf_path=leftover, target=SUNDAY)
+    assert beat["bulletin_date"] == "2026-11-08"
+    assert beat["bulletin_date"] != "2026-10-25"
+
+
+def test_last_sunday_front_page_stays_first_november_not_this_sunday(tmp_path: Path) -> None:
+    pdf = tmp_path / "8th-November-2026.pdf"
+    _pdf(pdf, ["FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45"])
+    url = "https://parish.ie/files/8th-November-2026.pdf"
+    fields = _bulletin_date_fields(url, pdf_path=pdf, target=SUNDAY)
+    assert fields["bulletin_date"] == "2026-11-01"
+    assert fields["bulletin_date_uk"] == "01/11/2026"
+    assert fields["bulletin_date"] != "2026-11-08"
+    result = SimpleNamespace(
+        key="probe-all-saints-not-a-parish",
+        display_name="Probe",
+        status="ok",
+        url=url,
+        file_path=pdf,
+        file_type="pdf",
+    )
+    verdict = freshness_verdict_for_ok_result(result, SUNDAY)
+    assert verdict.status == "stale"
+    assert verdict.extracted_date == date(2026, 11, 1)
+    assert verdict.extracted_date != SUNDAY
+
+
+def test_no_filename_date_and_no_heading_stays_blank(tmp_path: Path, monkeypatch) -> None:
+    pdf = tmp_path / "current-newsletter.pdf"
+    _pdf(pdf, ["Aifrinn na Seachtaine"])
+    monkeypatch.setattr(
+        "harvester.bulletin_freshness._ocr_first_page_text",
+        lambda path: "",
+    )
+    fields = _bulletin_date_fields(
+        "https://parish.ie/current-newsletter/",
+        pdf_path=pdf,
+        target=SUNDAY,
+    )
+    assert fields == {}
+    assert fields.get("bulletin_date") != "2026-11-08"
+
+    scan = tmp_path / "scan.pdf"
+    _pdf(scan, [])
+    monkeypatch.setattr(
+        "harvester.bulletin_freshness._ocr_first_page_text",
+        lambda path: "Sunday 8th November 2026",
+    )
+    ocr_fields = _bulletin_date_fields(
+        "https://parish.ie/current-newsletter/",
+        pdf_path=scan,
+        target=SUNDAY,
+    )
+    assert ocr_fields["bulletin_date"] == "2026-11-08"
+    monkeypatch.setattr(
+        "harvester.bulletin_freshness._ocr_first_page_text",
+        lambda path: "4 – 10 October 2026",
+    )
+    old_scan = _bulletin_date_fields(
+        "https://parish.ie/current-newsletter/",
+        pdf_path=scan,
+        target=SUNDAY,
+    )
+    assert old_scan == {}
+    assert old_scan.get("bulletin_date") != "2026-11-08"
