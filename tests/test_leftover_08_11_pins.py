@@ -234,6 +234,27 @@ class Leftover0811PinTests(unittest.TestCase):
         )
         self.assertNotIn("imagews?id=1443", recipe["start_url"])
 
+    def test_mourneabbey_aliases_mallow_8_nov_pdf_not_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/cloyne/mourneabbey.json")
+        mallow = _recipe("parishes/recipes/cloyne/mallow.json")
+        self.assertTrue(recipe.get("skip"))
+        self.assertEqual(recipe.get("alias_of"), "mallow")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("mallowparish.ie", recipe["start_url"])
+        self.assertNotIn("cloynediocese.ie", recipe["start_url"])
+        self.assertIn("Sunday-8th-November-2026.pdf", recipe.get("example_url") or "")
+        self.assertFalse(mallow.get("skip"))
+        self.assertNotEqual(mallow["site_type"], "predicted_dated_pdf")
+        self.assertEqual(mallow["playbook_type"], "direct_download")
+        verdict = check_bulletin_freshness(
+            "https://mallowparish.ie/wp-content/uploads/2026/11/Sunday-8th-November-2026.pdf",
+            date(2026, 11, 8),
+        )
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+        self.assertNotIn("Sunday-1st-November", recipe.get("example_url") or "")
+        self.assertNotIn("Sunday-15th-November", recipe.get("example_url") or "")
+
     def test_dromoreparish_pins_8_nov_archive_id_not_latest(self) -> None:
         recipe = _recipe("parishes/recipes/dromore/dromoreparish.json")
         self._assert_wordpress_direct(recipe, "id=1277")
