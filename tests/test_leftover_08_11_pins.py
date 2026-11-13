@@ -234,6 +234,34 @@ class Leftover0811PinTests(unittest.TestCase):
         )
         self.assertNotIn("imagews?id=1443", recipe["start_url"])
 
+    def test_dromoreparish_pins_8_nov_archive_id_not_latest(self) -> None:
+        recipe = _recipe("parishes/recipes/dromore/dromoreparish.json")
+        self._assert_wordpress_direct(recipe, "id=1277")
+        self.assertIn("get_pdf.php", recipe["start_url"])
+        self.assertIn("do=archive", recipe["start_url"])
+        self.assertTrue(recipe["start_url"].startswith("http://"))
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotIn("do=latest", recipe["start_url"])
+        self.assertNotIn("id=1275", recipe["start_url"])
+        self.assertNotIn("dromorediocese.org", recipe["start_url"])
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "http://www.stcolmans.org"
+        )
+
+    def test_crossmaglen_pins_8th_nov_pdf_not_15th(self) -> None:
+        recipe = _recipe("parishes/recipes/armagh/crossmaglen.json")
+        self._assert_wordpress_direct(recipe, "8th%20NOV%202026.pdf")
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotIn("15th", recipe["start_url"])
+        self.assertNotIn("1st%20NOV", recipe["start_url"])
+        self.assertNotIn("news.php", recipe["start_url"])
+        self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://www.uppercreggan.co.uk"
+        )
+        verdict = check_bulletin_freshness(recipe["start_url"], date(2026, 11, 8))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
 
 if __name__ == "__main__":

@@ -1,22 +1,47 @@
 {
+  "version": 2,
   "parish_key": "crossmaglen",
   "display_name": "Crossmaglen (Creggan Upper)",
   "diocese": "armagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://www.uppercreggan.co.uk/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
+  "start_url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "status": "active",
   "skip": false,
-  "reason": "Website found (https://www.uppercreggan.co.uk/) but no this-week PDF proved on 29/09/2026 kitchen-sink — link only until bulletin URL proved.",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
+  "href_patterns": [
+    "8th%20NOV%202026.pdf",
+    "8th NOV 2026",
+    ".pdf"
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.uppercreggan.co.uk/"
+      "url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
+      "use_captured_url": true
     }
   ],
-  "version": 1,
   "operator_notes": [
-    "12/11/2026 Step 4: unskipped missed-week recipe. Keep-weekly already retries these. Facebook-only and no-website stay skipped."
-  ]
+    "13/11/2026 leftover FAILED: harvest saved the Armagh diocese card. Own-site news.php lists 8th NOV 2026.pdf under 15th. GET 200 application/pdf 237278 bytes magic %PDF-1.7. Two pages. Text: Paróiste an Chreagain Uachtair / Parish of Upper Creggan. SUNDAY 8TH NOV 2026 32ND ORDINARY. Anniversaries St Patrick's Sat 7th/Sun 8th Nov. Irish name stays Irish. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Do not open news.php or armagharchdiocese.org."
+  ],
+  "do_not": [
+    "Do not pin 15th NOV 2026.pdf — that is 15/11 (grace-fresh, not 08/11). This Sunday is listed.",
+    "Do not pin 1st NOV 2026.pdf. 01/11 is not 08/11.",
+    "Do not set start_url to https://www.uppercreggan.co.uk/ or /news.php — listing has 15th above 8th.",
+    "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
+    "Do not use predicted_dated_pdf.",
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
