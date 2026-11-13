@@ -2147,10 +2147,10 @@ class HarvestMissRecipeTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/raphoe/drive-1jmslbrliw.json").read_text()
         )
-        url = "https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe"
+        url = "https://parishofraphoe.ie/bulletin/raphoe/test-parish"
         weekly = (
             "https://parishofraphoe.ie/wp-content/uploads/"
-            "parish-bulletins/unassigned/raphoe/test-parishraphoe/bulletin.pdf"
+            "parish-bulletins/unassigned/raphoe/test-parish/bulletin.pdf"
         )
         self.assertEqual(recipe["start_url"], url)
         self.assertEqual(recipe["site_type"], "permanent_redirect_document")
