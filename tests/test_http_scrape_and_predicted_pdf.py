@@ -2267,13 +2267,20 @@ class HarvestMissRecipeTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/derry/parishofclaudy.json").read_text()
         )
-        self.assertEqual(recipe["site_type"], "oneweb_docx")
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertNotEqual(recipe["site_type"], "oneweb_docx")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
-        step_url = recipe["steps"][0]["url"]
-        self.assertIn("NEWSLETTER", step_url)
-        self.assertIn("25-10-26", step_url)
-        self.assertTrue(step_url.lower().endswith(".docx"))
-        self.assertNotIn("13-9-26", step_url)
+        self.assertIn("9-11-26", recipe["start_url"])
+        self.assertTrue(recipe["start_url"].lower().endswith(".docx"))
+        self.assertNotIn("8-11-26", recipe["start_url"])
+        self.assertNotIn("15-11-26", recipe["start_url"])
+        self.assertNotIn("25-10-26", recipe["start_url"])
+        self.assertNotIn("13-9-26", recipe["start_url"])
+        self.assertNotIn("weekly-bulletin.html", recipe["start_url"])
+        self.assertEqual(recipe["steps"][1]["action"], "download")
+        self.assertTrue(recipe["steps"][1].get("use_captured_url"))
 
     def test_bellaghy_uses_current_newsletter_not_homepage(self) -> None:
         recipe = json.loads(
@@ -2356,8 +2363,8 @@ class HarvestMissRecipeTests(unittest.TestCase):
             "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
             "down_and_connor/glenariffeparish.json": "THIRTY-SECOND-SUNDAY-OF-THE-YEAR.pdf",
             "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
-            # 29/10/2026 the September pin was removed. Example is 25-Oct-26.pdf.
-            "down_and_connor/stoliverplunkettparish.json": "25-Oct-26.pdf",
+            # 13/11/2026 pin is Bulletin-8th-Nov-26.pdf (5 pages). Not 15th Nov.
+            "down_and_connor/stoliverplunkettparish.json": "Bulletin-8th-Nov-26.pdf",
             "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
             "down_and_connor/glenavyandkilleadparish.json": "2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
             # 29/10/2026 the example moved to Parish-Bulletin-25th-October-2026.pdf.

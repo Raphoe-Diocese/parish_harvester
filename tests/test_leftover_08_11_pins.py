@@ -53,6 +53,40 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotEqual(recipe["start_url"].rstrip("/"), "https://salthillparish.ie")
         self.assertNotIn("September-13th", recipe["start_url"])
 
+    def test_claudy_pins_9_november_docx_not_listing(self) -> None:
+        recipe = _recipe("parishes/recipes/derry/parishofclaudy.json")
+        self._assert_wordpress_direct(recipe, "NEWSLETTER 9-11-26.docx")
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
+        self.assertTrue(recipe["steps"][1].get("use_captured_url"))
+        self.assertNotIn("8-11-26", recipe["start_url"])
+        self.assertNotIn("15-11-26", recipe["start_url"])
+        self.assertNotIn("25-10-26", recipe["start_url"])
+        self.assertNotIn("weekly-bulletin.html", recipe["start_url"])
+        self.assertNotIn("financial statement", recipe["start_url"].lower())
+
+    def test_stoliver_pins_8th_nov_pdf_not_15th(self) -> None:
+        recipe = _recipe("parishes/recipes/down_and_connor/stoliverplunkettparish.json")
+        self._assert_wordpress_direct(recipe, "Bulletin-8th-Nov-26.pdf")
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
+        self.assertNotIn("15th-November-2026", recipe["start_url"])
+        self.assertNotIn("1st-Nov-26", recipe["start_url"])
+        self.assertNotIn("25-Oct-26", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"),
+            "https://stoliverplunkettparish.ie/bulletins",
+        )
+
+    def test_ardfinnan_print_to_pdf_is_wordpress_not_scrape(self) -> None:
+        recipe = _recipe("parishes/recipes/waterford_and_lismore/ardfinnan.json")
+        self.assertIn("newsletter-7th-8th-november-2026", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
+        self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+        self.assertNotIn("newsletter-14th-15th-november-2026", recipe["start_url"])
+
 
 if __name__ == "__main__":
     unittest.main()

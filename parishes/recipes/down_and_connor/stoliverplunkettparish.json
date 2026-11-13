@@ -1,36 +1,43 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "stoliverplunkettparish",
   "display_name": "St Oliver Plunkett",
   "diocese": "down_and_connor",
-  "start_url": "https://stoliverplunkettparish.ie/bulletins/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "Sun-",
-    "Oct-",
-    "Nov-",
-    "Sept",
-    "uploads",
-    ".pdf"
-  ],
+  "start_url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/11/Bulletin-8th-Nov-26.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "max_bulletin_pages": 8,
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-29",
-  "example_url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/10/25-Oct-26.pdf",
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/11/Bulletin-8th-Nov-26.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://stoliverplunkettparish.ie/bulletins/"
+      "url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/11/Bulletin-8th-Nov-26.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/11/Bulletin-8th-Nov-26.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "29/10/2026: Old recipe pinned Sun-13th-September-26.pdf. Status later guessed Sun-25th-October-26.pdf (HTTP 404). Live listing top is 25-Oct-26.pdf (HEAD 200 application/pdf 631793 bytes). Filename pattern varies (Sun-DDth-Month-26.pdf vs DD-Mon-26.pdf).",
-    "site_type:http_scrape_newest_pdf. Do not pin a dated filename."
+    "13/11/2026: /bulletins/ lists 8th November 2026 → Bulletin-8th-Nov-26.pdf and 15th November 2026 → 15th-November-2026.pdf. Harvest Sunday is 08/11/2026. Pin the 8th Nov file. GET 200 application/pdf 710815 bytes magic %PDF-1.4. Five pages. Embedded text 8TH NOVEMBER / NOVEMBER 2026 SUNDAY 8. max_bulletin_pages=8 so the 5-page weekly is kept.",
+    "Listing scrape can pick 15th-November-2026.pdf (next Sunday; also fresh under the 8-day grace). Do not scrape /bulletins/.",
+    "1st-Nov-26.pdf is 01/11 All Saints. 25-Oct-26.pdf is last month."
   ],
   "do_not": [
-    "Do not pin Sun-13th-September-26.pdf or invent Sun-25th-October-26.pdf.",
-    "Do not pin this week's dated PDF.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin 15th-November-2026.pdf — that is 15/11/2026.",
+    "Do not pin 1st-Nov-26.pdf or 25-Oct-26.pdf.",
+    "Do not scrape /bulletins/ or use http_scrape_newest_pdf.",
+    "Do not use predicted_dated_pdf.",
+    "Do not keep the default 4-page cap for this parish.",
+    "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    "Bulletin-8th-Nov-26",
+    ".pdf"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

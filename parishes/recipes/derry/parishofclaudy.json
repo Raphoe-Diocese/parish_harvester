@@ -1,31 +1,42 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "parishofclaudy",
   "display_name": "Claudy",
   "diocese": "derry",
-  "start_url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html",
-  "site_type": "oneweb_docx",
+  "start_url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-11-26.docx",
+  "site_type": "wordpress",
   "playbook_type": "direct_download",
   "max_bulletin_pages": 8,
-  "recorded_date": "2026-10-28",
+  "recorded_date": "2026-11-13",
   "timeout_ms": 90000,
   "total_timeout_s": 300,
-  "navigation_wait_until": "commit",
+  "example_url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-11-26.docx",
   "steps": [
     {
+      "action": "goto",
+      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-11-26.docx"
+    },
+    {
       "action": "download",
-      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 25-10-26.docx",
+      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-11-26.docx",
       "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "28/10/2026: the weekly page embeds NEWSLETTER 25-10-26.docx in a Google viewer. Direct onewebmedia download is application/vnd.openxmlformats-officedocument.wordprocessingml.document.",
-    "Harvest already rewrote the dated name, then failed Too many pages: 5 (max 4). max_bulletin_pages=8 allows the weekly Word newsletter.",
-    "Do not download GDPR, Privacy Notice, financial statement, or mcn seats files from the same page."
+    "13/11/2026: weekly page embeds NEWSLETTER 9-11-26.docx (heading NEWSLETTER 9/11/26). GET 200 application/vnd.openxmlformats-officedocument.wordprocessingml.document 33775 bytes PK zip. Last-Modified Fri 06/11/2026. Uploaded before Sunday 08/11. 9 Nov is +1 day, freshness within_grace_days.",
+    "NEWSLETTER 8-11-26.docx is 404. Harvest rewrote 25-10-26 to 8-11-26 then use_captured_url on the listing grabbed financial statement for bulletin, our version.docx. Pin the 9-11 file. Do not open the weekly HTML page.",
+    "Newsletter 15-11-26.docx is next Sunday (heading NEWSLETTER 15/11/26, Last-Modified 13/11). Do not pin it for 08/11.",
+    "max_bulletin_pages=8 allows the weekly Word newsletter."
   ],
   "do_not": [
-    "Do not pin last week's NEWSLETTER 13-9-26.docx.",
+    "Do not pin NEWSLETTER 8-11-26.docx — that name 404s.",
+    "Do not pin Newsletter 15-11-26.docx — that is 15/11/2026.",
+    "Do not pin NEWSLETTER 1-11-26.docx or NEWSLETTER 25-10-26.docx.",
+    "Do not download GDPR, Privacy Notice, financial statement, or mcn seats files.",
+    "Do not use predicted_dated_pdf or oneweb rewrite of 9-11-26 into 8-11-26.",
+    "Do not set start_url to the weekly-bulletin HTML listing.",
     "Do not open the Google Docs viewer as the download.",
-    "Do not keep the default 4-page cap for this parish."
+    "Do not keep the default 4-page cap for this parish.",
+    "Do not harvest Facebook."
   ]
 }

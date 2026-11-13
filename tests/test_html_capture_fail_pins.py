@@ -20,8 +20,11 @@ class HtmlCaptureFailPinsTests(unittest.TestCase):
         self.assertNotIn("newsletter-7th-november-2026/", recipe["start_url"])
         self.assertNotIn("31st-october-1st-november", recipe["start_url"])
         self.assertFalse(recipe.get("skip"))
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
         self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
         self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+        self.assertNotIn("newsletter-14th-15th-november-2026", recipe["start_url"])
 
     def test_abbeyknockmoy_is_honest_stale_all_saints_not_8th(self) -> None:
         recipe = _recipe("parishes/recipes/tuam/abbeyknockmoy.json")
