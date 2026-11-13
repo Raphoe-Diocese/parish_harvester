@@ -1,33 +1,40 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "foxrock",
   "display_name": "Foxrock",
   "diocese": "dublin",
   "start_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
+      "use_captured_url": true
+    }
+  ],
+  "operator_notes": [
+    "13/11/2026: predicted rewrite of Newsletter-November-1st-2026.pdf became Newsletter-November-8th-2026.pdf. That 8 November parish file 404s in /2026/10/ and /2026/11/. Homepage and search still show Parish Newsletter November 1st. WebFetch of the 1st file is All Saints 01/11/2026. Notices-08.11.26-Share2026Newsletter.pdf HEAD/GET 200 application/pdf 2351993 bytes magic %PDF-1.4 is the diocesan SHARE newsletter for 7/8 November, not the Foxrock parish newsletter. wordpress+direct_download of the 01/11 parish PDF with use_captured_url so harvest does not rewrite to the 404. 01/11 is stale for harvest Sunday 08/11/2026."
+  ],
+  "do_not": [
+    "Do not use predicted_dated_pdf — it rewrites November-1st into November-8th which 404s.",
+    "Do not pin Notices-08.11.26-Share2026Newsletter.pdf — that is diocesan Share, not the parish newsletter.",
+    "Do not treat Newsletter-November-1st-2026.pdf as 08/11/2026 — All Saints is stale.",
+    "Do not set start_url to the homepage — scrape then newsletter_brain hangs.",
+    "Do not harvest Facebook."
+  ],
   "href_patterns": [
     "Newsletter",
     "November",
     ".pdf"
-  ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_ahead": 1,
-  "recorded_date": "2026-11-06",
-  "example_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
-  "steps": [
-    {
-      "action": "download",
-      "url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf"
-    }
-  ],
-  "operator_notes": [
-    "06/11/2026: homepage scrape still timed out. Proved Newsletter-November-1st-2026.pdf GET 200 application/pdf 567718 bytes magic %PDF-1.7. start_url is the PDF so listing challenge is skipped."
-  ],
-  "do_not": [
-    "Do not set start_url to the homepage — scrape then newsletter_brain hangs.",
-    "Do not pin Newsletter-November-1st-2026.pdf forever — predicted_dated_pdf rewrites the date.",
-    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
