@@ -2806,21 +2806,17 @@ class ChurchtownWpJsonRecipeTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/dublin/churchtown.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
-        self.assertTrue(recipe["start_url"].startswith("https://churchtownparish.com/"))
-        self.assertFalse(recipe["start_url"].endswith(".pdf"))
-        self.assertIn(".pdf", recipe.get("href_patterns") or [])
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["start_url"], self.AUTO_PDF)
+        self.assertNotIn("newsletter-2026-11-01", recipe["start_url"])
         steps = recipe.get("steps") or []
-        self.assertFalse(
-            any(
-                str(step.get("url") or "").lower().endswith(".pdf")
-                for step in steps
-                if isinstance(step, dict)
-            ),
-            "pinned PDF step would 404 when the auto hash changes",
-        )
+        self.assertEqual(steps[0]["action"], "goto")
+        self.assertEqual(steps[-1]["action"], "download")
+        self.assertEqual(steps[-1]["url"], self.AUTO_PDF)
         do_not = " ".join(recipe.get("do_not") or []).lower()
-        self.assertIn("pin", do_not)
+        self.assertIn("predicted_dated_pdf", do_not)
 
     def test_media_date_beats_last_week_filename(self) -> None:
         import asyncio
