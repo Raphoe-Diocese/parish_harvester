@@ -7580,35 +7580,34 @@
       "recipe_file": "parishes/recipes/ferns/bree.json",
       "recipe": {
         "start_url": "https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "09/11/2026: wp-json rejected Newsletter-3745-Nov-7th-8th.pdf because the filename has two days. Media uploaded 06/11/2026, filesize 720525, mime application/pdf. Pin the PDF and skip listing. This IP RemoteDisconnected on Range GET; GitHub already reached bree.ie wp-json."
+          "13/11/2026: predicted_dated_pdf GitHub miss on Newsletter-3745-Nov-7th-8th.pdf (this PC HEAD 200 720525). Harvest 43348479362. Browser download of the pinned PDF.",
+          "09/11/2026: dual-date filename failed listing filter."
         ],
         "do_not": [
+          "Do not use predicted_dated_pdf \u2014 GitHub urllib misses bree.ie.",
           "Do not keep Newsletter-3742-Oct-17th-18th.pdf or 3744-Oct-31st-Nov-1st.pdf.",
           "Do not read 8th as the year 2018.",
-          "Do not take the JPEG page scans while a PDF exists.",
-          "Do not set start_url to the homepage \u2014 dual-date filenames fail the dated-PDF filter.",
-          "Do not harvest Facebook.",
-          "Do not use the ferns.ie mass-times card as the bulletin."
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-09"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
       "learned_pattern": "wp_json_weekend_range_pdf+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf for 2026-11-08 did not resolve to a real file (listing page was not opened)",
+      "last_error": "Recipe replay failed: APIRequestContext.get: socket hang up\nCall log:\n  - \u2192 GET https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf\n  -     - user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, ",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf for 2026-11-08 did not reso"
+      "suggested_reason": "Recipe replay failed: APIRequestContext.get: socket hang up\nCall log:\n  - \u2192 GET https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf\n "
     },
     {
       "parish_key": "parishofbright",
@@ -36834,21 +36833,21 @@
       "recipe_file": "parishes/recipes/dromore/mayobridge.json",
       "recipe": {
         "start_url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf",
-        "site_type": "predicted_dated_pdf",
+        "site_type": "wordpress",
         "playbook_type": "direct_download",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "13/11/2026: /parish-newsletter/ scrape timed out. Browser shows Parish Bulletin 8 November 2026 \u2192 Parish-Bulletin-8-November-2026.pdf under /uploads/2014/07/. start_url is that PDF so the listing is skipped.",
-          "Plain urllib from this PC gets 403; harvest browser download should still get it."
+          "13/11/2026: predicted_dated_pdf harvest 43347610567 timed out (urllib 403 here). Browser download of Parish-Bulletin-8-November-2026.pdf instead.",
+          "Do not start on /parish-newsletter/."
         ],
         "do_not": [
           "Do not start on /parish-newsletter/ \u2014 it times out.",
-          "Do not pin forever \u2014 predicted rewrites the date.",
+          "Do not use predicted_dated_pdf \u2014 GitHub urllib 403/timeout.",
           "Do not harvest Facebook."
         ],
         "recorded_date": "2026-11-13"
@@ -38560,20 +38559,20 @@
       "recipe_file": "parishes/recipes/armagh/termonmaguirc.json",
       "recipe": {
         "start_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "13/11/2026: /bulletins/ times out or rewrites Twenty-Sixth-1-November into a bad Twenty-Sixth-8-November URL. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 200 application/pdf magic %PDF. start_url is that PDF.",
+          "13/11/2026: predicted_dated_pdf rewrote Thirty-Second-8-Nov into Twenty-Sixth-Sunday-in-Ordinary-Time-8-November-2026.pdf then timed out. Harvest 43347615285. Do not use predicted. Browser download of the pinned Thirty-Second PDF.",
           "Do not start on /bulletins/ until Cloudflare/timeout is fixed."
         ],
         "do_not": [
-          "Do not rewrite Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf to 8-November.",
+          "Do not use predicted_dated_pdf \u2014 it rewrites Thirty-Second into a dead Twenty-Sixth URL.",
           "Do not harvest Facebook.",
           "Do not open /bulletins/ first \u2014 it hangs the harvest."
         ],
