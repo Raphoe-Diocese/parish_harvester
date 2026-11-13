@@ -1,28 +1,32 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "donaghmoyne",
   "display_name": "Donaghmoyne",
   "diocese": "clogher",
   "start_url": "https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf",
-  "site_type": "predicted_dated_pdf",
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-08",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf",
   "steps": [
+    {
+      "action": "goto",
+      "url": "https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf"
+    },
     {
       "action": "download",
       "url": "https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "08/11/2026: start_url was still the 1 November file. Proved 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf GET 206 application/pdf magic %PDF, full size 297112 bytes, uploaded 06/11/2026. Do not open the homepage — HTTP2 hang.",
-    "Harvest 42499804185 still tried 21st-of-Ordinary-Time-Sunday-8th-November-2026.pdf (rewrite of the old 1 November name). weeks_back 0 weeks_ahead 0 so only the 08th file is tried."
+    "13/11/2026: predicted rewrote this into 21st-of-Ordinary-Time-Sunday-8th-November-2026.pdf which HEAD 500s. Live file is 32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf GET 200 application/pdf 297112. Browser download. Do not open the homepage.",
+    "08/11/2026: Harvest still tried the 21st rewrite of the old 1 November name."
   ],
   "do_not": [
-    "Do not set start_url to the homepage or /category/parish-bulletin/ — HTTP2 / brain hang.",
+    "Do not use predicted_dated_pdf — it rewrites 32nd-All-Saints-08th into a 500 URL.",
+    "Do not set start_url to the homepage or /category/parish-bulletin/ — HTTP2 hang.",
     "Do not keep 21st-of-Ordinary-Time-Sunday-1st-November-2026.pdf.",
     "Do not harvest Facebook."
   ],

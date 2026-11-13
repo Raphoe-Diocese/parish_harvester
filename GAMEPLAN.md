@@ -1,3 +1,9 @@
+## 13/11/2026 09:20 - Donaghmoyne + Roslea pins. GitHub 403 cluster parked
+Ok 592 on GitHub 03:02. Ashbourne Donaghmore Mohill ok. Armagh Termon Mayobridge Milltown Bree GitHub 403/hang parked (two tries). Last this-week URL fails: Donaghmoyne predicted rewrite to 21st 500; Roslea listing timeout. Pin 32nd-All-Saints-08th and Bulletin-Sunday-8th-November. Not live.
+
+## 13/11/2026 03:00 - 584 merged. Termon Mayobridge Bree GitHub 403 parked
+584 merged 1b552f6a wait confirm harvest armaghparish. 583 harvests failed: Termon 403 on Thirty-Second PDF then chrome-error; Mayobridge 403; Bree socket hang up. Same GitHub WAF as Milltown. Two tries each. Park. Ashbourne Mohill Donaghmore ok. Not live.
+
 ## 13/11/2026 02:30 - 583 merged. Ashbourne ok. Armagh predicted miss. Milltown GitHub 403 parked
 583 merged 1b552f6a. Harvests: termonmaguirc 43352682365, mayobridge 43352686918, bree 43352691278. Ashbourne ok 32nd Sunday. Armagh 43349964493 GitHub predicted miss on /2026/11/8th-November.pdf. Milltown 43349973681 GitHub 403 even in browser — parked. Mohill Donaghmore ok. Not live.
 
