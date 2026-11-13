@@ -1,3 +1,6 @@
+## 13/11/2026 10:44 - HTTP-scrape pins: Laurel Lodge + St John's Cathedral
+Laurel Lodge newsletter.pdf HEAD/GET 200 application/pdf 380954 %PDF-1.7. Text Saturday/Sunday 7th-8th NOVEMBER 2026. St John's fileID E2080F83 HEAD/GET 200 application/pdf 2322335 %PDF-1.5. Text Newsletter Sunday 8th November 2026. wordpress + direct_download. Sandyford already pinned on main (Newsletter-2026-11-08.pdf GET 200 423870). Honest stale: foxrock parish newsletter still 01/11 (Share PDF is the diocesan appeal, not the parish paper); mulhuddart Newsletter November 2026 has no date in 02/11-08/11 (collections to 18/10); headford page is 24/25 October 2026. Roslea and the 403 list not touched. Not live.
+
 ## 13/11/2026 10:50 - Ardfinnan 7th-8th HTML pin. Four honest stale
 Ardfinnan GET 200 https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/ print_to_pdf skip_listing_nav. 8th-only and 7th-only slugs 404. All Saints 31 Oct/1 Nov not used.
 Honest stale: abbeyknockmoy current-newsletter is 01.11.26 All Saints GET 200 385861 %PDF (08.11.26 404); ballyphehane churchmedia 6m368b is 29.01.2023; dennkilmore parishofdenn.com parked garden page; doneraileparish.ie newsletter Composer 500. Key is doneraile not doneraileparish. Skip reasons omit "no this-week" so harvest does not HTML-capture homepages again. Not live.
