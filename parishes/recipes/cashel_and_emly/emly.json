@@ -1,38 +1,41 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "emly",
   "display_name": "Emly",
   "diocese": "cashel_and_emly",
-  "start_url": "https://emly.ie/category/parish-bulletin/",
-  "site_type": "click_then_download",
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "recorded_date": "2026-11-06",
-  "example_url": "https://emly.ie/wp-content/uploads/2026/10/Emly-Parish-Bulletin-25th-Octaber-2026.docx",
+  "start_url": "https://emly.ie/wp-content/uploads/2026/11/Emly-Parish-Bulletin-8th-November-2026.docx",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "max_bulletin_pages": 8,
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
+  "example_url": "https://emly.ie/wp-content/uploads/2026/11/Emly-Parish-Bulletin-8th-November-2026.docx",
   "steps": [
     {
       "action": "goto",
-      "url": "https://emly.ie/category/parish-bulletin/"
-    },
-    {
-      "action": "click",
-      "text": "Emly Parish Bulletin",
-      "match": "first"
+      "url": "https://emly.ie/wp-content/uploads/2026/11/Emly-Parish-Bulletin-8th-November-2026.docx"
     },
     {
       "action": "download",
-      "url_pattern": "*Bulletin*.docx"
+      "url": "https://emly.ie/wp-content/uploads/2026/11/Emly-Parish-Bulletin-8th-November-2026.docx",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "06/11/2026: category listing timed out on pinned September download. Click top Emly Parish Bulletin post, then Download .docx.",
-    "Proved 25th Oct post Download → Emly-Parish-Bulletin-25th-Octaber-2026.docx (site typo Octaber). LibreOffice converts docx.",
-    "Honest stale until a November post appears. Do not pin the misspelled filename."
+    "13/11/2026: leftover failed ERR_HTTP2 on /category/parish-bulletin/. wp-json media has Emly-Parish-Bulletin-8th-November-2026.docx. GET 200 application/vnd.openxmlformats-officedocument.wordprocessingml.document 97039 bytes PK zip. Last-Modified Sun 08/11/2026 16:13:05 GMT. Heading Emly Parish Bulletin 8th November 2026. Mass Times Sunday 11.15am. Same-name .pdf is 404. LibreOffice converts docx. Do not open the category listing."
   ],
   "do_not": [
-    "Do not pin Emly-Parish-Bulletin-*-sent.docx or *Octaber*.",
-    "Do not harvest Facebook.",
-    "Do not stay on the category page waiting for a direct PDF."
+    "Do not pin Emly-Parish-Bulletin-1st-November-2026-send.docx — that is 01/11.",
+    "Do not pin Emly-Parish-Bulletin-25th-Octaber-2026.docx.",
+    "Do not set start_url to /category/parish-bulletin/ — harvest HTTP2 fails there.",
+    "Do not use predicted_dated_pdf.",
+    "Do not invent an 8th November PDF — that path 404s.",
+    "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    "Emly-Parish-Bulletin-8th-November-2026",
+    ".docx"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

@@ -1,39 +1,43 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "wexford",
   "display_name": "Wexford",
   "diocese": "ferns",
-  "start_url": "https://wexfordparish.com/",
-  "site_type": "http_scrape_newest_images",
+  "start_url": "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-1-scaled.jpg",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
+  "example_url": "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-1-scaled.jpg",
+  "fallback_document_urls": [
+    "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-2-scaled.jpg",
+    "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-3-scaled.jpg",
+    "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-4-scaled.jpg"
+  ],
   "href_patterns": [
-    "Sunday-"
+    "Sunday-November-8th",
+    ".jpg"
   ],
   "image_count": 4,
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-10-07",
-  "example_url": "https://wexfordparish.com/wp-content/uploads/2026/10/Sunday-October-4th-1-scaled.jpg",
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "steps": [
     {
       "action": "goto",
-      "url": "https://wexfordparish.com/"
+      "url": "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-1-scaled.jpg"
     },
     {
-      "action": "image_stack",
-      "count": 4,
-      "position": "first",
-      "selector": "img[src*='Sunday-']",
-      "min_long_side": 700
+      "action": "download",
+      "url": "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-1-scaled.jpg"
     }
   ],
   "operator_notes": [
-    "07/10/2026: ferns.ie/wexford/ links https://wexfordparish.com/. Homepage lists four Sunday-October-4th page JPEGs. page01-scaled.jpg has no Sunday in the name and is not this stack.",
-    "Proved Sunday-October-4th-1-scaled.jpg GET 200 image/jpeg 383702 bytes. Page image text: Twenty-Seventh Sunday in Ordinary Time, 4th October 2026. Pages 2–4 are the same leaflet (452829, 395061, 391919 bytes).",
-    "SiteGround sometimes returns a captcha HTML page. The image scrape retries. Do not pin the dated JPEG names."
+    "13/11/2026: leftover timeout on homepage image scrape. wp-json has Sunday-November-8th-1..4-scaled.jpg (media 06/11) and Sunday-November-15th (media 13/11). Pin the 8th set. GET 200 image/jpeg magic ffd8ff: page1 378934, page2 449263, page3 410520, page4 402981. Last-Modified Fri 06/11/2026. Stack all four. Do not scrape the homepage — 15th is still fresh under the 8-day grace."
   ],
   "do_not": [
-    "Do not pin Sunday-October-4th-1-scaled.jpg.",
-    "Do not harvest page01-scaled.jpg as the dated bulletin.",
+    "Do not pin Sunday-November-15th-*-scaled.jpg — that is 15/11/2026.",
+    "Do not pin Sunday-November-1st or Sunday-October-25th.",
+    "Do not set start_url to https://wexfordparish.com/ — scrape picks 15 November.",
+    "Do not use predicted_dated_pdf.",
     "Do not harvest Facebook."
   ],
   "bulletin_layout": {

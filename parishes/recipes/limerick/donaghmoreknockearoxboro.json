@@ -1,33 +1,38 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "donaghmoreknockearoxboro",
   "display_name": "Donaghmore - Knockea - Roxboro",
   "diocese": "limerick",
   "start_url": "https://dkrparish.ie/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "timeout_ms": 30000,
   "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-08",
+  "recorded_date": "2026-11-13",
   "example_url": "https://dkrparish.ie/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf",
   "steps": [
     {
-      "action": "download",
+      "action": "goto",
       "url": "https://dkrparish.ie/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://dkrparish.ie/wp-content/uploads/2026/11/Newsletter-2026-11-08.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "08/11/2026: start_url was still Newsletter-2026-11-01.pdf in /2026/10/. Proved Newsletter-2026-11-08.pdf in /2026/11/ GET 206 application/pdf magic %PDF, full size 392377 bytes. weeks_ahead 1 tries 15 November first and misses."
+    "13/11/2026: leftover failed predicted_dated_pdf on this same file. GET 200 application/pdf 392377 bytes magic %PDF-1.7. Last-Modified Wed 04/11/2026. One page. Text: Parish of Donoughmore/Knockea/Roxboro, Sun 8th Nov 11am Mass. Short Mozilla/5.0 sometimes 202 sgcaptcha; curl/8.5.0 returned the PDF. Do not use predicted. Do not open /useful-links/newsletters/."
   ],
   "do_not": [
+    "Do not use predicted_dated_pdf.",
     "Do not set start_url to /useful-links/newsletters/ — scrape then brain hangs.",
     "Do not keep Newsletter-2026-11-01.pdf in /2026/10/.",
     "Do not harvest Queen of Peace or Holy Family from this file.",
     "Do not harvest Facebook."
   ],
   "href_patterns": [
-    "Newsletter",
+    "Newsletter-2026-11-08",
     ".pdf"
   ],
   "bulletin_layout": {
