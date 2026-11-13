@@ -6,9 +6,13 @@ import tempfile
 import unittest
 from datetime import date, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 from harvester.bulletin_freshness import (
     apply_freshness_safety_net,
+    bulletin_size_changed,
+    bulletin_url_changed,
+    canonical_bulletin_url,
     check_bulletin_freshness,
     extract_bulletin_date,
     extract_bulletin_date_from_text,
@@ -17,6 +21,8 @@ from harvester.bulletin_freshness import (
     issue_date_verdict,
     mark_result_stale,
     pdf_date_before_harvest_week,
+    previous_harvest_file_bytes,
+    previous_harvest_url,
     suggest_retry_strategy,
     text_date_before_harvest_week,
     verdict_for_extracted_date,
@@ -1075,6 +1081,206 @@ class HarvestWeekOwnDateTests(unittest.TestCase):
             ),
             self.TARGET,
         )
+
+
+class ChangedUrlAndSizeFreshnessTests(unittest.TestCase):
+    """Changed link or 1 KB+ size = this week. Do not invent 08/11/2026."""
+
+    TARGET = date(2026, 11, 8)
+    LAST_WEEK = "https://parish.ie/uploads/Newsletter-1st-November-2026.pdf"
+    UNDATED = "https://parish.ie/uploads/newsletter.pdf"
+    PERMANENT = "https://parish.ie/uploads/bulletin.pdf"
+
+    def _write_pdf(self, path: Path, *lines: str, size: int | None = None) -> None:
+        pen = canvas.Canvas(str(path))
+        y = 720
+        for line in lines:
+            pen.drawString(72, y, line)
+            y -= 18
+        pen.save()
+        if size is None:
+            return
+        current = path.stat().st_size
+        if current < size:
+            with path.open("ab") as handle:
+                handle.write(b"\0" * (size - current))
+
+    def test_canonical_url_drops_cache_busters_and_empty_is_unchanged(self) -> None:
+        dated = "https://Parish.ie/uploads/Newsletter.PDF?t=99"
+        self.assertEqual(
+            canonical_bulletin_url(dated),
+            canonical_bulletin_url("https://parish.ie/uploads/newsletter.pdf"),
+        )
+        self.assertFalse(bulletin_url_changed("", self.UNDATED))
+        self.assertFalse(bulletin_url_changed(self.UNDATED, ""))
+        self.assertTrue(bulletin_url_changed(self.LAST_WEEK, self.UNDATED))
+        self.assertFalse(bulletin_size_changed(None, 500 * 1024))
+        self.assertFalse(bulletin_size_changed(400 * 1024, 400 * 1024 + 500))
+        self.assertTrue(bulletin_size_changed(400 * 1024, 500 * 1024))
+
+    def test_previous_harvest_url_swallows_missing_file(self) -> None:
+        missing = Path("/tmp/parish-status-does-not-exist-7cea.json")
+        self.assertEqual(previous_harvest_url("any", status_path=missing), "")
+        self.assertIsNone(previous_harvest_file_bytes("any", status_path=missing))
+        with tempfile.TemporaryDirectory() as tmp:
+            status_path = Path(tmp) / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "demo": {
+                                "url": self.LAST_WEEK,
+                                "file_bytes": 400 * 1024,
+                            }
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                previous_harvest_url("demo", status_path=status_path),
+                self.LAST_WEEK,
+            )
+            self.assertEqual(
+                previous_harvest_file_bytes("demo", status_path=status_path),
+                400 * 1024,
+            )
+
+    def test_url_changed_blank_heading_is_not_stale_and_not_eighth_november(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "changed-url-blank.pdf"
+            self._write_pdf(pdf, "Aifrinn na Seachtaine")
+            result = FetchResult(
+                key="changed-url-blank",
+                display_name="Demo",
+                status="ok",
+                url=self.UNDATED,
+                file_path=pdf,
+                file_type="pdf",
+            )
+            with patch(
+                "harvester.bulletin_freshness.previous_harvest_url",
+                return_value=self.LAST_WEEK,
+            ), patch(
+                "harvester.bulletin_freshness.previous_harvest_file_bytes",
+                return_value=None,
+            ):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertNotEqual(verdict.status, "stale")
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
+            self.assertIsNone(verdict.extracted_date)
+
+    def test_url_changed_all_saints_heading_stays_first_november(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "changed-url-allsaints.pdf"
+            self._write_pdf(
+                pdf,
+                "FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45",
+                "Sunday 8th November Caheragh Old Cemetery after 11.15am Mass.",
+            )
+            result = FetchResult(
+                key="changed-url-allsaints",
+                display_name="Demo",
+                status="ok",
+                url=self.UNDATED,
+                file_path=pdf,
+                file_type="pdf",
+            )
+            with patch(
+                "harvester.bulletin_freshness.previous_harvest_url",
+                return_value=self.LAST_WEEK,
+            ), patch(
+                "harvester.bulletin_freshness.previous_harvest_file_bytes",
+                return_value=None,
+            ):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
+
+    def test_same_url_size_up_blank_heading_is_not_stale_and_not_eighth_november(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "size-up-blank.pdf"
+            self._write_pdf(pdf, "Aifrinn na Seachtaine", size=500 * 1024)
+            result = FetchResult(
+                key="size-up-blank",
+                display_name="Demo",
+                status="ok",
+                url=self.PERMANENT,
+                file_path=pdf,
+                file_type="pdf",
+            )
+            with patch(
+                "harvester.bulletin_freshness.previous_harvest_url",
+                return_value=self.PERMANENT,
+            ), patch(
+                "harvester.bulletin_freshness.previous_harvest_file_bytes",
+                return_value=400 * 1024,
+            ):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertNotEqual(verdict.status, "stale")
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
+            self.assertIsNone(verdict.extracted_date)
+
+    def test_same_url_same_kb_all_saints_stays_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "same-kb-allsaints.pdf"
+            self._write_pdf(
+                pdf,
+                "FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45",
+                size=400 * 1024,
+            )
+            result = FetchResult(
+                key="same-kb-allsaints",
+                display_name="Demo",
+                status="ok",
+                url=self.PERMANENT,
+                file_path=pdf,
+                file_type="pdf",
+            )
+            with patch(
+                "harvester.bulletin_freshness.previous_harvest_url",
+                return_value=self.PERMANENT,
+            ), patch(
+                "harvester.bulletin_freshness.previous_harvest_file_bytes",
+                return_value=400 * 1024,
+            ):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
+
+    def test_same_url_size_up_all_saints_still_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "size-up-allsaints.pdf"
+            self._write_pdf(
+                pdf,
+                "FEAST OF ALL SAINTS 1st November 2026 Vol. 41. No.45",
+                size=500 * 1024,
+            )
+            result = FetchResult(
+                key="size-up-allsaints",
+                display_name="Demo",
+                status="ok",
+                url=self.PERMANENT,
+                file_path=pdf,
+                file_type="pdf",
+            )
+            with patch(
+                "harvester.bulletin_freshness.previous_harvest_url",
+                return_value=self.PERMANENT,
+            ), patch(
+                "harvester.bulletin_freshness.previous_harvest_file_bytes",
+                return_value=400 * 1024,
+            ):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+            self.assertNotEqual(verdict.extracted_date, self.TARGET)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .config import PARISHES_DIR, REPORT_JSON
+from .config import BULLETINS_DIR, CURRENT_DIR, PARISHES_DIR, REPORT_JSON
 from .fetcher import parse_evidence_file
 from .parish_aliases import DRIVE_FOLDER_LISTING_ERROR, is_drive_folder_listing
 from .report import _load_recipe_meta_for_key, _recipe_is_inactive
@@ -248,6 +248,30 @@ def _row_bulletin_dates(item: dict) -> tuple[str | None, str | None]:
     return iso, format_uk_date(iso)
 
 
+def _row_file_bytes(item: dict, key: str) -> int | None:
+    """PDF size for an ok row: report file_bytes, else the file on disk."""
+    raw = item.get("file_bytes")
+    if raw is not None and raw != "":
+        try:
+            value = int(raw)
+            if value >= 0:
+                return value
+        except (TypeError, ValueError):
+            pass
+    file_name = str(item.get("file") or f"{key}.pdf").strip() or f"{key}.pdf"
+    for candidate in (
+        CURRENT_DIR / file_name,
+        CURRENT_DIR / f"{key}.pdf",
+        BULLETINS_DIR / f"{key}.pdf",
+    ):
+        try:
+            if candidate.is_file():
+                return int(candidate.stat().st_size)
+        except OSError:
+            continue
+    return None
+
+
 def _outcome_from_report_item(section: str, item: dict) -> str:
     if section == "downloaded":
         return "ok"
@@ -389,6 +413,7 @@ def build_parish_status(
                 and isinstance(prev_row, dict)
                 and bool(prev_row.get("slice_missing"))
             )
+            file_bytes = _row_file_bytes(item, key) if outcome == "ok" else None
             _upsert(
                 key,
                 {
@@ -418,6 +443,7 @@ def build_parish_status(
                         if isinstance(diagnosis, dict) and diagnosis.get("step_count") is not None
                         else (len(recipe_meta.get("steps") or []) if recipe_meta else None)
                     ),
+                    **({"file_bytes": file_bytes} if file_bytes is not None else {}),
                 },
             )
 

@@ -14,8 +14,9 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
-from urllib.parse import unquote
+from urllib.parse import parse_qsl, unquote, urlencode, urlparse, urlunparse
 
+from .config import PARISH_STATUS_JSON as PARISH_STATUS_PATH
 from .utils import (
     _is_within_opaque_hash,
     _opaque_hash_spans,
@@ -1249,6 +1250,149 @@ def pdf_date_before_harvest_week(path: Path, target: date) -> date | None:
     return None
 
 
+_CACHE_BUSTER_QUERY_KEYS = {
+    "t",
+    "v",
+    "ver",
+    "version",
+    "cb",
+    "cache",
+    "cachebust",
+    "timestamp",
+    "ts",
+    "_",
+    "nocache",
+    "rnd",
+    "random",
+    "r",
+    "time",
+}
+
+
+def canonical_bulletin_url(url: str | None) -> str:
+    """Compare form of a bulletin URL: unquoted, no cache-buster query, lower path."""
+    raw = unquote(str(url or "")).strip()
+    if not raw:
+        return ""
+    parsed = urlparse(raw)
+    kept = [
+        (key, value)
+        for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+        if key.lower() not in _CACHE_BUSTER_QUERY_KEYS
+        and not key.lower().startswith("utm_")
+    ]
+    path = parsed.path.rstrip("/").lower()
+    return urlunparse(
+        (
+            parsed.scheme.lower(),
+            parsed.netloc.lower(),
+            path,
+            parsed.params,
+            urlencode(kept, doseq=True),
+            "",
+        )
+    )
+
+
+def bulletin_url_changed(previous: str | None, current: str | None) -> bool:
+    """True when both URLs exist and their canonical forms differ."""
+    prev = str(previous or "").strip()
+    curr = str(current or "").strip()
+    if not prev or not curr:
+        return False
+    return canonical_bulletin_url(prev) != canonical_bulletin_url(curr)
+
+
+def _parish_status_row(key: str, status_path: Path | None = None) -> dict | None:
+    path = Path(status_path) if status_path is not None else PARISH_STATUS_PATH
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+    parishes = data.get("parishes") if isinstance(data, dict) else None
+    if not isinstance(parishes, dict):
+        return None
+    row = parishes.get(str(key or "").strip())
+    return row if isinstance(row, dict) else None
+
+
+def previous_harvest_url(key: str, status_path: Path | None = None) -> str:
+    """Last harvest's saved URL for this parish. Empty when missing or first harvest."""
+    row = _parish_status_row(key, status_path=status_path)
+    if row is None:
+        return ""
+    return str(row.get("url") or "").strip()
+
+
+def previous_harvest_file_bytes(key: str, status_path: Path | None = None) -> int | None:
+    """Last harvest's saved PDF size. None when missing or first harvest."""
+    row = _parish_status_row(key, status_path=status_path)
+    if row is None:
+        return None
+    raw = row.get("file_bytes")
+    if raw is None or raw == "":
+        return None
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return None
+    if value < 0:
+        return None
+    return value
+
+
+def bulletin_size_changed(
+    previous_bytes: int | None, current_bytes: int | None
+) -> bool:
+    """True when integer KB (file_bytes // 1024) differs. Missing size is not a signal."""
+    if previous_bytes is None or current_bytes is None:
+        return False
+    try:
+        previous_kb = int(previous_bytes) // 1024
+        current_kb = int(current_bytes) // 1024
+    except (TypeError, ValueError):
+        return False
+    return previous_kb != current_kb
+
+
+def _pdf_file_bytes(path: Path | None) -> int | None:
+    if path is None:
+        return None
+    try:
+        file_path = Path(path)
+        if file_path.is_file():
+            return int(file_path.stat().st_size)
+    except OSError:
+        return None
+    return None
+
+
+def _this_week_url_or_unknown(
+    verdict: FreshnessVerdict, target: date
+) -> FreshnessVerdict:
+    """Keep a parseable in-week URL date. Never stamp harvest Sunday."""
+    extracted = verdict.extracted_date
+    if extracted is not None:
+        week_start, week_end = week_window(target)
+        if week_start <= extracted <= week_end or verdict.status == "fresh":
+            return verdict
+    if verdict.status == "unknown":
+        return verdict
+    return FreshnessVerdict(status="unknown", reason="no_date_in_url")
+
+
+def _heading_date_before_harvest_week(
+    body_verdict: FreshnessVerdict | None, target: date
+) -> bool:
+    if body_verdict is None or body_verdict.status != "stale":
+        return False
+    extracted = body_verdict.extracted_date
+    if extracted is None:
+        return False
+    start, _end = week_window(target)
+    return extracted < start
+
+
 def freshness_verdict_for_ok_result(
     result: FetchResult,
     target: date,
@@ -1266,6 +1410,11 @@ def freshness_verdict_for_ok_result(
     week stays out of the collated PDF even when the file name says this
     Sunday. For 08/11/2026 that means a date before 02/11/2026. No printed
     date is not rewritten as the harvest Sunday.
+
+    A different URL vs last harvest, or the same URL with a 1 KB+ size
+    change, is treated as this week's file for picking/freshness only.
+    That does not invent harvest Sunday as ``bulletin_date``. A printed
+    date before this week still stays stale.
     """
     url = (result.url or "").strip()
     pdf_path = result.file_path
@@ -1286,6 +1435,17 @@ def freshness_verdict_for_ok_result(
     else:
         verdict = FreshnessVerdict(status="unknown", reason="no_date_in_url")
 
+    url_changed = bulletin_url_changed(previous_harvest_url(key), url)
+    current_bytes = None
+    for path in candidates:
+        size = _pdf_file_bytes(path)
+        if size is not None:
+            current_bytes = size
+            break
+    size_changed = bulletin_size_changed(
+        previous_harvest_file_bytes(key), current_bytes
+    )
+
     # Do not stop at the first path that exists but has no heading date.
     for path in candidates:
         if not path.exists():
@@ -1303,9 +1463,32 @@ def freshness_verdict_for_ok_result(
                 return verdict_for_extracted_date(url_date, target)
             return verdict_for_extracted_date(too_old, target)
         body_verdict = pdf_body_heading_verdict(path, target)
+        if body_verdict is not None and body_verdict.status == "fresh":
+            return issue_date_verdict(verdict, body_verdict)
+        if body_verdict is not None and _heading_date_before_harvest_week(
+            body_verdict, target
+        ):
+            return body_verdict
+        heading_undated = body_verdict is None or (
+            body_verdict.status == "unknown" or body_verdict.extracted_date is None
+        )
+        if url_changed and (verdict.status == "unknown" or heading_undated):
+            # A parseable URL date before this week is still stale. Only an
+            # unknown URL, or an undated heading, is kept as this week.
+            if verdict.status == "stale" and verdict.extracted_date is not None:
+                start, _end = week_window(target)
+                if verdict.extracted_date < start:
+                    return verdict
+            return _this_week_url_or_unknown(verdict, target)
+        if (not url_changed) and size_changed:
+            return _this_week_url_or_unknown(verdict, target)
         if body_verdict is None:
             continue
         return issue_date_verdict(verdict, body_verdict)
+    if url_changed and (verdict.status == "unknown"):
+        return _this_week_url_or_unknown(verdict, target)
+    if (not url_changed) and size_changed:
+        return _this_week_url_or_unknown(verdict, target)
     return verdict
 
 

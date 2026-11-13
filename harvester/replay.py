@@ -37,7 +37,12 @@ from playwright.async_api import (
 )
 from PyPDF2 import PdfReader
 
-from .bulletin_freshness import check_bulletin_freshness, extract_bulletin_date
+from .bulletin_freshness import (
+    bulletin_url_changed,
+    check_bulletin_freshness,
+    extract_bulletin_date,
+    previous_harvest_url,
+)
 from .cloud_folders import (
     drive_folder_id_from_url,
     drive_year_folder_id,
@@ -2498,6 +2503,7 @@ def _score_http_scrape_pdf_hrefs(
     hrefs: list[str],
     target_date: date,
     labels: dict[str, str] | None = None,
+    previous_url: str | None = None,
 ) -> list[tuple[date, str]]:
     """Rank listing-page PDF hrefs by extracted bulletin date.
 
@@ -2506,6 +2512,8 @@ def _score_http_scrape_pdf_hrefs(
     Parish-Newsletter-Sunday-9th-August.pdf are dated with the harvest year.
     When the URL has no date (hashed ``S25C-*.pdf``, ``Aug 16  2026.pdf``),
     score the listing link text if one was passed.
+    An undated href whose URL changed vs last harvest is scored as the
+    harvest Sunday for ranking only — that does not stamp bulletin_date.
     """
     scored: list[tuple[date, str]] = []
     ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
@@ -2534,6 +2542,8 @@ def _score_http_scrape_pdf_hrefs(
         found = _http_scrape_item_date(href, target_date)
         if not found and labels:
             found = _http_scrape_item_date(labels.get(href, ""), target_date)
+        if not found and bulletin_url_changed(previous_url, href):
+            found = target_date
         if found and found <= ahead:
             scored.append((found, href))
     return scored
@@ -2766,12 +2776,15 @@ async def _try_http_scrape_newest_pdf(
         break
     if not listing_html:
         return None
+    previous_url = previous_harvest_url(dest.stem)
     listing_pairs = _extract_matching_href_texts(
         listing_html, listing_fetched_from, href_patterns
     )
     hrefs = [href for href, _text in listing_pairs]
     labels = {href: text for href, text in listing_pairs if text}
-    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
+    scored = _score_http_scrape_pdf_hrefs(
+        hrefs, target_date, labels=labels, previous_url=previous_url
+    )
     if not scored:
         post_url = _newest_dated_post_url_from_listing(
             listing_html,
@@ -2806,7 +2819,9 @@ async def _try_http_scrape_newest_pdf(
         )
         hrefs = [href for href, _text in post_pairs]
         labels = {href: text for href, text in post_pairs if text}
-        scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
+        scored = _score_http_scrape_pdf_hrefs(
+            hrefs, target_date, labels=labels, previous_url=previous_url
+        )
     if not scored:
         return None
     from .newsletter_brain import pick_same_day_file, same_sunday_urls
@@ -2814,7 +2829,9 @@ async def _try_http_scrape_newest_pdf(
     same_day = same_sunday_urls(scored, target_date)
     if not same_day:
         return None
-    pdf_url = pick_same_day_file(same_day, href_patterns) or same_day[0]
+    changed = [item for item in same_day if bulletin_url_changed(previous_url, item)]
+    pool = changed or same_day
+    pdf_url = pick_same_day_file(pool, href_patterns) or pool[0]
     pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
