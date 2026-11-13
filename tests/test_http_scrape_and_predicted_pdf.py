@@ -2547,15 +2547,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
         termon = json.loads(
             Path("parishes/recipes/armagh/termonmaguirc.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(termon["site_type"], "http_scrape_newest_pdf")
-        self.assertIn("/bulletins/", termon["start_url"])
-        self.assertNotIn(
+        # Listing /bulletins/ hangs; pin the proved Thirty-Second PDF (not Twenty-Sixth rewrite).
+        self.assertEqual(termon["site_type"], "predicted_dated_pdf")
+        self.assertIn(
             "Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
             termon["start_url"],
         )
         self.assertNotIn("Twenty-Sixth", termon["start_url"])
-        self.assertNotIn(".pdf", termon["start_url"].lower())
-        self.assertEqual(termon["steps"][0]["action"], "goto")
+        self.assertNotIn("/bulletins/", termon["start_url"])
+        self.assertEqual(termon["steps"][0]["action"], "download")
         bree = json.loads(
             Path("parishes/recipes/ferns/bree.json").read_text(encoding="utf-8")
         )
@@ -2612,22 +2612,8 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("/2026/10/", dkr["start_url"])
 
     def test_nov8_hits_scrape_listing_not_pinned_pdf(self) -> None:
+        # termonmaguirc / mayobridge / donaghmore moved to predicted PDF pins (listing hangs).
         cases = {
-            "armagh/termonmaguirc.json": (
-                "https://www.termonmaguircparish.com/bulletins/",
-                "Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
-                None,
-            ),
-            "dromore/donaghmore.json": (
-                "https://donaghmoreparish.org",
-                "Donaghmore-Bulletin-8th-November-2026.pdf",
-                None,
-            ),
-            "dromore/mayobridge.json": (
-                "https://www.mayobridgeparish.com/parish-newsletter/",
-                "Parish-Bulletin-8-November-2026.pdf",
-                None,
-            ),
             "down_and_connor/stjohnsfallsroad.json": (
                 "https://stjohnsfallsroad.org/index.php/bulletin/",
                 "Sunday-8th-Nov-2026-ws.pdf",
@@ -2637,11 +2623,6 @@ class HarvestMissRecipeTests(unittest.TestCase):
                 "https://fairviewparish.ie/news-events/",
                 "Sunday-8th-November-2026-Parish-Newsletter.pdf",
                 "sermon/",
-            ),
-            "dublin/milltowndublin.json": (
-                "https://milltownparish.ie/newsletter/",
-                "Weekly-Bulletin-Sunday-November-8th-2026.pdf",
-                None,
             ),
             "dublin/sandymount.json": (
                 "https://www.stmarysstaroftheseasandymount.com/parish-newsletters.html",

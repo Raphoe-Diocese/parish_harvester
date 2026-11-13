@@ -2,33 +2,34 @@
   "parish_key": "mayobridge",
   "display_name": "St Patrick’s Clonallon (Mayobridge)",
   "diocese": "dromore",
-  "recorded_date": "2026-11-10",
-  "start_url": "https://www.mayobridgeparish.com/parish-newsletter/",
-  "site_type": "http_scrape_newest_pdf",
+  "recorded_date": "2026-11-13",
+  "start_url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "example_url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf",
   "playbook_type": "direct_download",
   "status": "active",
   "skip": false,
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.mayobridgeparish.com/parish-newsletter/"
+      "action": "download",
+      "url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf"
     }
   ],
-  "version": 2,
-  "href_patterns": [
-    "Parish-Bulletin"
-  ],
+  "version": 3,
   "timeout_ms": 45000,
-  "total_timeout_s": 120,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
   },
   "operator_notes": [
-    "10/11/2026: /parish-newsletter/ lists Parish-Bulletin-8-November-2026.pdf. Scrape that list. Do not pin the dated filename."
+    "13/11/2026: /parish-newsletter/ scrape timed out. Browser shows Parish Bulletin 8 November 2026 → Parish-Bulletin-8-November-2026.pdf under /uploads/2014/07/. start_url is that PDF so the listing is skipped.",
+    "Plain urllib from this PC gets 403; harvest browser download should still get it."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
+    "Do not start on /parish-newsletter/ — it times out.",
+    "Do not pin forever — predicted rewrites the date.",
     "Do not harvest Facebook."
   ]
 }
