@@ -448,6 +448,31 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
+    def test_newtownshandrum_aliases_charleville_8_nov_doc_not_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/cloyne/newtownshandrum.json")
+        charleville = _recipe("parishes/recipes/cloyne/charleville.json")
+        self.assertTrue(recipe.get("skip"))
+        self.assertEqual(recipe.get("alias_of"), "charleville")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("charlevilleparish.ie", recipe["start_url"])
+        self.assertNotIn("cloynediocese.ie", recipe["start_url"])
+        self.assertIn(
+            "8th-November-2026-CHARLEVILLE-PARISH-NEWSLETTER.doc",
+            recipe.get("example_url") or "",
+        )
+        self.assertIn("wpdmdl=6240", recipe.get("example_url") or "")
+        self.assertNotIn("wpdmdl=6241", recipe.get("example_url") or "")
+        self.assertNotIn("15th-november", (recipe.get("example_url") or "").lower())
+        self.assertFalse(charleville.get("skip"))
+        self.assertNotEqual(charleville["site_type"], "predicted_dated_pdf")
+        self.assertEqual(charleville["playbook_type"], "direct_download")
+        verdict = check_bulletin_freshness(
+            charleville["start_url"],
+            date(2026, 11, 8),
+        )
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+
 
 if __name__ == "__main__":
     unittest.main()
