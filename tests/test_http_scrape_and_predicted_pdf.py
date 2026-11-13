@@ -1807,6 +1807,51 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         chrome.assert_not_called()
         self.assertTrue(any(ua == "Mozilla/5.0" for ua in uas))
 
+    def test_apache_403_curl_ua_returns_pdf_when_mozilla_blocked(self) -> None:
+        from email.message import EmailMessage
+        from io import BytesIO
+        from unittest.mock import MagicMock, patch
+        from urllib.error import HTTPError
+
+        pdf = b"%PDF-1.7 foxrock-november-1st"
+        page = (
+            b"<!DOCTYPE HTML><html><head><title>403 Forbidden</title></head>"
+            b"<body><h1>Forbidden</h1></body></html>"
+        )
+        uas: list[str] = []
+
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
+            ua = req.get_header("User-agent") or ""
+            uas.append(ua)
+            if ua == "curl/8.5.0":
+                resp = MagicMock()
+                resp.status = 200
+                resp.read.return_value = pdf
+                resp.headers = {"Content-Type": "application/pdf"}
+                resp.__enter__.return_value = resp
+                resp.__exit__.return_value = False
+                return resp
+            raise HTTPError(
+                req.full_url, 403, "Forbidden", EmailMessage(), BytesIO(page)
+            )
+
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen), patch(
+            "harvester.replay._fetch_with_chrome_impersonation"
+        ) as chrome:
+            hit = _fetch_bytes_with_retries(
+                "https://foxrockparish.ie/wp-content/uploads/2026/10/"
+                "Newsletter-November-1st-2026.pdf",
+                max_attempts=3,
+                per_attempt_timeout_s=1,
+                total_budget_s=3,
+                want_file=True,
+            )
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], pdf)
+        chrome.assert_not_called()
+        self.assertTrue(any(ua == "Mozilla/5.0" for ua in uas))
+        self.assertTrue(any(ua == "curl/8.5.0" for ua in uas))
+
     def test_short_user_agent_pdf_skips_chrome(self) -> None:
         from unittest.mock import patch
 

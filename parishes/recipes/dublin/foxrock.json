@@ -1,33 +1,36 @@
 {
-  "version": 5,
+  "version": 6,
   "parish_key": "foxrock",
   "display_name": "Foxrock",
   "diocese": "dublin",
   "start_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
   "site_type": "wordpress",
   "playbook_type": "direct_download",
-  "timeout_ms": 45000,
-  "total_timeout_s": 120,
+  "status": "active",
+  "skip": false,
+  "ignore_https_errors": true,
+  "timeout_ms": 30000,
+  "total_timeout_s": 40,
   "recorded_date": "2026-11-13",
   "example_url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf"
-    },
-    {
       "action": "download",
       "url": "https://foxrockparish.ie/wp-content/uploads/2026/10/Newsletter-November-1st-2026.pdf",
-      "use_captured_url": true
+      "use_captured_url": true,
+      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
+    "13/11/2026 later: GitHub harvest failed HTTP download of Newsletter-November-1st-2026.pdf (browser was not opened). The 01/11 filename is stale vs harvest Sunday 08/11, so recorded-file HTTP was skipped. Engine now GETs that last-week pin. This cloud: GET 200 application/pdf 567718 bytes magic %PDF-1.7. Windows Chrome UA and Mozilla/5.0 can 403; curl/8.5.0 returns the PDF. ignore_https_errors. urllib only. If GitHub WAF 403s, fail-fast — do not Playwright. Recipe stays active. No 08/11 parish newsletter.",
     "13/11/2026: predicted rewrite of Newsletter-November-1st-2026.pdf became Newsletter-November-8th-2026.pdf. That 8 November parish file 404s in /2026/10/ and /2026/11/. Homepage and search still show Parish Newsletter November 1st. WebFetch of the 1st file is All Saints 01/11/2026. Notices-08.11.26-Share2026Newsletter.pdf HEAD/GET 200 application/pdf 2351993 bytes magic %PDF-1.4 is the diocesan SHARE newsletter for 7/8 November, not the Foxrock parish newsletter. wordpress+direct_download of the 01/11 parish PDF with use_captured_url so harvest does not rewrite to the 404. 01/11 is stale for harvest Sunday 08/11/2026."
   ],
   "do_not": [
     "Do not use predicted_dated_pdf — it rewrites November-1st into November-8th which 404s.",
     "Do not pin Notices-08.11.26-Share2026Newsletter.pdf — that is diocesan Share, not the parish newsletter.",
     "Do not treat Newsletter-November-1st-2026.pdf as 08/11/2026 — All Saints is stale.",
+    "Do not set skip true. Keep the recipe active.",
+    "Do not open Playwright on the PDF URL if HTTP 403s — fail-fast.",
     "Do not set start_url to the homepage — scrape then newsletter_brain hangs.",
     "Do not harvest Facebook."
   ],
