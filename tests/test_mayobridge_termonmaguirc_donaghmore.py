@@ -47,7 +47,8 @@ class PasteHitRecipePinsTests(unittest.TestCase):
         self.assertIn(
             "Weekly-Bulletin-Sunday-November-8th-2026.pdf", recipe["start_url"]
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
         self.assertNotIn("/newsletter/", recipe["start_url"])
 
     def test_mohill_pins_7th_november_html(self) -> None:

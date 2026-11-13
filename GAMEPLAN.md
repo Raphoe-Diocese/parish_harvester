@@ -1,3 +1,6 @@
+## 13/11/2026 01:56 - Mohill ok. Milltown GitHub predicted miss. PR 582
+Mohill harvest 43347626296 ok print_to_pdf 7th Nov page. Milltown 43347620331 GitHub predicted miss on a URL this PC HEAD 200 — switch off predicted, browser download instead. PR 582 Armagh 8th-November /2026/11 + Ashbourne 32nd Sunday. Mayobridge Termonmaguirc Bree still running. Not live.
+
 ## 13/11/2026 01:52 - PR 581 merged. Harvests running. Next Armagh + Ashbourne
 581 merged 89156308. Harvests: mayobridge 43347610567, termonmaguirc 43347615285, milltowndublin 43347620331, mohill 43347626296. Donaghmore already ok from 580. Next pins: Armagh /2026/11/8th-November.pdf (not /09/ 404). Ashbourne 32nd-sunday-a-2026.pdf under /2025/08/. Portmarnock URL is 8 Nov but dated 07/10 leftover — parked. Not live.
 
