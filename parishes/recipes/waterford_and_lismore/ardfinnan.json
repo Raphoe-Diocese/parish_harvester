@@ -1,10 +1,10 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "ardfinnan",
   "display_name": "Ardfinnan",
   "diocese": "waterford_and_lismore",
   "start_url": "https://www.stcarloacutisparish.ie/newsletter-7th-8th-november-2026/",
-  "site_type": "http_scrape_newest_html",
+  "site_type": "wordpress",
   "playbook_type": "html_text_bulletin",
   "status": "active",
   "skip": false,
@@ -27,14 +27,18 @@
     }
   ],
   "operator_notes": [
+    "13/11/2026 later: harvest 12/11 still HTML-captured the homepage. site_type http_scrape_newest_html intercepts before print_to_pdf and can score newsletter-14th-15th-november-2026 off the article. site_type wordpress so the pinned goto + print_to_pdf skip_listing_nav runs. GET 200 text/html this turn. Title and body: Newsletter 7th & 8th November 2026, THIRTY SECOND WEEK IN ORDINARY TIME, SATURDAY-VIGIL 7th November 2026, SUNDAY 8th November 2026.",
     "13/11/2026: wp-json newest post is Newsletter 7th & 8th November 2026, published 06/11. GET 200 text/html on /newsletter-7th-8th-november-2026/. Page title matches. No PDF in media. Pin the HTML page + print_to_pdf so homepage HTML-capture fail loses.",
     "newsletter-8th-november-2026 and newsletter-7th-november-2026 are 404. Do not invent those slugs.",
-    "newsletter-31st-october-1st-november-2026 is All Saints 01/11. That is not 08/11."
+    "newsletter-31st-october-1st-november-2026 is All Saints 01/11. That is not 08/11.",
+    "newsletter-14th-15th-november-2026 is next weekend. Do not pin it for 08/11."
   ],
   "do_not": [
     "Do not invent newsletter-8th-november-2026 — that slug 404s.",
     "Do not invent newsletter-7th-november-2026 — that slug 404s.",
     "Do not pin newsletter-31st-october-1st-november-2026. 01/11 All Saints is not 08/11.",
+    "Do not pin newsletter-14th-15th-november-2026 — that is 14/15 November.",
+    "Do not use http_scrape_newest_html — scrape intercepts the print_to_pdf pin.",
     "Do not print_to_pdf the homepage or /category/newsletters/ listing.",
     "Do not remove skip_listing_nav.",
     "Do not harvest Facebook."
