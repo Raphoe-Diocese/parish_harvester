@@ -1695,6 +1695,8 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
             )
 
         with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen), patch(
+            "harvester.replay._fetch_short_ua_hit", return_value=None
+        ), patch(
             "harvester.replay._fetch_with_chrome_impersonation",
             return_value=(pdf, {"content-type": "application/pdf"}),
         ) as chrome:
@@ -1709,6 +1711,49 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         self.assertEqual(hit[0], pdf)
         self.assertEqual(len(calls), 1)
         chrome.assert_called_once()
+
+    def test_apache_403_short_ua_returns_pdf(self) -> None:
+        from email.message import EmailMessage
+        from io import BytesIO
+        from unittest.mock import MagicMock, patch
+        from urllib.error import HTTPError
+
+        pdf = b"%PDF-1.7 churchtown-auto"
+        page = (
+            b"<!DOCTYPE HTML><html><head><title>403 Forbidden</title></head>"
+            b"<body><h1>Forbidden</h1></body></html>"
+        )
+        uas: list[str] = []
+
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
+            ua = req.get_header("User-agent") or ""
+            uas.append(ua)
+            if ua == "Mozilla/5.0":
+                resp = MagicMock()
+                resp.status = 200
+                resp.read.return_value = pdf
+                resp.headers = {"Content-Type": "application/pdf"}
+                resp.__enter__.return_value = resp
+                resp.__exit__.return_value = False
+                return resp
+            raise HTTPError(
+                req.full_url, 403, "Forbidden", EmailMessage(), BytesIO(page)
+            )
+
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen), patch(
+            "harvester.replay._fetch_with_chrome_impersonation"
+        ) as chrome:
+            hit = _fetch_bytes_with_retries(
+                "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto.pdf",
+                max_attempts=3,
+                per_attempt_timeout_s=1,
+                total_budget_s=3,
+                want_file=True,
+            )
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], pdf)
+        chrome.assert_not_called()
+        self.assertTrue(any(ua == "Mozilla/5.0" for ua in uas))
 
     def test_short_user_agent_pdf_skips_chrome(self) -> None:
         from unittest.mock import patch
@@ -2802,7 +2847,7 @@ class CappaghExtensionlessBulletinTests(unittest.TestCase):
 
 
 class ChurchtownWpJsonRecipeTests(unittest.TestCase):
-    """Hashed churchtown-auto PDF. 13/11/2026 the media API is 401, so the proved file is pinned."""
+    """Hashed churchtown-auto PDF. GitHub/datacenter IPs get 403/401; park, do not Playwright."""
 
     AUTO_PDF = (
         "https://churchtownparish.com/wp-content/uploads/2026/11/"
@@ -2814,17 +2859,25 @@ class ChurchtownWpJsonRecipeTests(unittest.TestCase):
     )
 
     def test_recipe_uses_wp_json_not_predicted_pin(self) -> None:
+        from harvester.recipe_brain import missed_week_should_retry
+
         recipe = json.loads(
             Path("parishes/recipes/dublin/churchtown.json").read_text(encoding="utf-8")
         )
         self.assertEqual(recipe["site_type"], "wordpress")
         self.assertEqual(recipe["playbook_type"], "direct_download")
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertEqual(recipe["start_url"], self.AUTO_PDF)
+        self.assertNotEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertTrue(recipe.get("skip"))
+        self.assertEqual(recipe.get("status"), "inactive")
+        self.assertFalse(missed_week_should_retry(recipe))
+        self.assertEqual(recipe.get("example_url"), self.AUTO_PDF)
         self.assertNotIn("newsletter-2026-11-01", recipe["start_url"])
         self.assertNotIn("/newsletter/", recipe["start_url"])
+        self.assertTrue((recipe.get("steps") or [])[-1].get("skip_listing_nav"))
         do_not = " ".join(recipe.get("do_not") or []).lower()
         self.assertIn("newsletter-2026-11-01", do_not)
+        self.assertIn("pin the same", do_not)
 
     def test_media_date_beats_last_week_filename(self) -> None:
         import asyncio

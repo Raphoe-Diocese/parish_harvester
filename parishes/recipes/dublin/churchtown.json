@@ -1,31 +1,33 @@
 {
-  "version": 6,
+  "version": 7,
   "parish_key": "churchtown",
   "display_name": "Churchtown",
   "diocese": "dublin",
   "start_url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
   "site_type": "wordpress",
   "playbook_type": "direct_download",
+  "status": "inactive",
+  "skip": true,
   "timeout_ms": 30000,
-  "total_timeout_s": 90,
+  "total_timeout_s": 40,
   "recorded_date": "2026-11-13",
   "example_url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
+  "reason": "GitHub WAF 403 on churchtownparish.com. Harvest 43414067315 HTTP 403 then chrome-error on the 08/11 churchtown-auto hash. This cloud IP urllib GET is Apache 403; curl_cffi Chrome TLS is nginx 401. PR 594 residential GET 200 application/pdf 1381831 bytes magic %PDF-1.7 heading 8th November 2026. Host blocks GitHub and datacenter IPs.",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf"
-    },
-    {
       "action": "download",
-      "url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf"
+      "url": "https://churchtownparish.com/wp-content/uploads/2026/11/churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf",
+      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
-    "13/11/2026: source page https://churchtownparish.com/newsletter/ returned 401. File churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf GET 200 application/pdf 1381831 bytes magic %PDF-1.7 (long Chrome token). Page heading 8th November 2026. PDF CreationDate 06/11/2026. Two pages."
+    "13/11/2026 later: parked. GitHub harvest 43414067315 after PR 594 pin: HTTP 403 on the hash then Playwright chrome-error. This cloud IP HEAD/GET long UA nginx 403 empty; short Mozilla/5.0 Apache 403 title 403 Forbidden. curl_cffi chrome/safari nginx 401 HTML. Referer and Range still 403. TLS verify was not the hang. Do not Playwright.",
+    "13/11/2026: source page https://churchtownparish.com/newsletter/ returned 401. File churchtown-auto-8c9056d343f7583cb7ff273d592cecd688e25151b674411fa05efb7d75b30aff.pdf GET 200 application/pdf 1381831 bytes magic %PDF-1.7 (long Chrome token, residential). Page heading 8th November 2026. PDF CreationDate 06/11/2026. Two pages."
   ],
   "do_not": [
-    "Do not open /newsletter/. It is 401 and the old scrape hangs.",
-    "Do not use predicted_dated_pdf or wp_json_newest_media. The media API is 401.",
+    "Do not pin the same churchtown-auto hash again hoping GitHub harvest will GET it.",
+    "Do not open /newsletter/ or the homepage in Playwright. They hang or 401/403.",
+    "Do not use predicted_dated_pdf or wp_json_newest_media. The media API is 401 from GitHub.",
     "Do not pin newsletter-2026-11-01.pdf.",
     "Do not harvest Facebook."
   ],

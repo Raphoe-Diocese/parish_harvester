@@ -1604,7 +1604,25 @@ def _fetch_bytes_with_retries(
             # shared retry budget on 404/410 (newtownkillea dated uploads).
             if exc.code in {404, 410}:
                 return None
-            # Cloyne: this 403 page is final for urllib. One Chrome GET.
+            # 403 is final for the long Chrome token. One short token
+            # (Cloyne / Churchtown Apache page), then one Chrome GET.
+            # Do not loop the long token until the parish budget dies.
+            if exc.code == 403:
+                if not tried_short_ua:
+                    tried_short_ua = True
+                    short_hit = _fetch_short_ua_hit(
+                        url, per_attempt_timeout_s, None
+                    )
+                    if short_hit and (
+                        not want_file
+                        or _dropfiles_body_looks_like_file(
+                            short_hit[1], short_hit[0]
+                        )
+                    ):
+                        return short_hit
+                return _chrome_file_or_none(
+                    url, per_attempt_timeout_s, want_file
+                )
             if _hard_page_forbidden(exc):
                 return _chrome_file_or_none(
                     url, per_attempt_timeout_s, want_file
@@ -5692,6 +5710,14 @@ async def replay_recipe(
         found = await _try_http_document_url(url, dest)
         if found:
             return dest, found[1], found[0]
+
+    # Pinned PDF/image (Churchtown / Termon): HTTP already tried the file.
+    # Playwright goto of the same URL hangs GitHub on WAF 403 then chrome-error.
+    playbook = str(recipe.get("playbook_type") or "").strip().lower()
+    if playbook == "direct_download" and _looks_like_direct_document_url(start_url):
+        raise RecipeReplayError(
+            f"HTTP download failed for {start_url} (browser was not opened)"
+        )
 
     context_opts: dict = {"accept_downloads": True}
     if host_profile.get("ignore_https_errors"):
