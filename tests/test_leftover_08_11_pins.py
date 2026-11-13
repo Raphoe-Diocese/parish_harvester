@@ -87,6 +87,60 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
         self.assertNotIn("newsletter-14th-15th-november-2026", recipe["start_url"])
 
+    def test_emly_pins_8th_november_docx_not_listing(self) -> None:
+        recipe = _recipe("parishes/recipes/cashel_and_emly/emly.json")
+        self._assert_wordpress_direct(
+            recipe, "Emly-Parish-Bulletin-8th-November-2026.docx"
+        )
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
+        self.assertNotIn("1st-November", recipe["start_url"])
+        self.assertNotIn("Octaber", recipe["start_url"])
+        self.assertNotIn("category/parish-bulletin", recipe["start_url"])
+
+    def test_wexford_stacks_8_november_jpegs_not_15th(self) -> None:
+        recipe = _recipe("parishes/recipes/ferns/wexford.json")
+        self.assertIn("Sunday-November-8th-1-scaled.jpg", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_images")
+        fallbacks = recipe.get("fallback_document_urls") or []
+        self.assertIn(
+            "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-2-scaled.jpg",
+            fallbacks,
+        )
+        self.assertIn(
+            "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-3-scaled.jpg",
+            fallbacks,
+        )
+        self.assertIn(
+            "https://wexfordparish.com/wp-content/uploads/2026/11/Sunday-November-8th-4-scaled.jpg",
+            fallbacks,
+        )
+        self.assertEqual(int(recipe["image_count"]), 4)
+        self.assertNotIn("Sunday-November-15th", recipe["start_url"])
+        self.assertNotIn("Sunday-November-15th", json.dumps(fallbacks))
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://wexfordparish.com"
+        )
+
+    def test_dkr_pins_8_november_pdf_not_predicted(self) -> None:
+        recipe = _recipe("parishes/recipes/limerick/donaghmoreknockearoxboro.json")
+        self._assert_wordpress_direct(recipe, "Newsletter-2026-11-08.pdf")
+        self.assertIn("/2026/11/", recipe["start_url"])
+        self.assertNotIn("/2026/10/", recipe["start_url"])
+        self.assertNotIn("2026-11-01", recipe["start_url"])
+        self.assertNotIn("useful-links/newsletters", recipe["start_url"])
+
+    def test_shanagolden_pins_7th_8th_nov_pdf_not_archive(self) -> None:
+        recipe = _recipe(
+            "parishes/recipes/limerick/shanagoldenrobertstownfoynes.json"
+        )
+        self._assert_wordpress_direct(recipe, "NL-7th-and-8th-Nov.-2026.pdf")
+        self.assertNotIn("newsletter-archive", recipe["start_url"])
+        self.assertNotIn("31st-Oct", recipe["start_url"])
+        self.assertNotIn("1st-Nov", recipe["start_url"])
+
 
 if __name__ == "__main__":
     unittest.main()

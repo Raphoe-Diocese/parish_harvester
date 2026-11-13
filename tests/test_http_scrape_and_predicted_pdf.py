@@ -2762,14 +2762,10 @@ class HarvestMissRecipeTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        # DKR harvest just ran; parked 403 list — leave predicted pin as-is.
-        self.assertEqual(dkr["site_type"], "predicted_dated_pdf")
-        self.assertIn("Newsletter-2026-11-08.pdf", dkr["start_url"])
+        self._assert_wordpress_direct_download(dkr, "Newsletter-2026-11-08.pdf")
         self.assertIn("/2026/11/", dkr["start_url"])
         self.assertNotIn("/2026/10/", dkr["start_url"])
         self.assertNotIn("2026-11-01", dkr["start_url"])
-        self.assertEqual(int(dkr["weeks_back"]), 0)
-        self.assertEqual(int(dkr["weeks_ahead"]), 0)
 
     def test_nov8_hits_scrape_listing_not_pinned_pdf(self) -> None:
         # termonmaguirc / mayobridge / donaghmore moved to predicted PDF pins (listing hangs).

@@ -1,33 +1,39 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "shanagoldenrobertstownfoynes",
   "display_name": "Shanagolden - Robertstown - Foynes",
   "diocese": "limerick",
-  "start_url": "https://shannonwestchurches.ie/newsletter-archive/",
-  "site_type": "wp_json_newest_media",
-  "href_patterns": [
-    "NL-",
-    ".pdf"
-  ],
+  "start_url": "https://shannonwestchurches.ie/wp-content/uploads/2026/11/NL-7th-and-8th-Nov.-2026.pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "timeout_ms": 30000,
   "total_timeout_s": 90,
-  "recorded_date": "2026-11-10",
+  "recorded_date": "2026-11-13",
   "example_url": "https://shannonwestchurches.ie/wp-content/uploads/2026/11/NL-7th-and-8th-Nov.-2026.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://shannonwestchurches.ie/newsletter-archive/"
+      "url": "https://shannonwestchurches.ie/wp-content/uploads/2026/11/NL-7th-and-8th-Nov.-2026.pdf"
+    },
+    {
+      "action": "download",
+      "url": "https://shannonwestchurches.ie/wp-content/uploads/2026/11/NL-7th-and-8th-Nov.-2026.pdf",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "07/11/2026: archive scrape timed out. wp-json has NL-31st-Oct-1st-Nov.-2026.pdf 432272 bytes (media 30/10, folder /2026/10/) and NL-7th-and-8th-Nov.-2026.pdf 522504 bytes (media 06/11, folder /2026/11/). Harvest once for the Shannon West unit. start_url is the PDF.",
-    "10/11/2026: wp-json media has NL-7th-and-8th-Nov.-2026.pdf. GET 200 application/pdf 522504 bytes, magic %PDF. Filename date 08/11/2026. Recipe reads the media library. Do not pin that filename. The archive HTML also lists it, and a browser scrape of that page has timed out."
+    "13/11/2026: leftover timeout on /newsletter-archive/ wp-json. Pin NL-7th-and-8th-Nov.-2026.pdf. GET 200 application/pdf 522504 bytes magic %PDF-1.7. Last-Modified Fri 06/11/2026. One page. Text: Shannon West Pastoral Unit, Sun 8th Nov, Sat 7th, 8th Nov 2026. Harvest once for the Shannon West unit. Do not open the archive listing."
   ],
   "do_not": [
-    "Do not pin NL-7th-and-8th-Nov.-2026.pdf.",
-    "Do not open /newsletter-archive/ in a browser — that scrape has timed out.",
+    "Do not set start_url to /newsletter-archive/ — that scrape timed out.",
+    "Do not pin NL-31st-Oct-1st-Nov.-2026.pdf — that is 01/11.",
+    "Do not use predicted_dated_pdf.",
     "Do not also harvest coolcappakilcolman, glin, or loughillballyhahill from this file.",
     "Do not harvest Facebook."
+  ],
+  "href_patterns": [
+    "NL-7th-and-8th-Nov",
+    ".pdf"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
