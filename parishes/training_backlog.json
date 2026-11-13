@@ -2,17 +2,17 @@
   "generated_at": "2026-11-13",
   "target_date": "2026-11-08",
   "summary": {
-    "downloaded": 592,
+    "downloaded": 593,
     "html_links": 0,
     "skipped": 483,
-    "failed": 158,
+    "failed": 157,
     "stale_rejected": 85
   },
   "action_counts": {
-    "ok": 468,
+    "ok": 469,
     "skip": 749,
     "mark_inactive": 18,
-    "investigate": 53,
+    "investigate": 52,
     "retrain": 1
   },
   "parishes": [
@@ -1951,7 +1951,7 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/armaghparish.json",
       "recipe": {
-        "start_url": "https://armaghparish.net/wp-content/uploads/2026/11/1st-November.pdf",
+        "start_url": "https://armaghparish.net/wp-content/uploads/2026/11/8th-November.pdf",
         "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
@@ -1961,15 +1961,15 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "02/11/2026: predicted PDF under /2026/09/ worked, then _challenge_pin_against_listing hung on /parish-bulletin/. start_url must be the PDF itself so the listing challenge is skipped.",
-          "06/11/2026: live file moved to /2026/11/1st-November.pdf (GET 200 application/pdf). /2026/09/1st-November.pdf is now 404. Do not set start_url to listing pages (403)."
+          "13/11/2026: harvest predicted /2026/09/8th-November.pdf (404) then timed out. Live file is /2026/11/8th-November.pdf GET 200 application/pdf 604745. Pin that PDF. Do not open /parish-bulletin/.",
+          "06/11/2026: live file moved to /2026/11/. Listing is 403."
         ],
         "do_not": [
           "Do not set start_url to /parish-bulletin/ \u2014 listing challenge hangs and listing is 403.",
-          "Do not pin 1st-November.pdf forever \u2014 predicted_dated_pdf rewrites the date.",
-          "Do not keep the old /2026/09/ folder once the site moves the month folder."
+          "Do not predict into /2026/09/ \u2014 that folder 404s for 8th-November.pdf.",
+          "Do not pin 1st-November.pdf."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
       "learned_pattern": "yearless_month_pdf+direct_download",
@@ -2014,35 +2014,34 @@
       "diocese": "meath",
       "recipe_file": "parishes/recipes/meath/ashbourne.json",
       "recipe": {
-        "start_url": "https://ashbourneparish.ie/newsletters/",
-        "site_type": "http_scrape_newest_pdf",
+        "start_url": "https://ashbourneparish.ie/wp-content/uploads/2025/08/32nd-sunday-a-2026.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "03/10/2026: listing https://ashbourneparish.ie/newsletters/ (WP post /2025/08/11/newsletters/). Folder /2025/08/ is not the bulletin date. Do not pin the dated filename.",
-          "06/11/2026: wp-json/wp/v2/media search returns 404. Listing has direct PDF hrefs: 28th\u201331st-sunday-a-2026.pdf. Proved 31st-sunday-a-2026.pdf GET 200 application/pdf 445720 bytes; PDF text Saturday 31st / Sunday 1st Nov All Saints Day \u2014 week of 01/11/2026. Switch to http_scrape_newest_pdf. If no newer Sunday file is posted, expect honest stale not failed."
+          "13/11/2026: /newsletters/ scrape failed on GitHub. Browser listing shows 32nd Sunday A 2026. File lives under /uploads/2025/08/32nd-sunday-a-2026.pdf GET 200 application/pdf 386599. Pin the PDF. Folder year 2025 is not the bulletin date.",
+          "06/11/2026: wp-json media search 404s. 31st Sunday was All Saints 01/11."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
-          "Do not harvest Facebook.",
-          "Do not use the diocese Facebook page as this parish link.",
-          "Do not use wp_json_newest_media \u2014 media API 404s here."
+          "Do not start on /newsletters/ \u2014 scrape fails.",
+          "Do not treat /2025/08/ as the bulletin date.",
+          "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-06"
+        "recorded_date": "2026-11-13"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "urllib_403_listing+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://ashbourneparish.ie/newsletters/ \u2014 no dated bulletin PDF matching ['sunday', '.pdf'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://ashbourneparish.ie/newsletters/ \u2014 no dated bulletin PDF matching ['sunday', '.pdf'] (not a selector problem; p"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ashford",
@@ -28774,20 +28773,21 @@
       "recipe_file": "parishes/recipes/dublin/milltowndublin.json",
       "recipe": {
         "start_url": "https://milltownparish.ie/wp-content/uploads/2026/11/Weekly-Bulletin-Sunday-November-8th-2026.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "site_type": "wordpress",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "13/11/2026: /newsletter/ scrape failed again. Proved Weekly-Bulletin-Sunday-November-8th-2026.pdf GET 200 application/pdf 557095. Pin the PDF.",
-          "08/11/2026: weeks_ahead 1 tried 15 November first. weeks_back 0 weeks_ahead 0."
+          "13/11/2026: predicted_dated_pdf on GitHub missed the same URL this PC HEAD 200 557095. Do not use predicted urllib. Browser download of the pinned PDF instead.",
+          "08/11/2026: weeks_ahead 1 tried 15 November first."
         ],
         "do_not": [
           "Do not harvest Facebook.",
+          "Do not use predicted_dated_pdf \u2014 GitHub urllib misses milltownparish.ie.",
           "Do not start on /newsletter/ \u2014 scrape fails on GitHub."
         ],
         "recorded_date": "2026-11-13"
