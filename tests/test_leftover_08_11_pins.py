@@ -263,6 +263,27 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
+    def test_dromahair_pins_08_11_churchtv_pdf_not_diocese_card(self) -> None:
+        recipe = _recipe("parishes/recipes/kilmore/dromahair.json")
+        self._assert_wordpress_direct(
+            recipe, "Dromahair-Newsletter-08-11-2026.pdf"
+        )
+        self.assertIn("/2021/02/", recipe["start_url"])
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotIn("01-11-2026", recipe["start_url"])
+        self.assertNotIn("09-11-2026", recipe["start_url"])
+        self.assertNotIn("16-11-2026", recipe["start_url"])
+        self.assertNotIn("drumlease-killargue.com", recipe["start_url"])
+        self.assertNotIn("kilmorediocese.ie", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        verdict = check_bulletin_freshness(
+            recipe["start_url"], date(2026, 11, 8)
+        )
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+
 
 if __name__ == "__main__":
     unittest.main()
+
