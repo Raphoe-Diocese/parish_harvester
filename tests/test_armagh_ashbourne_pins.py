@@ -16,8 +16,8 @@ class ArmaghAshbournePinTests(unittest.TestCase):
         self.assertIn("/2026/11/8th-November.pdf", recipe["start_url"])
         self.assertNotIn("/2026/09/", recipe["start_url"])
         self.assertNotIn("1st-November", recipe["start_url"])
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertEqual(recipe["steps"][0]["action"], "download")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["playbook_type"], "direct_download")
 
     def test_ashbourne_pins_32nd_sunday_pdf(self) -> None:
         recipe = json.loads(
