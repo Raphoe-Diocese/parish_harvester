@@ -648,6 +648,26 @@ jobs:
           path: _slices
           merge-multiple: false
 
+      - name: Snapshot parish_status before merge
+        run: |
+          set -euo pipefail
+          mkdir -p _guard
+          if [ -f parishes/parish_status.json ]; then
+            cp parishes/parish_status.json _guard/parish_status_before.json
+          else
+            echo '{"summary":{"ok":0},"parishes":{}}' > _guard/parish_status_before.json
+          fi
+
+      - name: Snapshot parish_status before merge
+        run: |
+          set -euo pipefail
+          mkdir -p _guard
+          if [ -f parishes/parish_status.json ]; then
+            cp parishes/parish_status.json _guard/parish_status_before.json
+          else
+            echo '{"summary":{"ok":0},"parishes":{}}' > _guard/parish_status_before.json
+          fi
+
       - name: Merge slices, status, mega PDFs
         env:
           HARVEST_MEGA_PDF: "1"
@@ -656,6 +676,26 @@ jobs:
           set -euo pipefail
           python scripts/merge_diocese_harvests.py --slices-dir _slices --mega
           python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
+
+      - name: Guard ok count (block big drop)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          python scripts/guard_ok_count.py \
+            --previous _guard/parish_status_before.json \
+            --new parishes/parish_status.json \
+            --max-drop-ratio 0.10
+
+      - name: Guard ok count (block big drop)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          python scripts/guard_ok_count.py \
+            --previous _guard/parish_status_before.json \
+            --new parishes/parish_status.json \
+            --max-drop-ratio 0.10
 
       - name: Upload mega PDF artifacts
         continue-on-error: true
