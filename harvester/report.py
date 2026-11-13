@@ -204,20 +204,35 @@ def _bulletin_date_fields(
             iso = match.group(1)
     pdf_file = Path(pdf_path) if pdf_path is not None else None
     has_pdf = pdf_file is not None and pdf_file.is_file()
+    pdf_front_outside = False
     if not iso and has_pdf:
         from .bulletin_freshness import heading_date_in_pdf
 
         extracted = heading_date_in_pdf(pdf_file, target=target, url=url or None)
         if extracted is not None:
             iso = extracted.isoformat()
+        elif target is not None:
+            from .bulletin_freshness import issue_date_from_pages, read_pdf_page_texts
+
+            _found, way = issue_date_from_pages(
+                read_pdf_page_texts(pdf_file), target, url=url or None
+            )
+            if _found is not None:
+                iso = _found.isoformat()
+            pdf_front_outside = way == "front_outside"
     if not iso and url:
         from .bulletin_freshness import extract_bulletin_date, week_window
 
         extracted = extract_bulletin_date(url)
-        if extracted is not None and has_pdf and target is not None:
+        if (
+            extracted is not None
+            and pdf_front_outside
+            and target is not None
+        ):
             week_start, week_end = week_window(target)
-            # The shared reader already took an in-week URL, or left it
-            # alone because the PDF already has an issue date.
+            # Front page is dated outside this week. Keep an in-week
+            # filename only when the shared reader already did (leftover
+            # older than last Sunday). Do not stamp this Sunday.
             if week_start <= extracted <= week_end:
                 extracted = None
         if extracted is not None:

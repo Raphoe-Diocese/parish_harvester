@@ -170,6 +170,19 @@ jobs:
             exit 1
           fi
 
+      # After PDFs and report.json exist. main.py already wrote parish_status;
+      # this fills blank ok dates from the saved files, then writes status again.
+      # Image PDFs stay blank until first-page OCR: tesseract-ocr is not
+      # installed here (apt + OCR of hundreds of first pages would slow harvest).
+      - name: Date blank ok bulletins from saved PDFs
+        if: steps.harvest_run.outcome == 'success'
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          python scripts/date_saved_bulletins.py
+          python -c "from harvester.parish_status import write_parish_status; write_parish_status()"
+
       # Full harvests can start on an older SHA, then a viewer-chrome PR lands on
       # main while this job is still running. Re-render diocese HTML with the
       # latest templates so the docs snapshot / commit do not wipe parish
@@ -577,6 +590,16 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+      # After PDFs and report.json exist. Image PDFs stay blank: no tesseract.
+      - name: Date blank ok bulletins from saved PDFs
+        if: steps.harvest_run.outcome == 'success'
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          python scripts/date_saved_bulletins.py
+          python -c "from harvester.parish_status import write_parish_status; write_parish_status()"
+
       - name: Commit this diocese now
         if: steps.harvest_run.outcome == 'success'
         env:
@@ -675,6 +698,10 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/merge_diocese_harvests.py --slices-dir _slices --mega
+          # Fill blank ok dates from the merged PDFs, then rewrite status so
+          # stitch does not keep the undated report rows. No tesseract here.
+          python scripts/date_saved_bulletins.py
+          python -c "from harvester.parish_status import write_parish_status; write_parish_status()"
           python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
 
       - name: Guard ok count (block big drop)
