@@ -268,7 +268,7 @@ def _looks_like_direct_document_url(url: str) -> bool:
     if looks_like_permanent_bulletin_url(url):
         return True
     path = urlparse(lower).path
-    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg")) or "/pdf/" in path
+    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg", ".webp")) or "/pdf/" in path
 
 
 def _looks_like_uploaded_file_url(url: str) -> bool:
@@ -279,7 +279,7 @@ def _looks_like_uploaded_file_url(url: str) -> bool:
     if "drive.usercontent.google.com/download" in lower:
         return True
     path = urlparse(lower).path
-    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg")) or "/pdf/" in path
+    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg", ".webp")) or "/pdf/" in path
 
 
 def _recipe_recorded_file_urls(recipe: dict) -> list[str]:
@@ -313,6 +313,32 @@ def _recipe_fresh_recorded_file_urls(
             continue
         out.append(url)
     return out
+
+
+def _same_dated_image_group(urls: list[str]) -> list[str]:
+    """Return 2+ image URLs that share one bulletin date.
+
+    Claregalway 13/11/2026 is page-001 and page-002, both 08/11/2026.
+    A single direct download would keep the front and drop the back page.
+    A PDF in the list, or two different dates, stays on the one-file path.
+    """
+    if len(urls) < 2:
+        return []
+    groups: dict[date, list[str]] = {}
+    for url in urls:
+        path = urlparse(unquote(url or "")).path.lower()
+        if not path.endswith((".png", ".jpg", ".jpeg", ".webp")):
+            return []
+        found = extract_bulletin_date(url)
+        if found is None:
+            return []
+        groups.setdefault(found, []).append(url)
+    if len(groups) != 1:
+        return []
+    found_urls = next(iter(groups.values()))
+    if len(found_urls) < 2:
+        return []
+    return sorted(found_urls)
 
 
 def _recipe_example_document_url(recipe: dict) -> str:
@@ -1358,6 +1384,31 @@ def _fetch_pdf_short_ua(url: str, timeout_s: float) -> tuple[int | None, bytes]:
         return None, b""
 
 
+def _fetch_short_ua_hit(
+    url: str,
+    timeout_s: float,
+    cookie_jar: CookieJar | None = None,
+) -> tuple[bytes, dict[str, str]] | None:
+    """One short-token GET. SiteGround's long Chrome token often stays on 202.
+
+    13/11/2026: Assumption Ballyfermot, Cloyne, and Crossmolina returned the
+    PDF to ``Mozilla/5.0`` and an sgcaptcha page to the long Chrome token.
+    """
+    request = Request(
+        quote_http_url(url),
+        headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"},
+    )
+    try:
+        with _urlopen_ipv4(
+            request,
+            timeout=timeout_s,
+            cookie_jar=cookie_jar,
+        ) as response:
+            return _ok_http_body(response)
+    except Exception:
+        return None
+
+
 def _fetch_sunday_pdf_bytes(url: str) -> bytes | None:
     """One Sunday upload. 404 is a miss. A 403 page gets one Chrome GET."""
     status, body = _fetch_pdf_short_ua(url, 12)
@@ -1512,6 +1563,7 @@ def _fetch_bytes_with_retries(
         return None
     insecure_ctx: ssl.SSLContext | None = None
     prefer_unverified = False
+    tried_short_ua = False
     while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
         attempts += 1
         request = Request(url, headers=headers_out)
@@ -1523,6 +1575,24 @@ def _fetch_bytes_with_retries(
                 context=ctx,
                 cookie_jar=cookie_jar,
             ) as response:
+                status = getattr(response, "status", None)
+                if status not in {None, 200}:
+                    # 202 + sgcaptcha is not an HTTP error. One short token.
+                    if status == 202 and not tried_short_ua:
+                        sniff = response.read(800) or b""
+                        if b"sgcaptcha" in sniff.lower():
+                            tried_short_ua = True
+                            short_hit = _fetch_short_ua_hit(
+                                url, per_attempt_timeout_s, None
+                            )
+                            if short_hit and (
+                                not want_file
+                                or _dropfiles_body_looks_like_file(
+                                    short_hit[1], short_hit[0]
+                                )
+                            ):
+                                return short_hit
+                    continue
                 hit = _ok_http_body(response)
                 if hit and (
                     not want_file
@@ -1540,7 +1610,19 @@ def _fetch_bytes_with_retries(
                     url, per_attempt_timeout_s, want_file
                 )
         except Exception as exc:
-            if prefer_unverified or not _is_certificate_verify_error(exc):
+            cert_error = _is_certificate_verify_error(exc)
+            # SiteGround sometimes drops the long Chrome token (RemoteDisconnected)
+            # instead of returning the 202 page. One short token, same as 202.
+            # Do not do that on an expired certificate: the next try is unverified TLS.
+            if not cert_error and not tried_short_ua:
+                tried_short_ua = True
+                short_hit = _fetch_short_ua_hit(url, per_attempt_timeout_s, None)
+                if short_hit and (
+                    not want_file
+                    or _dropfiles_body_looks_like_file(short_hit[1], short_hit[0])
+                ):
+                    return short_hit
+            if prefer_unverified or not cert_error:
                 continue
             # Expired leaf (limavadyparish.org) or missing intermediate
             # (mucknoparish.ie). Retry this URL once without verify.
@@ -1608,15 +1690,9 @@ async def _save_dropfiles_bytes_to_pdf(
         pdf_bytes = await _convert_docx_to_pdf_bytes(body)
         dest.write_bytes(pdf_bytes)
         return "docx_to_pdf"
-    if body[:3] == b"\xff\xd8\xff" or body[:8] == b"\x89PNG\r\n\x1a\n":
-        try:
-            from PIL import Image as PILImage
-        except ImportError as exc:
-            raise RecipeReplayError(
-                "Pillow is required for image bulletin conversion. Install with: pip install Pillow"
-            ) from exc
-        img = PILImage.open(io.BytesIO(body)).convert("RGB")
-        img.save(str(dest), "PDF")
+    if looks_like_image_bytes(body):
+        # JPEG, PNG, and WEBP (Our Lady of Victories Newsletter-8-Nov-26.webp).
+        write_image_bytes_as_pdf(dest, body)
         return "image_to_pdf"
     raise RecipeReplayError(f"Unrecognized Dropfiles file content for {url}")
 
@@ -5591,7 +5667,28 @@ async def replay_recipe(
     # before opening /bulletin/. That listing is fine in Chrome; harvest gets
     # Cloudflare 403 and used to report "site blocking" even though the file
     # itself is open. Skip last-month pins (Annagry 260726.pdf).
-    for url in _recipe_fresh_recorded_file_urls(recipe, target_date):
+    # Two page scans with the same date (Claregalway 08/11/2026) stack.
+    fresh_files = _recipe_fresh_recorded_file_urls(recipe, target_date)
+    stacked_images = _same_dated_image_group(fresh_files)
+    if stacked_images:
+        page_bytes: list[bytes] = []
+        for image_url in stacked_images:
+            image_hit = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                image_url,
+                max_attempts=3,
+                per_attempt_timeout_s=20,
+                total_budget_s=40,
+                want_file=True,
+            )
+            if not image_hit or not looks_like_image_bytes(image_hit[0]):
+                page_bytes = []
+                break
+            page_bytes.append(image_hit[0])
+        if len(page_bytes) == len(stacked_images):
+            await _images_bytes_to_pdf(dest, page_bytes)
+            return dest, "image_to_pdf", stacked_images[0]
+    for url in fresh_files:
         found = await _try_http_document_url(url, dest)
         if found:
             return dest, found[1], found[0]
