@@ -1,3 +1,9 @@
+## 13/11/2026 10:43 - Raphoe leftovers. Raphoe parish PDF pinned. Two honest stale
+Raphoe drive-1jmslbrliw: test-parishraphoe still 404. Live This Week's Bulletin is https://parishofraphoe.ie/bulletin/raphoe/test-parish. GET 200 application/pdf 433490 bytes %PDF-1.7. Header Sunday 8 November 2026. Recipe pinned. Not harvested. Not live.
+Kincasslagh honest stale. Homepage latest is Oct-24th-1st-Nov-compressed.pdf (24 Oct to 1 Nov). November filename guesses returned text/html. Not 08/11.
+Newtown Killea honest stale. bulletin.pdf GET 200. Printed header 01st November 2026, not 25/10 and not 08/11. Page itself was Cloudflare 403.
+Irish Martyrs and Gortahork left ok with a blank date. Not live.
+
 ## 13/11/2026 09:20 - Donaghmoyne + Roslea pins. GitHub 403 cluster parked
 Ok 592 on GitHub 03:02. Ashbourne Donaghmore Mohill ok. Armagh Termon Mayobridge Milltown Bree GitHub 403/hang parked (two tries). Last this-week URL fails: Donaghmoyne predicted rewrite to 21st 500; Roslea listing timeout. Pin 32nd-All-Saints-08th and Bulletin-Sunday-8th-November. Not live.
 
