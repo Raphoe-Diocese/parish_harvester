@@ -1,3 +1,6 @@
+## 13/11/2026 02:08 - 582 merged. Termon still Twenty-Sixth timeout. Next browser pins
+582 merged 5b4d4081. Harvests: armaghparish 43349964493, ashbourne 43349968906, milltowndublin 43349973681. Termon 43347615285 predicted rewrote Thirty-Second into Twenty-Sixth-8-November then timed out. Mayobridge timeout. Bree GitHub predicted miss. Mohill ok. Donaghmore ok. Not live.
+
 ## 13/11/2026 01:56 - Mohill ok. Milltown GitHub predicted miss. PR 582
 Mohill harvest 43347626296 ok print_to_pdf 7th Nov page. Milltown 43347620331 GitHub predicted miss on a URL this PC HEAD 200 — switch off predicted, browser download instead. PR 582 Armagh 8th-November /2026/11 + Ashbourne 32nd Sunday. Mayobridge Termonmaguirc Bree still running. Not live.
 

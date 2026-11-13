@@ -1,37 +1,39 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "bree",
   "display_name": "Bree",
   "diocese": "ferns",
   "start_url": "https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf",
-  "site_type": "predicted_dated_pdf",
+  "site_type": "wordpress",
+  "playbook_type": "direct_download",
   "href_patterns": [
     "Newsletter-",
     "Nov",
     ".pdf"
   ],
-  "timeout_ms": 30000,
-  "total_timeout_s": 90,
-  "weeks_back": 0,
-  "weeks_ahead": 0,
-  "recorded_date": "2026-11-09",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-11-13",
   "example_url": "https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf",
   "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf"
+    },
     {
       "action": "download",
       "url": "https://www.bree.ie/wp-content/uploads/2026/11/Newsletter-3745-Nov-7th-8th.pdf"
     }
   ],
   "operator_notes": [
-    "09/11/2026: wp-json rejected Newsletter-3745-Nov-7th-8th.pdf because the filename has two days. Media uploaded 06/11/2026, filesize 720525, mime application/pdf. Pin the PDF and skip listing. This IP RemoteDisconnected on Range GET; GitHub already reached bree.ie wp-json."
+    "13/11/2026: predicted_dated_pdf GitHub miss on Newsletter-3745-Nov-7th-8th.pdf (this PC HEAD 200 720525). Harvest 43348479362. Browser download of the pinned PDF.",
+    "09/11/2026: dual-date filename failed listing filter."
   ],
   "do_not": [
+    "Do not use predicted_dated_pdf — GitHub urllib misses bree.ie.",
     "Do not keep Newsletter-3742-Oct-17th-18th.pdf or 3744-Oct-31st-Nov-1st.pdf.",
     "Do not read 8th as the year 2018.",
-    "Do not take the JPEG page scans while a PDF exists.",
-    "Do not set start_url to the homepage — dual-date filenames fail the dated-PDF filter.",
-    "Do not harvest Facebook.",
-    "Do not use the ferns.ie mass-times card as the bulletin."
+    "Do not harvest Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
