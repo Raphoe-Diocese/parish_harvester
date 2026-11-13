@@ -1,30 +1,29 @@
 {
-  "version": 8,
+  "version": 9,
   "parish_key": "termonmaguirc",
   "display_name": "Termonmaguirc (Carrickmore, Loughmacrory & Creggan)",
   "diocese": "armagh",
-  "start_url": "https://www.termonmaguircparish.com/bulletins/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    ".pdf"
-  ],
+  "start_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "example_url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf",
   "timeout_ms": 30000,
   "total_timeout_s": 90,
-  "recorded_date": "2026-11-10",
+  "weeks_ahead": 1,
+  "recorded_date": "2026-11-13",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.termonmaguircparish.com/bulletins/"
+      "action": "download",
+      "url": "https://www.termonmaguircparish.com/wp-content/uploads/2026/11/Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf"
     }
   ],
   "operator_notes": [
-    "09/11/2026: Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf rewrite becomes Twenty-Sixth ... 8-November and 404s. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 206 application/pdf magic %PDF, 683554 bytes. start_url is the PDF so /bulletins/ challenge is skipped.",
-    "10/11/2026: /bulletins/ lists Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf with the older Sunday files. Scrape that listing. Do not pin the Sunday ordinal filename. Plain HTTP on 10/11/2026 returned the PDF links."
+    "13/11/2026: /bulletins/ times out or rewrites Twenty-Sixth-1-November into a bad Twenty-Sixth-8-November URL. Live file is Thirty-Second-Sunday-in-Ordinary-Time-8-Nov-2026.pdf. Proved GET 200 application/pdf magic %PDF. start_url is that PDF.",
+    "Do not start on /bulletins/ until Cloudflare/timeout is fixed."
   ],
   "do_not": [
-    "Do not keep Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf.",
+    "Do not rewrite Twenty-Sixth-Sunday-in-Ordinary-Time-1-November-2026.pdf to 8-November.",
     "Do not harvest Facebook.",
-    "Do not pin the Sunday ordinal filename."
+    "Do not open /bulletins/ first — it hangs the harvest."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",

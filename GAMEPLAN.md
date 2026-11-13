@@ -1,3 +1,6 @@
+## 13/11/2026 01:10 - Step 5/6: pin Mayobridge Termonmaguirc Donaghmore PDFs
+PR 580 clash merge 820c1d13. Recipes pin this-week PDFs so listing/Cloudflare hangs lose. Termonmaguirc Thirty-Second-8-Nov (not Twenty-Sixth rewrite). Mayobridge Parish-Bulletin-8-November-2026.pdf. Donaghmore 8th-November PDF + ignore_https_errors. Donaghmore harvest 43342340968 still running on old recipe. Not merged. Not live.
+
 ## 13/11/2026 00:30 - PRs 578+579 merged. Step 6 Donaghmore clash + Step 5 hits next
 578 guard and 579 unskip 25 on main. Fixing donaghmore key clash so Dromore active recipe loads. Paste hits Mayobridge + Termonmaguirc need re-harvest after. Raphoe still empty. Not live.
 

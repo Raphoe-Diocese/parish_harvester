@@ -2,35 +2,33 @@
   "parish_key": "donaghmore",
   "display_name": "Donaghmore",
   "diocese": "dromore",
-  "recorded_date": "2026-11-10",
-  "start_url": "https://donaghmoreparish.org",
-  "site_type": "http_scrape_newest_pdf",
+  "recorded_date": "2026-11-13",
+  "start_url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "example_url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf",
   "playbook_type": "direct_download",
   "status": "active",
   "skip": false,
+  "ignore_https_errors": true,
   "steps": [
     {
-      "action": "goto",
-      "url": "https://donaghmoreparish.org"
+      "action": "download",
+      "url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf"
     }
   ],
-  "version": 2,
+  "version": 3,
+  "timeout_ms": 45000,
+  "total_timeout_s": 90,
+  "weeks_ahead": 1,
   "operator_notes": [
-    "07/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 02/10/2026. Do not pin https://donaghmoreparish.org/wp-content/uploads/2026/10/service@riceoffice.com_20261002_122109.pdf.",
-    "10/11/2026: homepage links Donaghmore-Bulletin-8th-November-2026.pdf. Scrape the homepage. Do not pin the dated filename. Do not take the service@riceoffice hash PDF.",
-    "13/11/2026: Armagh Facebook-only skip renamed to donaghmorearmagh so this active recipe loads. recipe_path_for prefers active over skip."
+    "13/11/2026: homepage scrape can hang. Proved PDF Donaghmore-Bulletin-8th-November-2026.pdf GET 200 %PDF with ignore_https_errors (expired cert). start_url is the PDF.",
+    "Armagh Facebook-only parish is donaghmorearmagh."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not harvest Facebook.",
+    "Do not pin forever — predicted rewrites the date.",
     "Do not take the service@riceoffice hash PDF.",
-    "Do not reuse parish_key donaghmore for the Armagh Facebook-only parish."
+    "Do not harvest Facebook."
   ],
-  "href_patterns": [
-    "Donaghmore-Bulletin"
-  ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 120,
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
