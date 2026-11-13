@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -362,7 +363,51 @@ _MAX_ADJACENT_DATE_LINE_WORDS = 12
 _ADJACENT_BODY_PARAGRAPH_RE = re.compile(
     r"(?i)\b(?:died|death|anniversary|anniversaries|in memory|deceased|"
     r"will take|recently)\b"
+    r"|fuair.{0,60}b[aá]s"
+    r"|\bb[aá]sanna\b|\bb[aá]s\b"
+    r"|i ng?cuimhne|ar shl[ií] na f[ií]rinne"
 )
+
+# Irish month names stay Irish. Used only to read a date, never to translate.
+_IRISH_MONTHS: tuple[tuple[str, int], ...] = (
+    ("deireadh fomhair", 10),
+    ("mean fomhair", 9),
+    ("eanair", 1),
+    ("feabhra", 2),
+    ("marta", 3),
+    ("aibrean", 4),
+    ("bealtaine", 5),
+    ("meitheamh", 6),
+    ("iuil", 7),
+    ("lunasa", 8),
+    ("samhain", 11),
+    ("nollaig", 12),
+)
+_IRISH_MONTH_TO_NUM = {name: num for name, num in _IRISH_MONTHS}
+_IRISH_MONTH_ALT = "|".join(
+    re.escape(name) for name, _num in sorted(_IRISH_MONTHS, key=lambda item: -len(item[0]))
+)
+_IRISH_DAY_MONTH_YEAR_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th|u)?\s+({_IRISH_MONTH_ALT})\s+(20\d{{2}})(?!\d)",
+    re.IGNORECASE,
+)
+
+
+def _fold_irish(text: str) -> str:
+    folded = unicodedata.normalize("NFD", text or "")
+    folded = "".join(ch for ch in folded if unicodedata.category(ch) != "Mn")
+    return re.sub(r"\s+", " ", folded.lower())
+
+
+def _irish_month_date_from_line(line: str) -> date | None:
+    """Read 8 Samhain 2026 / 1ú Samhain 2026. The Irish words stay in the text."""
+    match = _IRISH_DAY_MONTH_YEAR_RE.search(_fold_irish(line))
+    if not match:
+        return None
+    month = _IRISH_MONTH_TO_NUM.get(match.group(2).lower())
+    if month is None:
+        return None
+    return _safe_date(int(match.group(3)), month, int(match.group(1)))
 
 
 def _nonempty_text_lines(text: str) -> list[str]:
@@ -377,7 +422,7 @@ def _parse_short_adjacent_date_line(line: str) -> date | None:
         return None
     if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
         return None
-    return extract_date_from_string(line)
+    return extract_date_from_string(line) or _irish_month_date_from_line(line)
 
 
 # Referee Brain slice 1 (stale harder, 29/09/2026): a masthead line that names
@@ -413,7 +458,7 @@ def extract_bulletin_date_from_text(text: str) -> date | None:
     for index, line in enumerate(lines):
         if not _BULLETIN_HEADING_RE.search(line):
             continue
-        parsed = extract_date_from_string(line)
+        parsed = extract_date_from_string(line) or _irish_month_date_from_line(line)
         if parsed:
             return parsed
         for offset in _ADJACENT_DATE_LINE_OFFSETS:
@@ -428,7 +473,7 @@ def extract_bulletin_date_from_text(text: str) -> date | None:
         if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
             continue
         if _FULL_YEAR_RE.search(line):
-            parsed = extract_date_from_string(line)
+            parsed = extract_date_from_string(line) or _irish_month_date_from_line(line)
             if parsed:
                 return parsed
         for offset in _ADJACENT_DATE_LINE_OFFSETS:
@@ -440,6 +485,16 @@ def extract_bulletin_date_from_text(text: str) -> date | None:
                 parsed = _parse_short_adjacent_date_line(neighbour)
                 if parsed:
                     return parsed
+    for line in lines:
+        if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
+            continue
+        if len(line) > _MAX_ADJACENT_DATE_LINE_CHARS:
+            continue
+        if len(line.split()) > _MAX_ADJACENT_DATE_LINE_WORDS:
+            continue
+        parsed = _irish_month_date_from_line(line)
+        if parsed:
+            return parsed
     return None
 
 
@@ -460,17 +515,23 @@ def heading_dates_in_text(text: str) -> list[date]:
     lines = _nonempty_text_lines(text)
     for index, line in enumerate(lines):
         if _BULLETIN_HEADING_RE.search(line):
-            add(extract_date_from_string(line))
+            add(extract_date_from_string(line) or _irish_month_date_from_line(line))
             for offset in _ADJACENT_DATE_LINE_OFFSETS:
                 neighbour_index = index + offset
                 if 0 <= neighbour_index < len(lines):
                     add(_parse_short_adjacent_date_line(lines[neighbour_index]))
         if not _LITURGICAL_MASTHEAD_RE.search(line):
+            if (
+                not _ADJACENT_BODY_PARAGRAPH_RE.search(line)
+                and len(line) <= _MAX_ADJACENT_DATE_LINE_CHARS
+                and len(line.split()) <= _MAX_ADJACENT_DATE_LINE_WORDS
+            ):
+                add(_irish_month_date_from_line(line))
             continue
         if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
             continue
         if _FULL_YEAR_RE.search(line):
-            add(extract_date_from_string(line))
+            add(extract_date_from_string(line) or _irish_month_date_from_line(line))
         for offset in _ADJACENT_DATE_LINE_OFFSETS:
             neighbour_index = index + offset
             if 0 <= neighbour_index < len(lines) and _FULL_YEAR_RE.search(lines[neighbour_index]):
@@ -682,7 +743,7 @@ def _line_issue_date(line: str) -> date | None:
     """A date on this line. Memorials and clock-years stay None."""
     if _ADJACENT_BODY_PARAGRAPH_RE.search(line or ""):
         return None
-    parsed = extract_date_from_string(line)
+    parsed = extract_date_from_string(line) or _irish_month_date_from_line(line)
     if parsed is None or _clock_stole_the_year(line, parsed):
         return None
     return parsed
