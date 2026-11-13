@@ -76,6 +76,19 @@ def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
     return dest
 
 
+def _file_bytes_field(path: Path | None) -> dict[str, int]:
+    """PDF size in bytes for next Sunday's same-URL compare. Empty when missing."""
+    if path is None:
+        return {}
+    try:
+        file_path = Path(path)
+        if file_path.is_file():
+            return {"file_bytes": int(file_path.stat().st_size)}
+    except OSError:
+        return {}
+    return {}
+
+
 def _recipe_is_inactive(meta: dict | None) -> bool:
     """True when harvest should not run the recipe at all.
 
@@ -319,6 +332,7 @@ def generate_report(
                 "file": dest.name if dest else f"{r.key}.pdf",
                 "file_type": r.file_type,
                 **_bulletin_date_fields(r.url, pdf_path=r.file_path, target=target),
+                **_file_bytes_field(dest or r.file_path),
             }
             downloaded.append(entry)
         elif r.status == "html_link":
@@ -445,6 +459,7 @@ def _result_to_report_entry(
             "file": dest.name if dest else f"{r.key}.pdf",
             "file_type": r.file_type,
             **_bulletin_date_fields(r.url, pdf_path=r.file_path, target=target),
+            **_file_bytes_field(dest or r.file_path),
         }
     if r.status == "html_link":
         return "html_links", {

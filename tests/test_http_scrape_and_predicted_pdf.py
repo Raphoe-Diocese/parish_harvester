@@ -386,6 +386,58 @@ class HttpScrapeScoreTests(unittest.TestCase):
         self.assertEqual(best_date, date(2026, 8, 16))
         self.assertIn("August-16", best_url)
 
+    def test_changed_undated_newsletter_scores_as_harvest_sunday(self) -> None:
+        last_week = (
+            "https://parish.ie/uploads/Newsletter-1st-November-2026.pdf"
+        )
+        undated = "https://parish.ie/uploads/newsletter.pdf"
+        scored = _score_http_scrape_pdf_hrefs(
+            [last_week, undated],
+            date(2026, 11, 8),
+            previous_url=last_week,
+        )
+        by_url = {url: found for found, url in scored}
+        self.assertEqual(by_url[undated], date(2026, 11, 8))
+        self.assertEqual(by_url[last_week], date(2026, 11, 1))
+        from harvester.newsletter_brain import same_sunday_urls
+
+        kept = same_sunday_urls(scored, date(2026, 11, 8))
+        self.assertEqual(kept, [undated])
+
+    def test_same_undated_url_is_not_scored_as_this_sunday(self) -> None:
+        last_week = (
+            "https://parish.ie/uploads/Newsletter-1st-November-2026.pdf"
+        )
+        undated = "https://parish.ie/uploads/newsletter.pdf"
+        scored = _score_http_scrape_pdf_hrefs(
+            [last_week, undated],
+            date(2026, 11, 8),
+            previous_url=undated,
+        )
+        urls = [url for _found, url in scored]
+        self.assertNotIn(undated, urls)
+        self.assertIn(last_week, urls)
+
+    def test_eighth_november_beats_order_of_mass(self) -> None:
+        order = (
+            "https://www.catholicbishops.ie/wp-content/uploads/2011/02/"
+            "Order-of-Mass.pdf"
+        )
+        this_week = (
+            "https://parish.ie/uploads/Newsletter-8th-November-2026.pdf"
+        )
+        last_week = (
+            "https://parish.ie/uploads/Newsletter-1st-November-2026.pdf"
+        )
+        scored = _score_http_scrape_pdf_hrefs(
+            [order, this_week, last_week],
+            date(2026, 11, 8),
+        )
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 11, 8))
+        self.assertEqual(best_url, this_week)
+        self.assertTrue(all("Order-of-Mass" not in url for _, url in scored))
+
 
 class WixDatedSlugCandidateTests(unittest.TestCase):
     def test_ballinascreen_includes_copy_of_variant(self) -> None:
