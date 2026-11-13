@@ -141,6 +141,50 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotIn("31st-Oct", recipe["start_url"])
         self.assertNotIn("1st-Nov", recipe["start_url"])
 
+    def test_faughart_print_to_pdf_is_08_11_newsboard(self) -> None:
+        recipe = _recipe("parishes/recipes/armagh/faughart.json")
+        self.assertIn("newsboard-08-11-2026", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "wordpress")
+        self.assertEqual(recipe["playbook_type"], "html_text_bulletin")
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_html")
+        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertFalse(recipe.get("skip"))
+        self.assertEqual(recipe["steps"][-1]["action"], "print_to_pdf")
+        self.assertTrue(recipe["steps"][-1].get("skip_listing_nav"))
+        self.assertNotIn("/2026/10/30/1335/", recipe["start_url"])
+        self.assertNotIn("01/11/2026", recipe["start_url"])
+        self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://www.faughartparish.ie"
+        )
+
+    def test_headford_pins_7th_8th_nov_churchtv_pdf(self) -> None:
+        recipe = _recipe("parishes/recipes/tuam/headford.json")
+        self._assert_wordpress_direct(recipe, "Newsletter-7th-8th-November-2026.pdf")
+        self.assertIn("/2021/02/", recipe["start_url"])
+        self.assertNotIn("14th-15th-November", recipe["start_url"])
+        self.assertNotIn("31st-October", recipe["start_url"])
+        self.assertNotIn("1st-November", recipe["start_url"])
+        self.assertNotIn("September", recipe["start_url"])
+        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://headfordchurch.com"
+        )
+
+    def test_bekan_pins_8_november_png_not_listing(self) -> None:
+        recipe = _recipe("parishes/recipes/tuam/bekan.json")
+        self._assert_wordpress_direct(recipe, "bpn8nov26.png")
+        self.assertFalse(recipe.get("skip"))
+        self.assertNotIn("bekanparishnewsletter01nov26", recipe["start_url"])
+        self.assertNotIn("bpn8nov26.jpg", recipe["start_url"])
+        self.assertNotIn("1st-november", recipe["start_url"])
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "http://www.bekan-parish.ie"
+        )
+        self.assertNotEqual(
+            recipe["start_url"].rstrip("/"), "https://bekan-parish.ie"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
