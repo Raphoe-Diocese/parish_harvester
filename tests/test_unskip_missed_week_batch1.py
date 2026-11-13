@@ -39,17 +39,18 @@ KEYS = [
 class UnskipMissedWeekBatch1Tests(unittest.TestCase):
     def test_batch_is_active_and_runnable(self) -> None:
         root = Path("parishes/recipes")
-        found = 0
+        by_key: dict[str, Path] = {}
         for path in root.glob("*/*.json"):
-            data = json.loads(path.read_text(encoding="utf-8"))
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
             key = str(data.get("parish_key") or path.stem)
-            if key not in KEYS:
-                continue
-            found += 1
+            if key in KEYS:
+                by_key[key] = path
+        self.assertEqual(sorted(by_key), sorted(KEYS))
+        for key, path in by_key.items():
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
             self.assertFalse(data.get("skip"), key)
             self.assertEqual(data.get("status"), "active", key)
             self.assertFalse(_recipe_is_inactive(data), key)
-        self.assertEqual(found, len(KEYS))
 
 
 if __name__ == "__main__":
