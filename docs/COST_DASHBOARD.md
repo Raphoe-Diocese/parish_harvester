@@ -1,6 +1,6 @@
 # 💷 Cost Dashboard
 
-_Auto-generated at 2026-11-12T17:36:51Z UTC._
+_Auto-generated at 2026-11-15T14:12:08Z UTC._
 
 _This file is rewritten on every harvest and OCR run. Do not edit manually._
 
@@ -11,7 +11,7 @@ _Month 2026-11. Counted from billed Mistral / Gemini / OpenAI pages only. Tesser
 | Provider | Pages this month | Free ceiling | % used | At 26 dioceses |
 |---|---:|---:|---:|---:|
 | Mistral | 0 | 2500 | 0.0% | 0 |
-| Gemini | 22 | unknown | unknown | 23 |
+| Gemini | 39 | unknown | unknown | 41 |
 | OpenAI | 0 | unknown | unknown | 0 |
 
 Read the three **Pages this month** numbers. Red only if a known ceiling is set and the 26-diocese projection is over it.
@@ -40,8 +40,8 @@ _Providers can change free tiers. Read the OCR table above for this month’s pa
 
 ## 🟢 Repository storage
 
-**Used:** 0.630 GB / 5.0 GB hard cap
-**Progress:** [██░░░░░░░░░░░░░░░░░░] 12.6%
+**Used:** 0.561 GB / 5.0 GB hard cap
+**Progress:** [██░░░░░░░░░░░░░░░░░░] 11.2%
 
 Plenty of space. No action needed.
 
