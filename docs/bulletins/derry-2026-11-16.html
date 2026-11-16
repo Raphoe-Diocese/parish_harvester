@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Derry Diocese Bulletin Viewer — 16/11/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="../mega_pdf/derry_mega_bulletin_p1.jpg?d=2026-11-16&amp;h=20261115T1036" as="image">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #f4f6f6;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a6b6b;
+    }
+
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
+    .section-heading {
+      margin: 34px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .viewer-block {
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .ocr-open-text {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 8px;
+      padding: 8px 14px;
+      background: #14524f;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .ocr-open-text:hover { background: #0e3b39; color: #fff; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
+
+    .pdf-frame-wrap {
+      position: relative;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      max-width: 100%;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px !important;
+      min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+
+
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .search-clear {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 4px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
+    .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
+    .diocese-intro {
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }
+    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
+    .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
+    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
+    .diocese-intro h3 {
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: #14524f;
+    }
+    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
+    .diocese-intro .intro-names {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+    .diocese-intro .intro-names li { margin: 0 0 4px; }
+    
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .ocr-zoom-bar button {
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
+    }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
+    .ocr-zoom-pct {
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    
+    #ocr-panel {
+      background: #f3f5f4;
+      color: #141918;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.7;
+      max-width: min(68ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h2.b-title, #ocr-panel .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    #ocr-panel h3.b-head, #ocr-panel .b-head {
+      font-size: 1.2em;
+      color: #0a3333;
+      margin: 1.5em 0 0.5em;
+      padding: 0.35em 0.55em 0.35em 0.65em;
+      border-left: 4px solid #1a6b6b;
+      border-bottom: 1px solid #cfd8d4;
+      background: #e7ecea;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+      letter-spacing: 0.01em;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.08em;
+      color: #145a3d;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.2em 0 0.4em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.95em;
+    }
+    #ocr-panel h3.ocr-page-heading,
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    #ocr-panel hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    #ocr-panel strong { color: #0f2b5b; }
+    #ocr-panel a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    #ocr-panel mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    #ocr-panel mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+      max-width: 100%;
+      height: auto;
+    }
+    #ocr-panel > :first-child {
+      margin-top: 0;
+    }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      border: 1px solid #d4ddd9;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .note-box {
+      margin-top: 12px;
+      color: #8a3b3b;
+      font-weight: 400;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 4px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .empty-state[hidden],
+    #parish-empty[hidden] { display: none !important; }
+    .parish-section {
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
+    }
+    .parish-section h2.section-heading {
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+    .parish-filter {
+      width: 100%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
+    }
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: #1a6b6b;
+      font-weight: 700;
+    }
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
+    }
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
+    footer {
+      margin-top: 40px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
+      }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
+      /* Tap targets big enough for a thumb. */
+      .az-letter,
+      .ocr-zoom-bar button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
+      .download-link-top { display: none; }
+      .ocr-open-text { margin-left: 0; width: 100%; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
+      #ocr-panel {
+        padding: 16px 14px 28px;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      .ocr-search-tools button {
+        min-height: 44px;
+        width: 100%;
+      }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="/assets/pdf-inpage-viewer.js?v=20261018a" defer></script>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html" target="_blank" rel="noopener noreferrer">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">DERRY</p>
+      <h1>Derry Collated Bulletin</h1>
+      
+      <p class="meta">Generated for 16/11/2026.</p>
+      <a class="download-link-top pdf-force-download" href="../mega_pdf/derry_mega_bulletin.pdf?d=2026-11-16&amp;h=20261115T1036" download="derry_mega_bulletin.pdf">Download PDF</a>
+    </header>
+    
+
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+    </div>
+
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballinascreen (Desertmartin)|Banagher|Bellaghy|Buncrana" title="Ballinascreen (Desertmartin), Banagher, Bellaghy, Buncrana" aria-label="Jump to Ballinascreen (Desertmartin)">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Camus|Cappagh (&amp; Killyclogher amalgamated)|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe" title="Camus, Cappagh (&amp; Killyclogher amalgamated), Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="DMA Parish (Claudy area)|Drumquin|Drumragh|Dunamanagh|Dungiven" title="DMA Parish (Claudy area), Drumquin, Drumragh, Dunamanagh, Dungiven" aria-label="Jump to DMA Parish (Claudy area)">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Garvagh|Gortin|Granaghan|Greencastle|Greenlough" title="Garvagh, Gortin, Granaghan, Greencastle, Greenlough" aria-label="Jump to Garvagh">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Killygordon|Kilrea" title="Killygordon, Kilrea" aria-label="Jump to Killygordon">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lavey|Leckpatrick|Lifford|Limavady|Long Tower" title="Lavey, Leckpatrick, Lifford, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Plumbridge" title="Plumbridge" aria-label="Jump to Plumbridge">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown|Strabane" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown, Strabane" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button></nav>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe data-pdf-url="../mega_pdf/derry_mega_bulletin.pdf?d=2026-11-16&amp;h=20261115T1036" title="Derry Diocese bulletin PDF"></iframe>
+        
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../mega_pdf/derry_mega_bulletin.pdf?d=2026-11-16&amp;h=20261115T1036" data-pdf-preview="../mega_pdf/derry_mega_bulletin_p1.jpg?d=2026-11-16&amp;h=20261115T1036">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a class="pdf-open-newtab" href="../mega_pdf/derry_mega_bulletin.pdf?d=2026-11-16&amp;h=20261115T1036" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="../mega_pdf/derry_mega_bulletin.pdf?d=2026-11-16&amp;h=20261115T1036" download="derry_mega_bulletin.pdf">Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="../mega_pdf/derry_mega_bulletin_p1.jpg?d=2026-11-16&amp;h=20261115T1036" alt="" style="display:block;width:100%;height:auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="ocr-sticky-chrome">
+      <div class="ocr-search-bar">
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+        </div>
+      </div>
+      </div>
+      <div class="ocr-controls-row">
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballinascreen (Desertmartin)|Banagher|Bellaghy|Buncrana" title="Ballinascreen (Desertmartin), Banagher, Bellaghy, Buncrana" aria-label="Jump to Ballinascreen (Desertmartin)">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Camus|Cappagh (&amp; Killyclogher amalgamated)|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe" title="Camus, Cappagh (&amp; Killyclogher amalgamated), Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="DMA Parish (Claudy area)|Drumquin|Drumragh|Dunamanagh|Dungiven" title="DMA Parish (Claudy area), Drumquin, Drumragh, Dunamanagh, Dungiven" aria-label="Jump to DMA Parish (Claudy area)">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Garvagh|Gortin|Granaghan|Greencastle|Greenlough" title="Garvagh, Gortin, Granaghan, Greencastle, Greenlough" aria-label="Jump to Garvagh">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Killygordon|Kilrea" title="Killygordon, Kilrea" aria-label="Jump to Killygordon">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lavey|Leckpatrick|Lifford|Limavady|Long Tower" title="Lavey, Leckpatrick, Lifford, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Plumbridge" title="Plumbridge" aria-label="Jump to Plumbridge">P</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown|Strabane" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown, Strabane" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button></nav>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+        <a class="ocr-open-text" href="derry-2026-11-16-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-aghyaran" data-parish-name="Aghyaran"><h2 class="ocr-parish-name">Aghyaran</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-ardmore" data-parish-name="Ardmore"><h2 class="ocr-parish-name">Ardmore</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-desertmartin" data-parish-name="Desertmartin"><h2 class="ocr-parish-name">Desertmartin</h2></header>
+<h4 class="b-sub">Telephone</h4>
+<p>79632196</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a></p>
+<h3 class="b-head">PARISH OFFICE</h3>
+<p>S Ballinascreen: 9 High Street Phone: (028)79628248</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:ballinascreenparish@gmail.com" target="_blank" rel="noopener noreferrer">ballinascreenparish@gmail.com</a> Opening Hours: Monday, Tuesday and Thursday: 8.45 am - 3.30 pm. Wednesday: 8.45 am - 3.00 pm. Desertmartin: St Patrick’s Keenaught Phone: (028)79397047</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a> Opening Hours: Wednesday and</p>
+<p>Thursday 10.30 am to 3.00 pm. SAFEGUARDING Contact Information If you have any concerns with regard to the safeguarding of children within the Church, please contact: Marie O’Kane - Diocesan Designated Liaison Person <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+44 7596 500793</a> or</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> Northern Ireland Emergency Services LIFELINE</p>
+<h4 class="b-sub">Tel</h4>
+<p>0808 808 8000 / Textphone 18001 0808 808 8000. <a href="https://www.lifelinehelpline.info" target="_blank" rel="noopener noreferrer">www.lifelinehelpline.info</a> SVP HELPLINE telephone number: <a href="tel:+3537710838050" style="color:#1d4ed8;font-weight:600;">07710838050</a></p>
+<p>GAMBLING HELPLINE Help is available, phone: <a href="tel:+442871351329" style="color:#1d4ed8;font-weight:600;">02871351329</a></p>
+<p>SPERRIN FOODBANK</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+3537543420639" style="color:#1d4ed8;font-weight:600;">07543420639</a></p>
+<p>BALLINASCREEN COMMUNITY SUPPORT GROUP Please click the link <a href="https://www.parishofballinascreen.com/ballinascreen-community-support-gro" target="_blank" rel="noopener noreferrer">https://www.parishofballinascreen.com/ballinascreen-community-support-gro</a> for full details of Ballinascreen Community Support Group.</p>
+<p>PSNI (Police Service of Northern Ireland): 101 Social Services: Gateway Services, Western HSC Trust: <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 7131 4090</a> (ask for the Duty Social Worker) Gateway Services, Northern HSC Trust: <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a></p>
+<p>Regional Emergency Social Work Services: 0800 1979 995</p>
+<p>Ballinascreen (Desertmartin) <a href="https://www.parishofballinascreen.com" target="_blank" rel="noopener noreferrer">https://www.parishofballinascreen.com</a></p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>NOTICES FOR THE BULLETIN should be received by 1.00 pm on Wednesday, preferably by email.</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:ballinascreenparish@gmail.com" target="_blank" rel="noopener noreferrer">ballinascreenparish@gmail.com</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a> VIGIL MASSES FOR SUNDAY Holy Rosary: 6.00 pm St Patrick’s, Keenaught: 4.30 pm - NB New Time</p>
+<h3 class="b-head">SUNDAY MASSES</h3>
+<p>St Columba’s, Straw: 9.00 am St Mary’s, Coolcalm: 10.00 am St Patrick’s, Sixtowns: 11.00 am St Eugene’s, Moneyneena: 12 noon MASSES FOR THIS WEEK Monday ~ 9 November 10.00 am ~ Holy Rosary Church 7.30 pm ~ Holy Rosary - Mass in honour of Padre Pio.</p>
+<p>Tuesday ~ 10 November 10.00 am ~ St Mary’s, Coolcalm.</p>
+<p>Wednesday ~ 11 November 10.00 am ~ Holy Rosary Church.</p>
+<p>Thursday ~ 12 November 10.00 am ~ St Mary’s, Coolcalm.</p>
+<p>Friday ~ 13 November 10.00 am ~ St Mary’s, Coolcalm. 7.30 pm ~ Holy Rosary Church.</p>
+<p>CONFESSIONS Ballinascreen: Holy Rosary at 5.30 pm - before Vigil Mass on Saturday.</p>
+<p>Desertmartin: St. Patrick&#x27;s, Keenaught at 4.00 pm - before Vigil Mass on Saturday.</p>
+<p>FEASTS OF THE WEEK</p>
+<p>Monday 9 November: The Dedication of The Lateran Basilica.</p>
+<p>Tuesday 10 November: St Leo the Great.</p>
+<p>Wednesday 11 November: St Martin of Tours</p>
+<p>Thursday 12 November: St Josaphat</p>
+<p>Friday 13 November: St Laurence O’Toole DERRY DIOCESAN SOCIETY If you wish to enrol someone in the society, please contact the parish office.</p>
+<p>The fee for a living or deceased member is £20. Prayers for the happy repose of the souls of the recently deceased members and all deceased members of the Derry Diocesan Society will take place at the Masses on the weekends of 7/8 November and 14/15 November.</p>
+<p>MASS IN HONOUR OF PADRE PIO The monthly mass in honour of St. Pio of Pietrelcina will be celebrated on</p>
+<p>Monday 9 November at 7.30 pm in Holy Rosary Church.</p>
+<p>Novena prayers and rosary at 7.00 pm. Adoration from 12 noon until 7.30 pm. ANNUAL MASS FOR DECEASED PARISHIONERS</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>The names of all who died or were buried in our parish since last year’s Parish Mass of Remembrance will be read out at this Mass.</p>
+<p>After all the names have been read out, a member of each of these bereaved families, will be invited to carry a lit candle to the altar.</p>
+<p>Each family should ensure that an adult has been selected to represent them.</p>
+<p>Candles will be provided at the back of the church during this Mass.</p>
+<p>CHANGE OF MASS TIME The Anniversary Mass on</p>
+<p>Friday 20 November in Holy Rosary Church, will be held at the earlier time of 7.00 pm , this schedule adjustment has been made to accommodate the town&#x27;s Christmas lights switch-on event occurring the same evening.</p>
+<h3 class="b-head">MONTH&#x27;S MIND</h3>
+<p>MASS The Month&#x27;s Mind Mass for Jacinta McEldowney, will take place on</p>
+<p>Saturday 14 November in St Patrick’s Church, Keenaught at 4.30 pm. The Month&#x27;s Mind Mass for Terrence Hegarty, Ranaghan Road, will take place on</p>
+<p>Friday 20 November at 7.00 pm in Holy Rosary Church.</p>
+<p>FIRST ANNIVERSARY MASS The First Anniversary Mass for Brigid O’Neill, née Burke, Magherafelt will be held on</p>
+<p>Friday 20 November at 7.00 pm in Holy Rosary Church.</p>
+<h3 class="b-head">ANNIVERSARIES</h3>
+<p>Ballinascreen: Annie Kelly, Mallon Villas; Victor Lynn, Cordarragh; Josephine Trainor, Moneyneena Rd.; Marie Mullen, Glenshane Park; Margaret McBride, Campbelltown Terrace.</p>
+<p>Desertmartin: Rose O’Hagan; Selina O’Hagan; Jimmy Lyttle; Jim McIvor; Gerry Murray; Nellie Trainor; Anne McGuigan; Rosie Donnelly.</p>
+<p>BAPTISMS We welcome into God’s family through the Sacrament of Baptism: Jude Thomas Glasgow, Cahore Terrace; Nora Sarah Conlon &amp; Conall Patrick Conlon, Brackaghislea Road.</p>
+<p>PILGRIMAGE TO LOURDES WITH BISHOP MICHAEL ROUTER Led by Bishop Michael Router.</p>
+<p>There are two options available as follows: Option 1 : 8 - 13 July, 5 nights, £980, from City of Derry Airport, with priority given to Assisted Pilgrims and family members, Care Team, Youth, Youth Leaders and Priests.</p>
+<p>Option 2 : 7 - 14 July, 7 nights, £1,095, from Belfast International Airport.</p>
+<p>Single Supplement and Travel Insurance will be extra.</p>
+<p>Expressions of Interest can be emailed to <a href="mailto:derrypilgrim@outlook.com" target="_blank" rel="noopener noreferrer">derrypilgrim@outlook.com</a> . Bookings will begin in mid-January, with more details later.</p>
+<p>Pilgrimage Gift Vouchers of any value are available from the Pastoral Centre, Bishop Street, Derry, for anyone wishing to purchase them, particularly as a Christmas Gift.</p>
+<p>Please contact <a href="tel:+442871362475" style="color:#1d4ed8;font-weight:600;">028 7136 2475</a> for further information.</p>
+<p>FATIMA PILGRIMAGE Fully escorted group to Fatima accompanied by Spiritual Director, 28 June – 5 July 2027. Direct Daytime Flights Belfast to Porto return.</p>
+<p>Staying in 4* Hotel. Full Board. Services of JWT Pilgrimage Guide.</p>
+<h3 class="b-head">Daily Mass</h3>
+<p>&amp; Spiritual Activities. Cost £975pps.</p>
+<p>Early Booking Offer: £100 OFF if Paid In Full by 30 November 2026. Further details contact Christina Lagan <a href="tel:+3537803192621" style="color:#1d4ed8;font-weight:600;">07803192621</a></p>
+<p>SHRINES OF FRANCE PILGRIMAGE Lisieux, Rue Du Bac, Nevers, Paris, Rocamadour and Lourdes - fully escorted pilgrimage from 11 to 18 June 2027. 7 Nights flying from Dublin to Paris/Lourdes to Dublin.</p>
+<p>Including visits to the home of the Miraculous Medal, and to see the incorrupt bodies of St Catherine Laboure and St Bernadette.</p>
+<p>In Paris visit Sacre-Coeur, Lourdes, plus much more.</p>
+<p>Comprehensive Travel insurance is extra £35.00. Cost: £1,200 per person sharing.</p>
+<p>Places are limited . Single room supplement is £345.00 extra . Spiritual Director: Fr Joe McGuigan. £250.00 deposit secures a seat!</p>
+<p>For further details contact: Jean Reynolds 07729 402311 or</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:jeanreynolds@hotmail.co.uk" target="_blank" rel="noopener noreferrer">jeanreynolds@hotmail.co.uk</a></p>
+<p>Tuesday 17 November at 7.30 pm in Holy Rosary Church.</p>
+<p>Wednesday 18 November at 7.30 pm in St Patrick&#x27;s Keenaught.</p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>PARISH COLLECTIONS Ballinascreen: Weekly Collection - £3547.80 Renovation Collection - £2468.50 Mission Collection - £81.50 (Total: £1592.65) Desertmartin: Weekly Collection - £1183.20 Renovation Collection - £686.20 Mission Collection - £145 Thank you for your generous support which is greatly appreciated . Totals shown include October Standing Orders from Parishioners.</p>
+<p>If would like to avail of this option please contact the Parish Office.</p>
+<p>CHOIR DIRECTOR: ST EUGENE’S CATHEDRAL, DERRY 10 hours per week: St Eugene’s Cathedral is recruiting for an experienced choir director to lead and manage all aspects of the cathedral choir.</p>
+<p>They will ensure that the music enhances worship services and aligns with the church’s liturgical themes.</p>
+<p>For a job description and application pack - Tel.: (028) 7126 2302 or</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> . Submit completed applications to Personnel, Bishop’s House, St Eugene’s Cathedral, Francis Street, Derry, BT48 9AP, or Email to: <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> . Applications to be received by noon on</p>
+<p>Thursday 12 November 2026. DERRY DIOCESE VOCATIONS There will be a meeting for anyone considering a vocation to the diocesan priesthood, in Derry, on</p>
+<p>Sunday 8 November, beginning at 4.00 pm. For further details, please contact the Diocesan Vocations Director, Fr Pat O&#x27;Hagan</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:pgoh2111@gmail.com" target="_blank" rel="noopener noreferrer">pgoh2111@gmail.com</a> or Tel.: (028) 79386259. TROCAIRE IS LOOKING FOR VOLUNTEERS To help deliver school talks during our annual Lent Appeal during February and March 2027. We are particularly interested in hearing from people with public speaking experience, especially retired teachers or those who have worked with young people.</p>
+<p>Volunteers will visit local schools during school hours to share stories of hope, justice and solidarity from communities around the world.</p>
+<p>The role involves approximately 1-2 short talks per week during the four-month campaign period.</p>
+<p>Full training, presentation materials and ongoing support will be provided.</p>
+<p>Please contact Fionnuala McGuinness on <a href="tel:+442890808033" style="color:#1d4ed8;font-weight:600;">028 9080 8033</a> or <a href="mailto:fionnuala.mcguinness@trocaire.org" target="_blank" rel="noopener noreferrer">fionnuala.mcguinness@trocaire.org</a> by the first week of December if you are interested!</p>
+<p>WARM WELCOME WEDNESDAY In Workspace Community Hub,</p>
+<p>Wednesday 11 November from 11.00 am to 1.00 pm. We will be joined by Inspire Wellbeing at 11.45 am for a mental health and wellbeing session.</p>
+<p>Inspire Wellbeing is an all-island charity focused on mental health, intellectual disabilities and addiction support.</p>
+<p>This session provides participants with an opportunity to consider what we really mean by ‘mental health’ and how we can look after our mental health and strengthen our overall wellbeing.</p>
+<p>Booking not required, just drop in on the day.</p>
+<p>Free tea, coffee and refreshments also served.</p>
+<p>HAEMOCHROMATOSIS COFFEE EVENING Free event, for anyone who suffers with haemochromatosis, waiting on diagnoses or family &amp; friends, to learn more &amp; support one another.</p>
+<p>Neil from haemochromatosis UK will be in attendance, to answer questions &amp; offer advice &amp; guidance.</p>
+<p>Venue: The Community Hub (next to library), Draperstown on</p>
+<p>Wednesday 11 November from 6.30 pm to 8.00 pm. All welcome. ABIDE WOMEN&#x27;S CONFERENCE 2026 20 - 22</p>
+<p>November. Join hundreds of women at the Great Northern Hotel, Bundoran, Speakers include Sarah Swafford, Danielle Noonan, Kimberlee Woo Ling, Fr Oisín Martin CFR, Fr Barry Braum, the Nashville Dominican Sisters, Fr David Nugent and Fr Mark Wharton, with Holy Mass celebrated by Bishop Fintan Gavin.</p>
+<p>A weekend of faith, celebration, healing and joy!</p>
+<p>Register on Eventbrite: Abide in His Love.</p>
+<p>FREE STRESS CONTROL CLASSES The classes are FREE and the next round will commence on</p>
+<p>Monday 9 November at 9.00 am , with session two on the following Monday at 9.00 am ( 16 November ).</p>
+<p>Access the online classes at <a href="https://ni.stresscontrol.org/.RANGANNAGAEILGE/IRISHLANGUAGECLASSESJoin" target="_blank" rel="noopener noreferrer">https://ni.stresscontrol.org/.RANGANNAGAEILGE/IRISHLANGUAGECLASSESJoin</a> a growing community to learn Irish in a fun, welcoming environment!</p>
+<p>A New Christmas Themed 6-week course is starting on</p>
+<p>Monday 9 November in St Mary’s Hall, Desertmartin, wrapping up with a festive Céili Na Nollaig (Christmas Céili) in the pub during Christmas week.</p>
+<p>Bunrang (Beginners): 6:45pm – 8.00 pm. Meanrang (Improvers): 8.00 pm – 9:30pm Spaces are limited.</p>
+<p>To book a place</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:knocknaginhc@gmail.com" target="_blank" rel="noopener noreferrer">knocknaginhc@gmail.com</a> , or Tel.: Edward <a href="tel:+3537835161927" style="color:#1d4ed8;font-weight:600;">07835161927</a> / Gerard <a href="tel:+442879631744" style="color:#1d4ed8;font-weight:600;">02879631744</a> .</p>
+<hr>
+<header data-issue-iso="2026-01-10" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-ballinascreen-desertmartin-amalgamated" data-parish-name="Ballinascreen (&amp; Desertmartin amalgamated)"><h2 class="ocr-parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-banagher" data-parish-name="Banagher"><h2 class="ocr-parish-name">Banagher</h2></header>
+<p class="page-label">Page 14</p>
+<p>Columban Young Adults is a relatively new group for those aged 18 - 35 in the diocese, who are seeking a community of like-minded young adults who have Christ at the centre of their lives.</p>
+<p>Our November event will be a Holy Hour and meditation on</p>
+<p>Thursday 19th November at 7.00 pm at Our Lady of Lourdes Church, Steelstown, Derry, delivered by recently retired Bishop Donal McKeown.</p>
+<p>Meditation will be followed by Solemn Benediction and refreshments.</p>
+<p>We are seeking new members. Please come along and bring a friend!</p>
+<p>For information, please contact <a href="mailto:columbanyoungadults@gmail.com" target="_blank" rel="noopener noreferrer">columbanyoungadults@gmail.com</a> or follow us on social media.</p>
+<p>Week of Witness for Persecuted Christians One in ten Christians, 220 million people, live in countries where they are persecuted for their faith.</p>
+<p>The charity, ‘Aid to the Church in Need’, which works to support them, is organising a ‘Week of Witness’ from 15th - 22nd November to highlight their plight, with a special appeal for parishioners to pray for the suffering Church on ‘Red Wednesday’, 18th November.</p>
+<p>More information is available at <a href="https://www.acnireland.org" target="_blank" rel="noopener noreferrer">www.acnireland.org</a> Pray for Vocations During this month of November, let us pray for the deceased priests who served our diocese and our parishes as we pray for the men who will take up their mantle in the years to come.</p>
+<p>Considering a Vocation to the Diocesan Priesthood?</p>
+<p>There will be a meeting for anyone considering a vocation to the diocesan priesthood, in Derry, today (Sunday) beginning at 4 pm. For further details, please contact the Diocesan Vocations Director, Fr Pat O&#x27;Hagan, at <a href="mailto:pgoh2111@gmail.com" target="_blank" rel="noopener noreferrer">pgoh2111@gmail.com</a> or (028) 79386259. The Next Diocesan Vocations Holy Hours will take place on</p>
+<p>Tuesday 1st December from 8 - 9 pm, following 7.30 pm Mass in St Columb’s Church, Chapel Road, Waterside, Derry.</p>
+<p>Everyone welcome. Dublin Gospel Choir – Sacred Heart Church, Omagh Join us on</p>
+<p>Sunday 29th November 6.30 pm for a magical evening of music!</p>
+<p>From traditional hymns with a modern flair to soulful gospel classics and festive favourites.</p>
+<p>Featuring local primary schools. Tickets £20 from Top News, parish office or <a href="https://www.eventbrite.co.uk" target="_blank" rel="noopener noreferrer">www.eventbrite.co.uk</a> . Proudly hosted by Droim Ratha Na Sairsealaigh in with Sacred Heart Church and its Reviving Omagh’s Sacred Stories Heritage Project.</p>
+<p>Marie Curie, Strabane Christmas Carol Service takes place on</p>
+<p>Thursday 10th December at 7.30 pm at Christ Church, Bowling Green, Strabane.</p>
+<p>All welcome – no tickets - any donations welcome on the evening.</p>
+<p>Those entertaining include Strabane Brass Band, Class Act singers, and special guest soloist, Ruth Corey.</p>
+<p>A number of our local clergy will take part, enhancing the evening with scripture readings telling the story of Christmas.</p>
+<p>Fr Declan Boland will offer a personal reflection.</p>
+<p>Your presence will surely add to a most enjoyable evening for all.</p>
+<hr>
+<p class="page-label">Page 15</p>
+<p>ACCORD Marriage Preparation Courses available.</p>
+<p>Please visit <a href="https://www.accordni" target="_blank" rel="noopener noreferrer">www.accordni</a> . com Job Opportunity St Eugene’s Cathedral, Derry is recruiting an experienced Choir Director (10 hours per week) to lead and manage all aspects of the cathedral choir, ensuring that the music enhances worship services and aligns with the church’s liturgical themes.</p>
+<p>For a job description / application pack, please contact (028) 71262302 / <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> Completed applications must be submitted to Personnel, Bishop’s House, St Eugene’s Cathedral, Derry, BT48 9AP or to <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> by noon on</p>
+<p>Thursday 12th November 2026. Anam Cara - Supporting Parents After Bereavement Monthly in-person support evening takes place on</p>
+<p>Thursday 12th Nov at 7.30 pm in Radisson Blu Hotel, Letterkenny, F92 FK15. No registration required. Next information event takes place ONLINE on</p>
+<p>Thursday 19th November at 7.00 pm. It will centre around where creativity intersects with grief with renowned author and psychotherapist, Sasha Bates and is open to all parents whose child or children have died, regardless of the age of their child, circumstances of their death, or time since bereavement.</p>
+<p>Please contact <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> or 00353 85 288 8888. Carmelite Open Day A Day of Prayer, reflection and sharing with the Carmelite friars and nuns, for men and women, aged 18-40, will take place on</p>
+<p>Saturday 21st November from 10.30 am - 4.30 pm in Avila Retreat Centre, Donnybrook, Dublin.</p>
+<p>Registration by 15th November. Please contact: <a href="mailto:opendayavila@gmail.com" target="_blank" rel="noopener noreferrer">opendayavila@gmail.com</a> The Contemplative Prayer Group meetings resume on Mondays at 8.00 pm in the Pastoral Office, 27 Butcher Street, Strabane.</p>
+<p>Everyone welcome. Parish Bingo and Lucky Four in St Pat’s Hall on Thursdays at 8 pm. Some fun, excitement and slight competition.</p>
+<p>Abide Women’s Conference from 20th - 22nd November at Great Northern Hotel, Bundoran.</p>
+<p>Speakers include Sarah Swafford, Fr Barry Braun, Fr Mark Wharton, Kimberlee Woo Ling, Danielle Noonan, Nashville Dominicans, etc.</p>
+<p>Mass will be celebrated by Bishop Fintan Gavin, Cork &amp; Ross diocese.</p>
+<p>Please visit Abide in His Love at Eventbrite.ie.</p>
+<p>Registration at <a href="https://abideinhislove.eventbrite.com" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com</a> ‘It is therefore a holy and wholesome thought to pray for the dead, that they may be loosed from sins’. (2 Maccabees 12:46) Parish Christmas Draw Tickets will be available during the week.</p>
+<p>Further details, including prizes on o Mer, will be posted next week.</p>
+<p>We appreciate the support from everyone throughout our parishes and beyond.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-bellaghy" data-parish-name="Bellaghy"><h2 class="ocr-parish-name">Bellaghy</h2></header>
+<p class="page-label">Page 16</p>
+<p>Weekend Mass Schedule Immaculate Conception: Saturday Vigil: 4.30 pm; Sunday: 11.00 am Sacred Heart, Derry Road: Sunday: 12.15 pm St Patrick’s, Clonleigh: Saturday Vigil: 6.00 pm ; Sunday: 9.45 am St Mary&#x27;s Cloughcor :</p>
+<p>Sunday 8.30am (8th Nov - alternate Sundays - 22nd Joseph&#x27;s Glenmornan :</p>
+<p>Sunday 8.30am (15th Nov - alternate Sundays – 29th Nov)</p>
+<h3 class="b-head">Weekday Mass Schedule</h3>
+<p>Monday: 7.45 am: Sacred Heart Church, Derry Road 10.00 am: St Patrick’s Church, Lifford Tuesday: 10.00 am : Immaculate Conception Church, Strabane Wednesday: 7.45 am: Sacred Heart Church, Derry Road (followed by Eucharistic Adoration until 5.30 pm). 10.00 am: St Patrick’s Church, Lifford Thursday: 10.00 am : Immaculate Conception Church, Strabane Friday: 7.45 am: Sacred Heart Church, Derry Road 10.00 am : Immaculate Conception Church, Strabane Weddings: Please contact the parish office.</p>
+<p>At least 6 months’ notice required. Baptisms : Parent(s) are asked to contact the parish office.</p>
+<p>The Parish Pastoral Area Office , 27 Butcher St, Strabane covers all 3 parishes . Office hours: Monday -</p>
+<p>Thursday 9.30 am - 4.30 pm;</p>
+<p>Friday 9.30 am - 12.30 pm. Feel free to call in or phone on <a href="tel:+442871882215" style="color:#1d4ed8;font-weight:600;">028 71882215</a> . Reminder that the deadline for parish bulletin notices is 2 pm on Wednesdays.</p>
+<p>A Small Collection of Candles, Mass cards / Mass bouquets available for purchase at the Pastoral Office.</p>
+<p>St Pio prayer cards also available. A gentle reminder that we can only accept cash /cheque payments.</p>
+<p>Thank you. Safeguarding Notice If you have any concerns with regard to the Safeguarding of children within the Church please contact Marie O’Kane, the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+447596500793</a> or</p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> Northern Ireland emergency services: PSNI (Police Service of Northern Ireland): 101 Social Services: Gateway Services, Western HSC Trust: <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 7131 4090</a> (and ask for the Duty Social Worker), Gateway Services, Northern HSC Trust: <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a> , Regional Emergency Social Work Services: 0800 1979 995. Republic of Ireland emergency services: Garda Síochána Buncrana: 00353 749 320 540</p>
+<p>Letterkenny: 00353 749 167 100, TUSLA (ROI) Child and Family Agency: 00353 749 102 23.</p>
+<hr>
+<p class="page-label">Page 17</p>
+<p>St Mary&#x27;s Killyclogher,. St-Mary’s Knochkhmoyle, Corpus Christi Mountfield,. Christ The King Strathroy</p>
+<h3 class="b-head">Mass SCHEDULE</h3>
+<p>St. Mary’s Church, Killyclogher Christ the King Church, Strathroy Sunday Mass: 9am &amp; 11:15am Sunday Mass: 12noon Vigil: 6.30pm (during October) Daily Mass: 10am: Mon, Tues, Wed, Thurs, Fri &amp; Sat Evening Mass: — 7:30pm: Tues St. Mary’s Church, Killyclogher Christ the King Church, Strathroy Confessions: After Saturday morning Mass Holy Souls Prayer Group: 1&quot; Thurs every month Confessions: 5:45pm-6. 15pm: Saturday Daily Rosary: 9:10am: Monday-Saturday St. Mary’s Church, Knockmoyle Legion of Mary: Every Monday after 10am Mass Rosary: Every Tuesday at 8pm, during October Children’s Liturgy Group: 11:15am Sunday Mass in KC Corpus Christi Church, Mountfield Rosary: Every Thursday at 8pm REMEMBERING OUR BELOVED DECEASED Masses for the Holy Souls: Corpus Christi, Mountfield on</p>
+<p>Wednesday 4&quot; November at 7.30pm. St. Mary’s Church, Knockmoyle on</p>
+<p>Wednesday 11&quot; November at 7.30pm. Greenhill: Mass to remember those buried in Greenhill Cemetery will be celebrated on</p>
+<p>Sunday 8&quot; November in Christ the King Church, Strathroy at 12noon.</p>
+<p>You are invited to take Holy Water at the end of Mass to bless your family grave.</p>
+<p>Remembrance: The Annual Mass of Remembrance, for all who died in our parish during the past year, will be celebrated on</p>
+<p>Wednesday 18&quot; November in St. Mary&#x27;s Church, Killyclogher at 7.30pm. If you have a family member who died in the past year but didn&#x27;t live in the parish; and you would like them included in this Mass-contact the parish office by</p>
+<p>Monday 16th November</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>ALL SAINTS &amp; ALL SOULS All Saints Day (Holy Day of Obligation):</p>
+<p>Sun 1“ Nov All Souls Day:</p>
+<p>Mon 2” Nev Vigil (31° Oct). 6.30pm: St. Mary&#x27;s Church, Killyclogher l0am: St. Mary’s Church, Killyclogher 9am &amp; 11:15am: St. Mary&#x27;s Church, Killyclogher 7.30pm: Christ the King Church, Strathroy 12noon: Christ the King Church, Strathroy ALL SOULS INDULGENCE 1. From noon on 1 Nov until midnight on 2 Nov all who have confessed, received Holy Communion &amp; ptayed for the Pope’s intentions (one Our Father &amp; Hail Mary, or any prayer of one’s choice) can gain one plenary indulgence by visiting a church or oratory, &amp; reciting one Our Father and the Apostle’s Creed.</p>
+<p>This indulgence is applicable only to the souls of the departed.</p>
+<p>Confession may be made at any time within the week preceding or the week following 1 Nov.</p>
+<p>Holy Communion may be received on any day from 1-8 Nov.</p>
+<p>Conditions above apply also for this. 2. The faithful who visit a cemetery &amp; pray for the dead may gain a plenary indulgence applicable only to the Holy Souls on the usual conditions once per day from 1-8 Nov.</p>
+<p>Conditions above apply also for this.</p>
+<h3 class="b-head">PARISH OFFICE</h3>
+<p>OPENING Hours: MONDAY —Ta Hurspay: 9AM-5PM (closed 1-1.30pm) Contact: Phone <a href="tel:+442882243375" style="color:#1d4ed8;font-weight:600;">028 8224 3375</a> or Email <a href="mailto:info@cappaghparish.com" target="_blank" rel="noopener noreferrer">info@cappaghparish.com</a> .</p>
+<h3 class="b-head">Anniversary</h3>
+<h4 class="b-sub">Mass Bookings</h4>
+<p>A Requiem Mass takes precedence and therefore your booking is subject to change.</p>
+<p>Please note that an Anniversary or Months Mind Mass may be shared with others.</p>
+<p>Warca Mass Live ON THE PARISH WEBCAM: <a href="https://www.cappaghparish.com" target="_blank" rel="noopener noreferrer">www.cappaghparish.com</a> Webcam live streams only.</p>
+<p>The recording of services broadcast on the webcam must be requested in advance by contacting the parish office on <a href="tel:+442882243375" style="color:#1d4ed8;font-weight:600;">028 8224 3375</a> or speaking with the priest (outside of office opening hours) FR Kevin McELHENNON <a href="tel:+442882258108" style="color:#1d4ed8;font-weight:600;">028 8225 8108</a> / <a href="mailto:k.mcelhennon@derrydiocese.org" target="_blank" rel="noopener noreferrer">k.mcelhennon@derrydiocese.org</a> Fr MALACHY GALLAGHER <a href="tel:+442882251055" style="color:#1d4ed8;font-weight:600;">028 8225 1055</a> / <a href="mailto:malachy.gallagher@derrydiocese.org" target="_blank" rel="noopener noreferrer">malachy.gallagher@derrydiocese.org</a> : <a href="tel:+3537738838066" style="color:#1d4ed8;font-weight:600;">07738838066</a></p>
+<p>SVPKC : <a href="tel:+3537738837992" style="color:#1d4ed8;font-weight:600;">07738837992</a></p>
+<hr>
+<header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-buncrana" data-parish-name="Buncrana"><h2 class="ocr-parish-name">Buncrana</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-camus" data-parish-name="Camus"><h2 class="ocr-parish-name">Camus</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-cappagh-killyclogher-amalgamated" data-parish-name="Cappagh (&amp; Killyclogher amalgamated)"><h2 class="ocr-parish-name">Cappagh (&amp; Killyclogher amalgamated)</h2></header>
+<p class="page-label">Page 25</p>
+<p>number of our local clergy will take part, enhancing the evening with scripture readings telling the story of Christmas.</p>
+<p>Fr Declan Boland will o er a personal reflection.</p>
+<p>Your presence will surely add to a most enjoyable evening for all.</p>
+<p>ACCORD Marriage Preparation Courses available.</p>
+<p>Please visit <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a> Job Opportunity St Eugene ʼs Cathedral, Derry is recruiting an experienced Choir Director (10 hours per week) to lead and manage all aspects of the cathedral choir, ensuring that the music enhances worship services and aligns with the church ʼs liturgical themes.</p>
+<p>For a job description / application pack, please contact (028) 71262302 / <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> Completed applic ations must be submitted to Personnel, Bishop ʼs House, St Eugene ʼs Cathedral, Derry, BT48 9AP or to <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> by noon on</p>
+<p>Thursday 12th November 2026. Anam Cara – Supporting Parents A  er Bereavement Monthly in-person support evening takes place on</p>
+<p>Thursday 12th Nov at 7.30 pm in Radisso n Blu Hotel, Letterkenny, F92 FK15. No registration required. Next information event takes place ONLINE on</p>
+<p>Thursday 19th November at 7.00 pm. It will centre around where creativity intersects with grief with renowned author and p sychotherapist, Sasha Bates and is open to all parents whose child or children haved ied, regardless of the age of their child, circumstances of their death, or time since bereavement.</p>
+<p>Please contact <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> or 00353 85 288 8888. Carmelite Open Day A Day of Prayer, reflection and sharing with the Carmelite friars and nuns, for men and women, aged 18-40, will take place on</p>
+<p>Saturday 21st November from 10.30 am – 4.30 pm in Avila Retreat Centre, Donn ybrook, Dublin.</p>
+<p>Registration by 15th November. Please contact: opendayavi <a href="mailto:la@gmail.com" target="_blank" rel="noopener noreferrer">la@gmail.com</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-carndonagh" data-parish-name="Carndonagh"><h2 class="ocr-parish-name">Carndonagh</h2></header>
+<p class="page-label">Page 26</p>
+<p>The Contemplative Prayer Group meetings resume on Mondays at 8.00 pm in the Pastoral O  ice, 27 Butcher Street, Strabane.</p>
+<p>Everyone welcome. Parish Bingo and Lucky Four in St Patʼs Hall on Thursdays at 8 pm. Some fun, excitement and slight competition.</p>
+<p>Abide Women ʼs Conference from 20th – 22nd November at Great Northern Hotel, Bundoran.</p>
+<p>Speakers include Sarah Swa ord, Fr Barry Braun, Fr Mark Wharton, Kimberlee Woo Ling, Danielle Noonan, Nashville Dominicans , etc.</p>
+<p>Mass will be celebrated by Bishop Fintan Gavin, Cork &amp; Ross diocese.</p>
+<p>Plea se visit Abide in His Love at Eventbrite.ie.</p>
+<p>Registration at <a href="https://abideinhislove.eventbrite.com" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com</a> It is therefore a holy and wholesome thought to pray for the dead, that they may be loosed from sins (2 Maccabees 12:46) Weekend Mass Schedule Immaculate Conception: Saturday Vigil: 4.30 pm; Sunday: 11.00 am Sacred Heart, Derry Road: Sunday: 12.15 pm St Patrick Clonleigh: Saturday Vigil: 6.00 pm ; Sunday: 9.45 am St Mary ʼs Cloughcor :</p>
+<p>Sunday 8.30am (8th Nov – alternate Sundays – 22nd Joseph ʼs Glenmornan :</p>
+<p>Sunday 8.30am (15th Nov – alternate Sundays – 29th Nov)</p>
+<h3 class="b-head">Weekday Mass Schedule</h3>
+<p>Monday: 7.45 am : Sacred Heart Church, Derry Road</p>
+<hr>
+<p class="page-label">Page 27</p>
+<p>10.00 am: St Patrick ʼs Church, Li ord Tuesday: 10.00 am : Immaculate Conception Church, Strabane Wednesday: 7.45 am: Sacred Heart Church, Derry Road (followed by Eucharistic Adoration until 5.30 pm). 10.00 am: St Patrick ʼs Church, Li ord Thursday: 10.00 am : Immaculate Conception Church, Strabane Friday: 7.45 am : Sacred Heart Church, Derry Road 10.00 am : Immaculate Conception Church, Strabane Weddings: Please contact the parish o  ice.</p>
+<p>At least 6 months notice required. Baptisms: Parent(s) are asked to contact the parish o  ice.</p>
+<p>The Parish Pastoral Area O  ice, 27 Butcher St, Strabane covers all 3 parishes . O ice hours: Monday –</p>
+<p>Thursday 9.30 am – 4.30 pm;</p>
+<p>Friday 9.30 am – 12.30 pm. Feel free to call in or phone on <a href="tel:+442871882215" style="color:#1d4ed8;font-weight:600;">028 71882215</a> . Reminder that the deadline for parish bulletin notices is 2 pm on Wedne sdays.</p>
+<p>A Small Collection of Candles, Mass cards / Mass bouquets available for purchase at the Pastoral O ice.</p>
+<p>St Pio prayer cards alsoavailable. A gentle reminder that we can only accept cash /cheque paymen ts.</p>
+<p>Thank you. Safeguarding Notice If you have any concerns with regard to the Safeguarding of children within the Church please contact Marie O ʼKane, the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+447596500793</a> or</p>
+<h4 class="b-sub">email</h4>
+<p>dlp@derryd iocese.org Northern Ireland emergency services: PSNI (Police Service of Northern Irela nd): 101 Social Services: Gateway Services, Western HSC Trust: 0 28 7131 4090 (and ask for the Duty Social Worker), Gateway Services, Northern HSC Trust: <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a> , Regional Emergency Social Work Services: 0800 1979 995.</p>
+<hr>
+<header data-issue-iso="2026-11-01" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-castlederg" data-parish-name="Castlederg"><h2 class="ocr-parish-name">Castlederg</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-clonleigh-strabane-pastoral-area" data-parish-name="Clonleigh (Strabane Pastoral Area)"><h2 class="ocr-parish-name">Clonleigh (Strabane Pastoral Area)</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-clonmany" data-parish-name="Clonmany"><h2 class="ocr-parish-name">Clonmany</h2></header>
+<p class="page-label">Page 39</p>
+<p>bring the Report to the attention of your parishioners and to share it on your social media outlets.</p>
+<p>It will be a useful tool as parishes move forward on the synodal journey in the autumn.</p>
+<p>The Report is now available on the website of the Synodal Pathway of the Church in Ireland website: <a href="https://www.synod.ie" target="_blank" rel="noopener noreferrer">www.synod.ie</a> Parish Envelopes: Following previous discussion with the Parish Finance Committee we encourage consideration for those who use envelopes infrequently to consider the use of a standing order, (through this medium you have full control), of the donation at your disposal.</p>
+<p>Further information is available from the parish website.</p>
+<p>If you advance the standing order, (it can be processed on-line with your bank), or alternatively bring the completed mandate to your bank.</p>
+<p>We request that when you are issuing your instruction to the bank, that you do so with your personal name, in doing so we can therefore identify from whom the standing order has been authorised.</p>
+<p>It is with your authorisation that the standing order is either processed weekly or monthly.</p>
+<p>Also, you can withdraw the mandate at your own discretion.</p>
+<p>We would appreciate an acknowledgement of this transaction (via the parish email) when it is activated, so that we can have a copy for the parish records.</p>
+<p>In the information forwarded we will require your address and telephone number.</p>
+<p>Several parishioners recently have set up a standing order, however we do not know who these parishioners are because they have not provided an address.</p>
+<p>We ask please that you follow the instructions above and email the parish to inform us who has authorised the standing order.</p>
+<p>We request now that the boxes are delivered, if you have not previously returned or updated a parish Census card, please complete the card in the back of the box and return in the collection envelope.</p>
+<p>Also, the Gift Aid card needs to be signed and returned if you are a taxpayer.</p>
+<p>Those who avail of Standing Orders are also asked to complete a Census card and Gift Aid card.</p>
+<p>These can be collected in each sacristy and returned at your convenience.</p>
+<p>Details of Parish Accounts for Standing Orders: (Errigal Ballerin: Sort Code - 950346 - Account No. 40067059 is the No 1 a/c) Errigal Development: Sort Code - 950346 - (Account No. 90042358 is the Renovation (Errigal Glenullin : Sort Code - 950346 Account No. 90062596 is the No 1 a/c) ( Errigal Parish : Sort Code 950689 - Account No. 90083712 is the Renovation</p>
+<h3 class="b-head">Parish Finance</h3>
+<p>If you wish to contribute to the parish by standing order - forms can be forwarded upon request by sending an email to - <a href="mailto:errigalparish@gmail.com" target="_blank" rel="noopener noreferrer">errigalparish@gmail.com</a> or they are available on the parish website.</p>
+<p>At the end of each month, we shall include in the</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-culdaff" data-parish-name="Culdaff"><h2 class="ocr-parish-name">Culdaff</h2></header>
+<p class="page-label">Page 40</p>
+<p>collection figures the amounts relating to the increase in standing orders, these figures are stated in brackets.</p>
+<p>Parish Census: In the recent distribution of collection envelopes, we request that at your earliest convenience you might return the census card with your family details for parish registration.</p>
+<p>Also, the Gift Aid card needs to be updated and signed so that the parish can claim Gift Aid if you are a taxpayer, this does not affect your personal details or taxation.</p>
+<p>If your tax circumstances change, please inform us, if you are no longer a taxpayer.</p>
+<p>Census cards are available in each sacristy, once completed they can be returned in a sealed envelope via the collection box at the back of each church.</p>
+<p>If you have previously registered, you do not have to do so again, unless your household occupation has changed.</p>
+<p>Church Cleaners: Cleaners are required to join the existing monthly groups who clean each church.</p>
+<p>The more that participate the less occasions that individuals will be required to cover.</p>
+<p>If interested, please leave your name/contact phone number in each sacristy or alternatively give details to a sacristan.</p>
+<p>Mass Cards/Mass Bouquets: Are available for sale at the back of each church please put the money in the candle box.</p>
+<p>ACCORD - Counselling: If you need to speak, to an experienced couples and relationships counsellor during this time of unprecedented stress and pressure on family life, please contact 95680151. This is a free helpline service available from 9am - 8pm. Monday to Friday.</p>
+<p>All calls charged at local rate. ACCORD DERRY: Virtual Interactive Marriage Preparation Programme (limited to 15 couples per course).</p>
+<p>Booking now online at <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a> Radio Maria Ireland: <a href="https://www.radiomaria.ie/radio-maria-ireland/" target="_blank" rel="noopener noreferrer">https://www.radiomaria.ie/radio-maria-ireland/</a> is an Irish-run Catholic Talk-Radio Station with commercial-free broadcasting of Prayer, Catechesis, Music, Talks, Interviews and Testimonies.</p>
+<p>Church Safeguarding: If you have any concerns with regard to Safeguarding children or adults in need of protection within the Church please contact: Mrs Marie O’Kane (Designated Liaison Person), Diocesan Pastoral Centre, 164 Bishop Street, Derry.</p>
+<h4 class="b-sub">Tel</h4>
+<p>02871 - 362475/ <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a> .</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> - or PSNI (Police Service of Northern Ireland) 101 or Social Services</p>
+<h4 class="b-sub">Tel</h4>
+<p>02871-314090. Parish Representatives - Tracey McGilligan and Clare Mullan.</p>
+<p>Errigal Privacy Notice: The Diocese of Derry complies with regulations.</p>
+<p>A privacy notice is available on the Parish Website or alternatively it is available from the Parish Office.</p>
+<p>Live stream of Mass and Services in St. Mary’s Church and a Utube streaming in St. Joseph’s Church are available online.</p>
+<p>Parishioners should note that the first three rows of seats are visible in St. Mary’s Church.</p>
+<hr>
+<header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-culmoe" data-parish-name="Culmoe"><h2 class="ocr-parish-name">Culmoe</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-dma-parish-claudy-area" data-parish-name="DMA Parish (Claudy area)"><h2 class="ocr-parish-name">DMA Parish (Claudy area)</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-drumquin" data-parish-name="Drumquin"><h2 class="ocr-parish-name">Drumquin</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-drumragh" data-parish-name="Drumragh"><h2 class="ocr-parish-name">Drumragh</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-dungiven" data-parish-name="Dungiven"><h2 class="ocr-parish-name">Dungiven</h2></header>
+<p class="page-label">Page 50</p>
+<p>Anniversaries Susan Carlin, William Cooke, Johnny Diver, Josie Doherty, Lila Doherty, Charlie Dolan, Joseph Flanagan, Jim Gallagher, Margaret Gallagher, Robert Gibson, Fr Augustine Gillespie, Ruby Hynes, Betty Kelly, Pat Kelly, Brigid Masterson, Joan McElchar, Isobel McElwee, Jim McFadden, Billy McGonagle, Mary McNulty, Charles O’Kane, Kathleen Patton, Hugh Rooney.</p>
+<p>May they rest in peace. 9.45 am Mass on Sundays in Murlog Chapel is live on Finn Valley Community Radio.</p>
+<p>Thank You for your generosity to last week’s collections Leckpatrick £1,311.61 (£361.40 grounds maintenance) Clonleigh €1,625.43 (€272.43 graveyard works) Camus £1,667,64 (£385.80 grounds maintenance) Thanks also to those who pay by standing order.</p>
+<p>Readings</p>
+<p>Sunday 15th November : 1st Reading: Proverbs 31:10-13,19-20,30-31 Psalm: 128: 1-2,3,4-52nd Reading: 1st Thessalonians 5:1-6 Gospel: Matthew 25:14- 30 Saints of the Coming Week: Monday: The Dedication of the Lateran Basilica in Rome Tuesday: St Leo the Great, pope and doctor of the Church Wednesday: St Martin of Tours, bishop Thursday: St Josaphat, bishop and martyr Saturday: St Laurence O’Toole, bishop Please Note that weekday Masses at Sacred Heart Church, Derry Rd is now at 7.45 am . We wish to remind you that the Vigil Mass at St Patrick’s, Murlog is now at 6.00 pm , until further notice.</p>
+<p>Thank you for your co-operation and understanding.</p>
+<p>St Vincent de Paul Annual Christmas Envelope Collection SVd Pwill distribute Christmas collection envelopes at Masses during the weekend of 21st/22nd November for return the following weekend.</p>
+<p>Your support is greatly welcomed. Derry Diocesan Pilgrimage to Lourdes 2027, led by Bishop Michael Router: There are two options available: Option 1: 8th - 13th July, 5 nights, £980, from City of Derry Airport, with priority given to assisted pilgrims and family members, care team, youth, youth leaders and priests.</p>
+<p>Option 2: 7th - 14th July, 7 nights, £1,095, from Belfast International Airport.</p>
+<p>Single supplement and travel insurance extra.</p>
+<p>Expressions of interest can be emailed to <a href="mailto:derrypilgrim@outlook.com" target="_blank" rel="noopener noreferrer">derrypilgrim@outlook.com</a> Bookings will begin in January.</p>
+<p>More details later. Pilgrimage gift vouchers of any value are available from the Pastoral Centre, Bishop St, Derry for anyone wishing to purchase them, particularly as a Christmas gift.</p>
+<p>Please tel <a href="tel:+442871362475" style="color:#1d4ed8;font-weight:600;">028 71362475</a> for information.</p>
+<hr>
+<header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-errigal" data-parish-name="Errigal"><h2 class="ocr-parish-name">Errigal</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-fahan" data-parish-name="Fahan"><h2 class="ocr-parish-name">Fahan</h2></header>
+<p class="page-label">Page 61</p>
+<p>Tommy Murray , 72 Laurel Drive Celine Connolly , 248 Melmount Road John McConnell , 15 Derry Road Philomena MacRory , Omagh Andy Gormley , Dublin formerly Claudy Michael McBride , Plumbridge Maureen Quinn , Stevenage, London</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Fr. Augustine Gillespie, Suzanna Howard, Thomas Howard Jim Roarty Jnr., Jim O’Donnell, Eamon Coyle Charlie Nelson, Margaret Nelson, Celine O’Neill Patsy McGarrigle, Annie Brennan, Mary McNulty Sean Duffy, Thaddaeus Gamble, John Porter Louis Farren, Susan Carlin, Emma Walsh Hugh Donaghey, Charlie McColgan, Marc Harkin Gerry McMenamin, Kate Ward, Tony Coyle, Molly Finlay Exposition of the Blessed Sacrament can be adored in the Adoration Room, St. Theresa’s, Sion Mills anytime while the church is open.</p>
+<p>Annual Service for the Dead The Annual Service in remembrance of deceased members of our families and parish will take place next Sunday, 15 November at 4.00pm in St. Mary’s Church, Melmount and at 6.00pm in St. Theresa’s Church, Sion Mills.</p>
+<p>Families who have suffered a</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-granaghan" data-parish-name="Granaghan"><h2 class="ocr-parish-name">Granaghan</h2></header>
+<p class="page-label">Page 62</p>
+<p>bereavement since November 2025 are asked to nomina te a representative to carry a candle to the altar in co mmemoration of their dead. (Candles will be provided).</p>
+<p>Vocations During this month of November let us pray for thed eceased priests who served our diocese and our parishes as we pray for the men who will take up their mantle in the years to come.</p>
+<p>There will be a meeting for anyone considering a vo cation to the diocesan priesthood, in Derry, today</p>
+<p>Sunday 8 November begin ning at 4.00pm. For further details, please contact the Diocesan Vocati ons Director, Fr. Pat O’Hagan at <a href="mailto:Pgoh2111@gmail.com" target="_blank" rel="noopener noreferrer">Pgoh2111@gmail.com</a> or by calling <a href="tel:+442879386259" style="color:#1d4ed8;font-weight:600;">028 79386259</a> . Parish Draw Promoters should make their returns for November to the Parish Office on</p>
+<p>Monday 16 November from 2.00pm - 4.30pm. The Draw for November will take place on</p>
+<p>Thursday 19 No vember at 10.30am in the Parish Office. Baptism Dates Melmount November:</p>
+<p>Saturday 14, 21 &amp; 28. December:</p>
+<p>Saturday 12;</p>
+<p>Sunday 20. Baptisms will be at 3.30pm on a Saturday and 12.45pm on a Sunday.</p>
+<p>Accord Marriage Preparation Courses 2027 Courses) will take place in January 29/30; February 19/20 and March 19/20. All courses are now online for booking at <a href="https://Www.Accordni.Com" target="_blank" rel="noopener noreferrer">Www.Accordni.Com</a> Please Note: These courses are in person and not on line courses.</p>
+<p>Pilgrimage to Fatima 5 July 2027 for 7 Nights Led by Spiritual Director: Fr Sean O’Donnell.</p>
+<p>Group Leader: Patricia Moore. For booking and more information contact Patricia Moore <a href="tel:+3537743936548" style="color:#1d4ed8;font-weight:600;">07743936548</a> or A nne McCambridge <a href="tel:+3537784953408" style="color:#1d4ed8;font-weight:600;">07784953408</a> .</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-greenlough" data-parish-name="Greenlough"><h2 class="ocr-parish-name">Greenlough</h2></header>
+<p class="page-label">Page 63</p>
+<p>Volunteers are Required one morning per month to help with Eucharistic Adoration for St. Mary’s children as part of t he Children of the Eucharist (COTE) programme.</p>
+<p>Safeguarding requiremen ts apply. If you would like to get involved, please leave your conta ct details with the</p>
+<h3 class="b-head">Parish Office</h3>
+<p>The Columban Young Adults is a relatively new group for those aged 18yrs – 35 yrs in the diocese, who are seeking a community of like-minded young adults who have Christ at the centre of their lives.</p>
+<p>Our November event will be a Holy Hour and meditation on</p>
+<p>Thursday 19 November at 7.00pm in Our Lady of Lourdes Church, Steelstown, Derry delivered by recently ret ired Bishop Donal McKeown.</p>
+<p>The meditation will be followed by Solemn Benediction and then refreshments.</p>
+<p>We are actively seeking new members – please come along and bring a friend.</p>
+<p>For any further informati on please contact us at <a href="mailto:Columbanyoungadults@gmail.com" target="_blank" rel="noopener noreferrer">Columbanyoungadults@gmail.com</a> or follow us on social media.</p>
+<p>Managing Grief at Christmas Time – Free Support Workshops Christmas can be an especially difficult time when grieving the loss of a loved one.</p>
+<p>Road Victim Support Northe rn Ireland–Donegal invites anyone experiencing grief to join us for a free, donation-based workshop, facilitated by Counsellor Debbie Mullan.</p>
+<p>These welcoming and supportive workshops offer practical tools for coping with grief, managing difficult emotions, navigating Christmas traditions and finding meaningful ways to remember loved ones.</p>
+<p>Open to everyone who h as experienced bereavement, regardless of the circumstances of the ir loss.</p>
+<p>Wednesday 18 November: The Hub, Cookstown, 7pm–9pm. Free to a ttend – optional donations welcome.</p>
+<p>For further information and booking call <a href="tel:+3537748570558" style="color:#1d4ed8;font-weight:600;">077 48570558</a> . You don’t have to navigate grief alone th is Christmas.</p>
+<p>Everyone is warmly welcome. Derry Diocesan Pilgrimage to Lourdes 2027, led by Bishop Michael Router There are two options available as follows: Option 1: 8 - 13 July, 5 nights, £980, from City of Derry Airport, with prio rity given to Assisted Pilgrims and family members, Care Team, Youth, Yout h Leaders and</p>
+<hr>
+<p class="page-label">Page 64</p>
+<p>Priests. Option 2: 7 - 14 July, 7 nights, £1,095, from Belfast Intern ational Airport.</p>
+<p>Single Supplement and Travel Insurance wil l be extra.</p>
+<p>If interested email <a href="mailto:Derrypilgrim@outlook.com" target="_blank" rel="noopener noreferrer">Derrypilgrim@outlook.com</a> Bookings will begin in mid-January, with more deta ils later.</p>
+<p>Pilgrimage Gift Vouchers of any value are available from the Pastoral Centre, Bishop Street, Derry, for anyone wishing to purchase them, particularly as a Christmas Gift.</p>
+<p>For further information contact 02 8 7136 2475. Safeguarding Notice If you have any concerns with regard to the Safeguarding of children within the church please c ontact Marie O’Kane, the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+44 7596500793</a> or email@ <a href="mailto:Dlp@Derrydiocese.Org" target="_blank" rel="noopener noreferrer">Dlp@Derrydiocese.Org</a> Northern Ireland emergency services: PSNI on 101; Social Services: Gateway Services, Western HSC Trust, <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 71314090</a> a nd ask for the Duty Social Worker.</p>
+<p>Regional Emergency Social Work Services 0800 1979 995.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-holy-family" data-parish-name="Holy Family"><h2 class="ocr-parish-name">Holy Family</h2></header>
+<p class="page-label">Page 65</p>
+<p>The Parish of Moville St Pius X, Moville St Mary’s, Ballybrack St Columba’s, Ballinacrae St Joseph’s Oratory, Shrove Parish Priest: Fr Colm O’Doherty (074) 9382057</p>
+<h3 class="b-head">Parish Office</h3>
+<p>(074) 9382057/ <a href="tel:+353899421375" style="color:#1d4ed8;font-weight:600;">0899421375</a> emails: <a href="mailto:movilleparish@derrydiocese.org" target="_blank" rel="noopener noreferrer">movilleparish@derrydiocese.org</a> <a href="mailto:movilleparish@gmail.com" target="_blank" rel="noopener noreferrer">movilleparish@gmail.com</a> Bulletin email address: <a href="mailto:movillebulletin@gmail.com" target="_blank" rel="noopener noreferrer">movillebulletin@gmail.com</a> Parish website: <a href="https://www.movilleparish.com" target="_blank" rel="noopener noreferrer">www.movilleparish.com</a> CALENDAR FOR THE WEEK AHEAD</p>
+<p>Sunday 8th The door is closed against the bridesmaids who did not keep vigil nor trim their lamps.</p>
+<p>The concern of the Christian should be readiness for the call of the Lord, to seek the light of Christ in daily living and to keep burning brightly the light received at baptism.</p>
+<p>It is true wisdom to be always eagerly longing for the Lord.</p>
+<p>Monday 9th Feast of the Dedication of the Lateran Basilica . This church in Rome is known as “the mother and head of all the churches in the city and in the world”. It is the Cathedral Church of the diocese of Rome where Pope Francis is Bishop.</p>
+<p>Tuesday 10th Pope St Leo the Great . Pope (440-461).</p>
+<p>A gifted pastor and teacher, who intervened decisively at the Council of Chalcedon in 451 in defence of the doctrine of the Incarnation.</p>
+<p>Wednesday 11th St Martin of Tours (317-397).</p>
+<p>Born in Hungary, educated in Italy, baptized a Christian at the age of 20. Took up the life of a hermit in France and set up the first monastery there.</p>
+<p>Thursday 12th St Josaphat (1580-1623). A bishop who worked for the reunification of Christians in Eastern Europe and died a martyr’s death in 1623.</p>
+<p>Saturday 14th St Laurence O’Toole (1123-80).</p>
+<p>Monk and Abbot of Glendalough, he became Archbishop of Dublin in 1162. He continued the movement of reform begun by Ceallach and Malachy.</p>
+<p>He died in Brittany in 1180 while on a mission to restore peace between the kings of Ireland and England.</p>
+<p>First Anniversary Mass for Roisin McCartney at 6.30pm.</p>
+<p>Sunday 15th 11.30am Mass will be celebrated in Ballybrack. Reader for this Mass is Teresa Ward. Mass this week in St Pius X: Monday to Friday 10am.</p>
+<p>Saturday 6.30pm; Sunday 10am. Confessions in St. Pius X Church :</p>
+<p>Saturday 5.45pm to 6.15pm. The Rosary and the Divine Mercy Chaplet will be recited in St. Pius X Church, Moville, at 7.30pm every day, from Sunday – Friday.</p>
+<p>Adoration of the Blessed Sacrament on Monday, 2-9pm; Wednesday, 6-9pm. We offer our sympathy to the families and friends of Jim Cavanagh, Carrowhugh, William Bergin, Carnagarve and England and George Murphy, Blackpool who died recently.</p>
+<p>May they rest in peace. Thank you for your generous financial support to the parish in the past week, which amounted to €3374 and €1425 for the Missions.</p>
+<p>Moville <a href="https://movilleparish.com" target="_blank" rel="noopener noreferrer">https://movilleparish.com</a></p>
+<hr>
+<p class="page-label">Page 66</p>
+<p>Prayer for Vocations: During this month of November let us pray for the deceased priests who served our diocese and our parishes as we pray for the men who will take up their mantle in the years to come.</p>
+<p>We pray to the Lord. Derry Diocesan Pilgrimage to Lourdes 2027 , led by Bishop Michael Router: There are two options available as follows: Option 1 : 8 - 13 July, 5 nights, £980, from City of Derry Airport, with priority given to Assisted Pilgrims and family members, Care Team, Youth, Youth Leaders and Priests.</p>
+<p>Option 2 : 7 - 14 July, 7 nights, £1,095, from Belfast International Airport.</p>
+<p>Single Supplement and Travel Insurance will be extra.</p>
+<p>Expressions of Interest can be emailed to <a href="mailto:derrypilgrim@outlook.com" target="_blank" rel="noopener noreferrer">derrypilgrim@outlook.com</a> . Bookings will begin in mid-January, with more details later.</p>
+<p>Pilgrimage Gift Vouchers of any value are available from the Pastoral Centre, Bishop Street, Derry, for anyone wishing to purchase them, particularly as a Christmas Gift.</p>
+<p>Please contact <a href="tel:+3534871362475" style="color:#1d4ed8;font-weight:600;">04871362475</a> for further information.</p>
+<p>Concert, Simple Gifts , presented by Danu Young Women’s Choir, takes place on 4 and December at 7pm in St Columb’s Hall, Derry.</p>
+<p>Moville Drama Group will stage the hilarious 3 Act Comedy Play, A Wake in the West in St Eugene’s Hall at 8pm each evening from</p>
+<p>Tuesday 17 to</p>
+<p>Saturday 21 November. No tickets on sale – pay at the door – adults €10 children €5. Scoil Eoghain, Parents Association is holding a Vinted Toy Sale on 14 November in the school hall, from 11am to 1pm. Please contact Danielle to book a table and more information.</p>
+<p>Toy donations can als o be made to the Parents Association table where all proceeds will go to the school.</p>
+<p>Plea se ensure that all Toys are off high quality, and good working order, as some of these toys maybe regifted Light up of Moville Christmas Tree is on</p>
+<p>Sunday 29 November at 5pm. Collection envelopes will be delivered to households over the next few weeks.</p>
+<p>Donations can be left in the post office , given to a committee member or made online.</p>
+<p>Carrowmena Community Centre (9367061) Places are available on Christmas decoration courses and Kids Build a Christmas tree.</p>
+<p>Greencastle Community Centre (9381054) <a href="mailto:info@greencastlecentre.ie" target="_blank" rel="noopener noreferrer">info@greencastlecentre.ie</a> Christmas Wreath Workshop on</p>
+<p>Thursday 26 November at 7pm.</p>
+<p>Contact Hayley 00447947431574. Christmas Craft Fair on</p>
+<p>Saturday 21 November from 12 noon to 3pm Tables €20. Bridge Builders Youth Drop-in every Friday in Men’s Shed Moville 2 to 4pm for secondary school children.</p>
+<p>Solar PV info event on</p>
+<p>Wednesday 11 November at 7pm. If you’d like to receive a copy of the parish newsletter by email, please send an email to: <a href="mailto:movillebulletin@gmail.com" target="_blank" rel="noopener noreferrer">movillebulletin@gmail.com</a> The newsletter will be sent out securely, giving no one else access to your email address, in accordance with Life Chain – Join Precious Life on</p>
+<p>Saturday 14 November at Foyleside Shopping Centre, Derry at 2pm for a Life Chain to mark the 7th Anniversary of Westminster imposing abortion on Northern Ireland.</p>
+<p>For more information, please contact Precious Life on <a href="tel:+3537592280522" style="color:#1d4ed8;font-weight:600;">07592280522</a></p>
+<p>See posters in Church porches with details of events taking place at St Columba’s, Long Tower, Derry.</p>
+<p>Safeguarding If you have any concerns with regards to Safeguarding children or adults, please contact Marie O’Kane, The Diocesan Designated Liaison Person at 00447596500793 or <a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> . Local Safeguarding Representatives are Mary McGranaghan and Brídín Hannaway</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilrea" data-parish-name="Kilrea"><h2 class="ocr-parish-name">Kilrea</h2></header>
+<p class="page-label">Page 67</p>
+<p>A short reflection on today’s Gospel Matthew 25: 1-13 In today’s Gospel, Jesus reminds us of the importance of being ready for His coming.</p>
+<p>While five of the bridesmaids are prepared with enough oil for their lamps, the other five are caught unprepared when the bridegroom arrives.</p>
+<p>The message is simple but profound: we are called to keep our faith alive and our hearts ready for the Lord.</p>
+<p>This readiness is not about fear or worrying about the future, but about living each day with faith, love and trust in God.</p>
+<p>The oil in our lamps can be seen as the everyday acts of kindness, prayer, forgiveness and generosity that nourish our relationship with Christ. These are the things that help our faith shine, especially when life becomes difficult or uncertain.</p>
+<p>As members of our parish community, let us encourage one another to keep our lamps burning brightly.</p>
+<p>May we never become so distracted by the busyness of life that we forget to make room for God.</p>
+<p>Lord, help us to remain watchful, faithful and ready to welcome You, keeping the light of Your love shining in our hearts and in the lives of those around us.</p>
+<p>Amen. Prayer for Vocations to the Priesthood : During this month of November let us pray for the deceased priests who served our diocese and our parishes as we pray for the men who will take up their mantle in the years to come.</p>
+<p>Remembrance of the Faithful Departed: The deceased members of our families and friends will be remembered at all Masses throughout November at St Eugene’s Cathedral.</p>
+<p>Remembrance Cards are available at the back of the Cathedral.</p>
+<p>Please take a card, write the names of your loved ones, and place it in the basket on the Sanctuary.</p>
+<p>Eternal rest grant unto them, O Lord, and let perpetual light shine upon them.</p>
+<p>May the souls of all the faithful departed, through the mercy of God, rest in peace.</p>
+<p>Amen. Our Lady, Untier of Knots Novena - The Novena to Our Lady, Untier of Knots continues after the 7.30pm Mass on Thursdays, in St Eugene’s Cathedral, concluding on</p>
+<p>Thursday 26th November. This Novena reminds us that sin never entangled Our Lady, and that Christ gave us His Mother as Our Lady, Untier of Knots.</p>
+<p>Through this devotion, we entrust our personal “knots” to her loving care - learning to let go and allowing her to gently untie what binds us.</p>
+<p>All are welcome to join in prayer and reflection during this special time of grace Safeguarding Information Evening - Fr Paul Farren kindly invites all Parish staff, Sacristans, Readers, Eucharistic Ministers, Collectors, Children’s Liturgy Facilitators, Pope John Paul Award Leaders, SVDP members, Choir/ music Leaders, Cleaners, Ground Workers and all those interested in Safeguarding in our Parish, to a Safeguarding Information Evening in the Cathedral Hall on</p>
+<p>Thursday 19th November at 6.00 to 7.00 pm. Please RSVP to Parochial House on <a href="tel:+442871262894" style="color:#1d4ed8;font-weight:600;">02871262894</a> or email <a href="mailto:cathedral@derrydiocese.org" target="_blank" rel="noopener noreferrer">cathedral@derrydiocese.org</a> by</p>
+<p>Tuesday 17th November. As safeguarding is a high priority in both our Parish and diocese, your attendance would be greatly appreciated.</p>
+<p>Parish Advent Pilgrimage on</p>
+<p>Thursday 3rd December. Bus leaves Cathedral at 9.15am and returns at approx. 5.30pm. Morning Prayer in the IOSAS Centre followed by refreshments.</p>
+<p>Mass in St. Michael’s Church, Urris, Clonmany and lunch in the Ballyliffin Hotel. Price £40 Includes Transport, Morning Tea &amp; Lunch.</p>
+<p>For more information or to book a place call into the Parish Office or call 71262894 or email <a href="mailto:cathedral@derrydiocese.org" target="_blank" rel="noopener noreferrer">cathedral@derrydiocese.org</a> This is a pre booking only event.</p>
+<p>Christmas Wreath Floral Workshop -</p>
+<p>Saturday 5th December at 12.00noon in the Cathedral Hall.</p>
+<p>Cost £20 which includes all flowers, sundries &amp; refreshments.</p>
+<p>Pre booking required. Call into the Parish Office or phone, <a href="tel:+442871262894" style="color:#1d4ed8;font-weight:600;">028 71262894</a> or email <a href="mailto:cathedral@derrydiocese.org" target="_blank" rel="noopener noreferrer">cathedral@derrydiocese.org</a> Christmas Table Centre Workshop -</p>
+<p>Saturday 12th December at 12.00noon in the Cathedral Hall.</p>
+<p>Cost £20 which includes all flowers, sundries &amp; refreshments.</p>
+<p>Pre booking required. Call into the Parish Office or phone, <a href="tel:+442871262894" style="color:#1d4ed8;font-weight:600;">028 71262894</a> or email <a href="mailto:cathedral@derrydiocese.org" target="_blank" rel="noopener noreferrer">cathedral@derrydiocese.org</a> Would you like to become an Altar Server in St Eugene&#x27;s Cathedral?</p>
+<p>We are recruiting for anyone who is in Primary 5 and upwards, to come and serve at our weekend Masses.</p>
+<p>If you are interested in becoming an altar server, please email Lauren at <a href="mailto:lauren.doherty@derrydiocese.org" target="_blank" rel="noopener noreferrer">lauren.doherty@derrydiocese.org</a> or phone the parish office on 02871 262894 for more information.</p>
+<p>Thank you Fr Farren acknowledges with thanks the following donations for: Mary’s Meals: £20, £40 Gaza Appeal: £50 Water Aid: £100, £50 Sight Savers: £100, £40 Smile Train: £50, £40 Hungry Children: £100 Matt Talbot: £10 Viatores Christi: €200 Collection Weekly Collection: £5,791 Parish Development: £1,067 Thank you for your generosity Readers for 14th / 15th November 6.15pm Claire O’Kane 7.30pm Mary Morrison 9.30am Kate Doherty 11.00am St Joseph’s BS 12.30pm Michael Wilson 7.00pm Anna Begley Sympathy We offer our sympathy to the family and friends of: Bernadette McGowan John Corcoran Paul McCallion Tom McBrearty Philip Walker May they rest in peace</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Please pray for the repose of the souls of: Margaret McConomy Séan &amp; Myra McCaul Elizabeth (Lily) McCafferty Gilllian Keaveney Eddie McKinney George Holmes Michael Gallacher May they rest in peace Baptisms We welcome as a member of God’s family: Darragh Charlie Thomas Balfour To book a Baptism contact the Parish Office 02871 262894</p>
+<p>St Eugene&#x27;s Cathedral (Templemore) <a href="https://steugenescathedral.com" target="_blank" rel="noopener noreferrer">https://steugenescathedral.com</a></p>
+<hr>
+<header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-lavey" data-parish-name="Lavey"><h2 class="ocr-parish-name">Lavey</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header data-issue-iso="2026-11-08" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-leckpatrick" data-parish-name="Leckpatrick"><h2 class="ocr-parish-name">Leckpatrick</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-limavady" data-parish-name="Limavady"><h2 class="ocr-parish-name">Limavady</h2></header>
+<p class="page-label">Page 76</p>
+<p>Mass &amp; Confession Times Sunday St Columb’s Church 10.00am, 12.30pm &amp; 6.00pm Church of Immaculate Conception 10.15am &amp; 12.15pm St Oliver Plunkett Church 11.15am St Mary’s Oratory 9.15am Monday – Friday St Columb’s Church 10.00am &amp; 7.30pm Church of Immaculate Conception 9.15am St Oliver Plunkett’s Church 11.00am Mon.</p>
+<p>Tues. Thurs. St Mary’s Oratory 11.00am – Wednesday only Saturday St Columb’s Church 10.00am &amp; 7.00pm (Vigil of Sunday) Church of Immaculate Conception 6.00pm (Vigil of Sunday) St Oliver Plunkett’s Church 6.00pm (Vigil of Sunday) Confessions St Columb’s Church Monday –</p>
+<p>Friday 7.00pm – 7.25pm Saturday after 10.00 Mass Church of Immaculate Conception</p>
+<p>Saturday 5.30pm – 5.55pm St Oliver Plunkett’s Church</p>
+<p>Saturday 5.30pm – 5.55pm Parish Office 32 Chapel Road, Derry BT47 2BB. Tel. 02871 342303</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a></p>
+<h4 class="b-sub">Web</h4>
+<p><a href="https://www.watersideparish.net" target="_blank" rel="noopener noreferrer">www.watersideparish.net</a> You Tube Channel: <a href="https://www.youtube.com/WatersideParish" target="_blank" rel="noopener noreferrer">www.youtube.com/WatersideParish</a> Rev. Michael Canny PP <a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a> Rev. Stephen Baxter CC <a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a> Rev Joshy Parokkaran CC <a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a> SAFEGUARDING CHILDREN AND VULNERABLE ADULTS – If you are concerned about the welfare and safety of children or a vulnerable adult contact: Designated Diocesan Person Ms Marie Gormley at <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a> or <a href="mailto:marie.gormley@derrydiocese.org" target="_blank" rel="noopener noreferrer">marie.gormley@derrydiocese.org</a> or PSNI 101. Our Churches are monitored by CCTV cameras and by live streaming.</p>
+<p>Live streaming can be viewed online at the parish website.</p>
+<p>The Diocese of Derry Privacy Notice is displayed on the parish website and Church notice board.</p></div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
+    </div>
+
+    <section class="parish-section">
+      <h2 class="section-heading">DERRY Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="https://www.parishofaghyaran.com/news.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="http://www.ardmoreparish.com/news.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="http://parishofardstraweast.com/pdf/240526.pdf" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (desertmartin)"><a class="parish-link" href="https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-21_june_2026" target="_blank" rel="noopener noreferrer">Ballinascreen (Desertmartin)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="https://www.banagherparish.com/files/9/Newsletters/384/Bulletin---Divine-Mercy-Sunday---12th-April-2026" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="https://bellaghyparish.com/wp-content/uploads/2026/04/Newsletter-12-April-2026-1.pdf" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="https://www.buncranaparish.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="https://camusparish.com/" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="cappagh (&amp; killyclogher amalgamated)"><a class="parish-link" href="https://cappaghparish.com/bulletins" target="_blank" rel="noopener noreferrer">Cappagh (&amp; Killyclogher amalgamated)</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="http://www.carndonaghparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="https://www.castledergparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="https://clonleighparish.com/2026/10/25/strabane-pastoral-area-newsletter-for-sunday-25th-october-2026/" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="https://clonmanyparish.ie/wp-content/uploads/2026/04/2026-04-12.pdf" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="coleraine (st john)"><a class="parish-link" href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer">Coleraine (St John)</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="http://www.culdaffparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="http://culmoreparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="https://dmaparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="https://drumquinparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="https://www.drumraghparish.com/" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dunamanagh"><a class="parish-link" href="https://www.derrydiocese.org/parishes/dunamanagh" target="_blank" rel="noopener noreferrer">Dunamanagh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="https://parishofdungiven.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="https://www.errigalparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="http://www.fahanparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="garvagh"><a class="parish-link" href="https://www.derrydiocese.org/parishes/garvagh" target="_blank" rel="noopener noreferrer">Garvagh</a></li><li class="parish-item" data-name="gortin"><a class="parish-link" href="https://www.derrydiocese.org/parishes/gortin" target="_blank" rel="noopener noreferrer">Gortin</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="https://granaghanparish.com/" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greencastle"><a class="parish-link" href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer">Greencastle</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="http://www.greenlough.com/publications/newsletter/2nd_Sunday_of_Easter_-_Divine_Mercy_Sunday_[2026-4-12].pdf" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="https://www.holyfamily-parish.com/pdf/160826.pdf" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="https://i0.wp.com/www.iskaheenparish.com/wp-content/uploads/2026/04/1.jpg?w=1090&amp;ssl=1" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="killygordon"><a class="parish-link" href="https://www.derrydiocese.org/parishes/killygordon" target="_blank" rel="noopener noreferrer">Killygordon</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="https://www.parishofkilrea.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="https://www.laveyparish.com/parishsecretary/laveyparishbulletin.pdf" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="https://www.leckpatrickparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="lifford"><a class="parish-link" href="https://www.derrydiocese.org/parishes/lifford" target="_blank" rel="noopener noreferrer">Lifford</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="https://www.limavadyparish.org/onewebmedia/5-4-26.pdf" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="long tower"><a class="parish-link" href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer">Long Tower</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="http://www.magheraparishderry.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="malin"><a class="parish-link" href="https://malinparish.ie/wp-content/uploads/2026/04/Bulletin-5th-April-2026.pdf" target="_blank" rel="noopener noreferrer">Malin</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="https://www.melmountparish.com/parishnews.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="https://movilleparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="plumbridge"><a class="parish-link" href="https://www.derrydiocese.org/parishes/plumbridge" target="_blank" rel="noopener noreferrer">Plumbridge</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="http://www.parishofsionmills.com/news.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="https://steugenescathedral.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="https://www.stmarysparishcreggan.com/bulletins" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1cF4BuBrZCRrSwMQeTT8mJrGNpr5aFGpD&amp;export=download" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="http://www.steelstownparish.com/" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="strabane"><a class="parish-link" href="https://www.derrydiocese.org/parishes/strabane" target="_blank" rel="noopener noreferrer">Strabane</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="https://www.threepatrons.org/files/10/Weekly-Bulletins/104/Sunday-14th-June-2026" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="urney and castlefin"><a class="parish-link" href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer">Urney and Castlefin</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="https://watersideparish.net/wp-content/uploads/2026/04/newsletter_120426oo.pdf" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+    </section>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
+      });
+    })();
+
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20261018a"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js?v=20261018a';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      if (parishFilter) {
+        parishFilter.addEventListener('input', function (event) {
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {
+              visibleCount += 1;
+            }
+          });
+          if (parishEmpty) {
+            parishEmpty.hidden = visibleCount !== 0;
+          }
+        });
+      }
+      if (parishEmpty) {
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+    
+    (function () {
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
+      }
+      function pageFor(name) {
+        var map = pageIndex();
+        if (map[name]) return map[name];
+        var n = norm(name);
+        var keys = Object.keys(map);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = map[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
+        }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          landInBox(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      document.addEventListener('click', function (ev) {
+        if (!ev.target || !ev.target.closest) return;
+        var btn = ev.target.closest('.az-letter');
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
+      });
+    })();
+    
+  </script>
+  <script type="application/json" id="parish-page-index">{}</script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
