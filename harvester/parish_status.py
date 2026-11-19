@@ -448,7 +448,7 @@ def build_parish_status(
                     **({"file_bytes": file_bytes} if file_bytes is not None else {}),
                     **{
                         field: pdf_evidence[field]
-                        for field in ("last_pdf_sha256", "last_pdf_week")
+                        for field in ("last_pdf_sha256", "last_pdf_text_sha256", "last_pdf_week")
                         if pdf_evidence.get(field)
                     },
                 },
