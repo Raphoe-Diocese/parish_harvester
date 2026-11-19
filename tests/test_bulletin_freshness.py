@@ -1200,6 +1200,33 @@ class ChangedUrlAndSizeFreshnessTests(unittest.TestCase):
                 verdict = freshness_verdict_for_ok_result(result, self.TARGET)
                 self.assertNotEqual(verdict.status, "stale")
 
+    def test_reexported_undated_pdf_with_identical_text_is_stale(self) -> None:
+        from harvester.bulletin_freshness import pdf_sha256, pdf_text_sha256
+
+        with tempfile.TemporaryDirectory() as tmp:
+            original = Path(tmp) / "original.pdf"
+            reexported = Path(tmp) / "new.pdf"
+            lines = ["Please pray with us for the intentions of our parish community."] * 5
+            self._write_pdf(original, *lines)
+            self._write_pdf(reexported, *lines, size=8192)
+            self.assertNotEqual(pdf_sha256(original), pdf_sha256(reexported))
+            digest = pdf_text_sha256(original)
+            self.assertIsNotNone(digest)
+            result = FetchResult(
+                key="demo", display_name="Demo", status="ok", url=self.UNDATED,
+                file_path=reexported, file_type="pdf",
+            )
+            previous = {
+                "url": self.LAST_WEEK,
+                "last_pdf_week": "2026-11-01",
+                "last_pdf_sha256": pdf_sha256(original),
+                "last_pdf_text_sha256": digest,
+            }
+            with patch("harvester.bulletin_freshness._parish_status_row", return_value=previous):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.reason, "unchanged_pdf_text_from_prior_week")
+
     def test_url_changed_all_saints_heading_stays_first_november(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             pdf = Path(tmp) / "changed-url-allsaints.pdf"
