@@ -3,9 +3,15 @@ from __future__ import annotations
 import ast
 import io
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
+from textwrap import dedent
+from zoneinfo import ZoneInfo
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -450,8 +456,8 @@ https://www.antrimparish.com
         self.assertIn("Upload OCR docs snapshot", workflow)
         self.assertIn("docs/parishes/", workflow)
         self.assertIn("docs/mega_pdf/", workflow)
-        self.assertIn("Copied staged mega PDFs into docs/mega_pdf", workflow)
-        self.assertIn("Keep smaller committed", workflow)
+        self.assertIn('cp "${pdf_path}" "${index_path}" docs/mega_pdf/', workflow)
+        self.assertIn('WEEK="${{ steps.stage.outputs.week }}"', workflow)
         self.assertIn("id: commit_ocr", workflow)
         self.assertIn("OCR push attempt", workflow)
         self.assertIn("github.event_name == 'workflow_dispatch'", workflow)
@@ -463,9 +469,9 @@ https://www.antrimparish.com
         self.assertIn('pattern: "*-mega-bulletin-pdf"', workflow)
         self.assertIn("steps.harvest_run.outputs.run_id", workflow)
         self.assertIn("mega-bulletin-pdf", workflow)
-        self.assertIn("Stage mega PDFs for OCR", workflow)
-        self.assertIn("GitHub Pages fallback", workflow)
-        self.assertIn("Skipping duplicate artifact path", workflow)
+        self.assertIn("Validate and stage the current harvest PDF and page index", workflow)
+        self.assertNotIn("PAGES_BASE", workflow)
+        self.assertIn("Wrong week or PDF name", workflow)
         self.assertIn("Rebuild diocese pages", workflow)
         self.assertIn("site_builder import run", workflow)
         self.assertIn("ocr/convert_bulletin.py", workflow)
@@ -473,6 +479,50 @@ https://www.antrimparish.com
         self.assertIn("GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}", workflow)
         self.assertIn("OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}", workflow)
         self.assertIn("git add docs", workflow)
+
+    def test_ocr_staging_rejects_old_index_and_accepts_matching_pair(self) -> None:
+        workflow = (REPO_ROOT / ".github/workflows/ocr-bulletin.yml").read_text(encoding="utf-8")
+        stage = workflow.split("- name: Validate and stage", 1)[1]
+        script = dedent(stage.split("python - <<'PY'\n", 1)[1].split("\n          PY", 1)[0])
+        today = datetime.now(ZoneInfo("Europe/Dublin")).date()
+        sunday = today - timedelta(days=(today.weekday() + 1) % 7)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            raw = root / "raw"
+            raw.mkdir()
+            staged = root / "staged"
+            script = script.replace("/tmp/ocr-bulletins/raw", raw.as_posix())
+            script = script.replace("/tmp/ocr-bulletins/staged", staged.as_posix())
+            report_root = root / "_harvest_bulletins"
+            report_root.mkdir()
+            (report_root / "report.json").write_text(
+                json.dumps({"target_date": sunday.isoformat()}), encoding="utf-8"
+            )
+            pdf = raw / "raphoe_mega_bulletin.pdf"
+            pdf.write_bytes(b"%PDF-test")
+            index = pdf.with_suffix(".pages.json")
+            output = root / "outputs"
+            env = {**os.environ, "GITHUB_OUTPUT": str(output)}
+
+            for edition in (sunday - timedelta(days=7), sunday):
+                with self.subTest(edition=edition):
+                    index.write_text(
+                        json.dumps({"date": edition.isoformat(), "pdf": pdf.name}), encoding="utf-8"
+                    )
+                    result = subprocess.run(
+                        [sys.executable, "-c", script], cwd=root, env=env,
+                        capture_output=True, text=True, check=False,
+                    )
+                    if edition != sunday:
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn("Wrong week or PDF name", result.stderr)
+                        self.assertFalse(output.exists())
+                    else:
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual((staged / pdf.name).read_bytes(), pdf.read_bytes())
+                        self.assertEqual((staged / index.name).read_bytes(), index.read_bytes())
+                        self.assertEqual(output.read_text().strip(), f"week={sunday}")
 
     def test_ocr_convert_provider_fallback_order(self) -> None:
         source = (REPO_ROOT / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")

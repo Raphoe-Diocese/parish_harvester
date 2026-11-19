@@ -414,6 +414,8 @@ def build_parish_status(
                 and bool(prev_row.get("slice_missing"))
             )
             file_bytes = _row_file_bytes(item, key) if outcome == "ok" else None
+            previous_pdf = prev_row if isinstance(prev_row, dict) else {}
+            pdf_evidence = item if outcome == "ok" and item.get("last_pdf_sha256") else previous_pdf
             _upsert(
                 key,
                 {
@@ -444,6 +446,11 @@ def build_parish_status(
                         else (len(recipe_meta.get("steps") or []) if recipe_meta else None)
                     ),
                     **({"file_bytes": file_bytes} if file_bytes is not None else {}),
+                    **{
+                        field: pdf_evidence[field]
+                        for field in ("last_pdf_sha256", "last_pdf_text_sha256", "last_pdf_week")
+                        if pdf_evidence.get(field)
+                    },
                 },
             )
 

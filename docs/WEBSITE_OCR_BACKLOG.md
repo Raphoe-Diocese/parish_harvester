@@ -8,6 +8,14 @@ This is the single list. Do not create a second competing plan. Do not mark an i
 
 Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/MM/YYYY**.
 
+## Harvest-to-OCR reliability (2026-11-19)
+
+- [ ] In review. Replace the fixed 16:00 homepage promise with each diocese’s reported availability. Verify the published cards show available, zero and unknown counts clearly.
+
+- [ ] In review. A Sunday OCR run must use the current harvest's report, collated PDF and matching parish page index. Use the bulletin Sunday in filenames and viewer dates. Reject stale or incomplete artefacts and preserve the previous published edition.
+- [ ] Verify a scheduled harvest and its automatic OCR deployment. Compare the published PDF, viewer date and parish page boundaries for Raphoe, including Kilcar and Rathmullan. Record the Actions run and public links.
+- [ ] Verify an old or missing input cannot publish new OCR. Make coverage failures visible before Pages publishes a replacement.
+
 ## Locked product rules (do not “helpfully” undo)
 
 | Rule | Where it lives |

@@ -26,6 +26,7 @@ jobs:
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main' &&
        (github.event.workflow_run.event == 'schedule' ||
         contains(github.event.workflow_run.display_title, '_diocese') ||
         github.event.workflow_run.display_title == 'Harvest all' ||
@@ -65,7 +66,7 @@ jobs:
           has_mega_artifact() {
             local run_id="$1"
             local count
-            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i")) | select(.expired == false)] | length')"
             [ "${count:-0}" -gt 0 ]
           }
           pick_run_with_mega_artifact() {
@@ -76,7 +77,7 @@ jobs:
                 run_id="${candidate}"
                 break
               fi
-            done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --limit 25 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success" or .conclusion == "failure") | .databaseId')
+            done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --branch main --limit 25 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success") | .databaseId')
             echo "${run_id}"
           }
 
@@ -86,8 +87,8 @@ jobs:
               echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
               echo "Using harvest workflow run ${RUN_ID} (has mega PDF artifact)"
             else
-              echo "run_id=none" >> "$GITHUB_OUTPUT"
-              echo "Harvest run ${RUN_ID} has no mega PDF artifact — will use GitHub Pages fallback"
+              echo "::error::Harvest run ${RUN_ID} has no usable mega PDF artefact. Existing viewers were kept."
+              exit 1
             fi
           else
             RUN_ID="$(pick_run_with_mega_artifact)"
@@ -95,14 +96,12 @@ jobs:
               echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
               echo "Manual OCR run — using harvest run ${RUN_ID} (has mega PDF artifact)"
             else
-              echo "run_id=none" >> "$GITHUB_OUTPUT"
-              echo "No harvest run with mega PDF artifacts — will use GitHub Pages fallback"
+              echo "::error::No successful main harvest with a usable mega PDF artefact."
+              exit 1
             fi
           fi
 
       - name: Download mega PDF artifacts from harvest run
-        if: steps.harvest_run.outputs.run_id != 'none'
-        continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
           github-token: ${{ github.token }}
@@ -112,18 +111,15 @@ jobs:
           merge-multiple: true
 
       - name: Download harvest report for site rebuild
-        if: steps.harvest_run.outputs.run_id != 'none'
-        continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
           github-token: ${{ github.token }}
           run-id: ${{ steps.harvest_run.outputs.run_id }}
           pattern: "bulletins-*"
-          path: Bulletins
+          path: _harvest_bulletins
           merge-multiple: true
 
       - name: Download harvest docs snapshot
-        if: steps.harvest_run.outputs.run_id != 'none'
         continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
@@ -146,67 +142,51 @@ jobs:
             echo "Applied harvest docs/manifest.json"
           fi
 
-      - name: Stage mega PDFs for OCR
+      - name: Validate and stage the current harvest PDF and page index
+        id: stage
         run: |
           set -euo pipefail
-          STAGED="/tmp/ocr-bulletins/staged"
-          RAW="/tmp/ocr-bulletins/raw"
-          mkdir -p "${STAGED}" "${RAW}"
-          shopt -s nullglob
-          mapfile -d '' PDFS < <(find "${RAW}" -type f -name '*_mega_bulletin.pdf' -print0 2>/dev/null || true)
-          for pdf in "${PDFS[@]}"; do
-            [ -n "${pdf}" ] || continue
-            name="$(basename "${pdf}")"
-            [ -n "${name}" ] || continue
-            dest="${STAGED}/${name}"
-            if [ -f "${dest}" ]; then
-              echo "Skipping duplicate artifact path (already staged): ${pdf}"
-              continue
-            fi
-            cp "${pdf}" "${dest}"
-            ls -lh "${dest}"
-          done
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          from datetime import date, datetime, timedelta
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
 
-          PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
-          for diocese in $(python -c "import json;print(' '.join(d['key'] for d in json.load(open('parishes/dioceses.json'))['dioceses']))"); do
-            dest="${STAGED}/${diocese}_mega_bulletin.pdf"
-            if [ -f "${dest}" ]; then
-              continue
-            fi
-            url="${PAGES_BASE}/mega_pdf/${diocese}_mega_bulletin.pdf"
-            echo "Trying GitHub Pages fallback for ${diocese}: ${url}"
-            if curl -fsSL "${url}" -o "${dest}.tmp" && python3 -c "import sys; sig=open(sys.argv[1],'rb').read(5); sys.exit(0 if sig==b'%PDF-' else 1)" "${dest}.tmp"; then
-              mv "${dest}.tmp" "${dest}"
-              ls -lh "${dest}"
-            else
-              rm -f "${dest}.tmp"
-              echo "Warning: no mega PDF for ${diocese} in artifacts or on Pages"
-            fi
-          done
+          today = datetime.now(ZoneInfo("Europe/Dublin")).date()
+          week = today - timedelta(days=(today.weekday() + 1) % 7)
+          report_path = Path("_harvest_bulletins/report.json")
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          if date.fromisoformat(report["target_date"]) != week:
+              raise SystemExit(f"::error::Expected harvest week {week}, got {report['target_date']}.")
 
-          mapfile -d '' STAGED_PDFS < <(find "${STAGED}" -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -print0)
-          if [ ${#STAGED_PDFS[@]} -eq 0 ]; then
-            echo "::error::No mega PDF files found (checked harvest artifacts and ${PAGES_BASE}/mega_pdf/)."
-            find "${RAW}" -type f 2>/dev/null | head -20 || true
-            exit 1
-          fi
-          echo "Staged ${#STAGED_PDFS[@]} mega PDF(s) for OCR"
-          mkdir -p docs/mega_pdf
-          for pdf in "${STAGED_PDFS[@]}"; do
-            [ -n "${pdf}" ] || continue
-            dest="docs/mega_pdf/$(basename "${pdf}")"
-            if [ -f "${dest}" ]; then
-              src_sz=$(stat -c%s "${pdf}")
-              dest_sz=$(stat -c%s "${dest}")
-              if [ "${src_sz}" -gt "${dest_sz}" ]; then
-                echo "Keep smaller committed ${dest} (${dest_sz}) — skip larger staged ${src_sz}"
-                continue
-              fi
-            fi
-            cp "${pdf}" "${dest}"
-            ls -lh "${dest}"
-          done
-          echo "Copied staged mega PDFs into docs/mega_pdf for Pages"
+          raw = Path("/tmp/ocr-bulletins/raw")
+          staged = Path("/tmp/ocr-bulletins/staged")
+          staged.mkdir(parents=True, exist_ok=True)
+          pdfs = sorted(raw.glob("*_mega_bulletin.pdf"))
+          if not pdfs:
+              raise SystemExit("::error::No mega PDFs in the selected harvest artefact.")
+
+          for pdf in pdfs:
+              index = pdf.with_suffix(".pages.json")
+              if not index.is_file():
+                  raise SystemExit(f"::error::No page index in the harvest artefact for {pdf.name}.")
+              metadata = json.loads(index.read_text(encoding="utf-8"))
+              if metadata.get("date") != week.isoformat() or metadata.get("pdf") != pdf.name:
+                  raise SystemExit(f"::error::Wrong week or PDF name in {index.name}.")
+              with pdf.open("rb") as source:
+                  if source.read(5) != b"%PDF-":
+                      raise SystemExit(f"::error::Invalid PDF signature in {pdf.name}.")
+              shutil.copy2(pdf, staged / pdf.name)
+              shutil.copy2(index, staged / index.name)
+
+          Path("Bulletins").mkdir(exist_ok=True)
+          shutil.copy2(report_path, "Bulletins/report.json")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"week={week}", file=output)
+          print(f"Staged {len(pdfs)} PDF and page-index pairs for {week}.")
+          PY
 
       - name: Generate OCR viewer pages
         id: ocr_generate
@@ -218,7 +198,8 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           set -euo pipefail
-          TODAY="$(date -u +%Y-%m-%d)"
+          WEEK="${{ steps.stage.outputs.week }}"
+          mkdir -p docs/mega_pdf
           STAGED="/tmp/ocr-bulletins/staged"
           PROCESSED=0
           FAILURES=0
@@ -228,13 +209,15 @@ jobs:
               echo "Warning: PDF not found for ${diocese}, skipping"
               continue
             fi
+            index_path="${pdf_path%.pdf}.pages.json"
+            cp "${pdf_path}" "${index_path}" docs/mega_pdf/
             workdir="/tmp/ocr-bulletins/${diocese}"
             mkdir -p "${workdir}"
-            ocr_html="${workdir}/bulletin-${TODAY}.html"
+            ocr_html="${workdir}/bulletin-${WEEK}.html"
             echo "=== OCR ${diocese} ==="
             if ! (
               cd "${workdir}"
-              python "${GITHUB_WORKSPACE}/ocr/convert_bulletin.py" "${pdf_path}" "${TODAY}"
+              python "${GITHUB_WORKSPACE}/ocr/convert_bulletin.py" "${pdf_path}" "${WEEK}"
             ); then
               echo "::error::convert_bulletin failed for ${diocese}"
               FAILURES=$((FAILURES + 1))
@@ -242,7 +225,7 @@ jobs:
             fi
             if ! python ocr/generate_bulletin_pages.py \
               --diocese "${diocese}" \
-              --date "${TODAY}" \
+              --date "${WEEK}" \
               --pdf "${pdf_path}" \
               --ocr-html "${ocr_html}"; then
               echo "::warning::generate_bulletin_pages failed for ${diocese}"
@@ -258,7 +241,8 @@ jobs:
             exit 1
           fi
           if [ "${FAILURES}" -gt 0 ]; then
-            echo "::error::OCR completed with ${FAILURES} diocese failure(s) — other dioceses still committed."
+            echo "::error::OCR failed for ${FAILURES} diocese(s). Existing viewers were kept."
+            exit 1
           fi
 
       - name: Update OCR quota dashboard

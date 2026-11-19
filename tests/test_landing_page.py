@@ -139,16 +139,16 @@ class LandingPageTests(unittest.TestCase):
             self.assertEqual(live_names[0], "Achonry Diocese")
             self.assertIn('class="is-long"', index_html)
             self.assertIn("white-space: nowrap", index_html)
-            self.assertIn("Bulletins ready @ 16:00", index_html)
-            self.assertIn("🟢 Bulletins ready @ 16:00", index_html)
-            self.assertIn("⚪ Bulletins ready @ 16:00", index_html)
+            self.assertNotIn("16:00", index_html)
+            self.assertIn("🟢 Bulletins available", index_html)
+            self.assertIn("⚪ Availability unknown", index_html)
             # Derry + Down & Connor have recipes and parish_status ok → 1/1.
             # Raphoe (evidence only) and Clogher (no recipes) stay —/—.
             # Cork fixture may also land as —/— or a count depending on recipes.
             self.assertEqual(index_html.count("1/1 available"), 2)
             self.assertGreaterEqual(index_html.count("—/— available"), 2)
-            self.assertEqual(index_html.count("🟢 Bulletins ready @ 16:00"), 2)
-            self.assertGreaterEqual(index_html.count("⚪ Bulletins ready @ 16:00"), 2)
+            self.assertEqual(index_html.count("🟢 Bulletins available"), 2)
+            self.assertGreaterEqual(index_html.count("⚪ Availability unknown"), 2)
             self.assertNotIn("30/57", index_html)
             self.assertIn("font-weight: 600", index_html)
             self.assertNotIn("Reliability available", index_html)
@@ -271,12 +271,16 @@ class LiveCardHeadingTests(unittest.TestCase):
                  "ready_count": 50, "total_count": 57},
                 {"key": "down-and-connor", "name": "Down and Connor", "dot": "⚪", "updated": "16/08/2026",
                  "ready_count": 10, "total_count": 57},
+                {"key": "killala", "name": "Killala", "dot": "🔴", "updated": "16/08/2026",
+                 "ready_count": 0, "total_count": 22},
             ]
         )
-        self.assertIn("⚪ Bulletins ready @ 16:00", html)
-        self.assertIn("🟡 Bulletins ready @ 16:00", html)
-        self.assertIn("🟢 Bulletins ready @ 16:00", html)
-        self.assertIn("🔴 Bulletins ready @ 16:00", html)
+        self.assertIn("⚪ Availability unknown", html)
+        self.assertIn("🟡 Bulletins available", html)
+        self.assertIn("🟢 Bulletins available", html)
+        self.assertIn("🔴 Bulletins available", html)
+        self.assertIn("🔴 No bulletins available yet", html)
+        self.assertIn("0/22 available", html)
         self.assertIn("—/— available", html)
         self.assertIn("30/57 available", html)
         self.assertIn("50/57 available", html)

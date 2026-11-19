@@ -7,6 +7,7 @@ recorded for the crawler / operator.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import unicodedata
@@ -1316,6 +1317,23 @@ def _parish_status_row(key: str, status_path: Path | None = None) -> dict | None
     return row if isinstance(row, dict) else None
 
 
+def pdf_sha256(path: Path) -> str | None:
+    """Fingerprint the saved PDF without loading the entire file into memory."""
+    try:
+        with path.open("rb") as pdf:
+            return hashlib.file_digest(pdf, "sha256").hexdigest()
+    except OSError:
+        return None
+
+
+def pdf_text_sha256(path: Path) -> str | None:
+    """Fingerprint substantive embedded text, ignoring whitespace and PDF metadata."""
+    text = " ".join(unicodedata.normalize("NFC", " ".join(read_pdf_page_texts(path))).split())
+    if len(text) < 200 or len(text.split()) < 30:
+        return None
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def previous_harvest_url(key: str, status_path: Path | None = None) -> str:
     """Last harvest's saved URL for this parish. Empty when missing or first harvest."""
     row = _parish_status_row(key, status_path=status_path)
@@ -1435,6 +1453,20 @@ def freshness_verdict_for_ok_result(
     else:
         verdict = FreshnessVerdict(status="unknown", reason="no_date_in_url")
 
+    previous = _parish_status_row(key) or {}
+    previous_week = _parse_iso_date(previous.get("last_pdf_week"))
+    previous_digest = previous.get("last_pdf_sha256")
+    saved_pdf = next((path for path in candidates if path.is_file()), None)
+    if (
+        verdict.status == "unknown"
+        and previous_week is not None
+        and previous_week < target
+        and previous_digest
+        and saved_pdf is not None
+        and pdf_sha256(saved_pdf) == previous_digest
+    ):
+        return FreshnessVerdict(status="stale", reason="unchanged_pdf_from_prior_week")
+
     url_changed = bulletin_url_changed(previous_harvest_url(key), url)
     current_bytes = None
     for path in candidates:
@@ -1472,6 +1504,17 @@ def freshness_verdict_for_ok_result(
         heading_undated = body_verdict is None or (
             body_verdict.status == "unknown" or body_verdict.extracted_date is None
         )
+        previous_text_digest = previous.get("last_pdf_text_sha256")
+        if (
+            verdict.status == "unknown"
+            and heading_undated
+            and previous_week is not None
+            and previous_week < target
+            and previous_text_digest
+            and path == saved_pdf
+            and pdf_text_sha256(path) == previous_text_digest
+        ):
+            return FreshnessVerdict(status="stale", reason="unchanged_pdf_text_from_prior_week")
         if url_changed and (verdict.status == "unknown" or heading_undated):
             # A parseable URL date before this week is still stale. Only an
             # unknown URL, or an undated heading, is kept as this week.

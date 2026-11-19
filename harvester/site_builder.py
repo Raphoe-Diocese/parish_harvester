@@ -815,7 +815,7 @@ def _viewer_pattern(diocese_key: str) -> re.Pattern[str]:
     return re.compile(rf"^{stem}-(\d{{4}}-\d{{2}}-\d{{2}})\.html$")
 
 
-def _latest_viewer(diocese_key: str) -> tuple[Path | None, str | None]:
+def _latest_viewer(diocese_key: str, week: str = "") -> tuple[Path | None, str | None]:
     if not BULLETINS_DIR.exists():
         return None, None
     regex = _viewer_pattern(diocese_key)
@@ -827,6 +827,8 @@ def _latest_viewer(diocese_key: str) -> tuple[Path | None, str | None]:
         if not match:
             continue
         date_text = match.group(1)
+        if week and date_text != week:
+            continue
         if latest is None or date_text > latest[1]:
             latest = (path, date_text)
     return latest if latest else (None, None)
@@ -846,7 +848,7 @@ def _ocr_html_from_viewer(path: Path | None) -> str:
     return match.group(1).strip()
 
 
-def _latest_ocr_standalone_stem(stem: str) -> Path | None:
+def _latest_ocr_standalone_stem(stem: str, week: str = "") -> Path | None:
     if not BULLETINS_DIR.exists() or not stem:
         return None
     pattern = stem.replace("-", "[-_]")
@@ -857,18 +859,20 @@ def _latest_ocr_standalone_stem(stem: str) -> Path | None:
         if not match:
             continue
         date_text = match.group(1)
+        if week and date_text != week:
+            continue
         if latest is None or date_text > latest[1]:
             latest = (path, date_text)
     return latest[0] if latest else None
 
 
-def _latest_ocr_standalone(diocese_key: str) -> Path | None:
-    found = _latest_ocr_standalone_stem(diocese_key)
+def _latest_ocr_standalone(diocese_key: str, week: str = "") -> Path | None:
+    found = _latest_ocr_standalone_stem(diocese_key, week)
     if found is not None:
         return found
     short = (diocese_key or "").split("-")[0]
     if short and short != diocese_key:
-        return _latest_ocr_standalone_stem(short)
+        return _latest_ocr_standalone_stem(short, week)
     return None
 
 
@@ -893,12 +897,12 @@ def _ocr_html_from_standalone(path: Path | None) -> str:
     return ""
 
 
-def _ocr_content_for_diocese(diocese_key: str) -> tuple[str, bool]:
-    viewer_path, _viewer_date = _latest_viewer(diocese_key)
+def _ocr_content_for_diocese(diocese_key: str, week: str = "") -> tuple[str, bool]:
+    viewer_path, _viewer_date = _latest_viewer(diocese_key, week)
     html_content = _ocr_html_from_viewer(viewer_path)
     if html_content:
         return html_content, True
-    standalone = _latest_ocr_standalone(diocese_key)
+    standalone = _latest_ocr_standalone(diocese_key, week)
     html_content = _ocr_html_from_standalone(standalone)
     if html_content:
         return html_content, True
@@ -1049,11 +1053,6 @@ def _status_label(avg_success_rate: float | None) -> str:
     return "Reliability available"
 
 
-# Public ready-by time on diocese cards (Irish clock). Harvest cron is 10:00 IST;
-# Frank asked for 16:00 as the time readers should expect the week's set.
-BULLETINS_READY_AT = "16:00"
-
-
 def _ready_count_text(ready: int | None, total: int | None) -> str:
     """Honest this-week count. None means we do not know yet — do not invent."""
     if ready is None or total is None:
@@ -1108,9 +1107,15 @@ def _live_card_ready_html(row: dict) -> str:
     total = raw_total if isinstance(raw_total, int) else None
     count = _ready_count_text(ready, total)
     dot = _count_dot(ready, total)
+    if ready is None or total is None:
+        status = "Availability unknown"
+    elif ready == 0:
+        status = "No bulletins available yet"
+    else:
+        status = "Bulletins available"
     return (
         "<p class=\"live-card-eyebrow\">"
-        f"<span class=\"live-card-ready\">{dot} Bulletins ready @ {html.escape(BULLETINS_READY_AT)}</span>"
+        f"<span class=\"live-card-ready\">{dot} {html.escape(status)}</span>"
         f"<span class=\"live-card-count\">{html.escape(count)} available</span>"
         "</p>"
     )
@@ -1202,7 +1207,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             "<div class=\"live-card-actions\">"
             f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\">Open bulletin</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True, week=row.get('week') or '', harvested_at=row.get('harvested_at') or ''), quote=True)}\">Mega PDF</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key'], row.get('week', '')), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
             "</div>"
             "</div>"
             "</article>"
@@ -1420,12 +1425,12 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 """
 
 
-def _ocr_standalone_url(diocese_key: str) -> str:
+def _ocr_standalone_url(diocese_key: str, week: str = "") -> str:
     """Same-origin text page. A github.io address bounces and the tap misses."""
-    standalone = _latest_ocr_standalone(diocese_key)
+    standalone = _latest_ocr_standalone(diocese_key, week)
     if standalone is not None:
         return f"/bulletins/{standalone.name}"
-    viewer_path, _viewer_date = _latest_viewer(diocese_key)
+    viewer_path, _viewer_date = _latest_viewer(diocese_key, week)
     if viewer_path is not None:
         return f"/bulletins/{viewer_path.name}"
     return "/bulletins/index.html"
@@ -1452,7 +1457,7 @@ def _mega_pdf_url(
     return with_mega_pdf_week(url, week, harvested_at=harvested_at)
 
 
-def _latest_pdf_standalone(diocese_key: str) -> Path | None:
+def _latest_pdf_standalone(diocese_key: str, week: str = "") -> Path | None:
     """Latest distraction-free PDF-only page (`{diocese}-{date}-pdf.html`)."""
     if not BULLETINS_DIR.exists():
         return None
@@ -1464,13 +1469,15 @@ def _latest_pdf_standalone(diocese_key: str) -> Path | None:
         if not match:
             continue
         date_text = match.group(1)
+        if week and date_text != week:
+            continue
         if latest is None or date_text > latest[1]:
             latest = (path, date_text)
     return latest[0] if latest else None
 
 
 def _pdf_standalone_url(diocese_key: str, week: str = "", harvested_at: str = "") -> str:
-    standalone = _latest_pdf_standalone(diocese_key)
+    standalone = _latest_pdf_standalone(diocese_key, week)
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
         return f"{pages_base}/bulletins/{standalone.name}"
@@ -1525,7 +1532,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         week_summary = None
         if diocese.key in LIVE_DIOCESES and trained:
             parish_links = _parish_links_for_big_bulletin(diocese.key, report_path)
-            ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
+            ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key, target_date)
             display_short = diocese.name.removesuffix(" Diocese").strip() or diocese.name
             if display_short == "Down and Connor":
                 display_short = "Down & Connor"
@@ -1545,7 +1552,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                     week=target_date,
                     harvested_at=harvested_at,
                 ),
-                ocr_standalone_url=_ocr_standalone_url(diocese.key),
+                ocr_standalone_url=_ocr_standalone_url(diocese.key, target_date),
                 pdf_standalone_url=_pdf_standalone_url(
                     diocese.key, week=target_date, harvested_at=harvested_at
                 ),
