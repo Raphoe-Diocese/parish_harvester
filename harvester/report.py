@@ -76,14 +76,20 @@ def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
     return dest
 
 
-def _file_bytes_field(path: Path | None) -> dict[str, int]:
-    """PDF size in bytes for next Sunday's same-URL compare. Empty when missing."""
+def _file_evidence(path: Path | None, target: date) -> dict[str, int | str]:
+    """Record the downloaded file's size, fingerprint and harvest week."""
+    from .bulletin_freshness import pdf_sha256
+
     if path is None:
         return {}
     try:
         file_path = Path(path)
         if file_path.is_file():
-            return {"file_bytes": int(file_path.stat().st_size)}
+            evidence: dict[str, int | str] = {"file_bytes": file_path.stat().st_size}
+            digest = pdf_sha256(file_path)
+            if digest is not None:
+                evidence.update(last_pdf_sha256=digest, last_pdf_week=target.isoformat())
+            return evidence
     except OSError:
         return {}
     return {}
@@ -332,7 +338,7 @@ def generate_report(
                 "file": dest.name if dest else f"{r.key}.pdf",
                 "file_type": r.file_type,
                 **_bulletin_date_fields(r.url, pdf_path=r.file_path, target=target),
-                **_file_bytes_field(dest or r.file_path),
+                **_file_evidence(dest or r.file_path, target),
             }
             downloaded.append(entry)
         elif r.status == "html_link":
@@ -459,7 +465,7 @@ def _result_to_report_entry(
             "file": dest.name if dest else f"{r.key}.pdf",
             "file_type": r.file_type,
             **_bulletin_date_fields(r.url, pdf_path=r.file_path, target=target),
-            **_file_bytes_field(dest or r.file_path),
+            **_file_evidence(dest or r.file_path, target),
         }
     if r.status == "html_link":
         return "html_links", {
