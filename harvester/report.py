@@ -76,9 +76,9 @@ def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
     return dest
 
 
-def _file_evidence(path: Path | None, target: date) -> dict[str, int | str]:
+def _file_evidence(path: Path | None, target: date | None) -> dict[str, int | str]:
     """Record the downloaded file's size, fingerprint and harvest week."""
-    from .bulletin_freshness import pdf_sha256
+    from .bulletin_freshness import pdf_sha256, pdf_text_sha256
 
     if path is None:
         return {}
@@ -86,9 +86,14 @@ def _file_evidence(path: Path | None, target: date) -> dict[str, int | str]:
         file_path = Path(path)
         if file_path.is_file():
             evidence: dict[str, int | str] = {"file_bytes": file_path.stat().st_size}
+            if target is None:
+                return evidence
             digest = pdf_sha256(file_path)
             if digest is not None:
                 evidence.update(last_pdf_sha256=digest, last_pdf_week=target.isoformat())
+                text_digest = pdf_text_sha256(file_path)
+                if text_digest is not None:
+                    evidence["last_pdf_text_sha256"] = text_digest
             return evidence
     except OSError:
         return {}
