@@ -554,8 +554,8 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         )
         self.assertEqual(recipe["start_url"], url)
         self.assertEqual(recipe["site_type"], "permanent_redirect_document")
-        # Cloudflare 403 on the HTML path — download bulletin.pdf first.
-        self.assertEqual(recipe["steps"][0]["url"], weekly)
+        # Prefer the permanent weekly URL, retaining the direct PDF as fallback.
+        self.assertEqual(recipe["steps"][0]["url"], url)
         self.assertTrue(recipe["steps"][0].get("use_target_url"))
         self.assertNotEqual(
             recipe["start_url"],
