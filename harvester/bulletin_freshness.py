@@ -1392,6 +1392,8 @@ def _this_week_url_or_unknown(
     extracted = verdict.extracted_date
     if extracted is not None:
         week_start, week_end = week_window(target)
+        if extracted < week_start and verdict.status == "stale":
+            return verdict
         if week_start <= extracted <= week_end or verdict.status == "fresh":
             return verdict
     if verdict.status == "unknown":
