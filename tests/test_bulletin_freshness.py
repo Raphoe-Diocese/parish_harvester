@@ -1255,6 +1255,29 @@ class ChangedUrlAndSizeFreshnessTests(unittest.TestCase):
             self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
             self.assertNotEqual(verdict.extracted_date, self.TARGET)
 
+    def test_same_dated_url_size_increase_preserves_previous_week_verdict(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "reuploaded.pdf"
+            self._write_pdf(pdf, "Aifrinn na Seachtaine", size=500 * 1024)
+            result = FetchResult(
+                key="dated-reupload",
+                display_name="Demo",
+                status="ok",
+                url=self.LAST_WEEK,
+                file_path=pdf,
+                file_type="pdf",
+            )
+            with patch(
+                "harvester.bulletin_freshness.previous_harvest_url",
+                return_value=self.LAST_WEEK,
+            ), patch(
+                "harvester.bulletin_freshness.previous_harvest_file_bytes",
+                return_value=400 * 1024,
+            ):
+                verdict = freshness_verdict_for_ok_result(result, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 11, 1))
+
     def test_same_url_size_up_blank_heading_is_not_stale_and_not_eighth_november(
         self,
     ) -> None:
