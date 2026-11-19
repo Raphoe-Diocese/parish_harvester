@@ -1457,7 +1457,7 @@ def _mega_pdf_url(
     return with_mega_pdf_week(url, week, harvested_at=harvested_at)
 
 
-def _latest_pdf_standalone(diocese_key: str) -> Path | None:
+def _latest_pdf_standalone(diocese_key: str, week: str = "") -> Path | None:
     """Latest distraction-free PDF-only page (`{diocese}-{date}-pdf.html`)."""
     if not BULLETINS_DIR.exists():
         return None
@@ -1477,7 +1477,7 @@ def _latest_pdf_standalone(diocese_key: str) -> Path | None:
 
 
 def _pdf_standalone_url(diocese_key: str, week: str = "", harvested_at: str = "") -> str:
-    standalone = _latest_pdf_standalone(diocese_key)
+    standalone = _latest_pdf_standalone(diocese_key, week)
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
         return f"{pages_base}/bulletins/{standalone.name}"
