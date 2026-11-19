@@ -1,0 +1,35 @@
+name: Scan desktop parish sources for 22 November
+on:
+  push:
+    branches: [scan/2026-11-22-desktop-sources]
+permissions:
+  contents: read
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Pass the edition date to secondary probes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("scripts/scan_pasted_sites.py")
+          text = path.read_text()
+          text = text.replace("def _extra_urls(page_url: str)", "def _extra_urls(page_url: str, target: date)")
+          text = text.replace("_extra_urls(url):", "_extra_urls(url, target):")
+          path.write_text(text)
+          PY
+      - name: Scan all desktop rows
+        run: python scripts/scan_pasted_sites.py --target 2026-11-22 --workers 24 --output desktop-scan-2026-11-22.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-scan-2026-11-22
+          path: desktop-scan-2026-11-22.json
+          if-no-files-found: error
