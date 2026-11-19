@@ -1326,6 +1326,14 @@ def pdf_sha256(path: Path) -> str | None:
         return None
 
 
+def pdf_text_sha256(path: Path) -> str | None:
+    """Fingerprint substantive embedded text, ignoring whitespace and PDF metadata."""
+    text = " ".join(unicodedata.normalize("NFC", " ".join(read_pdf_page_texts(path))).split())
+    if len(text) < 200 or len(text.split()) < 30:
+        return None
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def previous_harvest_url(key: str, status_path: Path | None = None) -> str:
     """Last harvest's saved URL for this parish. Empty when missing or first harvest."""
     row = _parish_status_row(key, status_path=status_path)
@@ -1496,6 +1504,17 @@ def freshness_verdict_for_ok_result(
         heading_undated = body_verdict is None or (
             body_verdict.status == "unknown" or body_verdict.extracted_date is None
         )
+        previous_text_digest = previous.get("last_pdf_text_sha256")
+        if (
+            verdict.status == "unknown"
+            and heading_undated
+            and previous_week is not None
+            and previous_week < target
+            and previous_text_digest
+            and path == saved_pdf
+            and pdf_text_sha256(path) == previous_text_digest
+        ):
+            return FreshnessVerdict(status="stale", reason="unchanged_pdf_text_from_prior_week")
         if url_changed and (verdict.status == "unknown" or heading_undated):
             # A parseable URL date before this week is still stale. Only an
             # unknown URL, or an undated heading, is kept as this week.
