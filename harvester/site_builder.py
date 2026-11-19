@@ -1049,11 +1049,6 @@ def _status_label(avg_success_rate: float | None) -> str:
     return "Reliability available"
 
 
-# Public ready-by time on diocese cards (Irish clock). Harvest cron is 10:00 IST;
-# Frank asked for 16:00 as the time readers should expect the week's set.
-BULLETINS_READY_AT = "16:00"
-
-
 def _ready_count_text(ready: int | None, total: int | None) -> str:
     """Honest this-week count. None means we do not know yet — do not invent."""
     if ready is None or total is None:
@@ -1108,9 +1103,15 @@ def _live_card_ready_html(row: dict) -> str:
     total = raw_total if isinstance(raw_total, int) else None
     count = _ready_count_text(ready, total)
     dot = _count_dot(ready, total)
+    if ready is None or total is None:
+        status = "Availability unknown"
+    elif ready == 0:
+        status = "No bulletins available yet"
+    else:
+        status = "Bulletins available"
     return (
         "<p class=\"live-card-eyebrow\">"
-        f"<span class=\"live-card-ready\">{dot} Bulletins ready @ {html.escape(BULLETINS_READY_AT)}</span>"
+        f"<span class=\"live-card-ready\">{dot} {html.escape(status)}</span>"
         f"<span class=\"live-card-count\">{html.escape(count)} available</span>"
         "</p>"
     )
