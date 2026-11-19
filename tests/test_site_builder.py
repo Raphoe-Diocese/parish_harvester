@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import harvester.site_builder as site_builder
@@ -208,6 +209,27 @@ class SiteBuilderTests(unittest.TestCase):
             ),
             "/mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-06&h=20260910T2324",
         )
+
+    def test_ocr_links_only_use_the_requested_bulletin_week(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            folder = Path(tmpdir)
+            for week in ("2026-11-08", "2026-11-16", "2026-11-15"):
+                (folder / f"raphoe-{week}-ocr.html").write_text(
+                    f'<main><div class="ocr-body">{week}</div></main>', encoding="utf-8"
+                )
+            with patch.object(site_builder, "BULLETINS_DIR", folder):
+                self.assertEqual(
+                    site_builder._ocr_content_for_diocese("raphoe", "2026-11-15"),
+                    ("2026-11-15", True),
+                )
+                self.assertEqual(
+                    site_builder._ocr_standalone_url("raphoe", "2026-11-15"),
+                    "/bulletins/raphoe-2026-11-15-ocr.html",
+                )
+                self.assertEqual(
+                    site_builder._ocr_content_for_diocese("raphoe", "2026-11-22"),
+                    ("", False),
+                )
 
     def test_short_ocr_filename_is_used_when_the_folder_name_is_longer(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
