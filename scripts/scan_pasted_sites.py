@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Check the 29/10/2026 pasted parish websites for this Sunday. GitHub only.
-
-A parish that is not already outcome ok for 08/11/2026, and not already in
-parishes/pasted_sites_scan.json, is also probed with the brain's proved paths.
-New hits go to parishes/pasted_brain_scan.json. Recipes are not edited.
-"""
+"""Scan pasted parish websites for an edition and record every source outcome."""
 from __future__ import annotations
 
 import argparse
@@ -43,18 +38,18 @@ def _facebook(url: str) -> bool:
     return "facebook.com" in lowered or "fb.watch" in lowered
 
 
-def _wix_hash(url: str) -> bool:
+def _wix_hash(url: str, target: date = TARGET) -> bool:
     """A Wix file hash is not a stable bulletin address. Do not pin it."""
     lowered = (url or "").lower()
     if "/_files/ugd/" in lowered:
         return True
     if "wixstatic.com" not in lowered:
         return False
-    return extract_bulletin_date(url) != TARGET
+    return extract_bulletin_date(url) != target
 
 
-def _keep_probe(url: str) -> bool:
-    """True when this URL can still be the 08/11/2026 file.
+def _keep_probe(url: str, target: date = TARGET) -> bool:
+    """True when this URL could serve the target edition.
 
     09-11-08.pdf is 2009-11-08. 11.08.26.pdf is 2026-08-11.
     A name that already has a different date is not this Sunday.
@@ -62,10 +57,10 @@ def _keep_probe(url: str) -> bool:
     url = (url or "").strip()
     if not url.startswith("http"):
         return False
-    if _facebook(url) or _wix_hash(url):
+    if _facebook(url) or _wix_hash(url, target):
         return False
     named = extract_bulletin_date(url)
-    if named is not None and named != TARGET:
+    if named is not None and named != target:
         return False
     return True
 
@@ -77,7 +72,7 @@ def _extra_urls(page_url: str) -> list[str]:
 
     def add(url: str) -> None:
         url = (url or "").strip()
-        if not _keep_probe(url) or url in seen:
+        if not _keep_probe(url, target) or url in seen:
             return
         seen.add(url)
         found.append(url)
@@ -103,10 +98,10 @@ def _extra_urls(page_url: str) -> list[str]:
     return found
 
 
-def brain_probe_urls(page_url: str) -> list[str]:
+def brain_probe_urls(page_url: str, target: date = TARGET) -> list[str]:
     """Brain paths for this start URL. Direct files first. No Facebook. No Wix hash.
 
-    A filename dated on another day is left out. Only 08/11/2026 can count.
+    A filename dated on another day is left out.
     """
     direct: list[str] = []
     later: list[str] = []
@@ -114,7 +109,7 @@ def brain_probe_urls(page_url: str) -> list[str]:
 
     def add(bucket: list[str], url: str) -> None:
         url = (url or "").strip()
-        if not url or url in seen or not _keep_probe(url):
+        if not url or url in seen or not _keep_probe(url, target):
             return
         seen.add(url)
         bucket.append(url)
@@ -128,19 +123,19 @@ def brain_probe_urls(page_url: str) -> list[str]:
     return direct + later
 
 
-def _prove_url(url: str, accepted: set[date]) -> dict | None:
-    if not _keep_probe(url):
+def _prove_url(url: str, accepted: set[date], target: date = TARGET) -> dict | None:
+    if not _keep_probe(url, target):
         return None
     proved = prove_this_week_file(url, accepted)
-    if not proved or proved.get("date") != TARGET.isoformat():
+    if not proved or proved.get("date") != target.isoformat():
         return None
     final = str(proved.get("url") or "")
-    if not _keep_probe(final):
+    if not _keep_probe(final, target):
         return None
     return proved
 
 
-def skip_reason(row: dict, parishes: dict, prior_hit_keys: set[str]) -> str | None:
+def skip_reason(row: dict, parishes: dict, prior_hit_keys: set[str], target: date = TARGET) -> str | None:
     """Why this pasted row is not probed. None means probe it."""
     key = str(row.get("key") or "")
     url = str(row.get("url") or "")
@@ -149,7 +144,7 @@ def skip_reason(row: dict, parishes: dict, prior_hit_keys: set[str]) -> str | No
     if _facebook(url):
         return "facebook"
     current = parishes.get(key) or {}
-    if current.get("outcome") == "ok" and current.get("bulletin_date") == TARGET.isoformat():
+    if current.get("outcome") == "ok" and current.get("bulletin_date") == target.isoformat():
         return "saved"
     if key and key in prior_hit_keys:
         return "prior_hit"
@@ -160,13 +155,15 @@ def rows_to_probe(rows: list[dict], parishes: dict, prior_hit_keys: set[str]) ->
     return [row for row in rows if skip_reason(row, parishes, prior_hit_keys) is None]
 
 
-def load_prior_hit_keys(path: Path | None = None) -> set[str]:
+def load_prior_hit_keys(path: Path | None = None, *, target: date | None = None) -> set[str]:
     file_path = path or PRIOR_HITS_PATH
     if not file_path.is_file():
         return set()
     try:
         report = json.loads(file_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
+        return set()
+    if target is not None and report.get("target") != target.isoformat():
         return set()
     keys: set[str] = set()
     for hit in report.get("hits") or []:
@@ -178,7 +175,7 @@ def load_prior_hit_keys(path: Path | None = None) -> set[str]:
     return keys
 
 
-def _one(row: dict, accepted: set[date]) -> dict:
+def _one(row: dict, accepted: set[date], target: date = TARGET) -> dict:
     url = str(row.get("url") or "")
     key = str(row.get("key") or "")
     proved: dict | None = None
@@ -188,12 +185,12 @@ def _one(row: dict, accepted: set[date]) -> dict:
         def try_url(candidate: str) -> None:
             nonlocal proved
             candidate = (candidate or "").strip()
-            if not candidate or candidate in tried or not _keep_probe(candidate):
+            if not candidate or candidate in tried or not _keep_probe(candidate, target):
                 return
             tried.add(candidate)
-            proved = _prove_url(candidate, accepted)
+            proved = _prove_url(candidate, accepted, target)
 
-        for candidate in brain_probe_urls(url):
+        for candidate in brain_probe_urls(url, target):
             try_url(candidate)
             if proved is not None:
                 break
@@ -222,27 +219,35 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--workers", type=int, default=30)
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--target", type=date.fromisoformat, default=TARGET)
+    parser.add_argument("--sources", type=Path, default=LIST_PATH)
+    parser.add_argument("--output", type=Path, default=OUT_PATH)
     args = parser.parse_args()
-    rows = json.loads(LIST_PATH.read_text(encoding="utf-8"))
+    target = args.target
+    rows = json.loads(args.sources.read_text(encoding="utf-8"))
     status = json.loads((REPO / "parishes" / "parish_status.json").read_text(encoding="utf-8"))
     parishes = status.get("parishes") or {}
-    prior_keys = load_prior_hit_keys()
+    prior_keys = load_prior_hit_keys(target=target)
     skipped = {"saved": 0, "prior_hit": 0, "facebook": 0, "no_website": 0}
     todo: list[dict] = []
+    outcomes: list[dict] = []
     for row in rows:
-        reason = skip_reason(row, parishes, prior_keys)
+        reason = skip_reason(row, parishes, prior_keys, target)
         if reason:
             skipped[reason] = skipped.get(reason, 0) + 1
+            outcomes.append({"key": row.get("key"), "url": row.get("url"), "outcome": reason})
             continue
         todo.append(row)
-    accepted = accepted_hunt_dates(TARGET)
+    accepted = accepted_hunt_dates(target)
     hits: list[dict] = []
     done = 0
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-        futures = [pool.submit(_one, row, accepted) for row in todo]
+        futures = [pool.submit(_one, row, accepted, target) for row in todo]
         for future in as_completed(futures):
             done += 1
             row = future.result()
+            outcome = "proved" if row.get("found") else "error" if row.get("error") else "no_verified_issue"
+            outcomes.append({**row, "outcome": outcome})
             if row.get("found"):
                 hits.append(row)
                 print(f"FOUND {row['key']} {row.get('bulletin_url')}", flush=True)
@@ -250,14 +255,15 @@ def main() -> int:
                 print(f"progress {done}/{len(todo)} hits {len(hits)}", flush=True)
     hits.sort(key=lambda item: str(item.get("key") or ""))
     report = {
-        "target": TARGET.isoformat(),
+        "target": target.isoformat(),
         "checked": len(todo),
         "skipped_saved": skipped.get("saved", 0),
         "skipped_prior_hits": skipped.get("prior_hit", 0),
         "found_this_sunday": len(hits),
         "hits": hits,
+        "outcomes": sorted(outcomes, key=lambda row: (str(row.get("key") or ""), str(row.get("url") or ""))),
     }
-    OUT_PATH.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(
         json.dumps(
             {
