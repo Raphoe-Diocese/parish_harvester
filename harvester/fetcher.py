@@ -2027,6 +2027,7 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
         "wp_json_newest_media",
         "wp_json_newest_post_images",
         "http_scrape_newest_images",
+        "archive_pdf_with_printed_date",
     }:
         return False
     steps = recipe_meta.get("steps")

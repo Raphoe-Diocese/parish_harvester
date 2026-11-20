@@ -3045,6 +3045,71 @@ async def _try_http_scrape_newest_pdf(
     return pdf_url, "pdf"
 
 
+async def _try_archive_pdf_with_printed_date(
+    listing_url: str,
+    dest: Path,
+    *,
+    target_date: date,
+    href_patterns: list[str],
+) -> tuple[str, str] | None:
+    """Fetch archive PDF links with no .pdf suffix; require printed issue date.
+
+    Loughshore /sunday-bulletin/ links are actual PDF responses under a
+    WordPress permalink, not PDF paths. Never pick a 2025 liturgical twin,
+    a stale issue or a future Sunday merely because its permalink changed.
+    """
+    result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        listing_url,
+        max_attempts=3,
+        per_attempt_timeout_s=10.0,
+        total_budget_s=20.0,
+    )
+    if not result:
+        return None
+    listing_body, headers = result
+    if "text/html" not in (headers.get("content-type") or "").lower():
+        return None
+    html = listing_body.decode("utf-8", "replace")
+    links = _extract_matching_hrefs(html, listing_url, href_patterns)
+    listing_path = urlparse(listing_url).path.rstrip("/")
+    host = urlparse(listing_url).hostname
+    checked: set[str] = set()
+    # The archive is newest-first. Limit cost, but validate the actual
+    # PDF's front page instead of relying on WordPress HTML sort order.
+    for link in links:
+        parsed = urlparse(link)
+        if parsed.hostname != host or parsed.path.rstrip("/") == listing_path:
+            continue
+        if link in checked:
+            continue
+        checked.add(link)
+        if len(checked) > 10:
+            break
+        response = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            link,
+            max_attempts=3,
+            per_attempt_timeout_s=10.0,
+            total_budget_s=20.0,
+            want_file=True,
+        )
+        if not response:
+            continue
+        body, file_headers = response
+        if not body.startswith(b"%PDF") or not _dropfiles_body_looks_like_file(file_headers, body):
+            continue
+        from .bulletin_freshness import heading_date_in_pdf_bytes
+        printed = heading_date_in_pdf_bytes(body, target=target_date)
+        if printed != target_date:
+            continue
+        dest.write_bytes(body)
+        # This permalink contains no issue date. A date positively read
+        # from the PDF's heading is safe to preserve in the harvest report.
+        return url_with_stated_issue_date(link, printed), "pdf"
+    return None
+
+
 async def _try_predicted_dated_pdf(
     example_url: str,
     dest: Path,
@@ -5671,6 +5736,17 @@ async def replay_recipe(
     # Listing page is reachable via plain HTTP but the current PDF lives
     # inside a closed accordion (Playwright visible-wait times out). Scrape
     # the raw HTML for matching PDF hrefs and download the newest dated one.
+    if site_type == "archive_pdf_with_printed_date" and target_date is not None:
+        patterns = [str(p).strip() for p in (recipe.get("href_patterns") or []) if str(p).strip()]
+        found = await _try_archive_pdf_with_printed_date(
+            start_url, dest, target_date=target_date, href_patterns=patterns
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"Archive at {start_url} has no verified PDF headed {target_date}"
+        )
+
     if site_type == "http_scrape_newest_pdf" and target_date is not None:
         href_patterns = [
             str(p).strip().lower()
