@@ -27,3 +27,10 @@ For each candidate record: parish, diocese, source page, source type, dynamic ex
 1. Recover the six missing Raphoe parishes (Gartan/Termon, Glenfin, Kincasslagh, Newtown Killea, Gaoth Dobhair, Mevagh).
 2. Import all 397 website seeds and the 61 structured link leads into a tracked machine-readable queue; deduplicate against existing recipes.
 3. Batch validate candidates by source type; create small verified recipe PRs, then check real weekly harvest and OCR.
+
+## Automated priority queue (2026-11-20)
+Run `python scripts/build_bulletin_discovery_queue.py` after each harvest. It reads **all original seed files** in `docs/discovery/` and `Bulletins/report.json`, writes `docs/discovery/research-queue-YYYY-MM-DD.json` and ranks candidates as stale, failed, skipped, unmatched or downloaded. **Every row is unverified research, even if its name matched a downloaded report row.**
+
+**Important matching trick:** different church titles can refer to the same parish. Match MCN through stable numerical `/Uploads/{church_id}/NewsLetter/` and Google Drive through their stable file ID; compare exact source URLs next and normalised parish names last. Do not match church-specific bulletins merely by a shared CloudFront, parishpress, or family-of-parishes domain. Label no-match as **unmatched**, not **new/working**.
+
+As of the 15-Nov-2026 report: 458 raw leads, 456 distinct leads; 98 align with stale records, 98 with failures, 44 with skipped, 202 with reported downloads, 14 remain unmatched. This is a triage count, **not new bulletin recovery**. The remaining 14 require checking whether they represent genuinely new sources, differently named churches or duplicate newsletters. Recompute after each harvest; figures will change.
