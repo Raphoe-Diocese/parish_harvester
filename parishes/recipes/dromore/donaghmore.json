@@ -2,35 +2,41 @@
   "parish_key": "donaghmore",
   "display_name": "Donaghmore",
   "diocese": "dromore",
-  "recorded_date": "2026-11-13",
-  "start_url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf",
-  "site_type": "predicted_dated_pdf",
+  "recorded_date": "2026-11-20",
+  "start_url": "https://donaghmoreparish.org/",
+  "site_type": "http_scrape_newest_pdf",
   "example_url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf",
-  "playbook_type": "direct_download",
+  "playbook_type": "pdf_download_list",
   "status": "active",
   "skip": false,
   "ignore_https_errors": true,
   "steps": [
     {
-      "action": "download",
-      "url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf"
+      "action": "goto",
+      "url": "https://donaghmoreparish.org/"
     }
   ],
-  "version": 3,
+  "version": 4,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "weeks_ahead": 1,
+  "weeks_ahead": 0,
   "operator_notes": [
-    "13/11/2026: homepage scrape can hang. Proved PDF Donaghmore-Bulletin-8th-November-2026.pdf GET 200 %PDF with ignore_https_errors (expired cert). start_url is the PDF.",
-    "Armagh Facebook-only parish is donaghmorearmagh."
+    "20/11/2026: Official homepage's 'Parish Weekly Bulletin' link points to https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-15th-November-2026.pdf. Confirmed real application/pdf one page, printed heading DONAGHMORE PARISH BULLETIN / 15TH NOVEMBER 2026 / THIRTY-THIRD SUNDAY IN ORDINARY TIME.",
+    "Previous predicted_dated_pdf recipe was created 13 November from the 8th-November PDF and 15 November saved report still rejected 8th as stale. Use actual homepage 'Parish Weekly Bulletin' href first, via HTTP scrape without Playwright navigation; fallback can use existing example_url prediction if homepage cannot be retrieved.",
+    "Use published issue date, not Sunday mentioned among intentions. 22 November must not be claimed current until its bulletin appears.",
+    "Donaghmore Dromore parish serves St John Glenn and St Mary Barr. It differs from Donaghmore in Archdiocese of Armagh (donaghmorearmagh)."
   ],
   "do_not": [
-    "Do not pin forever — predicted rewrites the date.",
-    "Do not take the service@riceoffice hash PDF.",
-    "Do not harvest Facebook."
+    "Do not pin a single November PDF in steps or start_url.",
+    "Do not confuse Sunday's Mass intentions with published issue date.",
+    "Do not confuse Dromore's Donaghmore with Armagh's Donaghmore.",
+    "Do not harvest Sunday Message link as parish bulletin."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "href_patterns": [
+    "Donaghmore-Bulletin-"
+  ]
 }
