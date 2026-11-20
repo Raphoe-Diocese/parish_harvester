@@ -194,6 +194,7 @@ def collapse_proven_shared_downloads(report: dict) -> dict:
             "proof": proof,
             "canonical_url": main_url,
             "canonical_sha256": p_hash,
+            "report_target_date": str(report.get("target_date") or ""),
         })
     report["downloaded"] = kept
     # This helper may run more than once (one-parish patch and mega rebuild).
@@ -207,6 +208,8 @@ def collapse_proven_shared_downloads(report: dict) -> dict:
         pair = (str(old.get("alias") or ""), str(old.get("canonical") or ""))
         main = canonical_rows.get(pair[1])
         if pair in known_pairs or not main or pair[0] in kept_keys:
+            continue
+        if str(old.get("report_target_date") or "") != str(report.get("target_date") or ""):
             continue
         if str(old.get("canonical_url") or "") != str(main.get("url") or ""):
             continue
