@@ -2688,6 +2688,9 @@ def _score_http_scrape_pdf_hrefs(
             # Download Monitor (Holy Trinity / Donaghmede) serves the PDF from
             # /download/8th-november-2026/ with no .pdf in the address.
             or "/download/" in path
+            # Joomla /news/routedownload/*.html is a redirect/thank-you page
+            # whose matching /news/download/*.html serves real PDF bytes.
+            or ("/routedownload/" in path and path.endswith(".html"))
         )
         # Mayo.ie sometimes posts this Sunday as .jpg while older weeks stay .pdf
         # (Balla-Belcarra 25-10-2026.jpg vs 18-10-2026.pdf — proved 29/10/2026).
@@ -2996,6 +2999,12 @@ async def _try_http_scrape_newest_pdf(
     changed = [item for item in same_day if bulletin_url_changed(previous_url, item)]
     pool = changed or same_day
     pdf_url = pick_same_day_file(pool, href_patterns) or pool[0]
+    # Joomla route-download links are an HTML thank-you landing page. The
+    # corresponding /download/ path returns PDF bytes despite the .html suffix
+    # (Ballybrack-Killiney, 14–15 November 2026). Resolve only this named
+    # route segment; never infer PDF from arbitrary .html pages.
+    if "/routedownload/" in urlparse(pdf_url).path.lower():
+        pdf_url = pdf_url.replace("/routedownload/", "/download/", 1)
     pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
