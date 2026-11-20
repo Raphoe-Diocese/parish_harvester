@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 QUEUE = ROOT / "docs/discovery/research-queue-2026-11-15.json"
 OUTPUT = ROOT / "docs/discovery/batch-bulletin-probes.json"
 CURSOR = ROOT / "parishes/batch_probe_cursor.json"
+ADDITIONAL = ROOT / "docs/discovery/additional-web-leads-2026-11-20.json"
 USER_AGENT = "ParishPress-BatchDiscovery/1.0 (+https://www.parishpress.ie/)"
 BAD = re.compile(r"gdpr|consent|standing.order|gift.aid|donat|privacy|cookie|safeguard|baptism.form|application.form|finance|accounts|lotto|raffle|poster|advert|logo|background|wedding", re.I)
 GOOD = re.compile(r"newsletter|bulletin|parish.news|sunday|mass.sheet|weekly", re.I)
@@ -227,6 +228,9 @@ def main() -> int:
     now = datetime.now(timezone.utc).date()
     sunday = date.fromisoformat(args.date) if args.date else now - timedelta(days=(now.weekday() + 1) % 7)
     queue = json.loads(QUEUE.read_text(encoding="utf-8"))
+    if ADDITIONAL.exists():
+        extra = json.loads(ADDITIONAL.read_text(encoding="utf-8"))
+        queue["leads"] = (extra.get("leads") or []) + (queue.get("leads") or [])
     state = json.loads(CURSOR.read_text(encoding="utf-8")) if CURSOR.exists() else {}
     if state.get("target_date") != sunday.isoformat():
         state = {"offset": 0}
