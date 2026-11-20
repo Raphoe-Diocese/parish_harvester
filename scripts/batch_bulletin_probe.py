@@ -232,6 +232,22 @@ def main() -> int:
         state = {"offset": 0}
     report, new_state = run(queue, state, sunday, max(1, args.limit), max(1, min(32, args.workers)))
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    # Keep a full-week ledger, not only the last 120 probes. Results are
+    # refreshed by seed URL on subsequent scans, preserving prior findings.
+    if OUTPUT.exists():
+        try:
+            previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            previous = {}
+        if previous.get("target_date") == sunday.isoformat():
+            ledger = {row["seed"]: row for row in previous.get("rows", []) if row.get("seed")}
+            ledger.update({row["seed"]: row for row in report["rows"] if row.get("seed")})
+            report["rows"] = list(ledger.values())
+            report["summary"]["total_checked_this_week"] = len(ledger)
+            report["summary"]["total_verified_links_this_week"] = sum(
+                row.get("verdict") == "candidate_verified_bytes_and_link_date"
+                for row in ledger.values()
+            )
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     CURSOR.write_text(json.dumps(new_state, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report["summary"], indent=2))
