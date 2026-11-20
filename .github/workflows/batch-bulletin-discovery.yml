@@ -4,6 +4,10 @@ name: Batch parish bulletin discovery
 on:
   schedule:
     - cron: '15 2,8,14,20 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/batch-discovery-now.txt'
   workflow_dispatch:
 
 permissions:
@@ -25,6 +29,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Install dependencies and verify probe safety
+        run: |
+          set -euo pipefail
+          pip install -r requirements.txt
+          python -m py_compile scripts/batch_bulletin_probe.py
+          python -m unittest discover -s tests -p test_batch_bulletin_probe.py -v
 
       - name: Probe 120 unresolved sources in parallel
         env:
