@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] Critical, 2026-11-20: Gartan/Termon shares one Drive file `1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa`; `Bulletins/report.json` dated 15 Nov labels canonical `drive-1kna8f6t54` **stale (8 Nov)** and alias `kilmacrenan` **downloaded (undated)**. Prevent the same known alias source being counted as fresh when canonical content is proven stale, but preserve separately date-verified current alias issues. Correct report.txt to use reconciled counts and record an explicit alias conflict. Verify future harvest, mega PDF and public status, not done yet.
+
 - [ ] In review, 2026-11-20: Glencolmcille also has independently listed MCN church ID 661. Prefer a date-verified fresh MCN PDF via its stable camera/ProfileDataByJson API before attempting the archived HTML accordion. Never pin UUIDs or accept prior-week PDFs. Test current/old card dates and contradictory printed mastheads; verify actual PDF/mega/OCR live after merge.
 
 - [ ] In review, 2026-11-20: common **standalone** English and Gaeilge newsletter headings (e.g. Eucharistic Adoration, Weekly Masses, November Masses for the Holy Souls, Aifreann Cuimhneacháin) were not promoted because only a limited Mass/Anniversary list was recognised. Add whole-line-only section label patterns and tests proving that sentences and announcements are not wrongly made headings. Inspect newly regenerated OCR pages and mobile heading hierarchy before marking done.
