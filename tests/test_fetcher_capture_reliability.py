@@ -557,3 +557,43 @@ def test_roscrea_cluster_recipe_accepts_five_page_weekly() -> None:
     assert recipe_max_bulletin_pages(recipe) == 8
     assert recipe["start_url"] == "http://stcronanscluster.ie/"
     assert recipe["site_type"] == "http_scrape_newest_pdf"
+
+
+class PageNumberedScanFreshnessTests(unittest.TestCase):
+    """No month-first guess when the issue date is printed on page 1."""
+
+    def test_ballymote_15_november_scan_uses_confirmed_ocr_date(self) -> None:
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ballymote.pdf"
+            _make_pdf_with_pages(path, 2, filler="")
+            url = "https://ballymoteparish.org/wp-content/uploads/2026/11/page-1-1.jpg"
+            with patch("harvester.bulletin_freshness.saved_bulletin_issue_date", return_value=(date(2026, 11, 15), "ocr")):
+                verdict = freshness_after_unknown_url(url, path, date(2026, 11, 15))
+            self.assertEqual(verdict.status, "fresh")
+            self.assertEqual(verdict.extracted_date, date(2026, 11, 15))
+
+    def test_unverified_page_scan_remains_stale(self) -> None:
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ballymote.pdf"
+            _make_pdf_with_pages(path, 2, filler="")
+            url = "https://ballymoteparish.org/wp-content/uploads/2026/11/page-1-1.jpg"
+            with patch("harvester.bulletin_freshness.saved_bulletin_issue_date", return_value=(None, "")):
+                verdict = freshness_after_unknown_url(url, path, date(2026, 11, 15))
+            self.assertEqual(verdict.status, "stale")
+
+    def test_other_undated_url_does_not_gain_ocr_bypass(self) -> None:
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "other.pdf"
+            _make_pdf_with_pages(path, 2, filler="")
+            url = "https://example.org/wp-content/uploads/2026/11/sermon.jpg"
+            with patch("harvester.bulletin_freshness.saved_bulletin_issue_date") as ocr:
+                freshness_after_unknown_url(url, path, date(2026, 11, 15))
+                ocr.assert_not_called()
+
+    def test_ballymote_recipe_limits_image_stack_to_current_pair(self) -> None:
+        meta = json.loads((Path(__file__).resolve().parents[1] / "parishes/recipes/achonry/ballymote.json").read_text(encoding="utf-8"))
+        self.assertEqual(meta["steps"][0]["count"], 2)
+        self.assertEqual(meta["image_count"], 2)
