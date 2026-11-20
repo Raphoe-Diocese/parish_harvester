@@ -129,6 +129,83 @@ def _load_recipe_meta_for_key(parish_key: str, parishes_dir: Path) -> dict:
         return {}
 
 
+def suppress_unverified_alias_successes(report: dict) -> dict:
+    """Do not count an alias as a fresh second copy of a proven-stale file.
+
+    A known alias can appear as a separate 'downloaded' row after a manual
+    Send & test. If the canonical parish has a stale dated PDF at the same
+    *actual source file*, a second undated download is not proof of freshness.
+    Preserve any alias which independently proves a current issue date, and
+    record suppression explicitly so the missing bulletin stays actionable.
+    """
+    from .cloud_urls import gdrive_file_id_from_url
+    from .parish_aliases import canonical_key
+
+    target_raw = str(report.get("target_date") or "")
+    try:
+        target = date.fromisoformat(target_raw)
+    except ValueError:
+        return report
+
+    stale = {
+        str(row.get("parish") or ""): row
+        for row in (report.get("stale_rejected") or [])
+        if isinstance(row, dict) and row.get("parish")
+    }
+    kept = []
+    suppressed = []
+    for row in report.get("downloaded") or []:
+        if not isinstance(row, dict):
+            continue
+        alias = str(row.get("parish") or "")
+        canonical = canonical_key(alias)
+        stale_row = stale.get(canonical) if canonical != alias else None
+        if not stale_row:
+            kept.append(row)
+            continue
+        url = str(row.get("url") or "")
+        stale_url = str(stale_row.get("url") or "")
+        file_id = gdrive_file_id_from_url(url)
+        stale_id = gdrive_file_id_from_url(stale_url)
+        same_document = (
+            bool(file_id and file_id == stale_id)
+            or bool(url and url == stale_url)
+        )
+        if not same_document:
+            kept.append(row)
+            continue
+        from .bulletin_freshness import extract_bulletin_date, verdict_for_extracted_date
+
+        candidate_date = None
+        raw_date = row.get("bulletin_date")
+        if isinstance(raw_date, str):
+            try:
+                candidate_date = date.fromisoformat(raw_date)
+            except ValueError:
+                pass
+        candidate_date = candidate_date or extract_bulletin_date(url)
+        if (
+            candidate_date is not None
+            and verdict_for_extracted_date(candidate_date, target).status == "fresh"
+        ):
+            # A verified current issue needs individual review rather than
+            # being hidden under an older canonical result.
+            kept.append(row)
+            continue
+        suppressed.append({
+            "alias": alias,
+            "canonical": canonical,
+            "reason": "same_source_as_proven_stale_canonical_no_fresh_issue_date",
+            "url": url,
+        })
+    report["downloaded"] = kept
+    if suppressed:
+        report["alias_conflicts"] = suppressed
+    else:
+        report.pop("alias_conflicts", None)
+    return report
+
+
 def reconcile_report_with_recipes(report: dict, parishes_dir: Path | None = None) -> dict:
     """
     Drop stale problem rows that recipes or harvest results have already resolved.
@@ -204,6 +281,7 @@ def reconcile_report_with_recipes(report: dict, parishes_dir: Path | None = None
         and str(item.get("parish") or "").strip() not in downloaded_keys
     ]
     report["skipped"] = skipped + moved_skipped
+    suppress_unverified_alias_successes(report)
     _recompute_summary(report)
     return report
 
@@ -385,6 +463,13 @@ def generate_report(
     }
 
     reconcile_report_with_recipes(report)
+    # The human-readable report must agree with the deduplicated JSON; the
+    # old local bucket variables predated reconciliation and overcounted OK.
+    downloaded = report["downloaded"]
+    html_links = report["html_links"]
+    skipped = report["skipped"]
+    failed = report["failed"]
+    stale_rejected = report["stale_rejected"]
 
     report_json.parent.mkdir(parents=True, exist_ok=True)
     report_json.write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -555,6 +640,7 @@ def merge_diocese_reports(reports: list[dict]) -> dict:
             ]
             if stamps:
                 out["last_patched_at"] = max(stamps)
+    suppress_unverified_alias_successes(out)
     _recompute_summary(out)
     return out
 
@@ -597,6 +683,7 @@ def merge_parish_report_rows(base: dict, mine: dict, parish_keys) -> dict:
     ]
     if stamps:
         out["last_patched_at"] = max(stamps)
+    suppress_unverified_alias_successes(out)
     _recompute_summary(out)
     return out
 
