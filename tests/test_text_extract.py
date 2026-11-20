@@ -116,6 +116,24 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertIn("Enda Hill", joined)
         self.assertIn("Edna Hill", joined)
 
+    def test_pick_richer_rejects_longer_glyph_garbage(self) -> None:
+        """A broken PDF font map must not beat a shorter readable extraction."""
+        legible = [
+            "MASS TIMES: Vigil Mass Saturday at 6.30pm and Sunday at 11am.",
+            "Recently deceased: please remember the family in your prayers.",
+            "Parish community notices and collection details for this week.",
+        ]
+        glyph_scraps = ["H{|} ^Y\\q }{{ scrambled glyph mapping"] * 50
+        self.assertGreater(len(" ".join(glyph_scraps)), len(" ".join(legible)))
+        picked = pick_richer_page_lines([glyph_scraps], [legible])
+        self.assertEqual(picked, [legible])
+
+    def test_pick_richer_keeps_legible_extra_notices(self) -> None:
+        """Quality check should not trim genuinely richer parish notices."""
+        short = ["Mass times for Sunday and parish announcements."]
+        full = short + ["Recently deceased and additional community notices."]
+        self.assertEqual(pick_richer_page_lines([full], [short]), [full])
+
     def test_clean_ocr_line_keeps_real_ordinals(self) -> None:
         self.assertEqual(clean_ocr_line("Saturday 22nd August"), "Saturday 22nd August")
         self.assertEqual(clean_ocr_line("Sunday 11th August"), "Sunday 11th August")
