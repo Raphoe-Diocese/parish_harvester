@@ -13,9 +13,9 @@ PDF = "https://exampleparish.ie/uploads/Bulletin-15-November-2026.pdf"
 OLD = "https://exampleparish.ie/uploads/Bulletin-8-November-2026.pdf"
 
 
-def sample(url=PDF):
+def sample(url=HOME):
     return {"name": "Example Parish", "matched_parish": "example",
-            "url": HOME, "source_type": "website", "status_hint": "failed"}
+            "url": url, "source_type": "website", "status_hint": "failed"}
 
 
 class BatchProbeTests(TestCase):
