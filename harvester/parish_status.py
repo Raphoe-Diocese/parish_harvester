@@ -416,6 +416,23 @@ def build_parish_status(
             file_bytes = _row_file_bytes(item, key) if outcome == "ok" else None
             previous_pdf = prev_row if isinstance(prev_row, dict) else {}
             pdf_evidence = item if outcome == "ok" and item.get("last_pdf_sha256") else previous_pdf
+            # Persist the actual downloaded file fingerprint even when the
+            # report row omitted it. Permanent bulletin URLs may keep both
+            # their name and size while their bytes change each week.
+            if outcome == "ok" and not item.get("last_pdf_sha256"):
+                from .bulletin_freshness import pdf_sha256
+
+                file_name = str(item.get("file") or f"{key}.pdf").strip() or f"{key}.pdf"
+                for candidate in (
+                    CURRENT_DIR / file_name,
+                    CURRENT_DIR / f"{key}.pdf",
+                    BULLETINS_DIR / f"{key}.pdf",
+                ):
+                    if candidate.is_file():
+                        digest = pdf_sha256(candidate)
+                        if digest:
+                            pdf_evidence = {**previous_pdf, "last_pdf_sha256": digest}
+                        break
             _upsert(
                 key,
                 {
