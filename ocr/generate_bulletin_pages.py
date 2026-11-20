@@ -2912,6 +2912,8 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     if not match:
         raise ValueError(f"Not a viewer file: {existing_path.name}")
     diocese, bulletin_date = match.group(1), match.group(2)
+    if not is_valid_weekly_bulletin_date(bulletin_date):
+        raise ValueError(f"Cannot regenerate non-Sunday OCR viewer {existing_path.name}")
     if diocese not in DIOCESES:
         raise ValueError(f"Unknown diocese key in viewer file: {diocese}")
     config = DIOCESES[diocese]
@@ -2976,6 +2978,8 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
 
 
 def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html_path: Path) -> Path:
+    if not is_valid_weekly_bulletin_date(bulletin_date):
+        raise ValueError(f"OCR viewer issue date must be a valid Sunday, got {bulletin_date!r}")
     config = DIOCESES[diocese]
     page_count = count_pdf_pages(pdf_path)
     raw_ocr_fragment = extract_ocr_fragment(ocr_html_path, tighten=False)
@@ -3045,6 +3049,14 @@ def _write_parish_bulletin_pages(
         print(f"  ⚠️  Per-parish bulletin pages failed for {diocese} (non-fatal): {exc}")
 
 
+def is_valid_weekly_bulletin_date(value: str) -> bool:
+    """Weekly collated viewers belong to the harvest Sunday, never Monday."""
+    try:
+        return date.fromisoformat(value).weekday() == 6
+    except (TypeError, ValueError):
+        return False
+
+
 def scan_viewer_entries() -> list[ViewerEntry]:
     entries: list[ViewerEntry] = []
     if not BULLETINS_DIR.exists():
@@ -3056,7 +3068,7 @@ def scan_viewer_entries() -> list[ViewerEntry]:
         if not match:
             continue
         diocese = match.group(1)
-        if diocese not in DIOCESES:
+        if diocese not in DIOCESES or not is_valid_weekly_bulletin_date(match.group(2)):
             continue
         entries.append(ViewerEntry(diocese=diocese, date=match.group(2), path=path))
     return sorted(entries, key=lambda entry: (entry.date, entry.diocese), reverse=True)
@@ -3139,9 +3151,14 @@ def prune_old_viewers(keep_dates: dict[str, str] | None = None) -> list[Path]:
 
     removed: list[Path] = []
     for diocese, pages_by_date in sorted(pages.items()):
-        keep = {max(pages_by_date)}
+        sundays = [d for d in pages_by_date if is_valid_weekly_bulletin_date(d)]
+        if not sundays:
+            # Never erase the only existing viewers before a valid replacement
+            # has been generated; exclude their bad dates from the archive index.
+            continue
+        keep = {max(sundays)}
         protected = (keep_dates or {}).get(diocese)
-        if protected:
+        if protected and is_valid_weekly_bulletin_date(protected):
             keep.add(protected)
         for page_date, paths in sorted(pages_by_date.items()):
             if page_date in keep:
