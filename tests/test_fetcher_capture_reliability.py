@@ -568,8 +568,9 @@ class PageNumberedScanFreshnessTests(unittest.TestCase):
             path = Path(tmp) / "ballymote.pdf"
             _make_pdf_with_pages(path, 2, filler="")
             url = "https://ballymoteparish.org/wp-content/uploads/2026/11/page-1-1.jpg"
-            with patch("harvester.bulletin_freshness.saved_bulletin_issue_date", return_value=(date(2026, 11, 15), "ocr")):
+            with patch("harvester.bulletin_freshness.saved_bulletin_issue_date", return_value=(date(2026, 11, 15), "ocr")) as ocr:
                 verdict = freshness_after_unknown_url(url, path, date(2026, 11, 15))
+                ocr.assert_called_once()
             self.assertEqual(verdict.status, "fresh")
             self.assertEqual(verdict.extracted_date, date(2026, 11, 15))
 
