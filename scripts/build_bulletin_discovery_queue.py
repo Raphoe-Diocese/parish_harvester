@@ -124,8 +124,8 @@ def build_queue(
             effective_status = status
             if (status == "downloaded" and isinstance(issue_date, str)
                     and isinstance(target_date, str)
-                    and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", issue_date)
-                    and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", target_date)
+                    and re.fullmatch(r"\d{4}-\d{2}-\d{2}", issue_date)
+                    and re.fullmatch(r"\d{4}-\d{2}-\d{2}", target_date)
                     and issue_date < target_date):
                 effective_status = "stale"
             hit = {"status": effective_status, "parish": item.get("parish") or ""}
