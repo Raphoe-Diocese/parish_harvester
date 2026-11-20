@@ -42,6 +42,11 @@ _ISOLATE_CURRENT_ACCORDION_JS = r"""
     if (!panel || panel === document.body || panel === container) continue;
     const text = String(panel.innerText || panel.textContent || '').replace(/\s+/g, ' ').trim();
     if (text.length < 230 || !/(mass|aifrinn|weekly|parish|intention|sunday)/i.test(text)) continue;
+    // CarrickOnline repeats this distinctive masthead once per weekly
+    // accordion entry. More than one means the panel contains an archive,
+    // not the single selected issue; never publish a stitched fake week.
+    const mastheads = text.match(/nuachtlitir na carraige agus mhin an aoire/gi) || [];
+    if (mastheads.length > 1) continue;
     const nested = Array.from(panel.querySelectorAll(selectors));
     if (nested.some(node => {
       const other = String(node.innerText || node.textContent || '');
