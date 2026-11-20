@@ -65,6 +65,25 @@ class BatchProbeTests(TestCase):
             result = batch.probe_one(sample(), SUNDAY)
         self.assertEqual(result["verdict"], "not_verified")
 
+
+    def test_direct_pdf_with_stale_masthead_rejected(self):
+        source = "https://exampleparish.ie/Bulletin-15-November-2026.pdf"
+        pdf = b"%PDF-1.4\n" + b"X" * 6000
+        with patch.object(batch, "fetch", return_value=(pdf, "application/pdf", source)):
+            with patch("harvester.bulletin_freshness.heading_date_in_pdf_bytes",
+                       return_value=date(2026, 11, 8)):
+                result = batch.probe_one(sample(source), SUNDAY)
+        self.assertEqual(result["verdict"], "not_verified")
+
+    def test_direct_pdf_with_correct_masthead_is_candidate(self):
+        source = "https://exampleparish.ie/Bulletin-15-November-2026.pdf"
+        pdf = b"%PDF-1.4\n" + b"X" * 6000
+        with patch.object(batch, "fetch", return_value=(pdf, "application/pdf", source)):
+            with patch("harvester.bulletin_freshness.heading_date_in_pdf_bytes",
+                       return_value=SUNDAY):
+                result = batch.probe_one(sample(source), SUNDAY)
+        self.assertEqual(result["verdict"], "candidate_verified_masthead")
+
     def test_unsupported_links_not_requested(self):
         with patch.object(batch, "fetch") as fetch:
             result = batch.probe_one({"name": "Unknown", "url": "https://facebook.com/example"}, SUNDAY)
