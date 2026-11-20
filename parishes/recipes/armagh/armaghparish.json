@@ -1,40 +1,39 @@
 {
-  "version": 6,
+  "version": 7,
   "parish_key": "armaghparish",
   "display_name": "Armagh",
   "diocese": "armagh",
-  "start_url": "https://armaghparish.net/wp-content/uploads/2026/11/8th-November.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
-  "example_url": "https://armaghparish.net/wp-content/uploads/2026/11/8th-November.pdf",
+  "start_url": "https://armaghparish.net/parish-bulletin/",
+  "site_type": "wp_json_newest_media",
+  "playbook_type": "pdf_download_list",
+  "example_url": "https://armaghparish.net/wp-content/uploads/2026/11/15th-November.pdf",
   "href_patterns": [
-    "November",
     ".pdf"
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 120,
-  "recorded_date": "2026-11-13",
+  "recorded_date": "2026-11-20",
   "steps": [
     {
       "action": "goto",
-      "url": "https://armaghparish.net/wp-content/uploads/2026/11/8th-November.pdf"
-    },
-    {
-      "action": "download",
-      "url": "https://armaghparish.net/wp-content/uploads/2026/11/8th-November.pdf"
+      "url": "https://armaghparish.net/parish-bulletin/"
     }
   ],
   "operator_notes": [
-    "13/11/2026: predicted_dated_pdf GitHub miss on /2026/11/8th-November.pdf (this PC GET 200 604745). Harvest 43349964493. Browser download. Do not open /parish-bulletin/.",
-    "06/11/2026: listing is 403."
+    "20/11/2026: official /parish-bulletin/ archive publicly lists 15th, 8th and 1st November 2026. Verified /wp-content/uploads/2026/11/15th-November.pdf: real one-page application/pdf headed St Patrick's Cathedral Parish, Armagh, containing notices for 21–23 November. Previous direct-download recipe remained pinned to 8th-November.pdf, causing 15-Nov harvest stale rejection.",
+    "Weekly WordPress PDF filename pattern is ordinal day + full month WITHOUT year (1st-November.pdf, 8th-November.pdf, 15th-November.pdf). Host-specific extra_sunday_names supplies exact candidate to browser-first _try_sunday_upload_pdf. It uses Chromium to get around site runner HTTP/urllib 403, before WordPress media API and date-rewritten example fallbacks.",
+    "Do not promise next-Sunday issue until file appears. Reject old PDF by dated URL and standard freshness check; first-page header has no explicit newsletter date.",
+    "Armagh Cathedral, St Malachy's, St Colmcille's and Immaculate Conception are listed in one shared Armagh bulletin. Harvest once here."
   ],
   "do_not": [
-    "Do not set start_url to /parish-bulletin/ — listing challenge hangs and listing is 403.",
-    "Do not use predicted_dated_pdf — GitHub urllib misses this file.",
-    "Do not pin 1st-November.pdf."
+    "Do not permanently pin any dated PDF or 8-November direct download step.",
+    "Do not rely on the /parish-bulletin/ listing being navigable from GitHub Actions; it was 403 in earlier runs.",
+    "Do not treat '15th November' as current for the following Sunday if 22nd is unpublished.",
+    "Do not create separate duplicates for the four Armagh churches."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "weeks_back": 2
 }

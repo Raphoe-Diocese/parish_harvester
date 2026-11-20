@@ -7,17 +7,17 @@ from pathlib import Path
 
 
 class ArmaghAshbournePinTests(unittest.TestCase):
-    def test_armagh_pins_8th_november_in_november_folder(self) -> None:
+    def test_armagh_uses_current_sunday_browser_first_not_stale_8_nov_pin(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/armagh/armaghparish.json").read_text(
                 encoding="utf-8-sig"
             )
         )
-        self.assertIn("/2026/11/8th-November.pdf", recipe["start_url"])
-        self.assertNotIn("/2026/09/", recipe["start_url"])
-        self.assertNotIn("1st-November", recipe["start_url"])
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertEqual(recipe["start_url"], "https://armaghparish.net/parish-bulletin/")
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["playbook_type"], "pdf_download_list")
+        self.assertIn("/2026/11/15th-November.pdf", recipe["example_url"])
+        self.assertTrue(all("8th-November.pdf" not in str(step) for step in recipe["steps"]))
 
     def test_donaghmoyne_pins_32nd_allsaints_pdf(self) -> None:
         recipe = json.loads(

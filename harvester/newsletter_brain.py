@@ -383,6 +383,12 @@ def extra_sunday_names(host: str, target: date) -> list[str]:
         "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December",
     )[target.month - 1]
+    if host == "armaghparish.net":
+        # Official cathedral parish archive: 1st-November.pdf,
+        # 8th-November.pdf, 15th-November.pdf (verified 20/11/2026).
+        # GitHub HTTP downloads can 403; _try_sunday_upload_pdf tests the
+        # exact dynamic filename through Chromium before generic guessing.
+        return [f"{_ordinal(target.day)}-{full_month}.pdf"]
     if host == "booterstownparish.ie":
         # 31/10/2026 proved Sun-25-October-2026 and Sun-1-November-2026.
         # The day has no ordinal. The Cloyne Newsletter-Dth-Month name missed.
