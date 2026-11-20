@@ -5441,16 +5441,44 @@ async def replay_recipe(
             url = str(extra or "").strip()
             if url and url not in candidates:
                 candidates.append(url)
+        # Permanent URLs may be served through stale CDN or WordPress
+        # upload caches. A successful HTTP/PDF response alone says nothing
+        # about the issue week; check the printed heading before returning,
+        # otherwise the first cached October PDF masks the newer fallback.
+        from .bulletin_freshness import pdf_date_before_harvest_week
+
+        rejected_candidates: list[str] = []
+
+        def _reject_old_candidate(candidate_url: str) -> bool:
+            if target_date is None or not dest.exists():
+                return False
+            stale_date = pdf_date_before_harvest_week(dest, target_date)
+            if stale_date is None:
+                return False
+            rejected_candidates.append(
+                f"{candidate_url} (printed issue {stale_date.isoformat()})"
+            )
+            dest.unlink(missing_ok=True)
+            return True
+
         for url in candidates:
             found = await _try_http_document_url(url, dest)
             if found:
+                if _reject_old_candidate(found[0]):
+                    continue
                 return dest, found[1], found[0]
         if site_type == "permanent_redirect_document":
             fallback = await _try_http_recipe_document_fallbacks(
                 recipe, dest, target_date
             )
             if fallback:
-                return dest, fallback[1], fallback[0]
+                if not _reject_old_candidate(fallback[0]):
+                    return dest, fallback[1], fallback[0]
+            if rejected_candidates:
+                raise RecipeReplayError(
+                    "All returned permanent-bulletin PDFs proved stale; "
+                    + "; ".join(rejected_candidates)
+                )
             raise RecipeReplayError(
                 f"Permanent bulletin URL {download_url} did not return a PDF/DOCX "
                 "(listing page was not opened)"
