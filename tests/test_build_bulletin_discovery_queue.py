@@ -131,3 +131,17 @@ def test_current_dated_download_remains_downloaded_in_discovery_queue():
     ]}
     queue = build_queue([_seed("Sample", "https://example.org/bulletin.pdf")], [], report)
     assert queue["leads"][0]["status_hint"] == "downloaded"
+
+
+def test_kentstown_mcn_seed_resolves_to_existing_beauparc_source():
+    from pathlib import Path
+    registry_path = Path(__file__).resolve().parents[1] / "docs/discovery/verified-mcn-church-identities.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))["by_mcn_church_id"]
+    queue = build_queue([], [
+        _seed("Church of the Assumption, Kentstown",
+              "https://d3gxiup807zlof.cloudfront.net/live/Uploads/628/NewsLetter/old.pdf")
+    ], {"target_date": "2026-11-15"}, known_mcn_sources=registry)
+    row = queue["leads"][0]
+    assert row["known_parish_key"] == "beauparc"
+    assert row["source_resolution"] == "existing_shared_parish"
+    assert row["status_hint"] == "unmatched"
