@@ -2547,11 +2547,13 @@ class HarvestMissRecipeTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("Newsletter-8th-November.jpg", recipe["start_url"])
-        self.assertNotIn("1st-November", recipe["start_url"])
-        self.assertNotIn("/category/newsletter/", recipe["start_url"])
-        self.assertNotIn("KSC-POSTER", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "wp_json_newest_post_images")
+        self.assertEqual(recipe["start_url"], "https://killenaule.net/category/newsletter/")
+        self.assertEqual(recipe["href_patterns"], ["Newsletter-"])
+        self.assertTrue(recipe["featured_image_fallback"])
+        self.assertTrue(recipe["require_target_post_week"])
+        self.assertEqual(recipe["image_count"], 1)
+        self.assertNotIn("KSC-POSTER", str(recipe["steps"]))
 
     def test_ayrfield_and_kilmichael_use_8_november_pdfs(self) -> None:
         ayrfield = json.loads(
