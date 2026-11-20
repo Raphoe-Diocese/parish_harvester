@@ -1,34 +1,41 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "monkstown",
   "display_name": "Monkstown",
   "diocese": "dublin",
-  "start_url": "https://www.monkstownparish.ie/newsletter/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://monkstownparish.ie/",
+  "site_type": "wp_json_newest_media",
   "href_patterns": [
-    "Newsletter",
-    "October",
+    "Monkstown-Newsletter",
     ".pdf"
   ],
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-20",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.monkstownparish.ie/newsletter/"
+      "url": "https://monkstownparish.ie/"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 207341 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "20/11/2026: verified weekly WordPress post https://monkstownparish.ie/newsletter-22nd-november-2026/ with linked Monkstown-Newsletter-2026-11-22-Wk34-OT-V1 PDF. 15 November previous week at /newsletter-15th-november-2026/ linked dated PDF. Old /newsletter/ archive was observed showing August issues, therefore do not rely on that archive page. Use newest WordPress media ranked by dated PDF filename and target Sunday.",
+    "Require target-week PDF validation: do not select an old media attachment or future dated issue for an earlier harvest."
   ],
   "do_not": [
-    "Do not pin a dated filename or Wix hash.",
-    "Do not harvest Facebook."
+    "Do not pin a dated November PDF URL.",
+    "Do not rely on /newsletter/ stale archive.",
+    "Do not harvest funeral notices."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "playbook_type": "wp_json_newest_media",
+  "href_skip_patterns": [
+    "funeral",
+    "screenshot",
+    ".png"
+  ]
 }
