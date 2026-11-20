@@ -2098,14 +2098,41 @@ def freshness_after_unknown_url(url: str, dest: Path, target: date) -> Freshness
     printed Sunday. Raphoe parish was left out because the Drive file was
     uploaded on a Monday.
     """
-    from .bulletin_freshness import issue_date_verdict, pdf_body_heading_verdict
+    from .bulletin_freshness import (
+        issue_date_verdict,
+        pdf_body_heading_verdict,
+        saved_bulletin_issue_date,
+        verdict_for_extracted_date,
+    )
+    from urllib.parse import unquote, urlparse
+    import re
 
     verdict = check_bulletin_freshness(url, target) if (url or "").strip() else FreshnessVerdict(
         status="unknown", reason="no_date_in_url"
     )
     if not dest.exists():
         return verdict
-    return issue_date_verdict(verdict, pdf_body_heading_verdict(dest, target))
+    body_verdict = pdf_body_heading_verdict(dest, target)
+    # Image-only newsletters named page-0-1.jpg have no issue date in the
+    # filename. The upload folder's first-of-month fallback is NOT the printed
+    # Sunday (Ballymote 15 Nov was incorrectly rejected as 1 Nov). Only an
+    # actual first-page OCR issue stamp may override that stale URL date.
+    # No guess and no blanket first-of-month freshness exception.
+    basename = unquote(urlparse(url or "").path).rsplit("/", 1)[-1]
+    page_scan = bool(re.fullmatch(r"page[-_]?[0-9]+(?:[-_][0-9]+)*\.(?:jpe?g|png|webp)", basename, re.I))
+    if page_scan and verdict.reason == "upload_folder_matches_target_month":
+        # The global URL heuristic permits undated monthly uploads, but for
+        # numbered scans we have an OCR-able first page: never invent a
+        # Sunday date from the month alone.
+        from .bulletin_freshness import extract_bulletin_date
+        folder_date = extract_bulletin_date(url)
+        if folder_date is not None:
+            verdict = verdict_for_extracted_date(folder_date, target)
+    if body_verdict is None and verdict.status == "stale" and page_scan:
+        printed_date, date_method = saved_bulletin_issue_date(dest, target=target, url=None)
+        if printed_date is not None and date_method == "ocr":
+            body_verdict = verdict_for_extracted_date(printed_date, target)
+    return issue_date_verdict(verdict, body_verdict)
 
 
 def _retry_pdf_still_stale(url: str, dest: Path, target: date) -> bool:
