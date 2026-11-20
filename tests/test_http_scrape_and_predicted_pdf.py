@@ -3239,3 +3239,23 @@ class GlenavyKilleadArchiveTests(unittest.TestCase):
         self.assertEqual(recipe["start_url"], "https://www.glenavyandkilleadparish.com/bulletins/")
         self.assertEqual(recipe["href_patterns"], [".pdf"])
         self.assertFalse(any(step.get("url", "").endswith(".pdf") or step.get("href", "").endswith(".pdf") for step in recipe["steps"]))
+
+
+class CrossmaglenUpperCregganArchiveTests(unittest.TestCase):
+    def test_current_sunday_is_selected_from_weekly_archive_not_first_link(self):
+        from harvester.newsletter_brain import same_sunday_urls
+        urls = [
+            "https://www.uppercreggan.co.uk/resources/15th%20NOV%202026.pdf",
+            "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
+            "https://www.uppercreggan.co.uk/resources/1st%20NOV%202026.pdf",
+        ]
+        for target, expected in [(date(2026,11,8),urls[1]),(date(2026,11,15),urls[0])]:
+            scored = _score_http_scrape_pdf_hrefs(urls, target)
+            self.assertEqual(same_sunday_urls(scored,target),[expected])
+
+    def test_sunday_links_selected_by_target_date_even_when_newer_exists(self):
+        from harvester.newsletter_brain import same_sunday_urls
+        newer = "https://www.uppercreggan.co.uk/resources/15th%20NOV%202026.pdf"
+        current = "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf"
+        result = same_sunday_urls(_score_http_scrape_pdf_hrefs([newer,current],date(2026,11,8)),date(2026,11,8))
+        self.assertEqual(result,[current])
