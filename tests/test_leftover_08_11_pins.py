@@ -271,20 +271,14 @@ class Leftover0811PinTests(unittest.TestCase):
             recipe["start_url"].rstrip("/"), "http://www.stcolmans.org"
         )
 
-    def test_crossmaglen_pins_8th_nov_pdf_not_15th(self) -> None:
+    def test_crossmaglen_follows_current_sunday_archive_not_eighth_nov_pin(self) -> None:
         recipe = _recipe("parishes/recipes/armagh/crossmaglen.json")
-        self._assert_wordpress_direct(recipe, "8th%20NOV%202026.pdf")
         self.assertFalse(recipe.get("skip"))
-        self.assertNotIn("15th", recipe["start_url"])
-        self.assertNotIn("1st%20NOV", recipe["start_url"])
-        self.assertNotIn("news.php", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["start_url"], "https://www.uppercreggan.co.uk/news.php")
+        self.assertEqual(recipe["href_patterns"], [".pdf"])
+        self.assertNotIn("8th%20NOV%202026.pdf", str(recipe["steps"]))
         self.assertNotIn("armagharchdiocese.org", recipe["start_url"])
-        self.assertNotEqual(
-            recipe["start_url"].rstrip("/"), "https://www.uppercreggan.co.uk"
-        )
-        verdict = check_bulletin_freshness(recipe["start_url"], date(2026, 11, 8))
-        self.assertEqual(verdict.status, "fresh")
-        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
     def test_dromahair_pins_08_11_churchtv_pdf_not_diocese_card(self) -> None:
         recipe = _recipe("parishes/recipes/kilmore/dromahair.json")
