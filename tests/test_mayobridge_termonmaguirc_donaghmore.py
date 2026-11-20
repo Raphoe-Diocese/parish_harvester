@@ -29,15 +29,17 @@ class PasteHitRecipePinsTests(unittest.TestCase):
         self.assertEqual(recipe["playbook_type"], "direct_download")
         self.assertNotIn("parish-newsletter", recipe["start_url"])
 
-    def test_donaghmore_pins_pdf_with_ignore_https(self) -> None:
+    def test_donaghmore_uses_homepage_weekly_pdf_link_not_old_pin(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/dromore/donaghmore.json").read_text(
                 encoding="utf-8-sig"
             )
         )
-        self.assertIn("Donaghmore-Bulletin-8th-November-2026.pdf", recipe["start_url"])
+        self.assertEqual(recipe["start_url"], "https://donaghmoreparish.org/")
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["href_patterns"], ["Donaghmore-Bulletin-"])
         self.assertTrue(recipe.get("ignore_https_errors"))
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertFalse(any("8th-November-2026.pdf" in str(step) for step in recipe["steps"]))
 
     def test_milltown_pins_8_november_pdf(self) -> None:
         recipe = json.loads(
