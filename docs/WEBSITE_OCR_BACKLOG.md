@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] In review, 2026-11-20: reports could count a known shared parish alias as a second fresh download even though the mega PDF stitcher skips aliases. Deduplicate only with actual identical-document evidence; retain a canonical shared-parish coverage mapping and flag alias-only successes that are not present in the mega PDF. Check after harvest that shared parishes have working links without duplicated pages. Never collapse distinct verified issue dates or different SHA-256 files. `harvester/report.py`, `tests/test_shared_bulletin_single_publication.py`.
+
 - [ ] Critical, 2026-11-20: Gartan/Termon shares one Drive file `1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa`; `Bulletins/report.json` dated 15 Nov labels canonical `drive-1kna8f6t54` **stale (8 Nov)** and alias `kilmacrenan` **downloaded (undated)**. Prevent the same known alias source being counted as fresh when canonical content is proven stale, but preserve separately date-verified current alias issues. Correct report.txt to use reconciled counts and record an explicit alias conflict. Verify future harvest, mega PDF and public status, not done yet.
 
 - [ ] In review, 2026-11-20: Glencolmcille also has independently listed MCN church ID 661. Prefer a date-verified fresh MCN PDF via its stable camera/ProfileDataByJson API before attempting the archived HTML accordion. Never pin UUIDs or accept prior-week PDFs. Test current/old card dates and contradictory printed mastheads; verify actual PDF/mega/OCR live after merge.

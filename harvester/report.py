@@ -129,6 +129,129 @@ def _load_recipe_meta_for_key(parish_key: str, parishes_dir: Path) -> dict:
         return {}
 
 
+def collapse_proven_shared_downloads(report: dict) -> dict:
+    """Count one proven identical publication once, even if an alias fetched it.
+
+    An alias is a parish covered by the canonical publication, not another
+    distinct weekly newsletter. However, a shared parish *can* publish its
+    own separate file: never collapse two URLs merely because parish names
+    are related. Require matching SHA-256, Google Drive file ID, or identical
+    document URL; contradictory hashes or printed issue dates veto the merge.
+    The canonical record wins so the mega PDF's alias-skipping rule agrees
+    with the report's downloadable count.
+    """
+    from .cloud_urls import gdrive_file_id_from_url
+    from .parish_aliases import canonical_key
+
+    rows = [x for x in (report.get("downloaded") or []) if isinstance(x, dict)]
+    canonical_rows = {
+        str(row.get("parish") or "").strip(): row
+        for row in rows
+        if str(row.get("parish") or "").strip()
+        and canonical_key(str(row.get("parish") or "").strip())
+        == str(row.get("parish") or "").strip()
+    }
+    kept = []
+    collapsed = []
+    for row in rows:
+        alias = str(row.get("parish") or "").strip()
+        canonical = canonical_key(alias)
+        primary = canonical_rows.get(canonical) if canonical != alias else None
+        if not primary:
+            kept.append(row)
+            continue
+
+        # A current and a previous issue of a permanent URL or a recycled
+        # Drive file ID must never be treated as the same publication.
+        a_date = str(row.get("bulletin_date") or "").strip()
+        p_date = str(primary.get("bulletin_date") or "").strip()
+        if a_date and p_date and a_date != p_date:
+            kept.append(row)
+            continue
+        a_hash = str(row.get("last_pdf_sha256") or "").strip().lower()
+        p_hash = str(primary.get("last_pdf_sha256") or "").strip().lower()
+        if a_hash and p_hash and a_hash != p_hash:
+            kept.append(row)
+            continue
+
+        url = str(row.get("url") or "").strip()
+        main_url = str(primary.get("url") or "").strip()
+        drive_id = gdrive_file_id_from_url(url)
+        main_drive_id = gdrive_file_id_from_url(main_url)
+        if a_hash and p_hash and a_hash == p_hash:
+            proof = "matching_pdf_sha256"
+        elif drive_id and drive_id == main_drive_id:
+            proof = "same_google_drive_file_id"
+        elif url and url == main_url:
+            proof = "identical_document_url"
+        else:
+            kept.append(row)
+            continue
+
+        collapsed.append({
+            "alias": alias,
+            "canonical": canonical,
+            "proof": proof,
+            "canonical_url": main_url,
+            "canonical_sha256": p_hash,
+            "report_target_date": str(report.get("target_date") or ""),
+        })
+    report["downloaded"] = kept
+    # This helper may run more than once (one-parish patch and mega rebuild).
+    # Keep previously collapsed evidence only if the exact canonical issue
+    # is still present. A new week's URL/hash invalidates the old record.
+    kept_keys = {str(row.get("parish") or "") for row in kept}
+    known_pairs = {(x["alias"], x["canonical"]) for x in collapsed}
+    for old in report.get("shared_download_aliases") or []:
+        if not isinstance(old, dict):
+            continue
+        pair = (str(old.get("alias") or ""), str(old.get("canonical") or ""))
+        main = canonical_rows.get(pair[1])
+        if pair in known_pairs or not main or pair[0] in kept_keys:
+            continue
+        if str(old.get("report_target_date") or "") != str(report.get("target_date") or ""):
+            continue
+        if str(old.get("canonical_url") or "") != str(main.get("url") or ""):
+            continue
+        if str(old.get("canonical_sha256") or "") != str(main.get("last_pdf_sha256") or ""):
+            continue
+        collapsed.append(old)
+    if collapsed:
+        report["shared_download_aliases"] = sorted(
+            collapsed, key=lambda item: (item["canonical"], item["alias"])
+        )
+    else:
+        report.pop("shared_download_aliases", None)
+    return report
+
+
+def _shared_bulletin_coverage(report: dict) -> list[dict]:
+    """Preserve proven shared-parish relationships without adding downloads.
+
+    This is a mapping of which parishes *share* a publication, not separate
+    evidence that each parish has published a fresh issue this Sunday.
+    """
+    from .parish_aliases import ALIAS_TO_CANONICAL
+
+    aliases_by_canonical: dict[str, list[str]] = {}
+    for alias, canonical in ALIAS_TO_CANONICAL.items():
+        aliases_by_canonical.setdefault(canonical, []).append(alias)
+    present = {
+        str(row.get("parish") or "").strip()
+        for row in (report.get("downloaded") or [])
+        if isinstance(row, dict) and row.get("parish")
+    }
+    return [
+        {
+            "canonical": canonical,
+            "shared_with": sorted(aliases_by_canonical[canonical]),
+            "basis": "known_shared_bulletin_mapping",
+        }
+        for canonical in sorted(present)
+        if canonical in aliases_by_canonical
+    ]
+
+
 def suppress_unverified_alias_successes(report: dict) -> dict:
     """Do not count an alias as a fresh second copy of a proven-stale file.
 
@@ -590,6 +713,23 @@ def _remove_parish_from_sections(report: dict, parish_key: str) -> None:
 
 
 def _recompute_summary(report: dict) -> None:
+    collapse_proven_shared_downloads(report)
+    report["shared_bulletin_coverage"] = _shared_bulletin_coverage(report)
+    # The PDF stitcher never includes is_alias_key entries. Flag any
+    # alias-only download for canonical recovery rather than presenting a
+    # 'downloaded' count as proof it appears in the mega PDF.
+    from .parish_aliases import canonical_key
+
+    present = {
+        str(row.get("parish") or "").strip()
+        for row in (report.get("downloaded") or [])
+        if isinstance(row, dict) and row.get("parish")
+    }
+    report["alias_downloads_without_canonical"] = [
+        {"alias": alias, "canonical": canonical_key(alias)}
+        for alias in sorted(present)
+        if canonical_key(alias) != alias and canonical_key(alias) not in present
+    ]
     report["summary"] = {
         "downloaded": len(report.get("downloaded") or []),
         "html_links": len(report.get("html_links") or []),
