@@ -2120,6 +2120,14 @@ def freshness_after_unknown_url(url: str, dest: Path, target: date) -> Freshness
     # No guess and no blanket first-of-month freshness exception.
     basename = unquote(urlparse(url or "").path).rsplit("/", 1)[-1]
     page_scan = bool(re.fullmatch(r"page[-_]?[0-9]+(?:[-_][0-9]+)*\.(?:jpe?g|png|webp)", basename, re.I))
+    if page_scan and verdict.reason == "upload_folder_matches_target_month":
+        # The global URL heuristic permits undated monthly uploads, but for
+        # numbered scans we have an OCR-able first page: never invent a
+        # Sunday date from the month alone.
+        from .bulletin_freshness import extract_bulletin_date
+        folder_date = extract_bulletin_date(url)
+        if folder_date is not None:
+            verdict = verdict_for_extracted_date(folder_date, target)
     if body_verdict is None and verdict.status == "stale" and page_scan:
         printed_date, date_method = saved_bulletin_issue_date(dest, target=target, url=None)
         if printed_date is not None and date_method == "ocr":
