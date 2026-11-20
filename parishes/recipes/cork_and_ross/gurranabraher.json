@@ -1,39 +1,35 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "gurranabraher",
   "display_name": "Gurranabraher",
   "diocese": "cork_and_ross",
-  "start_url": "https://www.gurranabraherparish.ie/wp-content/uploads/2026/11/Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
+  "start_url": "https://www.gurranabraherparish.ie/category/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
   "example_url": "https://www.gurranabraherparish.ie/wp-content/uploads/2026/11/Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf",
   "href_patterns": [
-    "Gurranabraher-",
-    "Nov-8th",
     ".pdf"
   ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 120,
-  "recorded_date": "2026-11-13",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-11-20",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.gurranabraherparish.ie/wp-content/uploads/2026/11/Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf"
-    },
-    {
-      "action": "download",
-      "url": "https://www.gurranabraherparish.ie/wp-content/uploads/2026/11/Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf"
+      "url": "https://www.gurranabraherparish.ie/category/newsletters/"
     }
   ],
   "operator_notes": [
-    "13/11/2026: leftover failed timeout on /category/newsletters/. Pin Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf. Proved GET 200 application/pdf 486776 bytes magic %PDF-1.7. wp-json media date 06/11/2026. Post title Newsletter Sunday November 8th 2026. Page Mass list Sun, 8th November 9:00am and 11:30am. Do not take All-Saints-Nov-1st."
+    "20/11/2026: official newsletter category lists Sunday 22 November 2026, linked to /wp-content/uploads/2026/11/Gurranabraher-Jesus-Christ-Universal-King-Nov-22nd-2026-A.pdf. Verified PDF GET application/pdf, 2 pages, first-page title Sunday 22nd November 2026, with 21/22 November Mass intentions.",
+    "Category's 22 November entry mistakenly labels its PDF anchor 'Click here to download the 15th November 2026 newsletter'. URL and printed PDF masthead both say 22 November. Score the actual PDF href date before link text; only use link title when URL undated. This source has confirmed 15 November as a separate file /33rd-Ordinary-Time-Nov-15th-2026-A.pdf.",
+    "13 Nov direct-download workaround pinned to 8 November after a Playwright timeout; replace with HTTP-only listing scrape and actual dated PDF selection. Do not open category in Playwright; http_scrape_newest_pdf bypasses DOM navigation.",
+    "Accept only current-week PDF after downstream freshness checks, not a stale older URL; live GitHub harvest still pending."
   ],
   "do_not": [
-    "Do not use predicted_dated_pdf.",
-    "Do not start on /category/newsletters/ — harvest times out on the listing.",
-    "Do not pin Gurranabraher-All-Saints-Nov-1st-2026-A.pdf.",
-    "Do not keep the 20 September filename.",
-    "Do not harvest Facebook."
+    "Do not permanently pin a 8, 15 or 22 November PDF filename.",
+    "Do not use the erroneous 15-November download caption to discard the real 22 November issue.",
+    "Do not open the newsletter category using Playwright (old timeout). Use HTTP listing scrape.",
+    "Do not harvest unrelated church posters or Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
