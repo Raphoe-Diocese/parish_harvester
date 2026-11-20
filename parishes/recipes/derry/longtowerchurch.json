@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "parish_key": "longtowerchurch",
+  "display_name": "Long Tower (St Columba's)",
+  "diocese": "derry",
+  "start_url": "https://longtowerchurch.org/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "recorded_date": "2026-11-20",
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 12,
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://longtowerchurch.org/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/bulletin/']:not([href$='/bulletin/'])",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
+    }
+  ],
+  "operator_notes": [
+    "20/11/2026: newly verified website homepage shows full article 'THIRTY THIRD SUNDAY IN ORDINARY TIME' (posted 13 Nov) containing full 15 Nov parish bulletin at /bulletin/thirty-third-sunday-in-ordinary-time-4/. This is HTML, not PDF. Follow newest bulletin ARTICLE from homepage and print article; archive /bulletin/ was cached at 4 Oct, so avoid that listing.",
+    "Prior research reported sporadic bot challenge HTTP 202 sg-captcha in automated harvest. This is an unverified browser-based recovery recipe, not proof of a successful harvest. Verify exact Sunday masthead before publishing."
+  ],
+  "do_not": [
+    "Do not print homepage or bulletin archive as the weekly bulletin.",
+    "Do not click /bulletin/ archive link instead of the individual article.",
+    "Do not force old 15 November URL on future runs.",
+    "Do not accept challenge/security HTML as a bulletin.",
+    "Do not treat past-week content as current."
+  ]
+}
