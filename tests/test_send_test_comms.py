@@ -77,10 +77,11 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("max-parallel: 8", yml)
         self.assertNotIn("harvest-${{ github.event.inputs.target_parish || 'full' }}", yml)
         self.assertNotIn('HARVEST_SKIP_STATUS: "1"', yml)
-        self.assertIn(
-            "if: github.event_name != 'workflow_dispatch' || github.event.inputs.target_parish == ''",
-            yml,
-        )
+        # Recipe health must be visible without the harvester mutating
+        # unreviewed JSON recipes inside an ephemeral Actions runner.
+        self.assertIn("Audit recipes without changing them", yml)
+        self.assertIn("diagnose_recipe_health.py --json", yml)
+        self.assertNotIn("python scripts/autofix_recipes.py", yml)
         self.assertIn("Cache Playwright browsers", yml)
         self.assertIn("merge_diocese_harvests.py", yml)
         stitch = yml.split("\n  stitch:", 1)[-1]

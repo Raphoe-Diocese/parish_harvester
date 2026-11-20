@@ -317,7 +317,14 @@ def _fix_stub_no_bulletin(path: Path, recipe: dict) -> bool:
 
 
 def _fix_hardcoded_pdf_recipe(path: Path, recipe: dict) -> bool:
-    """Replace stale direct-PDF recipes with newsletter-page newest_dated flow."""
+    """Only switch from a dated PDF to an explicitly verified listing page.
+
+    A PDF host is not evidence for a `/news/` page. Previously this helper
+    invented that path, overwrote the trained start URL and reported 'fixed'
+    even when no such bulletin listing existed. Require an independently
+    confirmed listing URL in the recipe and at least one real document link.
+    This tool is operator-initiated, never part of the weekly harvest.
+    """
     steps = recipe.get("steps")
     if not isinstance(steps, list):
         return False
@@ -336,10 +343,18 @@ def _fix_hardcoded_pdf_recipe(path: Path, recipe: dict) -> bool:
     )
     if not dated:
         return False
-    host = urlparse(download_urls[0]).netloc
-    if not host:
+    news_url = str(recipe.get("verified_news_listing") or "").strip()
+    parsed_listing = urlparse(news_url)
+    if parsed_listing.scheme not in {"http", "https"} or not parsed_listing.netloc:
+        # No evidence for a replacement URL: leave the trained recipe intact.
         return False
-    news_url = f"https://{host}/news/"
+    if news_url.lower().split("?", 1)[0].endswith((".pdf", ".doc", ".docx")):
+        return False
+    # A source page must actually advertise documents before being accepted.
+    # An HTTP 404, empty page, or list without PDFs cannot become a new recipe.
+    linked_documents = _probe_pdf_links(news_url)
+    if not linked_documents:
+        return False
     recipe["start_url"] = news_url
     recipe["steps"] = [
         {"action": "goto", "url": news_url},
