@@ -1,34 +1,40 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "killinarden",
   "display_name": "Killinarden",
   "diocese": "dublin",
-  "start_url": "https://www.killinardenparish.ie/newsletter/",
+  "start_url": "https://killinardenparish.ie/newsletter/",
   "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
-    "October",
-    "Bulletin",
-    ".pdf"
+    "Bulletin-"
   ],
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-03",
+  "recorded_date": "2026-11-20",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.killinardenparish.ie/newsletter/"
+      "url": "https://killinardenparish.ie/newsletter/"
     }
   ],
   "operator_notes": [
-    "03/10/2026 cloud hunt: proved GET 200 pdf 651612 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename."
+    "03/10/2026 cloud hunt: proved GET 200 pdf 651612 bytes magic %PDF. File date 04/10/2026. Do not pin the dated filename.",
+    "20/11/2026: search-indexed current genuine parish PDF /wp-content/uploads/2026/11/15th-November-2026-Bulletin-Revised.pdf includes 33rd Sunday in Ordinary Time and Mass intentions. Remove outdated 'October' and generic .pdf filters; preserve dynamic listing so next Sunday can be found. Live harvest still needs testing."
   ],
   "do_not": [
     "Do not pin a dated filename or Wix hash.",
-    "Do not harvest Facebook."
+    "Do not harvest Facebook.",
+    "Do not select generic unrelated .pdf or October documents."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "href_skip_patterns": [
+    "GDPR",
+    "Consent",
+    "Donation",
+    "Safeguarding"
+  ]
 }
