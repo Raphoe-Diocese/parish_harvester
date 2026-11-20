@@ -1,44 +1,38 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "crossmaglen",
   "display_name": "Crossmaglen (Creggan Upper)",
   "diocese": "armagh",
-  "start_url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
+  "start_url": "https://www.uppercreggan.co.uk/news.php",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
   "status": "active",
   "skip": false,
   "timeout_ms": 45000,
   "total_timeout_s": 120,
   "max_bulletin_pages": 8,
-  "recorded_date": "2026-11-13",
+  "recorded_date": "2026-11-20",
   "example_url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
   "href_patterns": [
-    "8th%20NOV%202026.pdf",
-    "8th NOV 2026",
     ".pdf"
   ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf"
-    },
-    {
-      "action": "download",
-      "url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
-      "use_captured_url": true
+      "url": "https://www.uppercreggan.co.uk/news.php"
     }
   ],
   "operator_notes": [
-    "13/11/2026 leftover FAILED: harvest saved the Armagh diocese card. Own-site news.php lists 8th NOV 2026.pdf under 15th. GET 200 application/pdf 237278 bytes magic %PDF-1.7. Two pages. Text: Paróiste an Chreagain Uachtair / Parish of Upper Creggan. SUNDAY 8TH NOV 2026 32ND ORDINARY. Anniversaries St Patrick's Sat 7th/Sun 8th Nov. Irish name stays Irish. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Do not open news.php or armagharchdiocese.org."
+    "20/11/2026: Official Upper Creggan news.php lists 15th NOV 2026.pdf (234.303 KB), 8th NOV 2026.pdf (231.717 KB) and 1st NOV 2026.pdf (231.624 KB), proving a newer 15 November issue since the 13 November 8-November direct-download pin. The 15-November listing is evidenced, PDF content still needs validation by live harvest.",
+    "The 15 November archive page lists multiple weeks. Use HTTP-only current Sunday ranking from PDF filename, not the first link and not a pinned dated PDF. For a target of 8 November choose 8th, for 15 November choose 15th. 22 November must not be claimed unless the parish posts that issue.",
+    "Previous advice 'do not scrape news.php because 15 November is above 8 November' applied to a blind 8-November click, not date-scored HTTP scraping. Never accept the next Sunday's edition prematurely.",
+    "Upper Creggan is Crossmaglen Parish; avoid a separate duplicate Upper Creggan recipe."
   ],
   "do_not": [
-    "Do not pin 15th NOV 2026.pdf — that is 15/11 (grace-fresh, not 08/11). This Sunday is listed.",
-    "Do not pin 1st NOV 2026.pdf. 01/11 is not 08/11.",
-    "Do not set start_url to https://www.uppercreggan.co.uk/ or /news.php — listing has 15th above 8th.",
-    "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
-    "Do not use predicted_dated_pdf.",
-    "Do not harvest Facebook."
+    "Do not pin 8th or 15th NOV 2026.pdf as a permanent URL.",
+    "Do not choose archive first-row indiscriminately; rank PDF links by target Sunday.",
+    "Do not use diocese parish-card URL as the bulletin.",
+    "Do not claim a new download until the GitHub harvest run verifies it."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
