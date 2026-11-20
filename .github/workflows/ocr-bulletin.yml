@@ -28,6 +28,8 @@ jobs:
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_branch == 'main' &&
        (github.event.workflow_run.event == 'schedule' ||
+        (github.event.workflow_run.event == 'push' &&
+         github.event.workflow_run.display_title == 'Harvest full') ||
         contains(github.event.workflow_run.display_title, '_diocese') ||
         github.event.workflow_run.display_title == 'Harvest all' ||
         github.event.workflow_run.display_title == 'Harvest full' ||
