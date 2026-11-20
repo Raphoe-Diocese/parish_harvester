@@ -32,6 +32,17 @@ from harvester.newsletter_brain import (
 TARGET = date(2026, 10, 11)
 
 
+def test_armagh_sunday_pdf_name_without_year() -> None:
+    assert extra_sunday_names("armaghparish.net", date(2026, 11, 1)) == ["1st-November.pdf"]
+    assert extra_sunday_names("www.armaghparish.net", date(2026, 11, 8)) == ["8th-November.pdf"]
+    assert extra_sunday_names("armaghparish.net", date(2026, 11, 15)) == ["15th-November.pdf"]
+    assert extra_sunday_names("armaghparish.net", date(2026, 11, 22)) == ["22nd-November.pdf"]
+    assert check_bulletin_freshness(
+        "https://armaghparish.net/wp-content/uploads/2026/11/15th-November.pdf",
+        date(2026, 11, 22),
+    ).status == "stale"
+
+
 def test_booterstown_sunday_name() -> None:
     october = extra_sunday_names("booterstownparish.ie", date(2026, 10, 25))
     assert october == ["Sun-25-October-2026-Booterstown-Weekly-Newsletter.pdf"]
