@@ -547,3 +547,13 @@ def test_doorabarefield_recipe_accepts_real_five_page_newsletters() -> None:
             fh.write(b"\n% " + b"0" * MIN_PDF_BYTES)
         assert not _is_real_pdf(pdf)
         assert _is_real_pdf(pdf, max_pages=recipe_max_bulletin_pages(recipe))
+
+
+def test_roscrea_cluster_recipe_accepts_five_page_weekly() -> None:
+    """Roscrea, Bournea, Kyle and Knock share a multi-page weekly issue."""
+    root = Path(__file__).resolve().parents[1]
+    recipe = json.loads((root / "parishes/recipes/killaloe/roscrea.json").read_text(encoding="utf-8"))
+    assert recipe["parish_key"] == "roscrea"
+    assert recipe_max_bulletin_pages(recipe) == 8
+    assert recipe["start_url"] == "http://stcronanscluster.ie/"
+    assert recipe["site_type"] == "http_scrape_newest_pdf"
