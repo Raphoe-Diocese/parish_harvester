@@ -3719,6 +3719,8 @@ async def _try_wp_json_newest_post_images(
     weeks_back: int = 3,
     image_count: int = 2,
     href_patterns: list[str] | None = None,
+    featured_image_fallback: bool = False,
+    require_target_post_week: bool = False,
 ) -> tuple[str, str] | None:
     """Find the newest Sunday bulletin post, then stack its page images.
 
@@ -3815,6 +3817,12 @@ async def _try_wp_json_newest_post_images(
         return None
 
     for post_url in probe_urls:
+        if require_target_post_week:
+            # Killenaule: the prior week's featured image is NOT the current
+            # bulletin, even when the category is lagging this Sunday.
+            dated_post = _score_wordpress_post_hrefs([post_url], target_date)
+            if not dated_post or dated_post[0][0] != target_date:
+                continue
         post_result = await asyncio.to_thread(
             _fetch_bytes_with_retries,
             post_url,
@@ -3829,31 +3837,63 @@ async def _try_wp_json_newest_post_images(
             continue
         post_html = post_body.decode("utf-8", errors="ignore")
         image_urls = _extract_post_page_images(post_html, post_url)
-        # Killenaule posts also embed the theme background and lotto ads.
-        # Keep only filenames the recipe named (Sunday- / Newsletter-).
-        if href_patterns:
-            image_urls = [
-                url
-                for url in image_urls
-                if _href_matches_patterns(url, href_patterns)
-            ]
-        image_urls = image_urls[:wanted]
-        if len(image_urls) < wanted:
+        # The post's FEATURED image may appear only as a resized WordPress
+        # thumbnail, e.g. Newsletter-Sunday-15th-November-1140x641.jpg.
+        # Treat the resize as a fallback for the *same* media file, not as
+        # a second newsletter page. Killenaule's article-body images are
+        # unrelated posters and must be rejected by filename filters.
+        image_groups: list[list[str]] = []
+        seen_origins: set[str] = set()
+        for url in image_urls:
+            if href_patterns and not _href_matches_patterns(url, href_patterns):
+                continue
+            if url in seen_origins:
+                continue
+            image_groups.append([url])
+            seen_origins.add(url)
+        if featured_image_fallback:
+            for match in _WP_UPLOAD_IMAGE_RE.finditer(post_html):
+                name = match.group("name")
+                if _SKIP_IMAGE_NAME_RE.search(name):
+                    continue
+                resize = _RESIZED_IMAGE_SUFFIX_RE.search(name)
+                if not resize:
+                    continue
+                thumb_url = _wp_upload_abs_url(match, post_url)
+                # Retain the original file's extension and remove only
+                # WordPress's trailing pixel dimensions.
+                stem = name[:resize.start()]
+                extension = name[resize.end()-4:] if name.lower().endswith((".jpg", ".png")) else name[-5:]
+                original_url = thumb_url[:-(len(name))] + stem + extension
+                if href_patterns and not _href_matches_patterns(original_url, href_patterns):
+                    continue
+                if original_url in seen_origins:
+                    group = next(g for g in image_groups if g[0] == original_url)
+                    if thumb_url not in group:
+                        group.append(thumb_url)
+                else:
+                    image_groups.append([original_url, thumb_url])
+                    seen_origins.add(original_url)
+        image_groups = image_groups[:wanted]
+        if len(image_groups) < wanted:
             continue
         image_bytes: list[bytes] = []
-        for image_url in image_urls:
-            image_result = await asyncio.to_thread(
-                _fetch_bytes_with_retries,
-                image_url,
-                max_attempts=3,
-                per_attempt_timeout_s=10.0,
-                total_budget_s=14.0,
-            )
-            if not image_result:
-                continue
-            image_body, image_headers = image_result
-            if _dropfiles_body_looks_like_file(image_headers, image_body):
-                image_bytes.append(image_body)
+        for candidates in image_groups:
+            for image_url in candidates:
+                image_result = await asyncio.to_thread(
+                    _fetch_bytes_with_retries,
+                    image_url,
+                    max_attempts=3,
+                    per_attempt_timeout_s=10.0,
+                    total_budget_s=14.0,
+                )
+                if not image_result:
+                    continue
+                image_body, image_headers = image_result
+                if (_dropfiles_body_looks_like_file(image_headers, image_body)
+                        and looks_like_image_bytes(image_body)):
+                    image_bytes.append(image_body)
+                    break
         if len(image_bytes) < wanted:
             continue
         await _images_bytes_to_pdf(dest, image_bytes[:wanted])
@@ -5980,6 +6020,8 @@ async def replay_recipe(
             weeks_back=_recipe_week_span(recipe, back_default=3)[0],
             image_count=image_count,
             href_patterns=image_href_patterns or None,
+            featured_image_fallback=bool(recipe.get("featured_image_fallback")),
+            require_target_post_week=bool(recipe.get("require_target_post_week")),
         )
         if found:
             return dest, found[1], found[0]
