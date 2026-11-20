@@ -126,11 +126,44 @@ jobs:
           set -euo pipefail
           python -m pytest -v --tb=short
 
-      - name: Autofix recipes before harvest
-        if: github.event_name != 'workflow_dispatch' || github.event.inputs.target_parish == ''
+      # A harvest must use the reviewed, committed recipe, not a temporary
+      # mutation of the runner workspace. The old autofix could guess /news/
+      # from an unrelated PDF host and silently alter recipes before replay.
+      - name: Audit recipes without changing them
         run: |
           set -euo pipefail
-          python scripts/autofix_recipes.py || true
+          set +e
+          python scripts/diagnose_recipe_health.py --json > "$RUNNER_TEMP/recipe-health.json"
+          AUDIT_STATUS=$?
+          set -e
+          # The audit returns 1 when existing recipes have issues: record
+          # those findings rather than blocking bulletin retrieval.
+          if [ "$AUDIT_STATUS" -gt 1 ]; then
+            echo "::error::Recipe audit failed unexpectedly (exit $AUDIT_STATUS)."
+            exit "$AUDIT_STATUS"
+          fi
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          data = json.loads((Path(os.environ["RUNNER_TEMP"]) / "recipe-health.json").read_text())
+          errors = sum(row.get("severity") == "error" for row in data.get("issues", []))
+          warnings = sum(row.get("severity") == "warn" for row in data.get("issues", []))
+          summary = f"Read-only recipe audit: {data.get('checked_recipes', 0)} recipes, {errors} errors, {warnings} warnings"
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as output:
+              print(f"### {summary}", file=output)
+              print("Full findings are attached as a workflow artefact. No recipes were changed.", file=output)
+          PY
+
+      - name: Preserve recipe audit findings
+        uses: actions/upload-artifact@v4
+        with:
+          name: recipe-audit-${{ github.run_id }}
+          path: ${{ runner.temp }}/recipe-health.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Run Bulletin Harvester
         id: harvest_run
