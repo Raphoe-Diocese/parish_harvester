@@ -112,3 +112,22 @@ def test_known_id_resolution_does_not_fabricate_a_successful_download():
     assert row["status_hint"] == "unmatched"
     assert row["matched_parish"] is None
     assert row["source_resolution"] == "existing_shared_parish"
+
+
+def test_old_dated_download_is_prioritised_as_stale_in_discovery_queue():
+    report = {"target_date": "2026-11-15", "downloaded": [
+        {"parish": "sample", "display_name": "Sample",
+         "url": "https://example.org/bulletin.pdf", "bulletin_date": "2026-11-08"}
+    ]}
+    queue = build_queue([_seed("Sample", "https://example.org/bulletin.pdf")], [], report)
+    assert queue["leads"][0]["status_hint"] == "stale"
+    assert queue["leads"][0]["priority"] == 1
+
+
+def test_current_dated_download_remains_downloaded_in_discovery_queue():
+    report = {"target_date": "2026-11-15", "downloaded": [
+        {"parish": "sample", "url": "https://example.org/bulletin.pdf",
+         "bulletin_date": "2026-11-15"}
+    ]}
+    queue = build_queue([_seed("Sample", "https://example.org/bulletin.pdf")], [], report)
+    assert queue["leads"][0]["status_hint"] == "downloaded"
