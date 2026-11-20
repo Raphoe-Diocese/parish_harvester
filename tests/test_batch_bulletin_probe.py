@@ -46,7 +46,7 @@ class BatchProbeTests(TestCase):
 
     def test_one_hop_current_pdf(self):
         article = HOME + "weekly-newsletter/"
-        landing = ('<a href="/weekly-newsletter/">Weekly Parish Newsletter</a>').encode()
+        landing = ('<html><a href="/weekly-newsletter/">Weekly Parish Newsletter</a></html>').encode()
         page = ('<a href="' + PDF + '">Sunday 15 November 2026</a>').encode()
         def fake_fetch(url, limit, timeout=12):
             if url == HOME:
