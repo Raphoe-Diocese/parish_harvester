@@ -22,6 +22,7 @@ from harvester.utils import extract_date_from_string, extract_date_from_slug
 
 ROOT = Path(__file__).resolve().parents[1]
 QUEUE = ROOT / "docs/discovery/research-queue-2026-11-15.json"
+HARVEST_REPORT = ROOT / "Bulletins/report.json"
 OUTPUT = ROOT / "docs/discovery/batch-bulletin-probes.json"
 CURSOR = ROOT / "parishes/batch_probe_cursor.json"
 ADDITIONAL = ROOT / "docs/discovery/additional-web-leads-2026-11-20.json"
@@ -130,12 +131,22 @@ def probe_one(item: dict, sunday: date) -> dict:
         result["reason"] = "specialised_api_needed"
         return result
 
-    content, kind, final = fetch(initial, MAX_HTML)
+    content, kind, final = fetch(initial, MAX_FILE if FILES.search(initial) else MAX_HTML)
     if not content:
         result["reason"] = "unreachable_or_too_large"
         return result
     if content.startswith(b"%PDF-"):
-        result["reason"] = "direct_document_requires_printed_date_verification"
+        from harvester.bulletin_freshness import heading_date_in_pdf_bytes
+        name_date = parse_issue_date(urlparse(final).path, sunday.year)
+        heading_date = heading_date_in_pdf_bytes(content, target=sunday)
+        if heading_date == sunday and name_date in (sunday, None):
+            result.update(verdict="candidate_verified_masthead",
+                          document_url=final, file_kind="pdf",
+                          issue_date=sunday.isoformat(), masthead_verified=True,
+                          bytes=len(content),
+                          reason="Direct PDF has target-Sunday masthead; parish identity still needs checking")
+        else:
+            result["reason"] = "direct_pdf_stale_or_undated"
         return result
     if "html" not in kind and not content[:200].lstrip().lower().startswith((b"<!doctype", b"<html")):
         result["reason"] = "not_html"
@@ -246,6 +257,20 @@ def main() -> int:
     if ADDITIONAL.exists():
         extra = json.loads(ADDITIONAL.read_text(encoding="utf-8"))
         queue["leads"] = (extra.get("leads") or []) + (queue.get("leads") or [])
+    # Recover sources not represented among the old 456 user-supplied leads.
+    # Downloaded parishes are deliberately excluded.
+    if HARVEST_REPORT.exists():
+        historic = json.loads(HARVEST_REPORT.read_text(encoding="utf-8"))
+        live_rows = []
+        for group in ("failed", "stale_rejected"):
+            for row in historic.get(group, []):
+                if row.get("url") and row.get("parish"):
+                    live_rows.append({
+                        "url": row["url"], "name": row.get("display_name") or row["parish"],
+                        "matched_parish": row["parish"], "status_hint": group,
+                        "validation": "unverified_seed", "source_type": "website",
+                    })
+        queue["leads"] = live_rows + queue["leads"]
     state = json.loads(CURSOR.read_text(encoding="utf-8")) if CURSOR.exists() else {}
     if state.get("target_date") != sunday.isoformat():
         state = {"offset": 0}
