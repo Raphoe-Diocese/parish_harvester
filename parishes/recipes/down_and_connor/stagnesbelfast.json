@@ -1,13 +1,38 @@
 {
+  "version": 2,
   "parish_key": "stagnesbelfast",
   "display_name": "St Agnes Belfast",
   "diocese": "down_and_connor",
-  "recorded_date": "2026-06-26",
-  "start_url": "https://www.stagnesbelfast.com/?p=6069",
-  "status": "dead_url",
-  "skip": true,
-  "dead_reason": "Bulletin page gone \u2014 no PDF on stagnesbelfast.com (stub since April).",
-  "reason": "Bulletin page gone \u2014 no PDF on stagnesbelfast.com (stub since April).",
-  "auto_fixed": true,
-  "steps": []
+  "start_url": "https://www.stagnesbelfast.com/",
+  "site_type": "http_scrape_newest_html",
+  "playbook_type": "html_text_bulletin",
+  "post_slug_patterns": [
+    "st-agnes-parish-bulletin"
+  ],
+  "max_bulletin_pages": 10,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-11-20",
+  "example_url": "https://www.stagnesbelfast.com/st-agnes-parish-bulletin-15th-november-2026/",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.stagnesbelfast.com/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
+    }
+  ],
+  "operator_notes": [
+    "20/11/2026: user-supplied https://www.stagnesbelfast.com/ is LIVE. Homepage lists a full weekly HTML parish bulletin published 12 November for Sunday 15 November at /st-agnes-parish-bulletin-15th-november-2026/; 8 November and 1 November posts also visible. This is a real newsletter, even though no PDF exists.",
+    "Old ?p=6069 URL was stale/dead in June; do not use it. Resolve newest dated st-agnes-parish-bulletin post from homepage, print only its bulletin article to PDF through http_scrape_newest_html, verify date against harvest Sunday. Do not print the homepage.",
+    "Check published posts on the source for the next Sunday; no claims of download until the next harvest verifies it."
+  ],
+  "do_not": [
+    "Do not open old ?p=6069; it is not the current weekly bulletin.",
+    "Do not treat an absence of PDF on the parish website as no bulletin; current newsletter is HTML text.",
+    "Do not print the homepage/listing as the current bulletin.",
+    "Do not hard-code the November 15 post for future Sundays."
+  ]
 }
