@@ -5435,6 +5435,38 @@ async def replay_recipe(
         if found:
             return dest, found[1], found[0]
 
+    # A parish may publish both an HTML accordion newsletter and an MCN
+    # PDF. For Glencolmcille the MCN church ID is 661, and the HTML page
+    # contains *several* previous issues. Take the PDF only with current
+    # issue-date evidence; otherwise let the fail-closed HTML step try.
+    # Never pin a CloudFront UUID or promote an undated old PDF.
+    alternative_mcn = str(recipe.get("alternative_mcn_camera_url") or "").strip()
+    if site_type == "html_current_accordion" and alternative_mcn and target_date is not None:
+        if (
+            urlparse(alternative_mcn).hostname in {"mcn.live", "www.mcn.live"}
+            and urlparse(alternative_mcn).path.lower().startswith("/camera/")
+        ):
+            mcn_hit = await _try_mcn_live_newsletter(alternative_mcn, dest)
+            if mcn_hit:
+                candidate_url, candidate_kind = mcn_hit
+                from .bulletin_freshness import pdf_body_heading_verdict
+
+                card = check_bulletin_freshness(candidate_url, target_date)
+                body = pdf_body_heading_verdict(dest, target_date)
+                dated_current = (
+                    card.status == "fresh"
+                    and not (body and body.status == "stale")
+                ) or (
+                    card.status == "unknown"
+                    and body is not None
+                    and body.status == "fresh"
+                )
+                if dated_current:
+                    return dest, candidate_kind, candidate_url
+                # An older MCN newsletter does not prevent the independent
+                # current-week HTML issue from being tried.
+                dest.unlink(missing_ok=True)
+
     # churchmedia.tv livestream pages expose "View Our Latest Newsletter"
     # only after Angular hydrates. GET /api/getChannelAbout?slug=… returns
     # the current PDF; the path token and ?cb= change every upload.
