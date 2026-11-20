@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] In review, 2026-11-20: `ocr/fidelity.py` treated an OCR passage as intact whenever every word longer than three letters occurred **anywhere in the entire output**. That cannot detect scrambled two-column reading order and repeated-word losses. Require locally aligned word sequences while allowing one displaced word for stitcher banners; add word-order and locality regressions. Sample generated parish PDFs and OCR pages before declaring the fix proven in production.
+
 - [ ] In review, 2026-11-20: the Sunday `stitch` job was running duplicate, identical status snapshots and duplicate 10% drop guards. Keep one of each in the correct order; verify next Sunday run has one snapshot and one guard and preserve count protection. `.github/workflows/harvest.yml`, `tests/test_sunday_stitch_single_guard.py`.
 
 - [ ] Critical, 2026-11-20: weekly `.github/workflows/harvest.yml` invoked `scripts/autofix_recipes.py` before harvesting. This script can invent `https://<host>/news/` without checking it, mutate the trained recipes in the runner workspace, and the workflow does not stage those recipe JSON files. Replace it with read-only `diagnose_recipe_health.py --json`, archive the results, and prohibit silent mutation; next run must verify full harvest and audit artefact. Review other guessed-url rewrites before using autofix manually.

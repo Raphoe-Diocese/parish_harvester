@@ -83,15 +83,57 @@ def _skip_phrase(phrase: str) -> bool:
     return bool(_SKIP_PHRASE.search(phrase or ""))
 
 
-def missing_phrases(pdf_text: str, ocr_text: str, window: int = 8) -> list[str]:
-    """Return 8-word PDF windows that are missing from OCR.
+def _nearby_in_reading_order(pdf_words: list[str], ocr_words: list[str], span: int) -> bool:
+    """Accept a short, local reading-order match with at most one displacement.
 
-    If the exact window is absent, accept the window when every word longer
-    than 3 characters is present in the OCR (parish-name glue / wrap noise).
+    Reordering a column must not pass merely because the entire bulletin
+    contains the same words somewhere else. A single displaced parish name
+    is tolerated (PDF stitcher banners sometimes interrupt the body).
+    """
+    from collections import Counter
+
+    if not pdf_words or not ocr_words:
+        return False
+    needed = Counter(pdf_words)
+    anchor = pdf_words[0]
+    for at, token in enumerate(ocr_words):
+        if token != anchor:
+            continue
+        # The first distinctive PDF word may have been displaced slightly.
+        for start in range(max(0, at - 6), at + 1):
+            local = ocr_words[start : start + span]
+            present = Counter(local)
+            if any(present[word] < count for word, count in needed.items()):
+                continue
+            # Longest common subsequence of distinctive words. Unlike
+            # set-membership, this retains word multiplicity and order.
+            state = [0] * (len(local) + 1)
+            for word in pdf_words:
+                previous = 0
+                for idx, actual in enumerate(local, start=1):
+                    old = state[idx]
+                    state[idx] = (
+                        previous + 1 if word == actual
+                        else max(state[idx], state[idx - 1])
+                    )
+                    previous = old
+            minimum = len(pdf_words) if len(pdf_words) <= 4 else len(pdf_words) - 1
+            if state[-1] >= minimum:
+                return True
+    return False
+
+
+def missing_phrases(pdf_text: str, ocr_text: str, window: int = 8) -> list[str]:
+    """Return local PDF word windows missing or scrambled in OCR.
+
+    Exact sequences pass. Allow a nearby sequence with at most one
+    displaced distinctive word for stitcher banners/line wraps. The
+    previous all-words-anywhere rule silently accepted interleaved
+    columns and heavily reordered notices, masking real OCR failures.
     """
     pdf_words = (pdf_text or "").split()
     ocr_norm = ocr_text or ""
-    ocr_words = set(ocr_norm.split())
+    ocr_tokens = ocr_norm.split()
     if not pdf_words:
         return []
 
@@ -100,8 +142,10 @@ def missing_phrases(pdf_text: str, ocr_text: str, window: int = 8) -> list[str]:
             return True
         if phrase and phrase in ocr_norm:
             return True
-        distinctive = [w for w in words if len(w) > 3]
-        return bool(distinctive) and all(w in ocr_words for w in distinctive)
+        distinctive = [word for word in words if len(word) > 3]
+        return _nearby_in_reading_order(
+            distinctive, ocr_tokens, span=max(24, len(words) * 3)
+        )
 
     if len(pdf_words) < window:
         phrase = " ".join(pdf_words)
