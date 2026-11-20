@@ -102,6 +102,24 @@ _REST_IS_BODY_WORD = re.compile(
 
 _MAX_HEADING_CHARS = 72
 
+# Printed standalone section labels omitted by the legacy Mass/Anniversary
+# pattern. These are only headings when they make up the WHOLE line; they
+# must not turn an ordinary sentence, future-dated notice, or Mass intention
+# into a fake heading. Preserve the original case and Irish spelling.
+_STANDALONE_SECTION_HEADING = re.compile(
+    r"^(?:"
+    r"weekly\s+masses|mass\s+intentions?|"
+    r"eucharistic\s+adoration|adoration\s+of\s+the\s+blessed\s+sacrament|"
+    r"confessions?|sacrament\s+of\s+reconciliation|"
+    r"november\s+masses\s+for\s+the\s+holy\s+souls|"
+    r"newsletter\s+notices?|church\s+collections?|"
+    r"pilgrim\s+statue\s+of\s+our\s+lady\s+of\s+fatima|"
+    r"aifreann\s+cuimhneach[aá]in(?:\s*/\s*memorial\s+mass)?|"
+    r"b[eé]al\s+an\s+phobail"
+    r")\s*[:.]?$",
+    re.IGNORECASE,
+)
+
 _URL_ONLY = re.compile(
     r"^(?:https?://|www\.)\S+$",
     re.IGNORECASE,
@@ -158,6 +176,8 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         return None, ""
     if _IRISH_RIP_HEADING.match(text) and len(text) <= 56:
         return text, ""
+    if len(text) <= _MAX_HEADING_CHARS and _STANDALONE_SECTION_HEADING.fullmatch(text):
+        return text.rstrip(".:"), ""
     match = _HEADING_START.match(text)
     if not match:
         return None, text
