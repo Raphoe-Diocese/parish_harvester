@@ -2404,7 +2404,7 @@ class HarvestMissRecipeTests(unittest.TestCase):
             # 13/11/2026 pin is Bulletin-8th-Nov-26.pdf (5 pages). Not 15th Nov.
             "down_and_connor/stoliverplunkettparish.json": "Bulletin-8th-Nov-26.pdf",
             "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
-            "down_and_connor/glenavyandkilleadparish.json": "2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
+            # Glenavy 13-Sep pin retired: dynamic November archive covered by GlenavyKilleadArchiveTests.
             # 29/10/2026 the example moved to Parish-Bulletin-25th-October-2026.pdf.
             # The 14/09 file Parish-Bulletin-30082026-3.pdf was the old misnamed row.
             "down_and_connor/st-colmcilles.json": "Parish-Bulletin-25th-October-2026.pdf",
@@ -3217,3 +3217,25 @@ class KillasserCurrentArchiveTests(unittest.TestCase):
         self.assertEqual(recipe["start_url"], "https://killasserparish.wordpress.com/")
         self.assertEqual(recipe["href_patterns"], [".pdf"])
         self.assertNotIn("/wp-content/uploads/", recipe["start_url"])
+
+
+class GlenavyKilleadArchiveTests(unittest.TestCase):
+    def test_real_november_pdf_filenames_choose_target_sunday(self) -> None:
+        from harvester.newsletter_brain import same_sunday_urls
+        links = [
+            "https://www.glenavyandkilleadparish.com/app/uploads/2026/11/2026-November-15-Thirty-Third-Sunday-in-Ordinary-Time.pdf",
+            "https://www.glenavyandkilleadparish.com/app/uploads/2026/11/2026-November-01-Feast-of-All-Saints.pdf",
+            "https://www.glenavyandkilleadparish.com/app/uploads/2026/11/2026-November-08-Thirty-Second-Sunday-in-Ordinary-Time.pdf",
+        ]
+        for sunday, expected in [(date(2026, 11, 15), links[0]), (date(2026, 11, 8), links[2])]:
+            scored = _score_http_scrape_pdf_hrefs(links, sunday)
+            self.assertEqual(same_sunday_urls(scored, sunday), [expected])
+
+    def test_glenavy_recipe_does_not_pin_old_september_pdf(self) -> None:
+        recipe = json.loads(
+            (Path(__file__).resolve().parents[1] / "parishes/recipes/down_and_connor/glenavyandkilleadparish.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["start_url"], "https://www.glenavyandkilleadparish.com/bulletins/")
+        self.assertEqual(recipe["href_patterns"], [".pdf"])
+        self.assertFalse(any(step.get("url", "").endswith(".pdf") or step.get("href", "").endswith(".pdf") for step in recipe["steps"]))
