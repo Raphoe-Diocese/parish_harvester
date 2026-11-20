@@ -6232,6 +6232,24 @@ async def replay_recipe(
                 if (step.get("url") or "").strip():
                     await page.goto(html_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
                 await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
+                if step.get("only_current_accordion"):
+                    # HTML archive pages can contain many older issues.
+                    # The normal print fallback would quietly concatenate all
+                    # of them. This opt-in path must identify exactly the
+                    # harvest Sunday's panel or fail without publishing.
+                    from .html_accordion import isolate_current_accordion_bulletin
+
+                    try:
+                        await isolate_current_accordion_bulletin(page, target_date)
+                    except ValueError as exc:
+                        raise RecipeReplayError(f"Current accordion bulletin not verified: {exc}") from exc
+                    await _print_page_to_pdf(page, dest)
+                    _verify_bulletin_pdf(
+                        dest, target=target_date,
+                        max_pages=recipe.get("max_bulletin_pages"),
+                    )
+                    return dest, "print_to_pdf", html_url
+
                 print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
                 skip_nav = bool(step.get("skip_listing_nav", False))
                 await _smart_print_page_to_pdf(
