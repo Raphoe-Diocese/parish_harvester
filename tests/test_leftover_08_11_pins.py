@@ -41,14 +41,12 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotIn("index.php/bulletin", recipe["start_url"])
         self.assertNotIn("1st-Nov", recipe["start_url"])
 
-    def test_gurranabraher_pins_32nd_nov_8_pdf(self) -> None:
+    def test_gurranabraher_has_dynamic_sunday_pdf_archive_not_eighth_nov_pin(self) -> None:
         recipe = _recipe("parishes/recipes/cork_and_ross/gurranabraher.json")
-        self._assert_wordpress_direct(
-            recipe, "Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf"
-        )
-        self.assertNotIn("category/newsletters", recipe["start_url"])
-        self.assertNotIn("All-Saints", recipe["start_url"])
-        self.assertNotIn("Nov-1st", recipe["start_url"])
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["start_url"], "https://www.gurranabraherparish.ie/category/newsletters/")
+        self.assertEqual(recipe["href_patterns"], [".pdf"])
+        self.assertFalse(any("Nov-8th-2026" in str(step) for step in recipe["steps"]))
 
     def test_salthill_pins_parish_news_nov_8_pdf(self) -> None:
         recipe = _recipe("parishes/recipes/galway/salthill.json")
