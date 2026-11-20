@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-11-13",
-  "target_date": "2026-11-08",
+  "generated_at": "2026-11-20",
+  "target_date": "2026-11-15",
   "summary": {
-    "downloaded": 632,
+    "downloaded": 594,
     "html_links": 0,
-    "skipped": 492,
-    "failed": 108,
-    "stale_rejected": 86
+    "skipped": 353,
+    "failed": 216,
+    "stale_rejected": 152
   },
   "action_counts": {
-    "ok": 509,
-    "skip": 742,
-    "mark_inactive": 12,
-    "investigate": 27
+    "ok": 497,
+    "skip": 738,
+    "mark_inactive": 15,
+    "investigate": 42
   },
   "parishes": [
     {
@@ -76,7 +76,7 @@
         "recorded_date": "2026-10-03"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -544,7 +544,7 @@
         "recorded_date": "2026-08-01"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -1057,8 +1057,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -1663,10 +1663,10 @@
         "navigation_timeout_ms": 55000
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ardlea",
@@ -1939,27 +1939,30 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/armaghparish.json",
       "recipe": {
-        "start_url": "https://armaghparish.net/wp-content/uploads/2026/11/8th-November.pdf",
-        "site_type": "wordpress",
-        "playbook_type": "direct_download",
+        "start_url": "https://armaghparish.net/parish-bulletin/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "13/11/2026: predicted_dated_pdf GitHub miss on /2026/11/8th-November.pdf (this PC GET 200 604745). Harvest 43349964493. Browser download. Do not open /parish-bulletin/.",
-          "06/11/2026: listing is 403."
+          "20/11/2026: official /parish-bulletin/ archive publicly lists 15th, 8th and 1st November 2026. Verified /wp-content/uploads/2026/11/15th-November.pdf: real one-page application/pdf headed St Patrick's Cathedral Parish, Armagh, containing notices for 21\u201323 November. Previous direct-download recipe remained pinned to 8th-November.pdf, causing 15-Nov harvest stale rejection.",
+          "Weekly WordPress PDF filename pattern is ordinal day + full month WITHOUT year (1st-November.pdf, 8th-November.pdf, 15th-November.pdf). Host-specific extra_sunday_names supplies exact candidate to browser-first _try_sunday_upload_pdf. It uses Chromium to get around site runner HTTP/urllib 403, before WordPress media API and date-rewritten example fallbacks.",
+          "Do not promise next-Sunday issue until file appears. Reject old PDF by dated URL and standard freshness check; first-page header has no explicit newsletter date.",
+          "Armagh Cathedral, St Malachy's, St Colmcille's and Immaculate Conception are listed in one shared Armagh bulletin. Harvest once here."
         ],
         "do_not": [
-          "Do not set start_url to /parish-bulletin/ \u2014 listing challenge hangs and listing is 403.",
-          "Do not use predicted_dated_pdf \u2014 GitHub urllib misses this file.",
-          "Do not pin 1st-November.pdf."
+          "Do not permanently pin any dated PDF or 8-November direct download step.",
+          "Do not rely on the /parish-bulletin/ listing being navigable from GitHub Actions; it was 403 in earlier runs.",
+          "Do not treat '15th November' as current for the following Sunday if 22nd is unpublished.",
+          "Do not create separate duplicates for the four Armagh churches."
         ],
-        "recorded_date": "2026-11-13"
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "yearless_month_pdf+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -1991,7 +1994,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -2560,8 +2563,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -2924,10 +2927,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "baldoyleparish",
@@ -3396,8 +3399,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -3643,10 +3646,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "ballinloughkiltullagh",
@@ -3799,13 +3802,13 @@
         "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballinteerparish",
@@ -4117,7 +4120,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -4128,27 +4131,36 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/ballybrackkilliney.json",
       "recipe": {
-        "start_url": "https://www.ballybrack-killiney-parish.org",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.ballybrack-killiney-parish.org/news.html",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "20/11/2026: official /news.html archive offers 'Newsletter 14th & 15th November 2026'; anchor download links to /news/routedownload/newsletter-14th-15th-november-2026.html (HTML thank-you intermediary). Following its 'here' link leads /news/download/newsletter-14th-15th-november-2026.html, served as actual 2-page application/pdf with 14th/15th November 2026 masthead.",
+          "Use plain HTTP newest-PDF scraping of the archive. The fetcher canonicalises /routedownload/ to /download/ before requesting PDF; no filename or weekend date is pinned. Future bulletins use the same URL shape.",
+          "Ballybrack-Killiney PDF also identifies neighbouring Loughlinstown, Shankill, Johnstown, Cabinteely and Sallynoggin pastoral partnership. This is not evidence those parishes have identical independent weekly publications; do not automatically alias them.",
+          "Live GitHub harvest result remains unverified."
+        ],
+        "do_not": [
+          "Do not download /routedownload/ HTML thank-you page as a PDF.",
+          "Do not reject a genuine application/pdf simply because its final URL ends .html.",
+          "Do not pin a November filename or use the old inactive link-only homepage recipe."
+        ],
+        "recorded_date": "2026-11-20"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
+      "suggested_action": "investigate",
+      "suggested_reason": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop"
     },
     {
       "parish_key": "ballybrack-killiney-parish",
@@ -4529,10 +4541,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "ballycullane",
@@ -4557,8 +4569,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -4717,7 +4729,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -4833,7 +4845,7 @@
         "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -4928,8 +4940,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -5061,7 +5073,7 @@
         "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -5433,8 +5445,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -5461,8 +5473,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -5485,7 +5497,9 @@
           "27/09/2026: official card links https://ballymoteparish.org/. Newsletter at /newsletter/ shows stacked page images Page-01-3.jpg \u2026 page-04-3.jpg under /uploads/2026/09/ (HTTP 200).",
           "site_type:http_scrape_newest_images count=4. Filenames have no day \u2014 freshness uses upload month.",
           "Site returns 406 without a normal browser User-Agent.",
-          "27/09/2026 harvest: page-04-3.jpg was misdated as 04/09 via slug_day \u2014 fixed in bulletin_freshness (page-scan same-month rule)."
+          "27/09/2026 harvest: page-04-3.jpg was misdated as 04/09 via slug_day \u2014 fixed in bulletin_freshness (page-scan same-month rule).",
+          "20/11/2026: live /newsletter/ page lists November 2026 page-0-1.jpg and page-1-1.jpg, both belonging to Sunday 15 November 2026. Remaining Page-3-3.jpg and page-04-3.jpg were September 2026 images and MUST NOT be mixed into November issue. Current weekly bulletin is 2 pages, not previous 4.",
+          "20/11/2026: output image URL has /uploads/2026/11/page-1-1.jpg, which is dated 1 November by generic folder-date heuristic although printed masthead says Thirty Third Sunday of Year A \u2013 15th November 2026. Use first-page local OCR to verify issue date before rejecting these page-numbered scans as stale. No date should be guessed when OCR is unavailable."
         ],
         "do_not": [
           "Do not pin Page-01-3.jpg \u2014 the -3 suffix changes each week.",
@@ -5565,7 +5579,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -5784,10 +5798,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballysokeary",
@@ -5870,7 +5884,7 @@
         "recorded_date": "2026-10-03"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_permanent_redirect_document",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -5978,10 +5992,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: HTTP-scrape listing http://bandonparish.ie/bulletin/ \u2014 no dated bulletin PDF matching ['bulletin-'] (not a selector problem; parish may not have posted)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing http://bandonparish.ie/bulletin/ \u2014 no dated bulletin PDF matching ['bulletin-'] (not a selector problem; parish may no"
     },
     {
       "parish_key": "bangorparish",
@@ -6669,7 +6683,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -6866,8 +6880,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -6894,8 +6908,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -7024,7 +7038,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -7094,10 +7108,10 @@
       "learned_pattern": "kerry_card_yyyymmdd_pdf+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "boherlahandualla",
@@ -7180,8 +7194,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -7248,10 +7262,10 @@
       "learned_pattern": "Mayo County Council parish-newsletters",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://achonrydiocese.org/parishes/mayo/bonniconlon/",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "bonnybrook",
@@ -7276,7 +7290,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -7559,7 +7573,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -7587,8 +7601,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -7615,8 +7629,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -7643,8 +7657,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -8159,8 +8173,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -8187,8 +8201,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -8215,8 +8229,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -8461,8 +8475,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -8937,8 +8951,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -9252,8 +9266,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -9414,10 +9428,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "cashelrosegreen",
@@ -9545,8 +9559,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -10477,7 +10491,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -10545,10 +10559,10 @@
       "learned_pattern": "Mayo County Council parish-newsletters",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://achonrydiocese.org/parishes/mayo/charlestown-3/",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "charleville",
@@ -10855,10 +10869,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "clanerathcoffey",
@@ -11046,7 +11060,7 @@
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -11180,10 +11194,10 @@
         "notes": "Many docs.google.com/viewer iframes load slowly (2\u20134 min) \u2014 ignore previews. Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx \u2014 download directly. Iframe src URLs are in the HTML immediately; no need to wait for previews. Harvester rewrites the date each Sunday and t"
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: HTTP download failed for http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-11-26.docx (browser was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: HTTP download failed for http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-11-26.docx (browser was not opened)"
     },
     {
       "parish_key": "cleenish",
@@ -11483,8 +11497,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -11732,7 +11746,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -11887,8 +11901,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -12270,7 +12284,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -12298,7 +12312,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -12424,8 +12438,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -12791,10 +12805,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "congcrosstheneale",
@@ -13113,8 +13127,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -13213,7 +13227,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -13247,7 +13261,7 @@
         "recorded_date": "2026-09-20"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -13397,8 +13411,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -13537,8 +13551,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://www.limerickdiocese.org/parish/?contentID=E12B41C8-E7C1-BF94-03BC8FBD5828CBE5",
       "suggested_action": "skip",
       "suggested_reason": "07/10/2026: card website croomparish.ie. Newest newsletter on the news page is St Patrick's Day 2021. Leaflets page is 403. No this-week PDF or JPEG. Left skip."
     },
@@ -13601,8 +13615,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -13673,29 +13687,30 @@
       "diocese": "armagh",
       "recipe_file": "parishes/recipes/armagh/crossmaglen.json",
       "recipe": {
-        "start_url": "https://www.uppercreggan.co.uk/resources/8th%20NOV%202026.pdf",
-        "site_type": "wordpress",
-        "playbook_type": "direct_download",
+        "start_url": "https://www.uppercreggan.co.uk/news.php",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "13/11/2026 leftover FAILED: harvest saved the Armagh diocese card. Own-site news.php lists 8th NOV 2026.pdf under 15th. GET 200 application/pdf 237278 bytes magic %PDF-1.7. Two pages. Text: Par\u00f3iste an Chreagain Uachtair / Parish of Upper Creggan. SUNDAY 8TH NOV 2026 32ND ORDINARY. Anniversaries St Patrick's Sat 7th/Sun 8th Nov. Irish name stays Irish. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download. Do not open news.php or armagharchdiocese.org."
+          "20/11/2026: Official Upper Creggan news.php lists 15th NOV 2026.pdf (234.303 KB), 8th NOV 2026.pdf (231.717 KB) and 1st NOV 2026.pdf (231.624 KB), proving a newer 15 November issue since the 13 November 8-November direct-download pin. The 15-November listing is evidenced, PDF content still needs validation by live harvest.",
+          "The 15 November archive page lists multiple weeks. Use HTTP-only current Sunday ranking from PDF filename, not the first link and not a pinned dated PDF. For a target of 8 November choose 8th, for 15 November choose 15th. 22 November must not be claimed unless the parish posts that issue.",
+          "Previous advice 'do not scrape news.php because 15 November is above 8 November' applied to a blind 8-November click, not date-scored HTTP scraping. Never accept the next Sunday's edition prematurely.",
+          "Upper Creggan is Crossmaglen Parish; avoid a separate duplicate Upper Creggan recipe."
         ],
         "do_not": [
-          "Do not pin 15th NOV 2026.pdf \u2014 that is 15/11 (grace-fresh, not 08/11). This Sunday is listed.",
-          "Do not pin 1st NOV 2026.pdf. 01/11 is not 08/11.",
-          "Do not set start_url to https://www.uppercreggan.co.uk/ or /news.php \u2014 listing has 15th above 8th.",
-          "Do not scrape https://www.armagharchdiocese.org/parishes/parish-details/.",
-          "Do not use predicted_dated_pdf.",
-          "Do not harvest Facebook."
+          "Do not pin 8th or 15th NOV 2026.pdf as a permanent URL.",
+          "Do not choose archive first-row indiscriminately; rank PDF links by target Sunday.",
+          "Do not use diocese parish-card URL as the bulletin.",
+          "Do not claim a new download until the GitHub harvest run verifies it."
         ],
-        "recorded_date": "2026-11-13"
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -14051,7 +14066,7 @@
         "recorded_date": "2026-09-23"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_permanent_redirect_document",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -14138,8 +14153,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -14222,7 +14237,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -14306,8 +14321,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -14362,8 +14377,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -14490,7 +14505,7 @@
       },
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://derriaghycatholicparish.com/?page_id=262\nCall log:\n  - navigating to \"https://derriaghycatholicparish.com/?page_id=262\", waiting until \"commit\"\n; headful fallback: St",
+      "last_error": "Recipe replay failed: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://derriaghycatholicparish.com/?page_id=262\nCall log:\n  - navigating to \"https://derriaghycatholicparish.com/?page_id=262\", waiting until \"commit\"\n; headful fallback: Re",
       "suggested_action": "investigate",
       "suggested_reason": "Recipe replay failed: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://derriaghycatholicparish.com/?page_id=262\nCall log:\n  - navigating to \"https://derriagh"
     },
@@ -14667,7 +14682,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -14695,7 +14710,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -14723,8 +14738,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -14751,8 +14766,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -14836,27 +14851,30 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/donaghmore.json",
       "recipe": {
-        "start_url": "https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-8th-November-2026.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "direct_download",
+        "start_url": "https://donaghmoreparish.org/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "active",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "13/11/2026: homepage scrape can hang. Proved PDF Donaghmore-Bulletin-8th-November-2026.pdf GET 200 %PDF with ignore_https_errors (expired cert). start_url is the PDF.",
-          "Armagh Facebook-only parish is donaghmorearmagh."
+          "20/11/2026: Official homepage's 'Parish Weekly Bulletin' link points to https://donaghmoreparish.org/wp-content/uploads/2026/11/Donaghmore-Bulletin-15th-November-2026.pdf. Confirmed real application/pdf one page, printed heading DONAGHMORE PARISH BULLETIN / 15TH NOVEMBER 2026 / THIRTY-THIRD SUNDAY IN ORDINARY TIME.",
+          "Previous predicted_dated_pdf recipe was created 13 November from the 8th-November PDF and 15 November saved report still rejected 8th as stale. Use actual homepage 'Parish Weekly Bulletin' href first, via HTTP scrape without Playwright navigation; fallback can use existing example_url prediction if homepage cannot be retrieved.",
+          "Use published issue date, not Sunday mentioned among intentions. 22 November must not be claimed current until its bulletin appears.",
+          "Donaghmore Dromore parish serves St John Glenn and St Mary Barr. It differs from Donaghmore in Archdiocese of Armagh (donaghmorearmagh)."
         ],
         "do_not": [
-          "Do not pin forever \u2014 predicted rewrites the date.",
-          "Do not take the service@riceoffice hash PDF.",
-          "Do not harvest Facebook."
+          "Do not pin a single November PDF in steps or start_url.",
+          "Do not confuse Sunday's Mass intentions with published issue date.",
+          "Do not confuse Dromore's Donaghmore with Armagh's Donaghmore.",
+          "Do not harvest Sunday Message link as parish bulletin."
         ],
-        "recorded_date": "2026-11-13"
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -14970,9 +14988,9 @@
       },
       "has_extension_diagnosis": true,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: APIRequestContext.get: socket hang up\nCall log:\n  - \u2192 GET https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf\n  -     - user-agent: Mozilla/5.0 (X11; Linux ",
+      "last_error": "Recipe replay failed: HTTP download failed for https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf (browser was not opened)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: APIRequestContext.get: socket hang up\nCall log:\n  - \u2192 GET https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Sai"
+      "suggested_reason": "Recipe replay failed: HTTP download failed for https://donaghmoyne.com/wp-content/uploads/2026/11/32nd-of-Ordinary-Time-All-Saints-Sunday-08th-November-2026.pdf"
     },
     {
       "parish_key": "doneraile",
@@ -15276,10 +15294,10 @@
       "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: HTTP download failed for https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_08+Newsletter.pdf (browser was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: HTTP download failed for https://irp.cdn-website.com/8e819f4b/files/uploaded/2026_11_08+Newsletter.pdf (browser was not opened)"
     },
     {
       "parish_key": "doorabarefield",
@@ -15298,7 +15316,8 @@
         "has_terminal": false,
         "operator_notes": [
           "02/10/2026 hunt. Proved 4th-Oct.pdf GET 200 application/pdf 1393347 bytes. Text starts 4th October 2026 and names Doora and Barefield.",
-          "site_type http_scrape_newest_pdf. example_url records the proved file. Do not pin the dated filename."
+          "site_type http_scrape_newest_pdf. example_url records the proved file. Do not pin the dated filename.",
+          "20/11/2026: 15/11 report failed with 'Too many pages: 5 pages (max 4)'. Official parish publishes multi-page newsletters, including 8 November 2026. Raise this recipe's page cap to 8; require usual fresh masthead/date check so older issues are not presented as current."
         ],
         "do_not": [
           "Do not pin the dated filename.",
@@ -15311,10 +15330,10 @@
       "learned_pattern": "Undated PDF, date in the link text",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Too many pages: 5 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Too many pages: 5 pages (max 4)"
     },
     {
       "parish_key": "drangancloneen",
@@ -15501,13 +15520,13 @@
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "dromara",
@@ -15939,8 +15958,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -16035,10 +16054,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "drumgooland",
@@ -16510,8 +16529,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -16667,27 +16686,36 @@
       "diocese": "dublin",
       "recipe_file": "parishes/recipes/dublin/dundrum.json",
       "recipe": {
-        "start_url": "https://www.dundrumparish.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "https://www.dundrumparish.com/",
+        "site_type": "wp_json_newest_post_images",
+        "playbook_type": "stacked_image_bulletin",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
+        "has_terminal": true,
+        "operator_notes": [
+          "20/11/2026: official website published Parish Newsletter Nov 22nd 2026 on 20 Nov at /parish-newsletter-nov-22nd-2026/, and Nov 15th / Nov 8th posts. Previously link_only inactive despite weekly posts.",
+          "The site exposes 990x1400 PNG uploads with dp- hashed filenames; select image from the newest correctly dated newsletter post, not static home-page graphics. WP JSON/RSS/listing discovery through wp_json_newest_post_images, PDF conversion via image_to_pdf.",
+          "Candidate source verified by public webpage, not yet by live GitHub runner or full-size image PDF check. Keep ordinary PDF/image freshness checks and do not claim a download until harvest succeeds.",
+          "If image selection fails in live harvest, check full-resolution post image DOM and adjust selector/count; do not pin the hashed PNG."
+        ],
+        "do_not": [
+          "Do not pin a dp- hashed PNG path; it changes every issue.",
+          "Do not print the homepage or select unrelated parish news thumbnails.",
+          "Do not mark a dated post as successful until its actual newsletter image is fetched and checked."
+        ],
         "recorded_date": "2026-10-03"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
+      "suggested_action": "investigate",
+      "suggested_reason": "Downloaded file looks like a website error/security page, not a bulletin PDF"
     },
     {
       "parish_key": "dundrum-and-tyrella-parish-dundrum",
@@ -17265,7 +17293,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -17293,8 +17321,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -17349,7 +17377,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -17497,10 +17525,10 @@
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://edgeworthstownparish.ie/wp-content/uploads/2026/11/sunday-newsletter-08-11-2026-edgeworthstown_compressed.pdf for 2026-11-15 did not resolve to a real file (listing page was not ",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://edgeworthstownparish.ie/wp-content/uploads/2026/11/sunday-newsletter-08-11-2026-edgeworthstown_com"
     },
     {
       "parish_key": "effingarrienderk",
@@ -17739,8 +17767,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -17773,7 +17801,7 @@
         "recorded_date": "2026-10-24"
       },
       "bulletin_format": "download",
-      "learned_pattern": "sunday_named_upload",
+      "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -18012,7 +18040,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -18550,8 +18578,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -18891,7 +18919,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -19096,7 +19124,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -19332,8 +19360,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -19360,7 +19388,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -19462,33 +19490,34 @@
       "recipe_file": "parishes/recipes/down_and_connor/glenavyandkilleadparish.json",
       "recipe": {
         "start_url": "https://www.glenavyandkilleadparish.com/bulletins/",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "20/11/2026: the parish bulletin archive directly links PDF files. Verified the 15/11/2026 link at /app/uploads/2026/11/2026-November-15-Thirty-Third-Sunday-in-Ordinary-Time.pdf, 4 pages, front page reads 'Thirty Third Sunday in Ordinary Time / 15 November 2026'. Source https://www.glenavyandkilleadparish.com/bulletins/.",
+          "15 Nov harvest failed because the old Playwright click recipe timed out waiting for domcontentloaded. Plain HTTP listing scrape finds current PDF href without browser navigation; choose by extracted Sunday date, not DOM order (archive shows 1 Nov before 8 Nov).",
+          "Do not pin the 15 November URL or the old 13 September captured link. Re-verify returned PDF issue date after downloading. A current-week download has not yet been confirmed by the GitHub harvester."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin a dated app/uploads PDF or September captured URL.",
+          "Do not assume archive DOM order is strictly chronological; compare issue dates.",
+          "Do not harvest webcam feeds or unrelated downloads."
         ],
-        "recorded_date": "2026-09-14"
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": true,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.glenavyandkilleadparish.com/bulletins/\", waiting until \"domcontentloaded\"\n",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.glenavyandkilleadparish.com/bulletins/\", waiting until \"domc"
     },
     {
       "parish_key": "glenbeigh",
@@ -19525,6 +19554,45 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "glencolmcille",
+      "display_name": "Glencolmcille (Carrick & Meenaneary)",
+      "diocese": "raphoe",
+      "recipe_file": "parishes/recipes/raphoe/glencolmcille.json",
+      "recipe": {
+        "start_url": "https://carrickonline.net/links/st-columbas-church-newsletter",
+        "site_type": "html_current_accordion",
+        "playbook_type": "html_current_accordion",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "Official Diocese of Raphoe lists Glencolmcille parish as Carrick, Meenaneary & Glencolmcille.",
+          "20/11/2026 web evidence: St Columba's Carrick/St Patrick's Meenaneary issue for 14/15 Nov 2026 published on this live HTML page.",
+          "Page is an archive with many dated accordion panels. The html step must isolate an accordion heading that matches the harvest Sunday, month and year; never print entire page.",
+          "Do not mark as live-verified until a scheduled or manual harvest has printed, validated and published the current weekly PDF/OCR.",
+          "Alternate independent MCN camera newsletter: live Church ID 661. HTTP/JSON ProfileDataByJson returns a changing CloudFront PDF URL and a stated issue date. The recipe only accepts that MCN issue when its date is current; otherwise retain CarrickOnline isolated-accordion fallback."
+        ],
+        "do_not": [
+          "Never use generic html capture/print_to_pdf on the untrimmed archive.",
+          "Never print multiple dated accordion sections or invent an issue date.",
+          "Never pin a dated HTML article URL, PDF or UUID.",
+          "Never accept an older MCN PDF merely because its CloudFront UUID differs; compare the issue date and printed masthead."
+        ],
+        "recorded_date": "2026-11-20"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "glendalough",
       "display_name": "Glendalough",
       "diocese": "dublin",
@@ -19547,8 +19615,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -19897,8 +19965,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -20525,10 +20593,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
       "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "gurranabraher",
@@ -20536,28 +20604,30 @@
       "diocese": "cork_and_ross",
       "recipe_file": "parishes/recipes/cork_and_ross/gurranabraher.json",
       "recipe": {
-        "start_url": "https://www.gurranabraherparish.ie/wp-content/uploads/2026/11/Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf",
-        "site_type": "wordpress",
-        "playbook_type": "direct_download",
+        "start_url": "https://www.gurranabraherparish.ie/category/newsletters/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "13/11/2026: leftover failed timeout on /category/newsletters/. Pin Gurranabraher-32nd-Ordinary-Time-Nov-8th-2026-A.pdf. Proved GET 200 application/pdf 486776 bytes magic %PDF-1.7. wp-json media date 06/11/2026. Post title Newsletter Sunday November 8th 2026. Page Mass list Sun, 8th November 9:00am and 11:30am. Do not take All-Saints-Nov-1st."
+          "20/11/2026: official newsletter category lists Sunday 22 November 2026, linked to /wp-content/uploads/2026/11/Gurranabraher-Jesus-Christ-Universal-King-Nov-22nd-2026-A.pdf. Verified PDF GET application/pdf, 2 pages, first-page title Sunday 22nd November 2026, with 21/22 November Mass intentions.",
+          "Category's 22 November entry mistakenly labels its PDF anchor 'Click here to download the 15th November 2026 newsletter'. URL and printed PDF masthead both say 22 November. Score the actual PDF href date before link text; only use link title when URL undated. This source has confirmed 15 November as a separate file /33rd-Ordinary-Time-Nov-15th-2026-A.pdf.",
+          "13 Nov direct-download workaround pinned to 8 November after a Playwright timeout; replace with HTTP-only listing scrape and actual dated PDF selection. Do not open category in Playwright; http_scrape_newest_pdf bypasses DOM navigation.",
+          "Accept only current-week PDF after downstream freshness checks, not a stale older URL; live GitHub harvest still pending."
         ],
         "do_not": [
-          "Do not use predicted_dated_pdf.",
-          "Do not start on /category/newsletters/ \u2014 harvest times out on the listing.",
-          "Do not pin Gurranabraher-All-Saints-Nov-1st-2026-A.pdf.",
-          "Do not keep the 20 September filename.",
-          "Do not harvest Facebook."
+          "Do not permanently pin a 8, 15 or 22 November PDF filename.",
+          "Do not use the erroneous 15-November download caption to discard the real 22 November issue.",
+          "Do not open the newsletter category using Playwright (old timeout). Use HTTP listing scrape.",
+          "Do not harvest unrelated church posters or Facebook."
         ],
-        "recorded_date": "2026-11-13"
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -20651,7 +20721,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -20707,7 +20777,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -20770,7 +20840,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -20798,7 +20868,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -20826,8 +20896,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -20861,7 +20931,7 @@
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -21156,10 +21226,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "hospitalherbertstown",
@@ -21247,8 +21317,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -21338,8 +21408,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -21726,8 +21796,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -21754,7 +21824,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -22122,8 +22192,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -22150,8 +22220,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -22178,7 +22248,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -22479,9 +22549,9 @@
       "diocese": "dromore",
       "recipe_file": "parishes/recipes/dromore/kilbroney.json",
       "recipe": {
-        "start_url": "https://kilbroneyparish.com",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "direct_download",
+        "start_url": "https://kilbroneyparish.com/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "active",
         "skip": false,
         "placeholder": false,
@@ -22489,13 +22559,18 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "15/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 09/10/2026. Do not pin https://kilbroneyparish.com/wp-content/uploads/2026/10/Bulletin-09.10.26-.pdf."
+          "20/11/2026: Official Kilbroney homepage contains 'Latest Bulletin' link pointing to /wp-content/uploads/2026/11/Bulletin-13.11.26-.pdf (1 page, genuine PDF). Masthead is 'Thirty-Third Sunday in Ordinary Time | 15th November 2026' with Saturday 14th/Sunday 15th intentions and following weekend notices; web PDF and visual first page verified.",
+          "15 November report rejected older 30 October PDF when wp_json_newest_media was active. Use plain HTTP homepage anchor scrape and rank by dated file link. Friday 13 Nov upload date is two days before printed Sunday 15 Nov, so post-download PDF masthead freshness must decide the bulletin's actual issue date.",
+          "Do not pin Bulletin-13.11.26-.pdf. Each Sunday read homepage Latest Bulletin href, verify contents and reject older-week mastheads. Do not accept future 22-Nov intentions inside 15-Nov PDF as a new issue.",
+          "St Mary's Star of the Sea Rostrevor and Sacred Heart Killowen share the Kilbroney weekly publication; collect once."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
-          "Do not harvest Facebook."
+          "Do not pin any weekly PDF file or guess 22-Nov filename.",
+          "Do not depend on WordPress media listing when the official homepage exposes 'Latest Bulletin'.",
+          "Do not mistake Friday upload date for printed Sunday issue date.",
+          "Do not harvest webcam or parish forms as bulletin."
         ],
-        "recorded_date": "2026-10-15"
+        "recorded_date": "2026-11-20"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "wp_json+direct_download",
@@ -23418,8 +23493,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -23672,33 +23747,32 @@
       "diocese": "achonry",
       "recipe_file": "parishes/recipes/achonry/killasser.json",
       "recipe": {
-        "start_url": "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf",
-        "site_type": "wordpress",
-        "playbook_type": "direct_download",
+        "start_url": "https://killasserparish.wordpress.com/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "active",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "13/11/2026 leftover FAILED: harvest saved the Achonry diocese card https://achonrydiocese.org/parishes/mayo/killasser-3/. mayo.ie Killasser listing newest file is still Killasser-Callow-25-01-2026.pdf. Kitchen-sink: killasserparish.wordpress.com homepage lists dated PDFs including 08-11-2026-1.pdf (also 01-11-2026-1.pdf and 15-11-2026.pdf). Pin https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf. Mozilla/5.0 HTTP/2 GET 200 application/pdf 91721 bytes magic %PDF-1.3 Last-Modified Fri 06/11/2026 07:30:37 GMT. curl/8.5.0 also 200. PDF text: KILLASSER PARISH NEWSLETTER The 32nd Sunday in Ordinary Time 8th Nov 2026. Adoration in Callow church and Killasser church. Sunday Mass Callow 10am / Killasser 12pm. Callow is the same Killasser/Callow paper \u2014 harvest once here. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download + http_first. Do not scrape mayo.ie or achonrydiocese.org."
+          "20/11/2026: Official Killasser/Callow WordPress homepage is a year-table listing individual weekly PDF links. Verified the 15 November 2026 file at /wp-content/uploads/2026/11/15-11-2026.pdf: HTTP/PDF via public page, 2 pages, masthead KILLASSER PARISH NEWSLETTER / The 33rd Sunday in Ordinary Time 15th Nov 2026.",
+          "The previous direct_download recipe was pinned to 08-11-2026-1.pdf, so it could never recover a subsequent week. Use http_scrape_newest_pdf on the archive and strict target Sunday scoring, then actual PDF masthead verification. URLs are inconsistent about -1 suffix, so do not predict filenames.",
+          "The 2026 archive lists 1, 8 and 15 November. Next Sunday's issue is not yet verified. This PR changes the recipe only, not evidence of live GitHub harvest success.",
+          "Killasser and Callow use the same paper. Harvest once as Killasser, not a second Callow parish."
         ],
         "do_not": [
-          "Do not pin 01-11-2026-1.pdf. 01/11 is not 08/11.",
-          "Do not pin 15-11-2026.pdf. 15/11 is not 08/11.",
-          "Do not pin 08-11-2026.pdf without -1 \u2014 that path is not the listing href.",
-          "Do not set start_url to https://killasserparish.wordpress.com/ \u2014 listing also has 15 November.",
-          "Do not scrape https://www.mayo.ie/en-ie/parish-newsletters/killasser-parish-newsletter \u2014 newest there is 25/01/2026.",
-          "Do not scrape https://achonrydiocese.org/parishes/mayo/killasser-3/.",
-          "Do not use predicted_dated_pdf.",
-          "Do not use http_scrape_newest_pdf \u2014 that can pick 15 November from the listing.",
-          "Do not harvest Facebook."
+          "Do not pin the 8-November or 15-November PDF as a permanent weekly URL.",
+          "Do not use Achonry diocese admin parish card or mayo.ie newsletter list (previously stale).",
+          "Do not guess -1 file suffix; choose real PDF href from the live archive.",
+          "Do not accept a stale previous-Sunday PDF as current if the parish has not posted yet.",
+          "Do not harvest Callow separately or scrape Facebook."
         ],
-        "recorded_date": "2026-11-13"
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "download",
-      "learned_pattern": "",
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
@@ -23880,10 +23954,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "killeeshil",
@@ -23979,6 +24053,37 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "killenaule",
+      "display_name": "Killenaule",
+      "diocese": "raphoe",
+      "recipe_file": "parishes/recipes/raphoe/killenaule.json",
+      "recipe": {
+        "start_url": "https://killenaule.net/category/newsletter/",
+        "site_type": "",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 4,
+        "click_count": 3,
+        "has_terminal": true,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-11-20"
+      },
+      "bulletin_format": "image",
+      "learned_pattern": "image_bulletin",
+      "host_profile": {
+        "total_timeout_s": 490,
+        "navigation_timeout_ms": 55000
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "killenaulemoyglass",
       "display_name": "Killenaule & Moyglass",
       "diocese": "cashel_and_emly",
@@ -24005,11 +24110,14 @@
           "Do not scrape /category/newsletter/ \u2014 the full Sunday file is not linked there, only the 540x304 thumb.",
           "Do not harvest Facebook."
         ],
-        "recorded_date": "2026-11-08"
+        "recorded_date": "2026-11-20"
       },
       "bulletin_format": "image_stack",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "total_timeout_s": 490,
+        "navigation_timeout_ms": 55000
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -24123,7 +24231,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -24492,8 +24600,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -24923,8 +25031,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -24995,10 +25103,10 @@
       "learned_pattern": "Mayo County Council parish-newsletters",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://kilmoveeparish.org/wp-content/uploads/2019/02/Consent-Form-GDPR.pdf",
+      "suggested_action": "mark_inactive",
+      "suggested_reason": "non-automatable source"
     },
     {
       "parish_key": "kilmuckridge",
@@ -25023,8 +25131,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -25154,10 +25262,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
       "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "kilrane",
@@ -25182,8 +25290,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -25311,8 +25419,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -25553,10 +25661,10 @@
       "learned_pattern": "http_scrape_newest_pdf+/",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "kiltoomcam",
@@ -25637,7 +25745,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -25687,7 +25795,9 @@
         "has_terminal": true,
         "operator_notes": [
           "08/09/2026: this-week file is /2026/09/Newsletter-sept-6th-3-2.pdf (HTTP 200, 1391716). Newsletter-6th-Sept.pdf is HTML, not a PDF.",
-          "Harvest 07/09 pinned Newsletter-21st-Aug.pdf. site_type:http_scrape_newest_pdf plus predicted fallback from example_url. Do not pin August."
+          "Harvest 07/09 pinned Newsletter-21st-Aug.pdf. site_type:http_scrape_newest_pdf plus predicted fallback from example_url. Do not pin August.",
+          "20/11/2026: Removed pinned September PDF from click/download steps. Select newest dated newsletter link from archive and download captured link; verify live archive and PDF before merge.",
+          "20/11/2026: archive displays an explicit 14th-21st November issue label. Select links by both newsletter name and PDF extension, allowing numeric upload filenames; score named bounded date-range labels against target Sunday. Printed PDF date/fingerprint remains the final freshness check."
         ],
         "do_not": [
           "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
@@ -26471,8 +26581,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -26866,7 +26976,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -26957,10 +27067,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "parishoflisburn",
@@ -27172,10 +27282,10 @@
         "total_timeout_s": 180
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "lisnaskeamaguiresbridgeparish",
@@ -27879,10 +27989,10 @@
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.lucansouthparish.net/wp-content/uploads/2026/11/45-Lucan-South-Notices-November-8th-2026.pdf for 2026-11-15 did not resolve to a real file (listing page was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.lucansouthparish.net/wp-content/uploads/2026/11/45-Lucan-South-Notices-November-8th-2026.pdf f"
     },
     {
       "parish_key": "lurgankilmore",
@@ -27935,7 +28045,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -28234,8 +28344,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -28428,8 +28538,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -28524,7 +28634,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -28552,7 +28662,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -28700,8 +28810,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -29318,8 +29428,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -29493,7 +29603,7 @@
         "recorded_date": "2026-10-05"
       },
       "bulletin_format": "download",
-      "learned_pattern": "Kandle /current-newsletter/ permanent redirect",
+      "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -29713,8 +29823,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -30304,7 +30414,7 @@
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -30722,7 +30832,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -30818,7 +30928,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -30943,8 +31053,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -31316,7 +31426,7 @@
         "has_terminal": true,
         "operator_notes": [
           "Permanent weekly link is https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea (Frank 07/09/2026). Same path every week.",
-          "Harvest often gets Cloudflare 403 on that HTML path. Download bulletin.pdf first. Frank confirmed that file is current on 18/10/2026.",
+          "Try the public weekly URL first. Its PDF masthead was verified as 15 November 2026 on 19 November. Retain the direct upload URL as a fallback for Cloudflare 403 responses.",
           "Do not start at /bulletin/ \u2014 that listing 403s harvest and showed a June 2024 leftover.",
           "use_target_url keeps the permanent path as-is (no date rewrite)."
         ],
@@ -31539,7 +31649,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -31631,8 +31741,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -31659,8 +31769,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -31926,8 +32036,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -31960,10 +32070,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "ourladyhelpofchristiansassociatedparish",
@@ -32135,8 +32245,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -32200,8 +32310,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -32496,7 +32606,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -32524,8 +32634,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -32839,10 +32949,10 @@
       "learned_pattern": "Dublin leftover parish-host listings after the 03/10 LIVE hunt",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.portmarnockparish.ie/_webedit/uploaded-files/All%20Files/Newsletter%20November%208th%202026.pdf for 2026-11-15 did not resolve to a real file (listing page was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.portmarnockparish.ie/_webedit/uploaded-files/All%20Files/Newsletter%20November%208th%202026.pd"
     },
     {
       "parish_key": "portroe",
@@ -33005,8 +33115,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -33073,7 +33183,7 @@
         "recorded_date": "2026-10-02"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -33132,7 +33242,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -33160,8 +33270,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -33257,8 +33367,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -33411,8 +33521,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -33439,7 +33549,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -33551,7 +33661,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -33648,8 +33758,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -33683,10 +33793,10 @@
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://edgeworthstownparish.ie/wp-content/uploads/2026/11/sunday-newsletter-08-11-2026-rathowenstreete_compressed.pdf for 2026-11-15 did not resolve to a real file (listing page was not",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://edgeworthstownparish.ie/wp-content/uploads/2026/11/sunday-newsletter-08-11-2026-rathowenstreete_co"
     },
     {
       "parish_key": "rathvillykiltegan",
@@ -33889,8 +33999,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -33917,7 +34027,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -33945,8 +34055,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -33973,7 +34083,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -34141,7 +34251,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -34234,7 +34344,8 @@
         "operator_notes": [
           "02/10/2026 hunt. One cluster PDF for Roscrea, Bournea, Kyle and Knock. Proved files/10.04.26.pdf GET 200 application/pdf 265857 bytes. PDF text: Oct 4th 2026. The filename 10.04.26 is read by the date parser as 10/04/2026. Harvest once under Roscrea.",
           "site_type http_scrape_newest_pdf. example_url records the proved file. Do not pin the dated filename.",
-          "10/11/2026: homepage links E-Missalette-8th-November.jpg. GET 200 image/jpeg 1909668 bytes. Yearless filename date 08/11/2026. href pattern missalette so the JPEG is scored with the PDFs. Do not pin the filename."
+          "10/11/2026: homepage links E-Missalette-8th-November.jpg. GET 200 image/jpeg 1909668 bytes. Yearless filename date 08/11/2026. href pattern missalette so the JPEG is scored with the PDFs. Do not pin the filename.",
+          "20/11/2026: the saved 15 November harvest failed 'Too many pages: 5 pages (max 4)' despite finding a PDF. Permit up to eight pages for this known multi-parish Roscrea/Bournea/Kyle/Knock newsletter. Keep the dynamic homepage source and freshness checks; do not pin a dated file."
         ],
         "do_not": [
           "Do not pin the dated filename.",
@@ -34248,10 +34359,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Too many pages: 5 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Too many pages: 5 pages (max 4)"
     },
     {
       "parish_key": "rosenallis",
@@ -34288,28 +34399,29 @@
       "recipe_file": "parishes/recipes/clogher/roslea.json",
       "recipe": {
         "start_url": "https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-8th-November-2026.pdf",
-        "site_type": "wordpress",
-        "playbook_type": "direct_download",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "13/11/2026: /category/parish-bulletin/ scrape timed out. Proved Bulletin-Sunday-8th-November-2026.pdf GET 200 application/pdf 181663. Pin the PDF. Do not use predicted.",
-          "10/11/2026: category page listed this file."
+          "20/11/2026: independently verified official 15 November weekly PDF at https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-15th-November-2026.pdf (4 pages, masthead confirms Sunday 15 November). The previous direct_download recipe pinned 8 November and harvest rejected it as stale on 15 November.",
+          "Predict /wp-content/uploads/YYYY/MM/Bulletin-Sunday-{ordinal day}-{Month}-{YYYY}.pdf from the dated 8 November template using the tested predicted_dated_pdf handler. Try target Sunday first; verify the actual PDF date. No need to scrape the WAF-blocked category or pin a dated file for every week.",
+          "13/11/2026: /category/parish-bulletin/ scrape timed out on GitHub runner; direct 8 Nov PDF had been GET 200 application/pdf 181663."
         ],
         "do_not": [
           "Do not start on /category/parish-bulletin/ \u2014 scrape times out.",
-          "Do not use predicted_dated_pdf.",
           "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
-          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret.",
+          "Do not leave this as a pinned direct_download of the 8 November PDF; date is a template only."
         ],
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": {
         "total_timeout_s": 490,
         "navigation_timeout_ms": 55000,
@@ -34517,7 +34629,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -34573,8 +34685,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -34768,10 +34880,10 @@
         "max_retries": 3
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: wp-json media at https://saintanthonys.uk/parish-bulletin/ \u2014 no dated bulletin PDF matching ['bulletin'] (listing page was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: wp-json media at https://saintanthonys.uk/parish-bulletin/ \u2014 no dated bulletin PDF matching ['bulletin'] (listing page was not opened)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "saintmalachysparish",
@@ -34980,7 +35092,7 @@
         "recorded_date": "2026-11-10"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -35322,10 +35434,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "investigate",
-      "suggested_reason": ""
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "shannon",
@@ -35820,8 +35932,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -35848,8 +35960,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -35859,27 +35971,36 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/stagnesbelfast.json",
       "recipe": {
-        "start_url": "https://www.stagnesbelfast.com/?p=6069",
-        "site_type": "",
-        "playbook_type": "",
-        "status": "dead_url",
-        "skip": true,
+        "start_url": "https://www.stagnesbelfast.com/",
+        "site_type": "http_scrape_newest_html",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
         "placeholder": false,
-        "step_count": 0,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-06-26"
+        "has_terminal": true,
+        "operator_notes": [
+          "20/11/2026: user-supplied https://www.stagnesbelfast.com/ is LIVE. Homepage lists a full weekly HTML parish bulletin published 12 November for Sunday 15 November at /st-agnes-parish-bulletin-15th-november-2026/; 8 November and 1 November posts also visible. This is a real newsletter, even though no PDF exists.",
+          "Old ?p=6069 URL was stale/dead in June; do not use it. Resolve newest dated st-agnes-parish-bulletin post from homepage, print only its bulletin article to PDF through http_scrape_newest_html, verify date against harvest Sunday. Do not print the homepage.",
+          "Check published posts on the source for the next Sunday; no claims of download until the next harvest verifies it."
+        ],
+        "do_not": [
+          "Do not open old ?p=6069; it is not the current weekly bulletin.",
+          "Do not treat an absence of PDF on the parish website as no bulletin; current newsletter is HTML text.",
+          "Do not print the homepage/listing as the current bulletin.",
+          "Do not hard-code the November 15 post for future Sundays."
+        ],
+        "recorded_date": "2026-11-20"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "skipped",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Bulletin page gone \u2014 no PDF on stagnesbelfast.com (stub since April)."
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "stannescarraroe",
@@ -36295,10 +36416,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "failed",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "stjosephgalway",
@@ -37127,13 +37248,13 @@
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP 403 for https://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf; headful fallback: Recipe replay failed: APIRequestContext.get: Protocol \"chrome-error:\" not supported. Expec",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP 403 for https://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf; headful fallback: Recipe rep"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "stpaulslimerick",
@@ -37376,27 +37497,33 @@
       "diocese": "waterford_and_lismore",
       "recipe_file": "parishes/recipes/waterford_and_lismore/stjosephstbenildusstmarys.json",
       "recipe": {
-        "start_url": "http://www.jbmparish.com",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "start_url": "http://www.jbmparish.com/newsletters/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "direct_download",
+        "status": "active",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-10-03"
+        "operator_notes": [
+          "15/11/2026 Parish scan: proved pdf dated 15/11/2026. Do not pin https://jbmparish.com/wp-content/uploads/2026/11/missalette_15.11.2026.pdf."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Facebook.",
+          "Do not rescrape the homepage when the permanent newsletter link is stale."
+        ],
+        "recorded_date": "2026-11-15"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "wp_json+direct_download",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "stlukestwinbrook",
@@ -38062,8 +38189,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -38118,8 +38245,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -38146,7 +38273,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -38174,7 +38301,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
@@ -38230,8 +38357,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -38690,8 +38817,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Downloaded admin/non-bulletin document \u2014 not a weekly bulletin: https://ferns.ie/diocese-of-ferns-parishes/",
       "suggested_action": "skip",
       "suggested_reason": "No this-week bulletin file proved yet on 02/10/2026 \u2014 official Ferns row / kitchen-sink still open. Do not invent Facebook PDFs."
     },
@@ -38856,10 +38983,10 @@
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "failed",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "investigate",
+      "suggested_reason": ""
     },
     {
       "parish_key": "terryglass",
@@ -39162,7 +39289,7 @@
         "recorded_date": "2026-11-13"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "saved_wordpress",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -39731,10 +39858,10 @@
       "learned_pattern": "saved_predicted_dated_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.tullylish.com/images/stories/BULLETINS/2026/08.11.26.pdf for 2026-11-15 did not resolve to a real file (listing page was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.tullylish.com/images/stories/BULLETINS/2026/08.11.26.pdf for 2026-11-15 did not resolve to a r"
     },
     {
       "parish_key": "tulsk",
@@ -39793,10 +39920,10 @@
       "learned_pattern": "saved_http_scrape_newest_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "twomilehouse",
@@ -39877,8 +40004,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -40147,8 +40274,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -40181,10 +40308,10 @@
       "learned_pattern": "Parishes Together prefix-DD-MM-YY.pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://parishestogether.ie/images/newsletters/Wgh-8-11-26.pdf for 2026-11-15 did not resolve to a real file (listing page was not opened)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://parishestogether.ie/images/newsletters/Wgh-8-11-26.pdf for 2026-11-15 did not resolve to a real fi"
     },
     {
       "parish_key": "watersideparish",
@@ -40412,8 +40539,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -40476,8 +40603,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
@@ -40507,7 +40634,7 @@
         "recorded_date": "2026-10-30"
       },
       "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -40566,8 +40693,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
       "suggested_action": "skip",
       "suggested_reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file."
     },
