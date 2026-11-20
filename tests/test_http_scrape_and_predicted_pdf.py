@@ -3192,3 +3192,28 @@ class DundrumImageNewsletterRecoveryTests(unittest.TestCase):
         self.assertEqual(recipe["image_count"], 1)
         self.assertEqual(recipe["href_patterns"], ["dp-"])
         self.assertIn("parish-newsletter-", recipe["post_slug_patterns"])
+
+
+class KillasserCurrentArchiveTests(unittest.TestCase):
+    def test_selects_correct_sunday_from_weekly_wordpress_archive(self) -> None:
+        from harvester.newsletter_brain import same_sunday_urls
+        urls = [
+            "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/01-11-2026-1.pdf",
+            "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf",
+            "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/15-11-2026.pdf",
+        ]
+        for sunday, wanted in [
+            (date(2026, 11, 8), urls[1]),
+            (date(2026, 11, 15), urls[2]),
+        ]:
+            scored = _score_http_scrape_pdf_hrefs(urls, sunday)
+            self.assertEqual(same_sunday_urls(scored, sunday), [wanted])
+
+    def test_killasser_recipe_uses_archive_not_last_week_pdf(self) -> None:
+        recipe = json.loads(
+            (Path(__file__).resolve().parents[1] / "parishes/recipes/achonry/killasser.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["start_url"], "https://killasserparish.wordpress.com/")
+        self.assertEqual(recipe["href_patterns"], [".pdf"])
+        self.assertNotIn("/wp-content/uploads/", recipe["start_url"])
