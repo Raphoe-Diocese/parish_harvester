@@ -480,9 +480,11 @@ class BulletinLayoutTests(unittest.TestCase):
             single_parish_name="Gortahork",
             bulletin_date=harvest,
         )
-        self.assertIn("Aifrinn na Seachtaine", irish)
-        self.assertIn("Samhain", irish)
-        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, irish)
+        # A 1-Nov Irish bulletin is stale for harvest Sunday 8-Nov, just
+        # as its English-dated equivalent would be. Do not silently
+        # exempt Gaeilge from the date guard.
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, irish)
+        self.assertNotIn("Aifrinn na Seachtaine", irish)
         self.assertNotIn("08/11/2026", irish)
         irish_now = structure_ocr_html(
             "<p>8 Samhain 2026</p><p>Aifrinn na Seachtaine</p><p>Dé Domhnaigh</p>",
@@ -493,6 +495,25 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn("Dé Domhnaigh", irish_now)
         self.assertIn("Samhain", irish_now)
         self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, irish_now)
+
+        old_irish = structure_ocr_html(
+            "<p>8ú Samhain 2026</p><p>AIFRINN NA SEACHTAINE</p>"
+            "<p>Dé Domhnaigh 11.00 r.n. Seán Ó Briain</p>",
+            single_parish_name="Gortahork",
+            bulletin_date="2026-11-15",
+        )
+        self.assertIn(NO_BULLETIN_THIS_SUNDAY, old_irish)
+        self.assertNotIn("Seán Ó Briain", old_irish)
+        current_irish = structure_ocr_html(
+            "<p>15ú Samhain 2026</p><p>AIFRINN NA SEACHTAINE</p>"
+            "<p>Dé Domhnaigh 11.00 r.n. Seán Ó Briain</p>",
+            single_parish_name="Gortahork",
+            bulletin_date="2026-11-15",
+        )
+        self.assertNotIn(NO_BULLETIN_THIS_SUNDAY, current_irish)
+        self.assertIn("Seán Ó Briain", current_irish)
+        self.assertIn("AIFRINN NA SEACHTAINE", current_irish)
+        self.assertIn("15ú Samhain 2026", current_irish)
 
         glued = structure_ocr_html(
             "<p>Anniversaries: Joe RIP. WEEKLY NEWSLETTER 01st November 2026 "
