@@ -4613,17 +4613,19 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
     dest.write_bytes(pdf_bytes)
 
 
-def _verify_bulletin_pdf(dest: Path, max_pages: int | None = None) -> None:
-    """Reject HTML/print captures that are too long to be a real weekly bulletin.
+def _verify_bulletin_pdf(
+    dest: Path,
+    max_pages: int | None = None,
+    *,
+    target: date | None = None,
+) -> None:
+    """Reject oversized HTML captures unless their printed issue date is current.
 
-    Mirrors ``fetcher._verify_bulletin_pdf`` so recipe-driven HTML/print_to_pdf
-    steps get the same page-count safety net as direct PDF downloads (previously
-    only the direct-download path was checked; the HTML print fallback below
-    could silently save a full multi-page article/site as the "bulletin").
-
-    *max_pages* lets a recipe override the global default via its own
-    ``max_bulletin_pages`` field (e.g. multi-parish pastoral-area newsletters
-    that are genuinely longer than a normal single-parish bulletin).
+    The normal page cap protects against accidentally printing an entire site.
+    A genuinely long weekly newsletter must not be deleted just for having
+    more pages: the same current-heading-date exception as direct downloads
+    applies, but only when the target Sunday is known and verifiable.
+    Undated, stale, or ad-hoc captures retain the strict page-count limit.
     """
     limit = MAX_BULLETIN_PAGES if max_pages is None else int(max_pages)
     try:
@@ -4632,6 +4634,13 @@ def _verify_bulletin_pdf(dest: Path, max_pages: int | None = None) -> None:
     except Exception:
         return  # unreadable — leave it to the caller's PDF checks
     if page_count > limit:
+        if target is not None:
+            # The fetcher already implements the shared printed-date policy.
+            # Avoid maintaining a second, divergent freshness rule for HTML.
+            from .fetcher import _fresh_five_page_heading_date
+
+            if _fresh_five_page_heading_date(dest, target) is not None:
+                return
         dest.unlink(missing_ok=True)
         raise ValueError(
             f"❌ Too many pages: {page_count} pages (max {limit})"
@@ -4651,7 +4660,7 @@ async def _smart_print_page_to_pdf(
     from .html_capture import capture_html_page_as_pdf
 
     def _verify(d: Path) -> None:
-        _verify_bulletin_pdf(d, max_pages)
+        _verify_bulletin_pdf(d, max_pages, target=target)
 
     ok, _mode = await capture_html_page_as_pdf(
         page,
@@ -4664,7 +4673,7 @@ async def _smart_print_page_to_pdf(
     )
     if not ok:
         await _print_page_to_pdf(page, dest)
-        _verify_bulletin_pdf(dest, max_pages)
+        _verify_bulletin_pdf(dest, max_pages, target=target)
 
 
 def _recipe_uses_parish_messenger(recipe: dict) -> bool:
