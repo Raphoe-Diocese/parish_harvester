@@ -3,9 +3,11 @@ run-name: Harvest ${{ github.event_name == 'schedule' && 'sunday-all-dioceses' |
 
 on:
   schedule:
-    # Sunday 09:00 UTC = 10:00 Irish time. Each diocese commits when it
-    # finishes. All 26 should be in well before 16:00 Irish.
-    - cron: '0 9 * * 0'
+    # Sunday 14:00 Ireland local time (GMT in winter, IST in summer).
+    # Let more parishes publish their Sunday newsletter before harvesting.
+    # GitHub timezone-aware schedule handles Irish daylight saving automatically.
+    - cron: '0 14 * * 0'
+      timezone: 'Europe/Dublin'
   push:
     branches: [main]
     paths:
