@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] In review, 2026-11-20: the native PDF extractor previously chose PyPDF2/PyMuPDF by character count alone, allowing an overlong glyph-junk result to replace readable text. Prefer readable extraction when only one candidate is flagged garbage; retain richer text if both are acceptable. Automated regressions added; need next harvest OCR sampling and user-visible verification before completion. `ocr/text_extract.py`, `tests/test_text_extract.py`.
+
 - [ ] In review, 2026-11-20: HTML/print-to-PDF recipe verifier used to delete legitimate current multi-page newsletters before the main harvester could apply its dated-issue exception. Share the fresh printed-masthead gate and add current/stale six-page regression tests; verify on a real source and after live harvest before marking done. `harvester/replay.py`, `tests/test_replay_verify_pdf.py`.
 
 - [ ] In review. Replace the fixed 16:00 homepage promise with each diocese’s reported availability. Verify the published cards show available, zero and unknown counts clearly.
