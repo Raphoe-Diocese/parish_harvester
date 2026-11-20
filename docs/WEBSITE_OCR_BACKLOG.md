@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] In review, 2026-11-20: HTML/print-to-PDF recipe verifier used to delete legitimate current multi-page newsletters before the main harvester could apply its dated-issue exception. Share the fresh printed-masthead gate and add current/stale six-page regression tests; verify on a real source and after live harvest before marking done. `harvester/replay.py`, `tests/test_replay_verify_pdf.py`.
+
 - [ ] In review. Replace the fixed 16:00 homepage promise with each diocese’s reported availability. Verify the published cards show available, zero and unknown counts clearly.
 
 - [ ] In review. A Sunday OCR run must use the current harvest's report, collated PDF and matching parish page index. Use the bulletin Sunday in filenames and viewer dates. Reject stale or incomplete artefacts and preserve the previous published edition.
