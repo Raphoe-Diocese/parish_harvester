@@ -1,36 +1,41 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "kilmovee",
   "display_name": "Kilmovee",
   "diocese": "achonry",
-  "start_url": "https://www.mayo.ie/en-ie/parish-newsletters/kilmovee-parish-newsletters",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://kilmoveeparish.org/newsletter/",
+  "site_type": "wp_json_newest_media",
   "href_patterns": [
-    "Kilmovee",
-    ".pdf",
-    "getmedia"
+    "Parish-Newsletter.pdf"
   ],
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-29",
+  "recorded_date": "2026-11-20",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.mayo.ie/en-ie/parish-newsletters/kilmovee-parish-newsletters"
+      "url": "https://kilmoveeparish.org/newsletter/"
     }
   ],
   "operator_notes": [
-    "29/10/2026: kilmoveeparish.org listing lagged (Sept pin / 404). mayo.ie listing shows October 25th 2026 at top (WebFetch).",
-    "Same Belmullet mayo.ie pattern. Scrape listing. Do not pin getmedia GUID."
+    "20/11/2026: failed harvest report exposes expected real bulletin https://kilmoveeparish.org/wp-content/uploads/2026/11/15-November-2026-Parish-Newsletter.pdf, but harvester selected unrelated 2019 Consent-Form-GDPR PDF from old mayo.ie scrape. Switch to Kilmovee's own WordPress media API and match only 'Parish-Newsletter.pdf', excluding admin PDFs. Live run not yet verified.",
+    "Do not pin 15 November URL; media discovery should select newest date-matched parish PDF."
   ],
   "do_not": [
-    "Do not pin dated kilmoveeparish.org uploads.",
-    "Do not pin the getmedia GUID or dated filename.",
-    "Do not harvest Facebook."
+    "Do not use mayo.ie archive when it returns unrelated or older attachments.",
+    "Do not accept GDPR consent, standing order, donation or other admin PDF.",
+    "Do not claim success without confirming selected PDF masthead date."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "playbook_type": "wp_json_newest_media",
+  "href_skip_patterns": [
+    "consent-form",
+    "gdpr",
+    "standing-order",
+    "gift-aid"
+  ]
 }
