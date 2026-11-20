@@ -542,13 +542,6 @@ def read_parish_issue_date(text: str, *, not_after: str = "") -> str:
 NO_BULLETIN_THIS_SUNDAY = "There is no bulletin for this Sunday."
 
 
-_ENGLISH_ISSUE_WORD_RE = re.compile(
-    r"(?i)\b(?:all\s+saints|newsletters?|bulletins?|parishioner|"
-    r"january|february|march|april|may|june|july|august|september|"
-    r"october|november|december|week\s+beginning|solemnity|feast\s+of)\b"
-)
-
-
 def printed_issue_is_before_this_week(printed_iso: str, harvest_iso: str) -> bool:
     """True when the paper's own date is older than this harvest week.
 
@@ -569,19 +562,6 @@ def printed_issue_is_before_this_week(printed_iso: str, harvest_iso: str) -> boo
 
     start, _end = week_window(harvest)
     return printed < start
-
-
-def _line_is_irish_date_only(line: str) -> bool:
-    """A line such as ``1ú Samhain 2026`` with no English issue words.
-
-    That is the parish's own Irish bulletin. It is not the English
-    "1 November" / "All Saints" line that must leave the current-week page.
-    """
-    folded = unicodedata.normalize("NFD", line or "")
-    folded = "".join(ch for ch in folded if unicodedata.category(ch) != "Mn")
-    if not re.search(r"(?i)\b(?:samhain|deireadh fomhair)\b", folded):
-        return False
-    return _ENGLISH_ISSUE_WORD_RE.search(line or "") is None
 
 
 def _winning_issue_line(text: str, not_after: str = "") -> tuple[str, str] | None:
@@ -605,22 +585,17 @@ def _winning_issue_line(text: str, not_after: str = "") -> tuple[str, str] | Non
 
 
 def body_should_be_hidden(text: str, harvest_iso: str) -> bool:
-    """Hide a body only when its own issue date is before this harvest week.
+    """Hide a body when its *own* printed issue predates this harvest week.
 
-    No readable date stays. An Irish date line on its own stays, so a
-    current Irish bulletin such as Gortahork (``1ú Samhain 2026`` /
-    ``Aifrinn na Seachtaine``) is not deleted. An English 1 November or
-    All Saints line before the week does not stay on the current-week page.
+    Apply the same rule to English and Irish dated editions; preserving
+    Gaeilge must not silently preserve stale parish bulletins. Date-less
+    text stays available for review instead of inventing an issue date.
     """
     found = _winning_issue_line(text, harvest_iso)
     if found is None:
         return False
-    line, iso = found
-    if not printed_issue_is_before_this_week(iso, harvest_iso):
-        return False
-    if _line_is_irish_date_only(line):
-        return False
-    return True
+    _line, iso = found
+    return printed_issue_is_before_this_week(iso, harvest_iso)
 
 
 def _html_to_issue_text(fragment: str) -> str:
@@ -668,8 +643,8 @@ def withhold_stale_issue_bodies(fragment: str, harvest_iso: str) -> str:
     """Drop a parish body whose own date is before this harvest week.
 
     The parish name stays. The page says there is no bulletin for this Sunday.
-    The harvest Sunday is not stamped onto that body. Irish in a current
-    bulletin is left as printed.
+    The harvest Sunday is not stamped onto that body. Current Irish wording
+    stays untouched; a genuinely older Irish issue is withheld too.
     """
     harvest = (harvest_iso or "").strip()[:10]
     source = fragment or ""
@@ -697,8 +672,8 @@ def withhold_stale_issue_bodies(fragment: str, harvest_iso: str) -> str:
             continue
         end += len("</header>")
         header, body = part[:end], part[end:]
-        # The body's own issue line decides. A date already stamped on the
-        # masthead is not enough, and an Irish date line is not deleted.
+        # The body's own dated issue line decides, irrespective of language.
+        # A date already stamped on the masthead is not enough.
         plain = _html_to_issue_text(body)
         if not body_should_be_hidden(plain, harvest):
             out.append(part)
