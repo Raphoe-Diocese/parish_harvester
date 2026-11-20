@@ -145,9 +145,29 @@ def probe_one(item: dict, sunday: date) -> dict:
     except ValueError:
         result["reason"] = "invalid_html"
         return result
+    # A newsletter is often on an article one click beyond the homepage.
+    # Probe only same-host bulletin/newsletter links, never generic navigation.
+    # This expands coverage without giving arbitrary links a PDF verdict.
+    article_urls = []
+    for href, caption in page.links:
+        sub = urljoin(final, href.strip())
+        if (allowed(sub) and host(sub) == host(final)
+                and not FILES.search(sub) and sub != final
+                and GOOD.search(urlparse(sub).path + " " + caption)
+                and not BAD.search(urlparse(sub).path + " " + caption)):
+            article_urls.append(sub)
+    expanded = list(page.links)
+    for article in list(dict.fromkeys(article_urls))[:2]:
+        subcontent, subtype, suburl = fetch(article, MAX_HTML)
+        if not subcontent or "html" not in subtype:
+            continue
+        subpage = Links()
+        subpage.feed(subcontent.decode("utf-8", "replace"))
+        expanded.extend((urljoin(suburl or article, href), text) for href, text in subpage.links)
+
     candidates = []
     seen = set()
-    for href, caption in page.links:
+    for href, caption in expanded:
         url = urljoin(final, href.strip())
         if not allowed(url) or not FILES.search(url) or url in seen:
             continue
