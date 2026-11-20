@@ -187,10 +187,24 @@ def probe_one(item: dict, sunday: date) -> dict:
         file_kind = verify_file(body, resolved or url)
         if not file_kind:
             continue
-        result.update(verdict="candidate_verified_bytes_and_link_date",
-                      document_url=resolved or url, file_kind=file_kind,
-                      issue_date=sunday.isoformat(), bytes=len(body),
-                      reason="PDF/image signature and link date verified; masthead and parish identity still require independent harvest validation")
+        masthead_date = None
+        if file_kind == "pdf":
+            from harvester.bulletin_freshness import heading_date_in_pdf_bytes
+            masthead_date = heading_date_in_pdf_bytes(body, target=sunday)
+            # An older masthead invalidates a current-looking filename.
+            if masthead_date is not None and masthead_date != sunday:
+                continue
+        confirmed_masthead = masthead_date == sunday
+        result.update(
+            verdict=("candidate_verified_masthead" if confirmed_masthead
+                     else "candidate_verified_bytes_and_link_date"),
+            document_url=resolved or url, file_kind=file_kind,
+            issue_date=sunday.isoformat(), bytes=len(body),
+            masthead_verified=confirmed_masthead,
+            reason=("PDF masthead and link match target Sunday; parish identity still needs harvest check"
+                    if confirmed_masthead else
+                    "Document signature and link date verified; image-only or unreadable masthead needs OCR and parish identity check"),
+        )
         return result
     result["reason"] = "no_current_dated_file_with_valid_bytes"
     result["candidate_links"] = len(candidates)
@@ -209,13 +223,14 @@ def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tup
     batch = (unique + unique)[offset:offset + min(limit, len(unique))]
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
         rows = list(pool.map(lambda r: probe_one(r, sunday), batch))
-    verified = [r for r in rows if r.get("verdict") == "candidate_verified_bytes_and_link_date"]
+    verified = [r for r in rows if str(r.get("verdict", "")).startswith("candidate_verified_")]
     report = {"generated_at": datetime.now(timezone.utc).isoformat(),
               "target_date": sunday.isoformat(), "total_unresolved_leads": len(unique),
               "window_start": offset, "rows": rows,
               "summary": {"probed": len(rows), "verified_candidate_links": len(verified),
                           "not_verified": len(rows) - len(verified),
-                          "requires_masthead_check": len(verified)}}
+                          "requires_masthead_check": sum(not r.get("masthead_verified") for r in verified),
+                          "masthead_verified": sum(bool(r.get("masthead_verified")) for r in verified)}}
     return report, {"offset": (offset + len(batch)) % len(unique), "target_date": sunday.isoformat()}
 
 
@@ -249,7 +264,7 @@ def main() -> int:
             report["rows"] = list(ledger.values())
             report["summary"]["total_checked_this_week"] = len(ledger)
             report["summary"]["total_verified_links_this_week"] = sum(
-                row.get("verdict") == "candidate_verified_bytes_and_link_date"
+                str(row.get("verdict", "")).startswith("candidate_verified_")
                 for row in ledger.values()
             )
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
