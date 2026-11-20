@@ -34,7 +34,7 @@ def test_current_mcn_newsletter_is_accepted_without_browser(tmp_path):
     ):
         result = asyncio.run(replay_recipe(RECIPE, dest, object(), target_date=date(2026, 11, 15)))
     assert result == (dest, "pdf", url)
-    fetch.assert_awaited_once_with(camera, dest)
+    fetch.assert_awaited_once_with(camera, dest, church_id_hint=661)
 
 
 @pytest.mark.parametrize("date_suffix", ["2026-11-08", "2026-10-25", "2026-11-01"])

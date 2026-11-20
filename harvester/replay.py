@@ -1819,21 +1819,38 @@ async def _save_dropfiles_bytes_to_pdf(
     raise RecipeReplayError(f"Unrecognized Dropfiles file content for {url}")
 
 
-def _mcn_fetch_newsletter_url(camera_url: str) -> tuple[str, date | None] | None:
-    """Plain-HTTP: camera page church id → ProfileDataByJson → newsLetterUrl.
+def _mcn_fetch_newsletter_url(
+    camera_url: str, church_id_hint: int | None = None
+) -> tuple[str, date | None] | None:
+    """Read MCN's newsletter JSON using its verified church ID.
 
-    Also returns the date on the newsletter card. The PDF address has none.
+    A camera page may be unavailable or blocked even while its JSON API
+    works. Trained MCN recipes already record a numeric church ID, so that
+    is the preferred stable identifier; otherwise discover it from HTML.
+    Only accept a hint for a genuine mcn.live /Camera/ URL. Never pin the
+    changing newsletter UUID or accept an arbitrary third-party endpoint.
     """
-    html_hit = _fetch_bytes_with_retries(
-        camera_url,
-        max_attempts=2,
-        per_attempt_timeout_s=15,
-        total_budget_s=25,
-    )
-    if not html_hit:
+    parsed = urlparse(camera_url)
+    if (
+        parsed.scheme != "https"
+        or (parsed.hostname or "").lower() not in {"mcn.live", "www.mcn.live"}
+        or not parsed.path.lower().startswith("/camera/")
+    ):
         return None
-    body, _headers = html_hit
-    church_id = extract_mcn_church_id(body.decode("utf-8", "ignore"))
+    church_id = ""
+    if isinstance(church_id_hint, int) and 0 < church_id_hint < 100000:
+        church_id = str(church_id_hint)
+    if not church_id:
+        html_hit = _fetch_bytes_with_retries(
+            camera_url,
+            max_attempts=2,
+            per_attempt_timeout_s=15,
+            total_budget_s=25,
+        )
+        if not html_hit:
+            return None
+        body, _headers = html_hit
+        church_id = extract_mcn_church_id(body.decode("utf-8", "ignore"))
     if not church_id:
         return None
     api = mcn_profile_data_url(camera_url, church_id)
@@ -1879,8 +1896,15 @@ async def _try_http_document_url(url: str, dest: Path) -> tuple[str, str] | None
     return url, kind
 
 
-async def _try_mcn_live_newsletter(start_url: str, dest: Path) -> tuple[str, str] | None:
-    fetched = await asyncio.to_thread(_mcn_fetch_newsletter_url, start_url)
+async def _try_mcn_live_newsletter(
+    start_url: str, dest: Path, *, church_id_hint: int | None = None
+) -> tuple[str, str] | None:
+    if church_id_hint is None:
+        fetched = await asyncio.to_thread(_mcn_fetch_newsletter_url, start_url)
+    else:
+        fetched = await asyncio.to_thread(
+            _mcn_fetch_newsletter_url, start_url, church_id_hint
+        )
     if not fetched:
         return None
     newsletter_url, stated = fetched
@@ -5500,7 +5524,19 @@ async def replay_recipe(
     if site_type == "mcn_live_parish_page" or (
         "/camera/" in start_url.lower() and "mcn.live" in start_url.lower()
     ):
-        found = await _try_mcn_live_newsletter(start_url, dest)
+        raw_mcn_id = recipe.get("mcn_church_id")
+        church_id_hint = None
+        try:
+            if raw_mcn_id is not None:
+                church_id_hint = int(raw_mcn_id)
+        except (ValueError, TypeError):
+            pass
+        if church_id_hint is None:
+            found = await _try_mcn_live_newsletter(start_url, dest)
+        else:
+            found = await _try_mcn_live_newsletter(
+                start_url, dest, church_id_hint=church_id_hint
+            )
         if found:
             return dest, found[1], found[0]
 
@@ -5515,7 +5551,14 @@ async def replay_recipe(
             urlparse(alternative_mcn).hostname in {"mcn.live", "www.mcn.live"}
             and urlparse(alternative_mcn).path.lower().startswith("/camera/")
         ):
-            mcn_hit = await _try_mcn_live_newsletter(alternative_mcn, dest)
+            raw_alt_id = recipe.get("mcn_church_id")
+            alt_id = int(raw_alt_id) if str(raw_alt_id or "").isdigit() else None
+            if alt_id is None:
+                mcn_hit = await _try_mcn_live_newsletter(alternative_mcn, dest)
+            else:
+                mcn_hit = await _try_mcn_live_newsletter(
+                    alternative_mcn, dest, church_id_hint=alt_id
+                )
             if mcn_hit:
                 candidate_url, candidate_kind = mcn_hit
                 from .bulletin_freshness import pdf_body_heading_verdict
