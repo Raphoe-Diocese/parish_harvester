@@ -1,10 +1,10 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "millstreet",
   "display_name": "Millstreet",
   "diocese": "kerry",
-  "start_url": "https://www.dioceseofkerry.ie/parish/millstreet/",
-  "site_type": "http_scrape_newest_pdf",
+  "start_url": "https://www.millstreet.ie/blog/archives/tag/millstreet-parish-newsletter",
+  "site_type": "html_text_bulletin",
   "href_patterns": [
     ".pdf",
     "Newsletter",
@@ -15,24 +15,38 @@
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-10-02",
+  "recorded_date": "2026-11-20",
   "example_url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/27th-Sunday-in-Ordinary-Time-4th-October-2026-1.pdf",
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/27th-Sunday-in-Ordinary-Time-4th-October-2026-1.pdf"
+      "action": "goto",
+      "url": "https://www.millstreet.ie/blog/archives/tag/millstreet-parish-newsletter"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/blog/archives/']:has-text('Millstreet Parish Newsletter')",
+      "pick_strategy": "first_match"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
   "operator_notes": [
-    "02/10/2026: newsletter PDF is on the Kerry diocese parish card. Proved GET 200 application/pdf. Do not pin the dated filename."
+    "02/10/2026: newsletter PDF is on the Kerry diocese parish card. Proved GET 200 application/pdf. Do not pin the dated filename.",
+    "20/11/2026: Millstreet community site's parish-newsletter tag has 15 Nov 2026 complete Mass intentions and bulletin HTML; previous recipe pinned old October PDF on Kerry diocesan card. Follow newest matching Millstreet Parish Newsletter article and print article, never the tag archive. Verify masthead Sunday before publication."
   ],
   "do_not": [
     "Do not pin the dated PDF.",
     "Do not use the diocese Facebook page as this parish link.",
-    "Do not harvest Facebook."
+    "Do not harvest Facebook.",
+    "Do not download old dated October diocesan PDF.",
+    "Do not print archive or general Millstreet community notices instead of parish newsletter."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "playbook_type": "html_text_bulletin",
+  "max_bulletin_pages": 12
 }
