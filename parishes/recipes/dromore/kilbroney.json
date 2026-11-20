@@ -2,24 +2,35 @@
   "parish_key": "kilbroney",
   "display_name": "Kilbroney (Rostrevor)",
   "diocese": "dromore",
-  "recorded_date": "2026-10-15",
-  "start_url": "https://kilbroneyparish.com",
-  "site_type": "wp_json_newest_media",
-  "playbook_type": "direct_download",
+  "recorded_date": "2026-11-20",
+  "start_url": "https://kilbroneyparish.com/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
   "status": "active",
   "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "https://kilbroneyparish.com"
+      "url": "https://kilbroneyparish.com/"
     }
   ],
-  "version": 1,
+  "version": 2,
   "operator_notes": [
-    "15/10/2026 Recipe Brain hub scan: proved GET 200 pdf 256000 bytes dated 09/10/2026. Do not pin https://kilbroneyparish.com/wp-content/uploads/2026/10/Bulletin-09.10.26-.pdf."
+    "20/11/2026: Official Kilbroney homepage contains 'Latest Bulletin' link pointing to /wp-content/uploads/2026/11/Bulletin-13.11.26-.pdf (1 page, genuine PDF). Masthead is 'Thirty-Third Sunday in Ordinary Time | 15th November 2026' with Saturday 14th/Sunday 15th intentions and following weekend notices; web PDF and visual first page verified.",
+    "15 November report rejected older 30 October PDF when wp_json_newest_media was active. Use plain HTTP homepage anchor scrape and rank by dated file link. Friday 13 Nov upload date is two days before printed Sunday 15 Nov, so post-download PDF masthead freshness must decide the bulletin's actual issue date.",
+    "Do not pin Bulletin-13.11.26-.pdf. Each Sunday read homepage Latest Bulletin href, verify contents and reject older-week mastheads. Do not accept future 22-Nov intentions inside 15-Nov PDF as a new issue.",
+    "St Mary's Star of the Sea Rostrevor and Sacred Heart Killowen share the Kilbroney weekly publication; collect once."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not harvest Facebook."
-  ]
+    "Do not pin any weekly PDF file or guess 22-Nov filename.",
+    "Do not depend on WordPress media listing when the official homepage exposes 'Latest Bulletin'.",
+    "Do not mistake Friday upload date for printed Sunday issue date.",
+    "Do not harvest webcam or parish forms as bulletin."
+  ],
+  "href_patterns": [
+    "Bulletin-",
+    ".pdf"
+  ],
+  "timeout_ms": 55000,
+  "total_timeout_s": 180
 }
