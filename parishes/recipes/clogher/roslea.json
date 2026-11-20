@@ -1,11 +1,11 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "roslea",
   "display_name": "Roslea",
   "diocese": "clogher",
   "start_url": "https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-8th-November-2026.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
+  "site_type": "predicted_dated_pdf",
+  "playbook_type": "dated_pdf_bulletin",
   "href_patterns": [
     "Bulletin-Sunday"
   ],
@@ -15,22 +15,20 @@
   "recorded_date": "2026-11-13",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-8th-November-2026.pdf"
-    },
-    {
       "action": "download",
       "url": "https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-8th-November-2026.pdf"
     }
   ],
   "operator_notes": [
-    "13/11/2026: /category/parish-bulletin/ scrape timed out. Proved Bulletin-Sunday-8th-November-2026.pdf GET 200 application/pdf 181663. Pin the PDF. Do not use predicted.",
-    "10/11/2026: category page listed this file."
+    "20/11/2026: independently verified official 15 November weekly PDF at https://parishofroslea.com/wp-content/uploads/2026/11/Bulletin-Sunday-15th-November-2026.pdf (4 pages, masthead confirms Sunday 15 November). The previous direct_download recipe pinned 8 November and harvest rejected it as stale on 15 November.",
+    "Predict /wp-content/uploads/YYYY/MM/Bulletin-Sunday-{ordinal day}-{Month}-{YYYY}.pdf from the dated 8 November template using the tested predicted_dated_pdf handler. Try target Sunday first; verify the actual PDF date. No need to scrape the WAF-blocked category or pin a dated file for every week.",
+    "13/11/2026: /category/parish-bulletin/ scrape timed out on GitHub runner; direct 8 Nov PDF had been GET 200 application/pdf 181663."
   ],
   "do_not": [
     "Do not start on /category/parish-bulletin/ — scrape times out.",
-    "Do not use predicted_dated_pdf.",
     "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
-    "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
-  ]
+    "Do not harvest the shared Clontibret-Muckno file twice under clontibret.",
+    "Do not leave this as a pinned direct_download of the 8 November PDF; date is a template only."
+  ],
+  "weeks_back": 1
 }
