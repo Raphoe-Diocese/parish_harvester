@@ -73,3 +73,42 @@ def test_stable_id_parsing():
     assert church_id("https://host/live/Uploads/164/NewsLetter/uuid.pdf") == "164"
     assert drive_id("https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view") == "1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa"
     assert normalise_name("Gartan/Termon (Kilmacrenan)") == "gartantermon"
+
+
+def test_reviewed_mcn_aliases_are_not_treated_as_new_parishes():
+    known = {
+        "607": {"parish_key": "tourlestrane", "resolution": "existing_shared_parish"},
+        "620": {"parish_key": "rathmore", "resolution": "existing_shared_parish"},
+        "661": {"parish_key": "glencolmcille", "resolution": "registered_pending_live_verification"},
+    }
+    seeds = [
+        _seed("Aclare", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/607/NewsLetter/a.pdf"),
+        _seed("Gneeveguilla", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/620/NewsLetter/b.pdf"),
+        _seed("Glencolmcille", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/661/NewsLetter/c.pdf"),
+        _seed("Unknown church", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/90000/NewsLetter/d.pdf"),
+    ]
+    queue = build_queue(seeds, [], {"target_date": "2026-11-15"}, known_mcn_sources=known)
+    by_name = {row["name"]: row for row in queue["leads"]}
+    assert by_name["Aclare"]["known_parish_key"] == "tourlestrane"
+    assert by_name["Gneeveguilla"]["known_parish_key"] == "rathmore"
+    assert by_name["Glencolmcille"]["source_resolution"] == "registered_pending_live_verification"
+    assert by_name["Unknown church"]["status_hint"] == "unmatched"
+    assert "source_resolution" not in by_name["Unknown church"]
+    assert queue["stats"]["known_shared_parish_leads"] == 2
+    assert queue["stats"]["registered_pending_live_leads"] == 1
+    assert queue["stats"]["unmatched_unresolved_leads"] == 1
+    assert all(x["validation"] == "unverified_seed" for x in queue["leads"])
+
+
+def test_known_id_resolution_does_not_fabricate_a_successful_download():
+    known = {"620": {"parish_key": "rathmore", "resolution": "existing_shared_parish"}}
+    queue = build_queue(
+        [],
+        [_seed("Gneeveguilla", "https://cloudfront.net/live/Uploads/620/NewsLetter/old.pdf")],
+        {"target_date": "2026-11-15"},
+        known_mcn_sources=known,
+    )
+    row = queue["leads"][0]
+    assert row["status_hint"] == "unmatched"
+    assert row["matched_parish"] is None
+    assert row["source_resolution"] == "existing_shared_parish"
