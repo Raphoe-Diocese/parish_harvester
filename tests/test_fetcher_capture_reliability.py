@@ -530,3 +530,20 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_doorabarefield_recipe_accepts_real_five_page_newsletters() -> None:
+    """A five-page weekly from the user's source list must not be rejected at 4."""
+    repo_root = Path(__file__).resolve().parents[1]
+    recipe = json.loads((repo_root / "parishes/recipes/killaloe/doorabarefield.json").read_text(encoding="utf-8"))
+    assert recipe["site_type"] == "http_scrape_newest_pdf"
+    assert recipe["start_url"].endswith("/newsletter/")
+    assert recipe_max_bulletin_pages(recipe) == 8
+    assert MAX_BULLETIN_PAGES == 4
+    with tempfile.TemporaryDirectory() as tmp:
+        pdf = Path(tmp) / "weekly.pdf"
+        _make_pdf_with_pages(pdf, 5)
+        with pdf.open("ab") as fh:
+            fh.write(b"\n% " + b"0" * MIN_PDF_BYTES)
+        assert not _is_real_pdf(pdf)
+        assert _is_real_pdf(pdf, max_pages=recipe_max_bulletin_pages(recipe))
