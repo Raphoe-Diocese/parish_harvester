@@ -166,9 +166,21 @@ def ocr_reading_css(selector: str) -> str:
     }}
     {selector} strong {{ color: #0f2b5b; }}
     {selector} a {{
-      color: {TEAL};
-      font-weight: 600;
+      color: #1554b0;
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 0.1em;
+      text-underline-offset: 0.16em;
       overflow-wrap: anywhere;
+    }}
+    {selector} a:visited {{ color: #6535a5; }}
+    {selector} a:hover, {selector} a:focus-visible {{
+      color: #103b80;
+      text-decoration-thickness: 0.15em;
+    }}
+    {selector} a:focus-visible {{
+      outline: 2px solid #103b80;
+      outline-offset: 2px;
     }}
     {selector} mark {{
       background: #fef08a;
