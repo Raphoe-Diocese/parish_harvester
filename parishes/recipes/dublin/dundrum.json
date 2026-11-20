@@ -3,17 +3,42 @@
   "display_name": "Dundrum",
   "diocese": "dublin",
   "recorded_date": "2026-10-03",
-  "start_url": "https://www.dundrumparish.com",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://www.dundrumparish.com/",
+  "site_type": "wp_json_newest_post_images",
+  "playbook_type": "stacked_image_bulletin",
+  "status": "active",
+  "skip": false,
+  "reason": "Weekly dated WordPress newsletter posts confirmed on 20 November 2026; latest post for Sunday 22 November. Convert newsletter post's full-size image to PDF; pending GitHub live harvest verification.",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dundrumparish.com"
+      "url": "https://www.dundrumparish.com/"
+    },
+    {
+      "action": "image_stack",
+      "count": 1,
+      "selector": "img[src*='/wp-content/uploads/'][src*='dp-']"
     }
   ],
-  "version": 1
+  "version": 2,
+  "post_slug_patterns": [
+    "parish-newsletter-"
+  ],
+  "example_post_url": "https://www.dundrumparish.com/parish-newsletter-nov-15th-2026/",
+  "weeks_back": 3,
+  "image_count": 1,
+  "href_patterns": [
+    "dp-"
+  ],
+  "operator_notes": [
+    "20/11/2026: official website published Parish Newsletter Nov 22nd 2026 on 20 Nov at /parish-newsletter-nov-22nd-2026/, and Nov 15th / Nov 8th posts. Previously link_only inactive despite weekly posts.",
+    "The site exposes 990x1400 PNG uploads with dp- hashed filenames; select image from the newest correctly dated newsletter post, not static home-page graphics. WP JSON/RSS/listing discovery through wp_json_newest_post_images, PDF conversion via image_to_pdf.",
+    "Candidate source verified by public webpage, not yet by live GitHub runner or full-size image PDF check. Keep ordinary PDF/image freshness checks and do not claim a download until harvest succeeds.",
+    "If image selection fails in live harvest, check full-resolution post image DOM and adjust selector/count; do not pin the hashed PNG."
+  ],
+  "do_not": [
+    "Do not pin a dp- hashed PNG path; it changes every issue.",
+    "Do not print the homepage or select unrelated parish news thumbnails.",
+    "Do not mark a dated post as successful until its actual newsletter image is fetched and checked."
+  ]
 }
