@@ -192,10 +192,31 @@ def collapse_proven_shared_downloads(report: dict) -> dict:
             "alias": alias,
             "canonical": canonical,
             "proof": proof,
+            "canonical_url": main_url,
+            "canonical_sha256": p_hash,
         })
     report["downloaded"] = kept
+    # This helper may run more than once (one-parish patch and mega rebuild).
+    # Keep previously collapsed evidence only if the exact canonical issue
+    # is still present. A new week's URL/hash invalidates the old record.
+    kept_keys = {str(row.get("parish") or "") for row in kept}
+    known_pairs = {(x["alias"], x["canonical"]) for x in collapsed}
+    for old in report.get("shared_download_aliases") or []:
+        if not isinstance(old, dict):
+            continue
+        pair = (str(old.get("alias") or ""), str(old.get("canonical") or ""))
+        main = canonical_rows.get(pair[1])
+        if pair in known_pairs or not main or pair[0] in kept_keys:
+            continue
+        if str(old.get("canonical_url") or "") != str(main.get("url") or ""):
+            continue
+        if str(old.get("canonical_sha256") or "") != str(main.get("last_pdf_sha256") or ""):
+            continue
+        collapsed.append(old)
     if collapsed:
-        report["shared_download_aliases"] = collapsed
+        report["shared_download_aliases"] = sorted(
+            collapsed, key=lambda item: (item["canonical"], item["alias"])
+        )
     else:
         report.pop("shared_download_aliases", None)
     return report
@@ -691,6 +712,21 @@ def _remove_parish_from_sections(report: dict, parish_key: str) -> None:
 def _recompute_summary(report: dict) -> None:
     collapse_proven_shared_downloads(report)
     report["shared_bulletin_coverage"] = _shared_bulletin_coverage(report)
+    # The PDF stitcher never includes is_alias_key entries. Flag any
+    # alias-only download for canonical recovery rather than presenting a
+    # 'downloaded' count as proof it appears in the mega PDF.
+    from .parish_aliases import canonical_key
+
+    present = {
+        str(row.get("parish") or "").strip()
+        for row in (report.get("downloaded") or [])
+        if isinstance(row, dict) and row.get("parish")
+    }
+    report["alias_downloads_without_canonical"] = [
+        {"alias": alias, "canonical": canonical_key(alias)}
+        for alias in sorted(present)
+        if canonical_key(alias) != alias and canonical_key(alias) not in present
+    ]
     report["summary"] = {
         "downloaded": len(report.get("downloaded") or []),
         "html_links": len(report.get("html_links") or []),
