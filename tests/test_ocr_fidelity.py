@@ -93,6 +93,27 @@ class OcrFidelityTests(unittest.TestCase):
         self.assertIn("rip", norm)
         self.assertEqual(normalize_for_compare("Enda Hill RIP"), "enda hill rip")
 
+    def test_scrambled_column_words_are_not_accepted_by_word_presence(self) -> None:
+        """A whole page containing the right words in reverse order is broken OCR."""
+        pdf = (
+            "saturday vigil parish notices provide important details about "
+            "funeral masses prayers collections and local community activities"
+        )
+        scrambled = " ".join(reversed(pdf.split()))
+        self.assertTrue(missing_phrases(pdf, scrambled, window=8))
+
+    def test_words_scattered_across_page_do_not_count_as_one_notice(self) -> None:
+        pdf = "parish collection donations support local families and community prayer"
+        pieces = []
+        for word in pdf.split():
+            pieces.extend([word] + ["unrelated"] * 30)
+        self.assertTrue(missing_phrases(pdf, " ".join(pieces), window=8))
+
+    def test_repeated_words_not_hidden_by_one_remote_occurrence(self) -> None:
+        pdf = "parish masses church parish masses church parish collection"
+        ocr = "parish masses church collection" + " unrelated" * 20
+        self.assertTrue(missing_phrases(pdf, ocr, window=8))
+
     def test_parish_name_glue_is_not_a_gap_when_words_exist(self) -> None:
         pdf = (
             "please do not park in the church car park ballycastle after five extra words"
