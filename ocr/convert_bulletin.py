@@ -123,7 +123,10 @@ CSS = """
     line-height: 1.35;
   }
   strong { color: #0f2b5b; }
-  a { color: #1a6b6b; font-weight: 600; overflow-wrap: anywhere; }
+  a { color: #1554b0; font-weight: 700; text-decoration: underline; text-decoration-thickness: 0.1em; text-underline-offset: 0.16em; overflow-wrap: anywhere; }
+  a:visited { color: #6535a5; }
+  a:hover, a:focus-visible { color: #103b80; text-decoration-thickness: 0.15em; }
+  a:focus-visible { outline: 2px solid #103b80; outline-offset: 2px; }
   table.b-table {
     border-collapse: collapse;
     width: 100%;

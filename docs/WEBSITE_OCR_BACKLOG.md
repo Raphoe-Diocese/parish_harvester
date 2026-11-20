@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] In review, 2026-11-20: OCR hyperlinks looked like ordinary green words; canonical viewer and standalone text generators now explicitly style links blue, underlined, visible on hover/focus, with a visited colour. Test generated HTML and verify on live Pages after merge; do **not** mark done yet. `ocr/generate_bulletin_pages.py`, `ocr/convert_bulletin.py`, `tests/test_ocr_bulletin_pages.py`.
+
 - [ ] Critical, 2026-11-20: `Bulletins/report.json` and Raphoe current page say Sunday 2026-11-15, while `docs/bulletins/index.html` links to Monday 2026-11-16 OCR pages. Prevent non-Sunday dates entering generated weekly viewers or the archive index; only remove wrong-date viewer files when a valid Sunday viewer exists. Need next OCR run, Pages publish and actual public site verification before marking done. `ocr/generate_bulletin_pages.py`, `tests/test_ocr_bulletin_pages.py`.
 
 - [ ] In review, 2026-11-20: the native PDF extractor previously chose PyPDF2/PyMuPDF by character count alone, allowing an overlong glyph-junk result to replace readable text. Prefer readable extraction when only one candidate is flagged garbage; retain richer text if both are acceptable. Automated regressions added; need next harvest OCR sampling and user-visible verification before completion. `ocr/text_extract.py`, `tests/test_text_extract.py`.
