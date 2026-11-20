@@ -2188,23 +2188,13 @@ class LoughshoreRecipeTests(unittest.TestCase):
     )
     RECIPE = Path("parishes/recipes/down_and_connor/loughshoreparishes.json")
 
-    def test_recipe_uses_predicted_2026_pdf_not_2025_twin(self) -> None:
-        raw = self.RECIPE.read_text(encoding="utf-8")
-        data = json.loads(raw)
-        self.assertEqual(data["site_type"], "predicted_dated_pdf")
-        self.assertIn("/2026/11/32nd-Sunday-in-Ordinary-Time.pdf", data.get("start_url") or "")
-        self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
-        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
-        steps_blob = json.dumps(data.get("steps") or [])
-        self.assertNotIn("/2025/11/", steps_blob)
-        self.assertNotIn("33rd-Sunday-in-Ordinary-Time.pdf", steps_blob)
-        self.assertFalse(
-            any(
-                str(step.get("action") or "") == "print_to_pdf"
-                for step in data.get("steps") or []
-                if isinstance(step, dict)
-            )
-        )
+    def test_recipe_uses_live_archive_and_checks_printed_pdf_date(self) -> None:
+        data = json.loads(self.RECIPE.read_text(encoding="utf-8"))
+        self.assertEqual(data["site_type"], "archive_pdf_with_printed_date")
+        self.assertEqual(data["start_url"], "https://www.loughshoreparishes.org/sunday-bulletin/")
+        self.assertEqual(data["href_patterns"], ["/sunday-bulletin/"])
+        self.assertEqual(data["max_bulletin_pages"], 8)
+        self.assertTrue(all("32nd-Sunday-in-Ordinary-Time.pdf" not in str(step) for step in data["steps"]))
 
     def test_21st_sunday_beats_20th(self) -> None:
         scored = _score_http_scrape_pdf_hrefs(
