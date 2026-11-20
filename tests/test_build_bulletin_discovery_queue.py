@@ -131,3 +131,17 @@ def test_current_dated_download_remains_downloaded_in_discovery_queue():
     ]}
     queue = build_queue([_seed("Sample", "https://example.org/bulletin.pdf")], [], report)
     assert queue["leads"][0]["status_hint"] == "downloaded"
+
+
+def test_monaghan_shared_church_ids_not_counted_as_independent_sources():
+    from pathlib import Path
+    registry_path = Path(__file__).resolve().parents[1] / "docs/discovery/verified-mcn-church-identities.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))["by_mcn_church_id"]
+    seeds = [
+        _seed("St Joseph's Park Street", "https://host/live/Uploads/153/NewsLetter/old.pdf"),
+        _seed("St Patrick's Tyholland", "https://host/live/Uploads/554/NewsLetter/old.pdf"),
+    ]
+    queue = build_queue([], seeds, {"target_date": "2026-11-15"}, known_mcn_sources=registry)
+    assert all(row["known_parish_key"] == "monaghanrackwallace" for row in queue["leads"])
+    assert all(row["source_resolution"] == "existing_shared_parish" for row in queue["leads"])
+    assert all(row["status_hint"] == "unmatched" for row in queue["leads"])
