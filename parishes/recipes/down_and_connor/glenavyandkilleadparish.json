@@ -1,44 +1,36 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "glenavyandkilleadparish",
   "display_name": "Glenavy and Killead",
   "diocese": "down_and_connor",
   "start_url": "https://www.glenavyandkilleadparish.com/bulletins/",
   "steps": [
     {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.glenavyandkilleadparish.com/app/uploads/2026/09/2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
-      "text": "Twenty Fourth Sunday in Ordinary Time 13/09/2026",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.glenavyandkilleadparish.com/app/uploads/2026/09/2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf"
+      "action": "goto",
+      "url": "https://www.glenavyandkilleadparish.com/bulletins/"
     }
   ],
   "observed_load_ms": 18077,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "site_type": "http_scrape_newest_pdf",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "20/11/2026: the parish bulletin archive directly links PDF files. Verified the 15/11/2026 link at /app/uploads/2026/11/2026-November-15-Thirty-Third-Sunday-in-Ordinary-Time.pdf, 4 pages, front page reads 'Thirty Third Sunday in Ordinary Time / 15 November 2026'. Source https://www.glenavyandkilleadparish.com/bulletins/.",
+    "15 Nov harvest failed because the old Playwright click recipe timed out waiting for domcontentloaded. Plain HTTP listing scrape finds current PDF href without browser navigation; choose by extracted Sunday date, not DOM order (archive shows 1 Nov before 8 Nov).",
+    "Do not pin the 15 November URL or the old 13 September captured link. Re-verify returned PDF issue date after downloading. A current-week download has not yet been confirmed by the GitHub harvester."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin a dated app/uploads PDF or September captured URL.",
+    "Do not assume archive DOM order is strictly chronological; compare issue dates.",
+    "Do not harvest webcam feeds or unrelated downloads."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-09-14"
+  "recorded_date": "2026-11-20",
+  "href_patterns": [
+    ".pdf"
+  ]
 }
