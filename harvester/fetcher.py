@@ -2119,7 +2119,7 @@ def freshness_after_unknown_url(url: str, dest: Path, target: date) -> Freshness
     # actual first-page OCR issue stamp may override that stale URL date.
     # No guess and no blanket first-of-month freshness exception.
     basename = unquote(urlparse(url or "").path).rsplit("/", 1)[-1]
-    page_scan = bool(re.fullmatch(r"page[-_]?[0-9]+(?:[-_][0-9]+)*\\.(?:jpe?g|png|webp)", basename, re.I))
+    page_scan = bool(re.fullmatch(r"page[-_]?[0-9]+(?:[-_][0-9]+)*\.(?:jpe?g|png|webp)", basename, re.I))
     if body_verdict is None and verdict.status == "stale" and page_scan:
         printed_date, date_method = saved_bulletin_issue_date(dest, target=target, url=None)
         if printed_date is not None and date_method == "ocr":
