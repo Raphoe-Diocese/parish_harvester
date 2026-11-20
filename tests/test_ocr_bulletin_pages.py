@@ -35,6 +35,46 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertEqual(format_uk_date("2026-05-21"), "21/05/2026")
         self.assertEqual(format_uk_date("bad-date"), "bad-date")
 
+    def test_ocr_archive_rejects_monday_dated_weekly_viewer(self) -> None:
+        """Report 15 November must not be displaced by OCR labelled Monday 16th."""
+        from unittest.mock import patch
+        from ocr import generate_bulletin_pages as pages
+
+        self.assertTrue(pages.is_valid_weekly_bulletin_date("2026-11-15"))
+        self.assertFalse(pages.is_valid_weekly_bulletin_date("2026-11-16"))
+        with self.assertRaisesRegex(ValueError, "Sunday"):
+            pages.write_viewer_page(
+                "raphoe", "2026-11-16", Path("missing.pdf"), Path("missing.html")
+            )
+
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp)
+            sunday = folder / "raphoe-2026-11-15.html"
+            monday = folder / "raphoe-2026-11-16.html"
+            sunday.write_text("valid weekly edition", encoding="utf-8")
+            monday.write_text("wrong day", encoding="utf-8")
+            with patch.object(pages, "BULLETINS_DIR", folder):
+                listed = pages.scan_viewer_entries()
+                self.assertEqual([entry.date for entry in listed], ["2026-11-15"])
+                removed = pages.prune_old_viewers()
+                self.assertIn(monday, removed)
+                self.assertFalse(monday.exists())
+                self.assertTrue(sunday.exists())
+
+    def test_ocr_archive_preserves_last_viewer_until_sunday_exists(self) -> None:
+        """Wrong-date pages are hidden but not destroyed without a replacement."""
+        from unittest.mock import patch
+        from ocr import generate_bulletin_pages as pages
+
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp)
+            monday = folder / "raphoe-2026-11-16.html"
+            monday.write_text("wrong date", encoding="utf-8")
+            with patch.object(pages, "BULLETINS_DIR", folder):
+                self.assertEqual(pages.scan_viewer_entries(), [])
+                self.assertEqual(pages.prune_old_viewers(), [])
+                self.assertTrue(monday.exists())
+
     def test_mega_pdf_week_stamp_busts_phone_cache(self) -> None:
         href = "/mega_pdf/clogher_mega_bulletin.pdf"
         self.assertEqual(
