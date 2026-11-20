@@ -2598,6 +2598,41 @@ def _http_scrape_item_date(text: str, target_date: date) -> date | None:
     )
 
 
+def _date_in_explicit_bulletin_range(label: str, target_date: date) -> bool:
+    """Recognise a *labelled* Saturday–Sunday/week range covering target.
+
+    Kincasslagh lists '14th-21st November' for the Sunday 15 Nov issue.
+    A month folder or old-looking filename must not override the explicitly
+    stated issue span. Never interpret arbitrary numbers in PDF bytes or a
+    filename as a range. Require a named month and a bounded 1–8 day span;
+    the downloaded PDF is still subject to the printed-date freshness gate.
+    """
+    text = re.sub(r"\s+", " ", (label or "").strip())
+    match = re.search(
+        r"(?<!\d)(\d{1,2})(?:st|nd|rd|th)?\s*[-–—]\s*"
+        r"(\d{1,2})(?:st|nd|rd|th)?\s+"
+        r"(January|February|March|April|May|June|July|August|"
+        r"September|October|November|December)\b"
+        r"(?:\s+(20\d{2}))?",
+        text,
+        re.IGNORECASE,
+    )
+    if not match:
+        return False
+    start_day, end_day = int(match.group(1)), int(match.group(2))
+    month = (
+        "january february march april may june july august september "
+        "october november december"
+    ).split().index(match.group(3).lower()) + 1
+    year = int(match.group(4)) if match.group(4) else target_date.year
+    try:
+        start = date(year, month, start_day)
+        end = date(year, month, end_day)
+    except ValueError:
+        return False
+    return 0 <= (end - start).days <= 8 and start <= target_date <= end
+
+
 def _score_http_scrape_pdf_hrefs(
     hrefs: list[str],
     target_date: date,
@@ -2638,9 +2673,15 @@ def _score_http_scrape_pdf_hrefs(
             and not extensionless_ok
         ):
             continue
-        found = _http_scrape_item_date(href, target_date)
-        if not found and labels:
-            found = _http_scrape_item_date(labels.get(href, ""), target_date)
+        # Prefer an explicit current-week range on the listing link over
+        # the upload filename: an archive may title a 14–21 November issue
+        # while storing the PDF under an opaque or misleading name.
+        if labels and _date_in_explicit_bulletin_range(labels.get(href, ""), target_date):
+            found = target_date
+        else:
+            found = _http_scrape_item_date(href, target_date)
+            if not found and labels:
+                found = _http_scrape_item_date(labels.get(href, ""), target_date)
         if not found and bulletin_url_changed(previous_url, href):
             found = target_date
         if found and found <= ahead:
