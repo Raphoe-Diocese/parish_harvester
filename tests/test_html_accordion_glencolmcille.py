@@ -40,6 +40,8 @@ def test_browser_script_isolates_one_panel_and_has_no_archive_print_fallback():
     assert "innerText" in script
     assert "getAttribute('aria-controls')" in script
     assert "No isolated current-week accordion bulletin" in script
+    assert "nuachtlitir na carraige agus mhin an aoire" in script
+    assert "mastheads.length > 1" in script
 
 
 def test_current_sunday_passes_exact_date_to_browser():
