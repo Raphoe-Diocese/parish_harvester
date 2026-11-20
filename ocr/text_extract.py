@@ -81,7 +81,14 @@ def pick_richer_page_lines(
     first: list[list[str]] | None,
     second: list[list[str]] | None,
 ) -> list[list[str]]:
-    """Per page, keep the line list with more characters."""
+    """Choose legible text per page before using character count as a tie-break.
+
+    PDF glyph maps can yield *more* text that is mostly symbol scraps.
+    Previously the longer extract always won, even when the alternative
+    parser extracted coherent notices. Never reward extra garbage solely
+    because it has more characters. If both look legible (or both look
+    suspect), preserve the existing richer-page rule.
+    """
     first = list(first or [])
     second = list(second or [])
     n = max(len(first), len(second))
@@ -89,6 +96,12 @@ def pick_richer_page_lines(
     for i in range(n):
         a = first[i] if i < len(first) else []
         b = second[i] if i < len(second) else []
+        if a and b:
+            a_garbage = page_text_is_garbage(a)
+            b_garbage = page_text_is_garbage(b)
+            if a_garbage != b_garbage:
+                out.append(b if a_garbage else a)
+                continue
         out.append(a if page_text_char_count(a) >= page_text_char_count(b) else b)
     return out
 
