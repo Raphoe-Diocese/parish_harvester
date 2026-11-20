@@ -3153,3 +3153,42 @@ class NewtowncashelSquarespaceImageTests(unittest.TestCase):
         self.assertIn(self.THIS_WEEK, urls)
         self.assertIn(self.LAST_WEEK, urls)
         self.assertEqual(max(item[0] for item in scored), date(2026, 9, 27))
+
+
+class DundrumImageNewsletterRecoveryTests(unittest.TestCase):
+    def test_picks_22_november_post_from_weekly_archive(self) -> None:
+        urls = [
+            "https://www.dundrumparish.com/parish-newsletter-nov-8th-2026/",
+            "https://www.dundrumparish.com/parish-newsletter-nov-22nd-2026/",
+            "https://www.dundrumparish.com/parish-newsletter-nov-15th-2026/",
+        ]
+        self.assertEqual(
+            _pick_newest_dated_post_url(urls, date(2026, 11, 22)),
+            urls[1],
+        )
+        self.assertEqual(
+            _pick_newest_dated_post_url(urls, date(2026, 11, 15)),
+            urls[2],
+        )
+
+    def test_only_full_sized_dated_post_image_is_candidate(self) -> None:
+        full = "https://www.dundrumparish.com/wp-content/uploads/2026/11/dp-f45d4abaff3b7347588b26099aa33ccd16af9ca918c783cada03708911c3af68.png"
+        html = (
+            f'<img src="{full}" width="990" height="1400">'
+            '<img src="https://www.dundrumparish.com/wp-content/uploads/2015/07/logo4-300x110.jpg">'
+        )
+        images = _extract_post_page_images(
+            html, "https://www.dundrumparish.com/parish-newsletter-nov-15th-2026/"
+        )
+        self.assertIn(full, images)
+        self.assertEqual([url for url in images if "dp-" in url], [full])
+
+    def test_dundrum_recipe_uses_post_discovery_not_pinned_image(self) -> None:
+        recipe = json.loads(
+            (Path(__file__).resolve().parents[1] / "parishes/recipes/dublin/dundrum.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(recipe["site_type"], "wp_json_newest_post_images")
+        self.assertFalse(recipe["skip"])
+        self.assertEqual(recipe["image_count"], 1)
+        self.assertEqual(recipe["href_patterns"], ["dp-"])
+        self.assertIn("parish-newsletter-", recipe["post_slug_patterns"])
