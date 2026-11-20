@@ -29,6 +29,42 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIsNone(classify_heading_line("Vigil Mass on Saturday at 6.30pm"))
         self.assertIsNone(classify_heading_line("Please keep Fr Morty in your prayers."))
 
+    def test_printed_standalone_subheadings_keep_semantic_hierarchy(self) -> None:
+        labels = [
+            "WEEKLY MASSES",
+            "MASS INTENTIONS",
+            "EUCHARISTIC ADORATION",
+            "CONFESSIONS",
+            "NOVEMBER MASSES FOR THE HOLY SOULS",
+            "NEWSLETTER NOTICES:",
+            "PILGRIM STATUE OF OUR LADY OF FATIMA",
+            "AIFREANN CUIMHNEACHÁIN / MEMORIAL MASS",
+            "BÉAL AN PHOBAIL",
+        ]
+        for label in labels:
+            with self.subTest(label=label):
+                heading = label.rstrip(":")
+                self.assertEqual(classify_heading_line(label), heading)
+                self.assertEqual(split_heading_prefix(label), (heading, ""))
+                rendered = structure_ocr_html(
+                    "<p>" + label + "</p><p>The parish Mass will be offered on Sunday.</p>",
+                    single_parish_name="Glencolmcille",
+                    bulletin_date="2026-11-15",
+                )
+                self.assertIn('class="b-head">', rendered)
+                self.assertIn(heading, rendered)
+
+    def test_new_subheading_labels_do_not_rewrite_body_sentences(self) -> None:
+        for sentence in [
+            "Confessions will take place before Mass on Saturday.",
+            "Eucharistic Adoration takes place each Thursday in Carrick.",
+            "Newsletter notices can be submitted before noon on Thursday.",
+            "Pilgrim Statue of Our Lady of Fatima visits the Day Centre on Monday.",
+        ]:
+            with self.subTest(sentence=sentence):
+                self.assertIsNone(split_heading_prefix(sentence)[0])
+                self.assertIsNone(classify_heading_line(sentence))
+
     def test_splits_heading_from_following_schedule(self) -> None:
         head, rest = split_heading_prefix("Mass times Saturday 15th August 10:00am")
         self.assertEqual(head.lower(), "mass times")
