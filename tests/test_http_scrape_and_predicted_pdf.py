@@ -35,6 +35,7 @@ from harvester.replay import (
     _resolve_download_candidates,
     _score_bulletin_link,
     _score_http_scrape_pdf_hrefs,
+    _date_in_explicit_bulletin_range,
     _score_wordpress_post_hrefs,
     _wordpress_feed_post_links,
     _wordpress_post_links_from_payload,
@@ -59,6 +60,43 @@ from harvester.utils import (
     wix_dated_slug_candidates,
     yearless_slug_date,
 )
+
+
+class KincasslaghDateRangeTests(unittest.TestCase):
+    def test_14_to_21_november_covers_harvest_sunday(self) -> None:
+        self.assertTrue(
+            _date_in_explicit_bulletin_range("14th-21st November", date(2026, 11, 15))
+        )
+        self.assertFalse(
+            _date_in_explicit_bulletin_range("14th-21st November", date(2026, 11, 22))
+        )
+
+    def test_current_range_overrides_bad_upload_filename(self) -> None:
+        pdf = "https://kincasslagh.ie/app/uploads/2026/11/20261101.pdf"
+        old = "https://kincasslagh.ie/app/uploads/2026/10/Newsletter-Oct-1st_.pdf"
+        scored = _score_http_scrape_pdf_hrefs(
+            [pdf, old], date(2026, 11, 15),
+            labels={pdf: "14th-21st November", old: "3rd Oct"},
+        )
+        self.assertIn((date(2026, 11, 15), pdf), scored)
+        self.assertNotIn((date(2026, 11, 15), old), scored)
+
+    def test_cross_month_or_long_ranges_do_not_claim_fresh(self) -> None:
+        for label in ("14th-29th November", "14th-21st December",
+                      "14-21 November 2025", "14th-21st November 2027",
+                      "15th-14th November", "20261114-20261121"):
+            with self.subTest(label=label):
+                self.assertFalse(
+                    _date_in_explicit_bulletin_range(label, date(2026, 11, 15))
+                )
+
+    def test_unmatched_archive_link_remains_old(self) -> None:
+        pdf = "https://kincasslagh.ie/app/uploads/2026/10/Newsletter-Oct-1st_.pdf"
+        result = _score_http_scrape_pdf_hrefs(
+            [pdf], date(2026, 11, 15),
+            labels={pdf: "14th-21st October"},
+        )
+        self.assertNotIn((date(2026, 11, 15), pdf), result)
 
 
 class YearlessSlugTests(unittest.TestCase):
