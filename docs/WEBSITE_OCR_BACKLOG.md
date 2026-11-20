@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] New Raphoe parish in review, 2026-11-20: Glencolmcille (Carrick / Meenaneary) has a genuine HTML bulletin dated 14/15 November 2026 on `https://carrickonline.net/links/st-columbas-church-newsletter`. A single page also holds old issues in accordion panels. Register a new evidence row/recipe and use opt-in `only_current_accordion` extraction that refuses to print if the target Sunday's panel or enough actual newsletter text is absent. CI tests are necessary but **not sufficient**: verify a real GitHub Runner download, masthead date, page count, OCR, site publication and that no old accordion sections leaked before marking done.
+
 - [ ] In review, 2026-11-20: `ocr/fidelity.py` treated an OCR passage as intact whenever every word longer than three letters occurred **anywhere in the entire output**. That cannot detect scrambled two-column reading order and repeated-word losses. Require locally aligned word sequences while allowing one displaced word for stitcher banners; add word-order and locality regressions. Sample generated parish PDFs and OCR pages before declaring the fix proven in production.
 
 - [ ] In review, 2026-11-20: the Sunday `stitch` job was running duplicate, identical status snapshots and duplicate 10% drop guards. Keep one of each in the correct order; verify next Sunday run has one snapshot and one guard and preserve count protection. `.github/workflows/harvest.yml`, `tests/test_sunday_stitch_single_guard.py`.
