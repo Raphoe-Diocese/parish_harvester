@@ -6,6 +6,10 @@ on:
     # Sunday 09:00 UTC = 10:00 Irish time. Each diocese commits when it
     # finishes. All 26 should be in well before 16:00 Irish.
     - cron: '0 9 * * 0'
+  push:
+    branches: [main]
+    paths:
+      - '.github/harvest-now.txt'
   workflow_dispatch:
     inputs:
       diocese:
@@ -548,7 +552,7 @@ jobs:
           " || echo "⚠️  Cost dashboard update failed — harvest continues."
 
   diocese:
-    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all') }}
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all') }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     strategy:
@@ -676,7 +680,7 @@ jobs:
 
   stitch:
     needs: diocese
-    if: ${{ !cancelled() && needs.diocese.result == 'success' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all')) }}
+    if: ${{ !cancelled() && needs.diocese.result == 'success' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
