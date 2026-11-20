@@ -117,7 +117,18 @@ def build_queue(
     by_url = defaultdict(list)
     for field, status in STATUS_FIELDS:
         for item in report.get(field) or []:
-            hit = {"status": status, "parish": item.get("parish") or ""}
+            # An explicitly dated old issue must never be suggested as a successful
+            # current download merely because a legacy report put it there.
+            issue_date = item.get("bulletin_date")
+            target_date = report.get("target_date")
+            effective_status = status
+            if (status == "downloaded" and isinstance(issue_date, str)
+                    and isinstance(target_date, str)
+                    and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", issue_date)
+                    and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", target_date)
+                    and issue_date < target_date):
+                effective_status = "stale"
+            hit = {"status": effective_status, "parish": item.get("parish") or ""}
             for text in (item.get("display_name"), item.get("parish"), item.get("name")):
                 key = normalise_name(text or "")
                 if key:
