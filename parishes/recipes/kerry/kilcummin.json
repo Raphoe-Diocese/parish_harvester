@@ -2,24 +2,39 @@
   "parish_key": "kilcummin",
   "display_name": "Kilcummin",
   "diocese": "kerry",
-  "recorded_date": "2026-10-10",
-  "start_url": "https://www.dioceseofkerry.ie/parish/kilcummin/",
-  "site_type": "wp_json_newest_media",
-  "playbook_type": "direct_download",
+  "recorded_date": "2026-11-20",
+  "start_url": "https://kilcumminparish.com/local-news/parish-newsletter",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
   "status": "active",
   "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dioceseofkerry.ie/parish/kilcummin/"
+      "url": "https://kilcumminparish.com/local-news/parish-newsletter"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/local-news/parish-newsletter/']",
+      "pick_strategy": "first_match",
+      "text": "Parish Newsletter"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1,
+  "version": 2,
   "operator_notes": [
-    "10/10/2026 Recipe Brain hub scan: proved GET 200 pdf 213275 bytes dated 27/09/2026. Do not pin https://www.dioceseofkerry.ie/wp-content/uploads/2026/10/TWENTY-EIGHT-SUNDAY-IN-ORDINARY-TIME-27TH-SEPTEMBER-2026-.pdf."
+    "20/11/2026: verified current issue https://kilcumminparish.com/local-news/parish-newsletter/1132-parish-newsletter-15-11-2026 is genuine HTML bulletin headed 33rd Sunday in Ordinary Time 15/11/2026. Older diocesan WordPress media feed was the wrong source. Click newest parish-newsletter article on parish website and print its article HTML.",
+    "HTML listing may have caching delays; verify printed masthead date against harvest Sunday before publication."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not harvest Facebook."
-  ]
+    "Do not harvest older 27 September diocesan PDF as current.",
+    "Do not print the category/listing page itself.",
+    "Do not treat stale printed article as current Sunday."
+  ],
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 10
 }
