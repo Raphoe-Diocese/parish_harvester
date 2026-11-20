@@ -10,6 +10,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 
 ## Harvest-to-OCR reliability (2026-11-19)
 
+- [ ] Critical, 2026-11-20: weekly `.github/workflows/harvest.yml` invoked `scripts/autofix_recipes.py` before harvesting. This script can invent `https://<host>/news/` without checking it, mutate the trained recipes in the runner workspace, and the workflow does not stage those recipe JSON files. Replace it with read-only `diagnose_recipe_health.py --json`, archive the results, and prohibit silent mutation; next run must verify full harvest and audit artefact. Review other guessed-url rewrites before using autofix manually.
+
 - [ ] Critical, 2026-11-20: `ocr/bulletin_layout.py` previously allowed **any** old Irish-dated parish issue to bypass OCR freshness withholding, even though `harvester.utils` already parses `8ú Samhain 2026`. Remove blanket Irish exemption, preserve Irish text unchanged for genuinely current issues, and cover stale/current 8 and 15 November with regression tests. Verify generated Raphoe OCR and live Pages after merge; not done yet. `tests/test_bulletin_layout.py`.
 
 - [ ] In review, 2026-11-20: OCR hyperlinks looked like ordinary green words; canonical viewer and standalone text generators now explicitly style links blue, underlined, visible on hover/focus, with a visited colour. Test generated HTML and verify on live Pages after merge; do **not** mark done yet. `ocr/generate_bulletin_pages.py`, `ocr/convert_bulletin.py`, `tests/test_ocr_bulletin_pages.py`.
