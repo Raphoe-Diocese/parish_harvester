@@ -1,37 +1,40 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "loughshoreparishes",
   "display_name": "Loughshore",
   "diocese": "down_and_connor",
-  "start_url": "https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf",
-  "site_type": "predicted_dated_pdf",
+  "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
+  "site_type": "archive_pdf_with_printed_date",
   "href_patterns": [
-    "Sunday-in-Ordinary-Time",
-    ".pdf"
+    "/sunday-bulletin/"
   ],
   "example_url": "https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf",
-  "weeks_ahead": 1,
+  "weeks_ahead": 0,
   "max_bulletin_pages": 8,
   "timeout_ms": 30000,
   "total_timeout_s": 90,
-  "recorded_date": "2026-11-08",
+  "recorded_date": "2026-11-20",
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf"
+      "action": "goto",
+      "url": "https://www.loughshoreparishes.org/sunday-bulletin/"
     }
   ],
   "operator_notes": [
-    "08/11/2026: wp_json_newest_media grabbed /2025/11/33rd-Sunday-in-Ordinary-Time.pdf and dated it 16/11/2025. Listing sunday-bulletin has 32nd Sunday 8 November 2026. Proved https://www.loughshoreparishes.org/app/uploads/2026/11/32nd-Sunday-in-Ordinary-Time.pdf GET 200 application/pdf 903755 bytes magic %PDF-1.7. start_url is the 2026 PDF so the 2025 liturgical twin is skipped."
+    "20/11/2026: Official /sunday-bulletin/ archive links PDF-response URLs that do not end .pdf. Verified Sunday 22 November 2026 at /sunday-bulletin/our-lord-jesus-christ-king-of-the-universe/: application/pdf 4 pages, printed heading 22 November 2026.",
+    "Verified 15 November 2026 /sunday-bulletin/33rd-sunday-in-ordinary-time-3/: application/pdf 5 pages, printed heading 15 November 2026. The generic default four-page limit would reject this 5-page issue, so set parish max=8.",
+    "Old predicted_dated_pdf start URL /2026/11/32nd-Sunday-in-Ordinary-Time.pdf is stale and will fail for Christ the King, whose title does not have a numbered Sunday. Find actual PDF endpoints by clicking archive hrefs via HTTP, then read issue date from first-page PDF text and require exact harvest Sunday. Only a verified printed date may be attached as bulletin_date.",
+    "Shared parish publication covers St Mary's Greencastle, Star of the Sea Whitehouse, St James Whiteabbey, St Colman's Greenisland; one PDF for all, no duplicate harvest."
   ],
   "do_not": [
-    "Do not scrape wp-json media for sunday-in-ordinary-time — the 2025 33rd Sunday file wins.",
-    "Do not pin 32nd-Sunday-in-Ordinary-Time.pdf forever — predicted rewrites the liturgical Sunday.",
-    "Do not download DC-Vocations-Newsletter.pdf or Safeguarding PDFs.",
-    "Do not print_to_pdf the listing."
+    "Do not predict numbered Sunday filename for Christ the King or Advent.",
+    "Do not query WP media across years: 2025's identically titled 33rd Sunday was previously selected.",
+    "Do not accept undated PDF endpoints based on link change alone; inspect printed PDF date.",
+    "Do not pin one permalink forever or treat a link as PDF until %PDF is confirmed."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "playbook_type": "pdf_download_list"
 }
