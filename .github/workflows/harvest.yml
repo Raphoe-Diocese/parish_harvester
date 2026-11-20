@@ -116,7 +116,7 @@ jobs:
           # (config.MIN_PDF_BYTES) — reporting a false "failed" for parishes
           # whose bulletin was genuinely available.
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends libreoffice-writer ghostscript
+          sudo apt-get install -y --no-install-recommends libreoffice-writer ghostscript tesseract-ocr tesseract-ocr-eng
           gs --version
 
       - name: Run tests
@@ -205,8 +205,8 @@ jobs:
 
       # After PDFs and report.json exist. main.py already wrote parish_status;
       # this fills blank ok dates from the saved files, then writes status again.
-      # Image PDFs stay blank until first-page OCR: tesseract-ocr is not
-      # installed here (apt + OCR of hundreds of first pages would slow harvest).
+      # Local first-page Tesseract is available. Only blank/image-derived dates
+      # are OCR checked; no paid provider calls during harvest.
       - name: Date blank ok bulletins from saved PDFs
         if: steps.harvest_run.outcome == 'success'
         env:
@@ -612,7 +612,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends libreoffice-writer ghostscript
+          sudo apt-get install -y --no-install-recommends libreoffice-writer ghostscript tesseract-ocr tesseract-ocr-eng
 
       - name: Harvest one diocese
         id: harvest_run
