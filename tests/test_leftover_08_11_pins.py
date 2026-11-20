@@ -448,28 +448,19 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
-    def test_killasser_pins_08_11_2026_1_pdf_not_mayo_or_diocese_card(self) -> None:
+    def test_killasser_now_harvests_fresh_archive_instead_of_8_nov_pin(self) -> None:
+        # The 13 November emergency pin was valid for one week only. Killasser
+        # has since posted a verifiable 15 November PDF in the official table.
         recipe = _recipe("parishes/recipes/achonry/killasser.json")
-        self._assert_wordpress_direct(recipe, "08-11-2026-1.pdf")
-        self.assertTrue(recipe.get("http_first"))
         self.assertFalse(recipe.get("skip"))
         self.assertEqual(recipe.get("status"), "active")
-        self.assertIn("/2026/11/", recipe["start_url"])
-        self.assertIn("killasserparish.wordpress.com", recipe["start_url"])
-        self.assertTrue(recipe["start_url"].endswith("08-11-2026-1.pdf"))
-        self.assertNotIn("01-11-2026", recipe["start_url"])
-        self.assertNotIn("15-11-2026", recipe["start_url"])
+        self.assertEqual(recipe["start_url"], "https://killasserparish.wordpress.com/")
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["playbook_type"], "pdf_download_list")
+        self.assertEqual(recipe["href_patterns"], [".pdf"])
+        self.assertNotIn("/wp-content/uploads/", recipe["start_url"])
         self.assertNotIn("mayo.ie", recipe["start_url"])
         self.assertNotIn("achonrydiocese.org", recipe["start_url"])
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_pdf")
-        self.assertNotEqual(
-            recipe["start_url"].rstrip("/"),
-            "https://killasserparish.wordpress.com",
-        )
-        verdict = check_bulletin_freshness(recipe["start_url"], date(2026, 11, 8))
-        self.assertEqual(verdict.status, "fresh")
-        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
 
     def test_newtownshandrum_aliases_charleville_8_nov_doc_not_diocese_card(self) -> None:
         recipe = _recipe("parishes/recipes/cloyne/newtownshandrum.json")

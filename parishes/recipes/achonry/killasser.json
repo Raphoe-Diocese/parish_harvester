@@ -1,48 +1,40 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "killasser",
   "display_name": "Killasser",
   "diocese": "achonry",
-  "start_url": "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
+  "start_url": "https://killasserparish.wordpress.com/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
   "status": "active",
   "skip": false,
   "http_first": true,
   "timeout_ms": 45000,
   "total_timeout_s": 120,
   "max_bulletin_pages": 8,
-  "recorded_date": "2026-11-13",
-  "example_url": "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf",
+  "recorded_date": "2026-11-20",
+  "example_url": "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/15-11-2026.pdf",
   "href_patterns": [
-    "08-11-2026-1.pdf",
-    "08-11-2026",
     ".pdf"
   ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf"
-    },
-    {
-      "action": "download",
-      "url": "https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf",
-      "use_captured_url": true
+      "url": "https://killasserparish.wordpress.com/"
     }
   ],
   "operator_notes": [
-    "13/11/2026 leftover FAILED: harvest saved the Achonry diocese card https://achonrydiocese.org/parishes/mayo/killasser-3/. mayo.ie Killasser listing newest file is still Killasser-Callow-25-01-2026.pdf. Kitchen-sink: killasserparish.wordpress.com homepage lists dated PDFs including 08-11-2026-1.pdf (also 01-11-2026-1.pdf and 15-11-2026.pdf). Pin https://killasserparish.wordpress.com/wp-content/uploads/2026/11/08-11-2026-1.pdf. Mozilla/5.0 HTTP/2 GET 200 application/pdf 91721 bytes magic %PDF-1.3 Last-Modified Fri 06/11/2026 07:30:37 GMT. curl/8.5.0 also 200. PDF text: KILLASSER PARISH NEWSLETTER The 32nd Sunday in Ordinary Time 8th Nov 2026. Adoration in Callow church and Killasser church. Sunday Mass Callow 10am / Killasser 12pm. Callow is the same Killasser/Callow paper — harvest once here. Freshness in_bulletin_week 08/11/2026. Pin wordpress + direct_download + http_first. Do not scrape mayo.ie or achonrydiocese.org."
+    "20/11/2026: Official Killasser/Callow WordPress homepage is a year-table listing individual weekly PDF links. Verified the 15 November 2026 file at /wp-content/uploads/2026/11/15-11-2026.pdf: HTTP/PDF via public page, 2 pages, masthead KILLASSER PARISH NEWSLETTER / The 33rd Sunday in Ordinary Time 15th Nov 2026.",
+    "The previous direct_download recipe was pinned to 08-11-2026-1.pdf, so it could never recover a subsequent week. Use http_scrape_newest_pdf on the archive and strict target Sunday scoring, then actual PDF masthead verification. URLs are inconsistent about -1 suffix, so do not predict filenames.",
+    "The 2026 archive lists 1, 8 and 15 November. Next Sunday's issue is not yet verified. This PR changes the recipe only, not evidence of live GitHub harvest success.",
+    "Killasser and Callow use the same paper. Harvest once as Killasser, not a second Callow parish."
   ],
   "do_not": [
-    "Do not pin 01-11-2026-1.pdf. 01/11 is not 08/11.",
-    "Do not pin 15-11-2026.pdf. 15/11 is not 08/11.",
-    "Do not pin 08-11-2026.pdf without -1 — that path is not the listing href.",
-    "Do not set start_url to https://killasserparish.wordpress.com/ — listing also has 15 November.",
-    "Do not scrape https://www.mayo.ie/en-ie/parish-newsletters/killasser-parish-newsletter — newest there is 25/01/2026.",
-    "Do not scrape https://achonrydiocese.org/parishes/mayo/killasser-3/.",
-    "Do not use predicted_dated_pdf.",
-    "Do not use http_scrape_newest_pdf — that can pick 15 November from the listing.",
-    "Do not harvest Facebook."
+    "Do not pin the 8-November or 15-November PDF as a permanent weekly URL.",
+    "Do not use Achonry diocese admin parish card or mayo.ie newsletter list (previously stale).",
+    "Do not guess -1 file suffix; choose real PDF href from the live archive.",
+    "Do not accept a stale previous-Sunday PDF as current if the parish has not posted yet.",
+    "Do not harvest Callow separately or scrape Facebook."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
