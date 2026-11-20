@@ -5,10 +5,11 @@ on:
     workflows: ["Harvest Parish Bulletins"]
     types:
       - completed
-  # Fallback if workflow_run does not fire: Sunday 13:00 UTC (14:00 Irish).
-  # Primary trigger is workflow_run after a full harvest finishes.
+  # Fallback at Sunday 22:00 Irish time, after the 14:00 harvest window.
+  # Primary trigger remains workflow_run once the full harvest finishes.
   schedule:
-    - cron: '0 13 * * 0'
+    - cron: '0 22 * * 0'
+      timezone: 'Europe/Dublin'
   workflow_dispatch:
 
 permissions:
