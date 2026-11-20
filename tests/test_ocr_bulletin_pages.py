@@ -1126,6 +1126,14 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotEqual(OCR_PAPER.lower(), "#fff")
         self.assertIn("border-left: 4px solid", shared)
         self.assertIn("background: #e7ecea", shared)
+        # Links must not rely on colour alone: blue, visible underline and focus.
+        for target in ("#ocr-panel", ".ocr-body"):
+            link_css = ocr_reading_css(target)
+            self.assertIn(f"{target} a {{", link_css)
+            self.assertIn("color: #1554b0", link_css)
+            self.assertIn("text-decoration: underline", link_css)
+            self.assertIn(f"{target} a:focus-visible", link_css)
+
 
         viewer = render_bulletin_viewer_shell(
             page_title="Example Diocese Collated Bulletin",
@@ -1148,6 +1156,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn(OCR_PAPER, viewer)
         self.assertIn("overflow-wrap: anywhere", viewer)
         self.assertIn('id="ocr-panel"', viewer)
+        self.assertIn("#ocr-panel a {", viewer)
+        self.assertIn("text-underline-offset: 0.16em", viewer)
+
         # Cramped legacy OCR body values must not return.
         self.assertNotRegex(viewer, r"#ocr-panel\s*\{[^}]*line-height:\s*1\.38")
         self.assertRegex(viewer, r"#ocr-panel p\s*\{[^}]*margin:\s*0 0 0\.9em")
@@ -1170,6 +1181,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn(OCR_PAPER, standalone)
         self.assertIn("overflow-wrap: anywhere", standalone)
         self.assertIn('class="ocr-body"', standalone)
+        self.assertIn(".ocr-body a {", standalone)
+        self.assertIn("text-decoration: underline", standalone)
+
         # Body/OCR reading measure — not the old cramped 1.35 body default.
         self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", standalone)
         self.assertRegex(standalone, r"\.ocr-body\s*\{[^}]*line-height:\s*1\.7")
@@ -1182,6 +1196,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("#f3f5f4", convert_bulletin.CSS)
         self.assertIn("overflow-wrap: anywhere", convert_bulletin.CSS)
         self.assertIn("border-left: 4px solid #1a6b6b", convert_bulletin.CSS)
+        self.assertIn("a { color: #1554b0; font-weight: 700; text-decoration: underline;", convert_bulletin.CSS)
+
 
 
     def test_az_parish_html_shows_failed_banner_when_no_markers_found(self) -> None:
