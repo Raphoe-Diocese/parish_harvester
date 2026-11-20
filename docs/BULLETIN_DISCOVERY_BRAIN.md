@@ -37,3 +37,13 @@ As of the 15-Nov-2026 report: 458 raw leads, 456 distinct leads; 98 align with s
 
 ### Glencolmcille: independent MCN backup (2026-11-20)
 Glencolmcille / St Columba's (Carrick, Meenaneary) has a second source at `https://mcn.live/Camera/st-columbas-glencolmcille`. Its MCN **church ID is 661**, identified from the original 29 October MCN/CloudFront seed `/live/Uploads/661/NewsLetter/` and matched with the official named MCN camera directory. **Never pin the UUID**. Reuse `_mcn_fetch_newsletter_url` (camera → `ProfileDataByJson/661` → `newsletter.newsLetterUrl`) and retain the stated newsletter date. A current card date with no contradictory stale PDF masthead, or an undated card with a fresh printed masthead, may be accepted. If it is older or cannot be dated, discard the PDF and try the independent CarrickOnline HTML accordion. This is a recipe fallback, not evidence of a successful live harvest.
+
+### Avoid re-discovering shared MCN churches (20 November 2026)
+
+Full, auditable mapping lives in `docs/discovery/verified-mcn-church-identities.json` and is consumed by `scripts/build_bulletin_discovery_queue.py`:
+
+- MCN **607**, The Most Holy Rosary, **Aclare** → **Tourlestrane** (canonical church ID 606; shared newsletter). Existing Achonry recipe confirmed this.
+- MCN **620**, Holy Rosary, **Gneeveguilla** → **Rathmore** (canonical church ID 200; part of the same Kerry parish, alternate camera with no separate Latest Bulletin in prior check). Official Kerry Rathmore parish directory confirms the church.
+- MCN **661**, St Columba's, **Glencolmcille** → **glencolmcille**, new recipe with MCN/HTML fallback already committed, but still **pending a live harvest**.
+
+**Never count a camera as a new bulletin just because its MCN church ID differs**. The 15-Nov-2026 snapshot still has 14 `unmatched` report rows, but 2 are now confirmed shared parish cameras and 1 has a registered recipe awaiting live proof, leaving **11 unresolved candidates**. The tags are source identity evidence, not a claim of live download or printed issue date. Keep future discoveries in the registry with documented parish evidence and tests.

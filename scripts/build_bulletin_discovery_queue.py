@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WEBSITES = ROOT / "docs/discovery/seeds-websites-2026-10-29.txt"
 SPECIALISED = ROOT / "docs/discovery/seeds-specialised-2026-10-29.txt"
 REPORT = ROOT / "Bulletins/report.json"
+IDENTITIES = ROOT / "docs/discovery/verified-mcn-church-identities.json"
 STATUS_FIELDS = (
     ("stale_rejected", "stale"),
     ("failed", "failed"),
@@ -103,7 +104,13 @@ def load_seeds(path: Path, *, fallback_type: str = "website") -> list[dict]:
     return rows
 
 
-def build_queue(website_rows: list[dict], specialised_rows: list[dict], report: dict) -> dict:
+def build_queue(
+    website_rows: list[dict],
+    specialised_rows: list[dict],
+    report: dict,
+    *,
+    known_mcn_sources: dict[str, dict] | None = None,
+) -> dict:
     by_name = defaultdict(list)
     by_church = defaultdict(list)
     by_drive = defaultdict(list)
@@ -147,6 +154,12 @@ def build_queue(website_rows: list[dict], specialised_rows: list[dict], report: 
                 break
         found = min(matching, key=lambda item: STATUS_ORDER[item["status"]]) if matching else None
         status = found["status"] if found else "unmatched"
+        # A separately named church may belong to a parish already harvested
+        # under another MCN church ID. This registry is reviewed evidence,
+        # not a fuzzy name guess or a declaration that this week's PDF works.
+        identity = (known_mcn_sources or {}).get(church_id(url) or "")
+        resolution = identity.get("resolution") if isinstance(identity, dict) else None
+        known_parish = identity.get("parish_key") if isinstance(identity, dict) else None
         rows.append({
             **seed,
             "status_hint": status,
@@ -154,6 +167,10 @@ def build_queue(website_rows: list[dict], specialised_rows: list[dict], report: 
             "priority": PRIORITY[status],
             "match_method": method,
             "validation": "unverified_seed",
+            **({
+                "known_parish_key": known_parish,
+                "source_resolution": resolution,
+            } if known_parish and resolution else {}),
         })
     rows.sort(key=lambda x: (x["priority"], normalise_name(x["name"]), x["url"]))
     counts = Counter(row["status_hint"] for row in rows)
@@ -171,6 +188,16 @@ def build_queue(website_rows: list[dict], specialised_rows: list[dict], report: 
             "id_matched_leads": sum(
                 x["match_method"] in {"mcn_church_id", "drive_file_id"} for x in rows
             ),
+            "known_shared_parish_leads": sum(
+                x.get("source_resolution") == "existing_shared_parish" for x in rows
+            ),
+            "registered_pending_live_leads": sum(
+                x.get("source_resolution") == "registered_pending_live_verification" for x in rows
+            ),
+            "unmatched_unresolved_leads": sum(
+                x["status_hint"] == "unmatched" and not x.get("source_resolution")
+                for x in rows
+            ),
         },
         "leads": rows,
     }
@@ -181,10 +208,17 @@ def main() -> None:
     parser.add_argument("--websites", type=Path, default=WEBSITES)
     parser.add_argument("--specialised", type=Path, default=SPECIALISED)
     parser.add_argument("--report", type=Path, default=REPORT)
+    parser.add_argument("--identities", type=Path, default=IDENTITIES)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding="utf-8"))
-    data = build_queue(load_seeds(args.websites), load_seeds(args.specialised, fallback_type="specialised"), report)
+    registry = json.loads(args.identities.read_text(encoding="utf-8"))
+    data = build_queue(
+        load_seeds(args.websites),
+        load_seeds(args.specialised, fallback_type="specialised"),
+        report,
+        known_mcn_sources=registry.get("by_mcn_church_id") or {},
+    )
     output = args.output or ROOT / "docs/discovery" / (
         f"research-queue-{report['target_date']}.json"
     )
