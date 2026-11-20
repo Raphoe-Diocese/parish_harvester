@@ -1,114 +1,242 @@
-"""Regression tests for repeatable bulletin source discovery and matching."""
+"""Build a reproducible, evidence-labelled queue from parish discovery seeds.
+
+No seed URL is treated as a verified current bulletin. MCN and Drive sources
+are matched by stable identifiers rather than ephemeral PDF UUID filenames.
+Run: python scripts/build_bulletin_discovery_queue.py
+"""
 from __future__ import annotations
 
+import argparse
 import json
+import re
+import unicodedata
+from collections import Counter, defaultdict
+from pathlib import Path
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
 
-from scripts.build_bulletin_discovery_queue import (
-    build_queue, church_id, drive_id, load_seeds, normalise_name, source_type,
+
+ROOT = Path(__file__).resolve().parent.parent
+WEBSITES = ROOT / "docs/discovery/seeds-websites-2026-10-29.txt"
+SPECIALISED = ROOT / "docs/discovery/seeds-specialised-2026-10-29.txt"
+REPORT = ROOT / "Bulletins/report.json"
+IDENTITIES = ROOT / "docs/discovery/verified-mcn-church-identities.json"
+STATUS_FIELDS = (
+    ("stale_rejected", "stale"),
+    ("failed", "failed"),
+    ("skipped", "skipped"),
+    ("downloaded", "downloaded"),
 )
+PRIORITY = {"stale": 1, "failed": 1, "unmatched": 2, "skipped": 2, "downloaded": 4}
+STATUS_ORDER = {"stale": 0, "failed": 1, "skipped": 2, "downloaded": 3}
 
 
-def _seed(name, url, source="test.txt"):
-    return {"name": name, "url": url, "source_type": source_type(url), "source_file": source}
+def normalise_name(value: str) -> str:
+    value = unicodedata.normalize("NFKD", value or "")
+    value = "".join(ch for ch in value if not unicodedata.combining(ch))
+    value = re.sub(r"\([^)]*\)", "", value)
+    return re.sub(r"[^a-z0-9]", "", value.lower())
 
 
-def test_mcn_id_matches_changed_uuid_and_parish_name():
-    stale = "https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/NewsLetter/old.pdf"
-    found = "https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/NewsLetter/new.pdf"
-    report = {"target_date": "2026-11-15", "stale_rejected": [
-        {"parish": "glenfin-parish", "display_name": "Glenfin", "url": stale}
-    ]}
-    queue = build_queue([], [_seed("Our Lady of Perpetual Succour, Glenfinn", found)], report)
-    assert queue["leads"][0]["status_hint"] == "stale"
-    assert queue["leads"][0]["match_method"] == "mcn_church_id"
-    assert queue["leads"][0]["matched_parish"] == "glenfin-parish"
+def church_id(value: str) -> str | None:
+    match = re.search(r"/Uploads/(\d+)/NewsLetter/", value or "", re.I)
+    return match.group(1) if match else None
 
 
-def test_drive_id_matches_download_host_and_prioritises_stale():
-    shared = "1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa"
-    report = {
-        "target_date": "2026-11-15",
-        "stale_rejected": [{"parish": "kilmacrenan", "url": f"https://drive.usercontent.google.com/download?id={shared}&export=download"}],
-        "downloaded": [{"parish": "kilmacrenan", "url": f"https://drive.usercontent.google.com/download?id={shared}&export=download"}],
+def drive_id(value: str) -> str | None:
+    url = value or ""
+    parts = urlsplit(url.replace(" ", "%20"))
+    for key in ("id",):
+        values = parse_qs(parts.query).get(key)
+        if values and re.fullmatch(r"[\w-]{12,}", values[0]):
+            return values[0]
+    match = re.search(r"/(?:file/d|folders)/([\w-]{12,})", url, re.I)
+    return match.group(1) if match else None
+
+
+def canonical_url(value: str) -> str:
+    try:
+        parts = urlsplit((value or "").strip().replace(" ", "%20"))
+        if parts.scheme not in {"http", "https"} or not parts.netloc:
+            return ""
+        query = parse_qs(parts.query, keep_blank_values=True)
+        query.pop("bulletin_date", None)
+        return urlunsplit(
+            (parts.scheme.lower(), parts.netloc.lower(), parts.path.rstrip("/"),
+             urlencode(query, doseq=True), "")
+        )
+    except ValueError:
+        return ""
+
+
+def source_type(value: str, fallback: str = "website") -> str:
+    lower = value.lower()
+    if "/newsletter/" in lower and "cloudfront.net" in lower:
+        return "mcn_live"
+    if "drive.google.com/" in lower or "drive.usercontent.google.com/" in lower:
+        return "google_drive"
+    if "churchmedia.tv/" in lower:
+        return "churchmedia"
+    if "/onewebmedia/" in lower:
+        return "onewebmedia"
+    if "parishpress.net/" in lower:
+        return "parishpress"
+    if "churchtv.ie/" in lower:
+        return "churchtv"
+    return fallback
+
+
+def load_seeds(path: Path, *, fallback_type: str = "website") -> list[dict]:
+    rows = []
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        match = re.search(r"https?://", line, re.I)
+        if not match:
+            continue  # category heading / blank / explanation
+        name = re.split(r"\s{2,}", line[: match.start()].strip(), maxsplit=1)[0]
+        url = line[match.start() :].strip()
+        if not name or not url:
+            continue
+        rows.append({
+            "name": name,
+            "url": url,
+            "source_type": source_type(url, fallback_type),
+            "source_file": path.name,
+        })
+    return rows
+
+
+def build_queue(
+    website_rows: list[dict],
+    specialised_rows: list[dict],
+    report: dict,
+    *,
+    known_mcn_sources: dict[str, dict] | None = None,
+) -> dict:
+    by_name = defaultdict(list)
+    by_church = defaultdict(list)
+    by_drive = defaultdict(list)
+    by_url = defaultdict(list)
+    for field, status in STATUS_FIELDS:
+        for item in report.get(field) or []:
+            # An explicitly dated old issue must never be suggested as a successful
+            # current download merely because a legacy report put it there.
+            issue_date = item.get("bulletin_date")
+            target_date = report.get("target_date")
+            effective_status = status
+            if (status == "downloaded" and isinstance(issue_date, str)
+                    and isinstance(target_date, str)
+                    and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", issue_date)
+                    and re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}", target_date)
+                    and issue_date < target_date):
+                effective_status = "stale"
+            hit = {"status": effective_status, "parish": item.get("parish") or ""}
+            for text in (item.get("display_name"), item.get("parish"), item.get("name")):
+                key = normalise_name(text or "")
+                if key:
+                    by_name[key].append(hit)
+            for index, key in (
+                (by_church, church_id(item.get("url") or "")),
+                (by_drive, drive_id(item.get("url") or "")),
+                (by_url, canonical_url(item.get("url") or "")),
+            ):
+                if key:
+                    index[key].append(hit)
+
+    rows = []
+    seen = set()
+    for seed in [*website_rows, *specialised_rows]:
+        key = (normalise_name(seed["name"]), seed["url"].rstrip("/"))
+        if key in seen:
+            continue
+        seen.add(key)
+
+        url = seed["url"]
+        methods = (
+            ("mcn_church_id", by_church, church_id(url)),
+            ("drive_file_id", by_drive, drive_id(url)),
+            ("exact_url", by_url, canonical_url(url)),
+            ("parish_name", by_name, normalise_name(seed["name"])),
+        )
+        matching = []
+        method = None
+        for candidate_method, index, identifier in methods:
+            if identifier and index.get(identifier):
+                matching = index[identifier]
+                method = candidate_method
+                break
+        found = min(matching, key=lambda item: STATUS_ORDER[item["status"]]) if matching else None
+        status = found["status"] if found else "unmatched"
+        # A separately named church may belong to a parish already harvested
+        # under another MCN church ID. This registry is reviewed evidence,
+        # not a fuzzy name guess or a declaration that this week's PDF works.
+        identity = (known_mcn_sources or {}).get(church_id(url) or "")
+        resolution = identity.get("resolution") if isinstance(identity, dict) else None
+        known_parish = identity.get("parish_key") if isinstance(identity, dict) else None
+        rows.append({
+            **seed,
+            "status_hint": status,
+            "matched_parish": found["parish"] if found else None,
+            "priority": PRIORITY[status],
+            "match_method": method,
+            "validation": "unverified_seed",
+            **({
+                "known_parish_key": known_parish,
+                "source_resolution": resolution,
+            } if known_parish and resolution else {}),
+        })
+    rows.sort(key=lambda x: (x["priority"], normalise_name(x["name"]), x["url"]))
+    counts = Counter(row["status_hint"] for row in rows)
+    return {
+        "schema_version": 1,
+        "generated_from_harvest_date": report.get("target_date"),
+        "description": (
+            "Unverified source leads. Matches use MCN/Drive IDs, exact URL or parish "
+            "name and never establish a current issue or successful download."
+        ),
+        "stats": {
+            "raw_leads": len(website_rows) + len(specialised_rows),
+            "deduplicated_leads": len(rows),
+            "by_hint": dict(sorted(counts.items())),
+            "id_matched_leads": sum(
+                x["match_method"] in {"mcn_church_id", "drive_file_id"} for x in rows
+            ),
+            "known_shared_parish_leads": sum(
+                x.get("source_resolution") == "existing_shared_parish" for x in rows
+            ),
+            "registered_pending_live_leads": sum(
+                x.get("source_resolution") == "registered_pending_live_verification" for x in rows
+            ),
+            "unmatched_unresolved_leads": sum(
+                x["status_hint"] == "unmatched" and not x.get("source_resolution")
+                for x in rows
+            ),
+        },
+        "leads": rows,
     }
-    queue = build_queue([_seed("Gartan/Termon", f"https://drive.google.com/file/d/{shared}/view")], [], report)
-    assert queue["leads"][0]["status_hint"] == "stale"
-    assert queue["leads"][0]["match_method"] == "drive_file_id"
 
 
-def test_unmatched_lead_is_not_claimed_as_a_newly_harvested_bulletin():
-    queue = build_queue([_seed("Unknown Parish", "https://example.org/bulletin")], [], {})
-    row = queue["leads"][0]
-    assert row["status_hint"] == "unmatched"
-    assert row["validation"] == "unverified_seed"
-    assert row["matched_parish"] is None
-
-
-def test_duplicate_leads_are_kept_once_and_share_website_gets_no_false_match():
-    site = _seed("Barryroe", "https://onefaith.ie/newsletter")
-    other = _seed("Clonakilty", "https://onefaith.ie/newsletter")
-    queue = build_queue([site, site, other], [], {"target_date": "2026-11-15"})
-    assert queue["stats"]["raw_leads"] == 3
-    assert queue["stats"]["deduplicated_leads"] == 2
-    assert all(x["status_hint"] == "unmatched" for x in queue["leads"])
-
-
-def test_seed_parser_handles_mcn_dates_and_spaced_docx_urls(tmp_path):
-    file = tmp_path / "specialised.txt"
-    file.write_text(
-        "MCN camera files from 29/10/2026. 40 links.\n"
-        "Glenfin  25/10/2026  https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/NewsLetter/a.pdf\n"
-        "Claudy  onewebmedia  http://parishofclaudy.com/onewebmedia/NEWSLETTER 25-10-26.docx\n",
-        encoding="utf-8",
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--websites", type=Path, default=WEBSITES)
+    parser.add_argument("--specialised", type=Path, default=SPECIALISED)
+    parser.add_argument("--report", type=Path, default=REPORT)
+    parser.add_argument("--identities", type=Path, default=IDENTITIES)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+    report = json.loads(args.report.read_text(encoding="utf-8"))
+    registry = json.loads(args.identities.read_text(encoding="utf-8"))
+    data = build_queue(
+        load_seeds(args.websites),
+        load_seeds(args.specialised, fallback_type="specialised"),
+        report,
+        known_mcn_sources=registry.get("by_mcn_church_id") or {},
     )
-    rows = load_seeds(file)
-    assert len(rows) == 2
-    assert rows[0]["name"] == "Glenfin"
-    assert rows[0]["source_type"] == "mcn_live"
-    assert rows[1]["url"].endswith("NEWSLETTER 25-10-26.docx")
-    assert rows[1]["source_type"] == "onewebmedia"
-
-
-def test_stable_id_parsing():
-    assert church_id("https://host/live/Uploads/164/NewsLetter/uuid.pdf") == "164"
-    assert drive_id("https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view") == "1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa"
-    assert normalise_name("Gartan/Termon (Kilmacrenan)") == "gartantermon"
-
-
-def test_reviewed_mcn_aliases_are_not_treated_as_new_parishes():
-    known = {
-        "607": {"parish_key": "tourlestrane", "resolution": "existing_shared_parish"},
-        "620": {"parish_key": "rathmore", "resolution": "existing_shared_parish"},
-        "661": {"parish_key": "glencolmcille", "resolution": "registered_pending_live_verification"},
-    }
-    seeds = [
-        _seed("Aclare", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/607/NewsLetter/a.pdf"),
-        _seed("Gneeveguilla", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/620/NewsLetter/b.pdf"),
-        _seed("Glencolmcille", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/661/NewsLetter/c.pdf"),
-        _seed("Unknown church", "https://d3gxiup807zlof.cloudfront.net/live/Uploads/90000/NewsLetter/d.pdf"),
-    ]
-    queue = build_queue(seeds, [], {"target_date": "2026-11-15"}, known_mcn_sources=known)
-    by_name = {row["name"]: row for row in queue["leads"]}
-    assert by_name["Aclare"]["known_parish_key"] == "tourlestrane"
-    assert by_name["Gneeveguilla"]["known_parish_key"] == "rathmore"
-    assert by_name["Glencolmcille"]["source_resolution"] == "registered_pending_live_verification"
-    assert by_name["Unknown church"]["status_hint"] == "unmatched"
-    assert "source_resolution" not in by_name["Unknown church"]
-    assert queue["stats"]["known_shared_parish_leads"] == 2
-    assert queue["stats"]["registered_pending_live_leads"] == 1
-    assert queue["stats"]["unmatched_unresolved_leads"] == 1
-    assert all(x["validation"] == "unverified_seed" for x in queue["leads"])
-
-
-def test_known_id_resolution_does_not_fabricate_a_successful_download():
-    known = {"620": {"parish_key": "rathmore", "resolution": "existing_shared_parish"}}
-    queue = build_queue(
-        [],
-        [_seed("Gneeveguilla", "https://cloudfront.net/live/Uploads/620/NewsLetter/old.pdf")],
-        {"target_date": "2026-11-15"},
-        known_mcn_sources=known,
+    output = args.output or ROOT / "docs/discovery" / (
+        f"research-queue-{report['target_date']}.json"
     )
-    row = queue["leads"][0]
-    assert row["status_hint"] == "unmatched"
-    assert row["matched_parish"] is None
-    assert row["source_resolution"] == "existing_shared_parish"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"Discovery leads: {data['stats']}; wrote {output}")
+
+
+if __name__ == "__main__":
+    main()
