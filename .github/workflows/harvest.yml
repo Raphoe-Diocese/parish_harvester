@@ -680,7 +680,7 @@ jobs:
 
   stitch:
     needs: diocese
-    if: ${{ !cancelled() && needs.diocese.result == 'success' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all')) }}
+    if: ${{ !cancelled() && needs.diocese.result != 'cancelled' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -709,6 +709,24 @@ jobs:
           pattern: harvest-slice-*
           path: _slices
           merge-multiple: false
+
+      - name: Verify adequate harvest slices before publishing
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          # One failed runner should not discard all good diocese results;
+          # a widespread outage must never replace the published bulletin.
+          expected = 25
+          minimum = 23
+          reports = list(Path("_slices").rglob("report.json"))
+          count = len(reports)
+          print(f"Received {count}/{expected} diocesan slices (minimum {minimum})")
+          if count < minimum:
+              raise SystemExit(f"::error::Only {count}/{expected} slices; aborting incomplete full publication")
+          if count < expected:
+              print(f"::warning::{expected-count} diocese slice(s) missing. Publishing with coverage guard; check failed matrix jobs.")
+          PY
 
       - name: Snapshot parish_status before merge
         run: |
