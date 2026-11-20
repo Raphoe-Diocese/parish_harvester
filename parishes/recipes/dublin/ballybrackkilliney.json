@@ -2,18 +2,34 @@
   "parish_key": "ballybrackkilliney",
   "display_name": "Ballybrack",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.ballybrack-killiney-parish.org",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "recorded_date": "2026-11-20",
+  "start_url": "https://www.ballybrack-killiney-parish.org/news.html",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "pdf_download_list",
+  "status": "active",
+  "skip": false,
+  "reason": "Official weekly archive contains dated two-page bulletins, downloadable via Joomla .html routes which return real PDF bytes.",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.ballybrack-killiney-parish.org"
+      "url": "https://www.ballybrack-killiney-parish.org/news.html"
     }
   ],
-  "version": 1
+  "version": 2,
+  "href_patterns": [
+    "/routedownload/"
+  ],
+  "timeout_ms": 55000,
+  "total_timeout_s": 180,
+  "operator_notes": [
+    "20/11/2026: official /news.html archive offers 'Newsletter 14th & 15th November 2026'; anchor download links to /news/routedownload/newsletter-14th-15th-november-2026.html (HTML thank-you intermediary). Following its 'here' link leads /news/download/newsletter-14th-15th-november-2026.html, served as actual 2-page application/pdf with 14th/15th November 2026 masthead.",
+    "Use plain HTTP newest-PDF scraping of the archive. The fetcher canonicalises /routedownload/ to /download/ before requesting PDF; no filename or weekend date is pinned. Future bulletins use the same URL shape.",
+    "Ballybrack-Killiney PDF also identifies neighbouring Loughlinstown, Shankill, Johnstown, Cabinteely and Sallynoggin pastoral partnership. This is not evidence those parishes have identical independent weekly publications; do not automatically alias them.",
+    "Live GitHub harvest result remains unverified."
+  ],
+  "do_not": [
+    "Do not download /routedownload/ HTML thank-you page as a PDF.",
+    "Do not reject a genuine application/pdf simply because its final URL ends .html.",
+    "Do not pin a November filename or use the old inactive link-only homepage recipe."
+  ]
 }
