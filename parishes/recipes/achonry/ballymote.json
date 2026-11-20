@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "ballymote",
   "display_name": "Ballymote",
   "diocese": "achonry",
@@ -15,19 +15,22 @@
   "steps": [
     {
       "action": "image_stack",
-      "count": 4
+      "count": 2
     }
   ],
   "operator_notes": [
     "27/09/2026: official card links https://ballymoteparish.org/. Newsletter at /newsletter/ shows stacked page images Page-01-3.jpg … page-04-3.jpg under /uploads/2026/09/ (HTTP 200).",
     "site_type:http_scrape_newest_images count=4. Filenames have no day — freshness uses upload month.",
     "Site returns 406 without a normal browser User-Agent.",
-    "27/09/2026 harvest: page-04-3.jpg was misdated as 04/09 via slug_day — fixed in bulletin_freshness (page-scan same-month rule)."
+    "27/09/2026 harvest: page-04-3.jpg was misdated as 04/09 via slug_day — fixed in bulletin_freshness (page-scan same-month rule).",
+    "20/11/2026: live /newsletter/ page lists November 2026 page-0-1.jpg and page-1-1.jpg, both belonging to Sunday 15 November 2026. Remaining Page-3-3.jpg and page-04-3.jpg were September 2026 images and MUST NOT be mixed into November issue. Current weekly bulletin is 2 pages, not previous 4.",
+    "20/11/2026: output image URL has /uploads/2026/11/page-1-1.jpg, which is dated 1 November by generic folder-date heuristic although printed masthead says Thirty Third Sunday of Year A – 15th November 2026. Use first-page local OCR to verify issue date before rejecting these page-numbered scans as stale. No date should be guessed when OCR is unavailable."
   ],
   "do_not": [
     "Do not pin Page-01-3.jpg — the -3 suffix changes each week.",
     "Do not harvest telehealth/livestream decorative images from the homepage.",
     "Do not use ballymoteparish.com or .ie — those hosts do not resolve."
   ],
-  "bulletin_format": "image_stack"
+  "bulletin_format": "image_stack",
+  "image_count": 2
 }
