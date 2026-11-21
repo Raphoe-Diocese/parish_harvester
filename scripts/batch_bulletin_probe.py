@@ -281,10 +281,10 @@ def probe_one(item: dict, sunday: date) -> dict:
         # WordPress automatically generates low-resolution image thumbnails.
         # Prefer the full image before accepting a one-page newsletter scan.
         picture_path = urlparse(resolved or url).path
-        thumbnail = re.search(r"-(\\d{2,4})x(\\d{2,4})(?=\\.(?:png|jpe?g)$)", picture_path, re.I)
+        thumbnail = re.search(r"-(\d{2,4})x(\d{2,4})(?=\.(?:png|jpe?g)$)", picture_path, re.I)
         if file_kind in ("png", "jpeg") and thumbnail:
             original_url = re.sub(
-                r"-(\\d{2,4})x(\\d{2,4})(?=\\.(?:png|jpe?g)$)",
+                r"-(\d{2,4})x(\d{2,4})(?=\.(?:png|jpe?g)$)",
                 "", resolved or url, flags=re.I,
             )
             full, _full_type, full_url = fetch(original_url, MAX_FILE, timeout=20)
@@ -294,7 +294,7 @@ def probe_one(item: dict, sunday: date) -> dict:
                 continue
         # A second-page scan by itself is not a complete parish bulletin.
         basename = urlparse(resolved or url).path.rsplit("/", 1)[-1]
-        if file_kind in ("png", "jpeg") and re.search(r"page[-_ ]?0?[2-9](?!\\d)", basename, re.I):
+        if file_kind in ("png", "jpeg") and re.search(r"page[-_ ]?0?[2-9](?!\d)", basename, re.I):
             continue
         # Avoid accepting Gurteen's bulletin as Headford's merely because
         # the shared ChurchTV host returned a current PDF.
