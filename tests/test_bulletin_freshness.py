@@ -18,6 +18,7 @@ from harvester.bulletin_freshness import (
     extract_bulletin_date_from_text,
     freshness_verdict_for_ok_result,
     heading_dates_in_text,
+    issue_date_from_pages,
     issue_date_verdict,
     mark_result_stale,
     pdf_date_before_harvest_week,
@@ -34,6 +35,14 @@ from harvester.fetcher import FetchResult, ParishEntry
 
 
 class BulletinFreshnessTests(unittest.TestCase):
+    def test_king_of_the_universe_masthead_after_first_column(self):
+        front = "Parish office information\n" * 45
+        front += "21st & 22nd November  2026  Our Lord Jesus Christ King of the Universe"
+        self.assertEqual(issue_date_from_pages([front], date(2026, 11, 22)),
+                         (date(2026, 11, 22), "front_page"))
+        self.assertEqual(issue_date_from_pages([front], date(2026, 11, 29)),
+                         (None, "front_outside"))
+
     def test_extract_bulletin_date_supports_common_formats(self) -> None:
         self.assertEqual(
             extract_bulletin_date("https://x.com/bulletin_150626.pdf"),

@@ -720,6 +720,11 @@ _CLOCK_RE = re.compile(
     r"(?:[:.][0-5]\d)?\s*(?:a\.?\s*m\.?|p\.?\s*m\.?|noon)\b"
     r"|(?<!\d)(?:[01]?\d|2[0-3])[:.][0-5]\d\b"
 )
+# Some three-column newsletters extract the masthead after the first 40 lines.
+_KING_OF_UNIVERSE_HEADING_RE = re.compile(
+    r"(?i)^\s*\d{1,2}(?:st|nd|rd|th)?\s*&\s*\d{1,2}(?:st|nd|rd|th)?"
+    r"\s+[a-z]+\s+20\d{2}\s+our lord jesus christ king of the universe\s*$"
+)
 _SUNDAY_WORD_RE = re.compile(r"(?i)\bsunday\b")
 _ORDINARY_SUNDAY_RE = re.compile(
     r"\b(\d{1,2})(?:st|nd|rd|th)? sunday in ordinary time\b"
@@ -765,6 +770,12 @@ def _front_page_issue_dates(text: str) -> list[date]:
         parsed = _line_issue_date(line)
         if parsed is not None:
             found.append(parsed)
+    if not found:
+        for line in _nonempty_text_lines(text):
+            if _KING_OF_UNIVERSE_HEADING_RE.fullmatch(line):
+                parsed = _line_issue_date(line)
+                if parsed is not None:
+                    found.append(parsed)
     return found
 
 
