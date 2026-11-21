@@ -226,6 +226,19 @@ class BatchProbeTests(TestCase):
         self.assertEqual(checked["verdict"], "candidate_requires_manual_review")
         self.assertEqual(checked["reason"], "different_parish_named_in_file")
 
+    def test_dated_prefix_cannot_disguise_another_parish(self):
+        row = {
+            "verdict": "candidate_verified_masthead",
+            "file_kind": "pdf",
+            "document_url": HOME + "20261115-Caltra-Parish-Newsletter-for-14th-Nov.pdf",
+            "name": "Crossmolina",
+            "parish": "crossmolina",
+            "masthead_verified": True,
+        }
+        flagged = batch.audit_existing_candidate(row)
+        self.assertEqual(flagged["verdict"], "candidate_requires_manual_review")
+        self.assertEqual(flagged["reason"], "different_parish_named_in_file")
+
     def test_cumulative_ledger_demotes_small_and_page_two_images(self):
         for path, expected in (
             ("Newsletter-15-November-2026-front-180x180.png", "thumbnail_not_full_bulletin"),
