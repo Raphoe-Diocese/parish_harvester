@@ -106,3 +106,37 @@ def reject_future_dated_downloads(report: dict) -> int:
     summary["stale_rejected"] = len(report["stale_rejected"])
     summary["future_dated_rejected"] = len(rejected)
     return len(rejected)
+
+
+def reject_known_diocesan_admin_downloads(report: dict) -> int:
+    """Block known one-off central documents repeatedly picked for parishes.
+
+    This does not reject genuine parish weekly editions with 'safeguarding'
+    in a notice; the exact document identity is required.
+    """
+    suspect = "kandle.ie/wp-content/uploads/2026/02/safeguarding-sunday-newsletter-2026.pdf"
+    good = []
+    rejected = []
+    for row in report.get("downloaded") or []:
+        if not isinstance(row, dict):
+            continue
+        url = str(row.get("url") or "").lower()
+        if suspect not in url:
+            good.append(row)
+            continue
+        rejected.append({
+            "parish": row.get("parish"),
+            "display_name": row.get("display_name"),
+            "url": row.get("url"),
+            "error": "Generic February diocesan Safeguarding Sunday file is not a current parish newsletter",
+            "reason": "diocesan_admin_document_false_positive",
+        })
+    if not rejected:
+        return 0
+    report["downloaded"] = good
+    report.setdefault("failed", []).extend(rejected)
+    summary = report.setdefault("summary", {})
+    summary["downloaded"] = len(good)
+    summary["failed"] = len(report["failed"])
+    summary["diocesan_admin_rejected"] = len(rejected)
+    return len(rejected)
