@@ -133,6 +133,23 @@ class BatchProbeTests(TestCase):
                 result = batch.probe_one(sample(source), SUNDAY)
         self.assertEqual(result["verdict"], "candidate_verified_masthead")
 
+    def test_one_broken_parish_does_not_abort_120_source_batch(self):
+        queue = {"leads": [
+            {"name": "Broken", "url": HOME + "broken", "matched_parish": "broken",
+             "status_hint": "failed", "validation": "unverified_seed"},
+            {"name": "Working", "url": HOME + "working", "matched_parish": "working",
+             "status_hint": "failed", "validation": "unverified_seed"},
+        ]}
+        def simulate(row, target):
+            if row["matched_parish"] == "broken":
+                raise RuntimeError("site parser crashed")
+            return {"seed": row["url"], "parish": "working", "verdict": "not_verified"}
+        with patch.object(batch, "probe_one", side_effect=simulate):
+            report, _state = batch.run(queue, {}, SUNDAY, 2, 2)
+        self.assertEqual(report["summary"]["probed"], 2)
+        self.assertEqual(report["summary"]["probe_exceptions"], 1)
+        self.assertEqual(len(report["rows"]), 2)
+
     def test_unsupported_links_not_requested(self):
         with patch.object(batch, "fetch") as fetch:
             result = batch.probe_one({"name": "Unknown", "url": "https://facebook.com/example"}, SUNDAY)
