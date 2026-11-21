@@ -103,6 +103,20 @@ class DiscoveryFallbackTests(unittest.TestCase):
             self.assertEqual(dest.read_bytes(), pdf)
             fetch.assert_called_once()
 
+    def test_mcn_redirect_to_another_church_is_rejected(self) -> None:
+        url = "https://d3gxiup807zlof.cloudfront.net/live/Uploads/606/NewsLetter/week.pdf"
+        with tempfile.TemporaryDirectory() as tmp, patch("harvester.discovery_fallback.urlopen") as get:
+            ledger = Path(tmp) / "ledger.json"
+            dest = Path(tmp) / "issue.pdf"
+            self._ledger(ledger, document_url=url)
+            response = get.return_value.__enter__.return_value
+            response.geturl.return_value = url.replace("/606/", "/607/")
+            self.assertIsNone(fetch_verified_discovery_pdf(
+                "stpatricksbelfast", self.TARGET, [url], dest, ledger_path=ledger
+            ))
+            response.read.assert_not_called()
+            self.assertFalse(dest.exists())
+
     def test_old_pdf_body_cannot_be_rescued(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             ledger = Path(tmp) / "ledger.json"

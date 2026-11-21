@@ -10,6 +10,7 @@ import json
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.request import urlopen
 
 from .utils import mcn_upload_church_id
 
@@ -99,13 +100,25 @@ def fetch_verified_discovery_pdf(
     from .replay import _fetch_bytes_with_retries
     from .bulletin_freshness import heading_date_in_pdf_bytes
 
-    hit = _fetch_bytes_with_retries(
-        url, max_attempts=4, per_attempt_timeout_s=8.0,
-        total_budget_s=25.0, want_file=True,
-    )
-    if not hit:
-        return None
-    body, _headers = hit
+    church_id = mcn_upload_church_id(url)
+    if church_id:
+        try:
+            with urlopen(url, timeout=12) as response:
+                if mcn_upload_church_id(response.geturl()) != church_id:
+                    return None
+                body = response.read(12_000_001)
+        except (OSError, ValueError):
+            return None
+        if len(body) > 12_000_000:
+            return None
+    else:
+        hit = _fetch_bytes_with_retries(
+            url, max_attempts=4, per_attempt_timeout_s=8.0,
+            total_budget_s=25.0, want_file=True,
+        )
+        if not hit:
+            return None
+        body, _headers = hit
     if not body.startswith(b"%PDF-") or len(body) < 4096:
         return None
     if heading_date_in_pdf_bytes(body, target=target) != target:
