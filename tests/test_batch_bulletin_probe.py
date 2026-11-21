@@ -19,6 +19,11 @@ def sample(url=HOME):
 
 
 class BatchProbeTests(TestCase):
+    def test_image_with_valueless_alt_has_an_empty_caption(self):
+        page = batch.Links()
+        page.feed('<img src="newsletter.jpg" alt>')
+        self.assertEqual(page.links, [("newsletter.jpg", "")])
+
     def test_mcn_identity_must_match_before_and_after_fetch(self):
         seed = "https://d3gxiup807zlof.cloudfront.net/live/Uploads/606/NewsLetter/old.pdf"
         current = seed.replace("old.pdf", "new.pdf")

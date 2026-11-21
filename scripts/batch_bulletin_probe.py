@@ -87,7 +87,7 @@ class Links(HTMLParser):
                 self.links.append((src, attrs.get("title") or ""))
         elif tag == "img":
             src = attrs.get("src", "")
-            alt = attrs.get("alt", "")
+            alt = attrs.get("alt") or ""
             if src:
                 self.links.append((src, alt))
 
