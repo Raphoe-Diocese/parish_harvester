@@ -1,7 +1,7 @@
 """A diocesan parish directory is not a weekly bulletin."""
 import unittest
 
-from harvester.report_quality import is_directory_html_result, reject_directory_downloads, reject_future_dated_downloads
+from harvester.report_quality import is_directory_html_result, reject_directory_downloads, reject_future_dated_downloads, reject_known_diocesan_admin_downloads
 
 
 class ReportQualityTests(unittest.TestCase):
@@ -46,6 +46,21 @@ class ReportQualityTests(unittest.TestCase):
         self.assertEqual(len(report["downloaded"]), 3)
         self.assertEqual(report["stale_rejected"][0]["reason"], "date_ahead_of_target")
         self.assertEqual(report["summary"]["downloaded"], 3)
+
+    def test_repeated_diocesan_safeguarding_pdf_rejected(self):
+        admin = "https://www.kandle.ie/wp-content/uploads/2026/02/Safeguarding-Sunday-Newsletter-2026.pdf"
+        weekly = "https://www.kandle.ie/wp-content/uploads/2026/11/Parish-Newsletter-15th-November-2026.pdf"
+        report = {
+            "downloaded": [
+                {"parish": "abbeyleix", "url": admin, "file_type": "pdf"},
+                {"parish": "real", "url": weekly, "file_type": "pdf"},
+            ],
+            "failed": [],
+            "summary": {"downloaded": 2, "failed": 0},
+        }
+        self.assertEqual(reject_known_diocesan_admin_downloads(report), 1)
+        self.assertEqual(report["downloaded"][0]["parish"], "real")
+        self.assertEqual(report["summary"]["downloaded"], 1)
 
     def test_reclassify_without_counting_fake_as_success(self):
         report = {
