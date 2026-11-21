@@ -58,6 +58,34 @@ class BatchProbeTests(TestCase):
             result = batch.probe_one(sample(), SUNDAY)
         self.assertEqual(result["verdict"], "candidate_verified_bytes_and_link_date")
 
+
+    def test_wordpress_media_recovers_current_pdf_without_homepage_link(self):
+        import json
+        media = HOME + "wp-json/wp/v2/media?per_page=75&orderby=date&order=desc"
+        html = b"<html><h1>Parish notices</h1></html>"
+        payload = [{"source_url": PDF,
+                    "title": {"rendered": "Parish Bulletin 15 November 2026"},
+                    "date": "2026-11-14T10:00:00"}]
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            if url == media:
+                return json.dumps(payload).encode(), "application/json", media
+            return b"%PDF-1.5\\n" + b"X" * 6000, "application/pdf", PDF
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "candidate_verified_bytes_and_link_date")
+        self.assertEqual(result["document_url"], PDF)
+
+    def test_wordpress_upload_date_not_mistaken_for_issue_date(self):
+        payload = [{"source_url": HOME + "files/Parish-Newsletter.pdf",
+                    "title": {"rendered": "Weekly Parish Newsletter"},
+                    "date": "2026-11-15T10:00:00"}]
+        import json
+        with patch.object(batch, "fetch", return_value=(json.dumps(payload).encode(), "application/json", HOME)):
+            found = batch.wordpress_media_candidates(HOME, SUNDAY)
+        self.assertEqual(found, [])
+
     def test_admin_documents_not_accepted(self):
         bad = HOME + "wp-content/Consent-15-November-2026.pdf"
         html = ('<a href="' + bad + '">Parish Newsletter 15 November 2026</a>').encode()
