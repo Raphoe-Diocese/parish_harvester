@@ -18,15 +18,14 @@ class PasteHitRecipePinsTests(unittest.TestCase):
         self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertEqual(recipe["playbook_type"], "direct_download")
 
-    def test_mayobridge_pins_8_november_pdf(self) -> None:
+    def test_mayobridge_predicts_weekly_pdf_without_permanent_pin(self) -> None:
         recipe = json.loads(
-            Path("parishes/recipes/dromore/mayobridge.json").read_text(
-                encoding="utf-8-sig"
-            )
+            Path("parishes/recipes/dromore/mayobridge.json").read_text(encoding="utf-8-sig")
         )
         self.assertIn("Parish-Bulletin-8-November-2026.pdf", recipe["start_url"])
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["playbook_type"], "predicted_dated_pdf")
+        self.assertGreaterEqual(int(recipe["weeks_ahead"]), 1)
         self.assertNotIn("parish-newsletter", recipe["start_url"])
 
     def test_donaghmore_uses_homepage_weekly_pdf_link_not_old_pin(self) -> None:
