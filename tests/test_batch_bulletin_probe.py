@@ -133,6 +133,24 @@ class BatchProbeTests(TestCase):
                 result = batch.probe_one(sample(source), SUNDAY)
         self.assertEqual(result["verdict"], "candidate_verified_masthead")
 
+    def test_date_only_pdf_in_newsletter_directory(self):
+        dated = HOME + "images/newsletter/15.11.2026.pdf"
+        html = ('<html><a href="' + dated + '">Download</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            return b"%PDF-1.7\\n" + b"X" * 6000, "application/pdf", dated
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "candidate_verified_bytes_and_link_date")
+
+    def test_date_only_admin_pdf_not_accepted(self):
+        dated = HOME + "documents/15.11.2026.pdf"
+        html = ('<html><a href="' + dated + '">Download</a></html>').encode()
+        with patch.object(batch, "fetch", return_value=(html, "text/html", HOME)):
+            result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "not_verified")
+
     def test_one_broken_parish_does_not_abort_120_source_batch(self):
         queue = {"leads": [
             {"name": "Broken", "url": HOME + "broken", "matched_parish": "broken",
