@@ -300,7 +300,14 @@ def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tup
     leads = [r for r in queue.get("leads", []) if r.get("status_hint") != "downloaded"
              and r.get("validation") == "unverified_seed"]
     # Stable deduplication: scan each distinct URL once, even if multiple aliases exist.
-    unique = list({str(x.get("url")): x for x in reversed(leads) if x.get("url")})
+    # Keep the FULL lead records; iterating a dict directly returns URL
+    # strings, which caused every scan to fail with "'str' has no attribute
+    # 'get'" (Actions run 44843000034).
+    unique = list({
+        str(x.get("url")): x
+        for x in reversed(leads)
+        if isinstance(x, dict) and x.get("url")
+    }.values())
     unique.reverse()
     if not unique:
         return {"target_date": sunday.isoformat(), "rows": [], "summary": {}}, {"offset": 0}
