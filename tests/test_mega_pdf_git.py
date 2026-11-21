@@ -612,7 +612,8 @@ class HarvestWorkflowMegaPushTests(unittest.TestCase):
         self.assertIn("gh release create", workflow)
         self.assertIn("S2: do not commit PDFs", workflow)
         self.assertIn("docs/dioceses/", workflow)
-        self.assertIn("cron: '0 9 * * 0'", workflow)
+        self.assertIn("cron: '0 14 * * 0'", workflow)
+        self.assertIn("timezone: 'Europe/Dublin'", workflow)
         # S1 diocese slices skip mega; the stitch job builds it once.
         self.assertIn("merge_diocese_harvests.py --slices-dir _slices --mega", workflow)
         self.assertGreaterEqual(workflow.count('HARVEST_MEGA_PDF: "1"'), 1)
