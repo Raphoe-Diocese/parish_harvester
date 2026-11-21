@@ -28,11 +28,12 @@ class Nov8HttpScrapePinTests(unittest.TestCase):
         self.assertNotEqual(recipe["start_url"], "https://www.laurellodgeparish.ie/")
         self.assertTrue(recipe["start_url"].lower().endswith(".pdf"))
 
-    def test_stjohns_cathedral_pins_8_november_file(self) -> None:
+    def test_stjohns_cathedral_uses_proved_15_november_file_not_old_pin(self) -> None:
         recipe = _load("limerick/stjohnscathedral.json")
         self._assert_wordpress_pin(
-            recipe, "fileID=E2080F83-25AE-47CD-A5E344B06704E699"
+            recipe, "fileID=C8F7451D-9C14-4020-93CD0EE130411ADD"
         )
+        self.assertNotIn("fileID=E2080F83-25AE-47CD-A5E344B06704E699", recipe["start_url"])
         self.assertNotEqual(recipe["start_url"], "https://www.limerickcathedral.com/")
 
 
