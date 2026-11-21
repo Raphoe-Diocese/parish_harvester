@@ -1,30 +1,27 @@
 {
-  "version": 4,
+  "version": 5,
   "parish_key": "stjohnsfallsroad",
   "display_name": "St John's (Falls Road)",
   "diocese": "down_and_connor",
   "start_url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
+  "site_type": "predicted_dated_pdf",
+  "playbook_type": "predicted_dated_pdf",
   "example_url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf",
   "href_patterns": [
-    "Sunday-8th-Nov-2026-ws.pdf"
+    "Sunday-"
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 120,
-  "recorded_date": "2026-11-13",
+  "recorded_date": "2026-11-21",
   "steps": [
-    {
-      "action": "goto",
-      "url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf"
-    },
     {
       "action": "download",
       "url": "https://stjohnsfallsroad.org/wp-content/uploads/2022/06/Sunday-8th-Nov-2026-ws.pdf"
     }
   ],
   "operator_notes": [
-    "13/11/2026: leftover failed timeout on /index.php/bulletin/. GitHub runners stall on the listing. Pin Sunday-8th-Nov-2026-ws.pdf under the stale /uploads/2022/06/ folder. Proved GET 200 application/pdf 566600 bytes magic %PDF-1.3. Page text 32 SUNDAY ORDINARY TIME, Saturday 7 November, Sunday 8 November. Filename date is the real date, not the 2022 folder."
+    "13/11/2026: leftover failed timeout on /index.php/bulletin/. GitHub runners stall on the listing. Pin Sunday-8th-Nov-2026-ws.pdf under the stale /uploads/2022/06/ folder. Proved GET 200 application/pdf 566600 bytes magic %PDF-1.3. Page text 32 SUNDAY ORDINARY TIME, Saturday 7 November, Sunday 8 November. Filename date is the real date, not the 2022 folder.",
+    "21/11/2026: batch discovery produced genuine 15 Nov weekly document with target-date masthead. 15 November dated PDF confirmed; 8 November direct-download pin now fails. Changed to dynamic source to avoid weekly stale pins. Requires targeted live harvest before counting as recovered."
   ],
   "do_not": [
     "Do not use predicted_dated_pdf.",
@@ -32,10 +29,13 @@
     "Do not read the /2022/06/ folder as the bulletin date.",
     "Do not pin Sunday-1st-Nov-2026-ws.pdf.",
     "Do not download Fr-Jobin / Vocations PDFs.",
-    "Do not harvest Facebook."
+    "Do not harvest Facebook.",
+    "Do not publish an older or wrong-parish issue as a current bulletin; check date and identity before mega PDF."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "weeks_back": 0,
+  "weeks_ahead": 1
 }
