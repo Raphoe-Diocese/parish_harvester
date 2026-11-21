@@ -500,6 +500,52 @@ def main() -> int:
         except Exception as exc:
             print(f"  ⚠️  Late stale reclassify failed (non-fatal): {exc}")
 
+    if not target_parish_key:
+        # Do not wait until the all-diocese stitch to block fake bulletins:
+        # matrix workers publish their own mega PDFs/status before stitch.
+        # A November report previously miscounted 140 directory HTML prints,
+        # next-week issues and diocesan safeguarding paperwork as successes.
+        from harvester.report_quality import (
+            reject_directory_downloads,
+            reject_future_dated_downloads,
+            reject_known_diocesan_admin_downloads,
+        )
+
+        report_payload = json.loads(REPORT_JSON.read_text(encoding="utf-8"))
+        original_downloaded = {
+            str(row.get("parish") or "")
+            for row in report_payload.get("downloaded") or []
+            if isinstance(row, dict)
+        }
+        directory_rejected = reject_directory_downloads(report_payload)
+        future_rejected = reject_future_dated_downloads(report_payload)
+        admin_rejected = reject_known_diocesan_admin_downloads(report_payload)
+        total_quality_rejected = directory_rejected + future_rejected + admin_rejected
+        if total_quality_rejected:
+            surviving = {
+                str(row.get("parish") or "")
+                for row in report_payload.get("downloaded") or []
+                if isinstance(row, dict)
+            }
+            rejected_keys = original_downloaded - surviving
+            REPORT_JSON.write_text(
+                json.dumps(report_payload, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            for result in all_results:
+                if result.key in rejected_keys and result.status == "ok":
+                    result.status = "error"
+                    result.is_stale = True
+                    result.error = (
+                        "Weekly bulletin quality gate: incorrect date, "
+                        "diocesan directory or unrelated administrative document"
+                    )
+            print(
+                f"  ⛔ Pre-publication quality gate: excluded {total_quality_rejected} "
+                f"false bulletin successes ({directory_rejected} directory, "
+                f"{future_rejected} future week, {admin_rejected} admin)"
+            )
+
     print("\n── Parish status ───────────────────────────────────────────")
     skip_status = os.environ.get("HARVEST_SKIP_STATUS", "0").strip().lower() in {
         "1",
