@@ -1,10 +1,10 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "parishofroslea",
   "display_name": "Roslea (St Tierney's & St Mary's)",
   "diocese": "clogher",
   "start_url": "https://parishofroslea.com/",
-  "site_type": "http_scrape_newest_pdf",
+  "site_type": "pdf_download_list",
   "href_patterns": [
     "Bulletin-Sunday-"
   ],
@@ -18,17 +18,34 @@
     {
       "action": "goto",
       "url": "https://parishofroslea.com/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/parish-bulletin/bulletin-sunday-']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/wp-content/uploads/'][href*='Bulletin-Sunday-'][href$='.pdf']",
+      "pick_strategy": "first_match"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
     "20/11/2026: repository 15 Nov report shows category page scrape FAILED. Parish homepage visibly exposes current 'Bulletin Sunday 15th November 2026' with link /wp-content/uploads/2026/11/Bulletin-Sunday-15th-November-2026.pdf, plus prior weeks. Switch to homepage and filter filename to Bulletin-Sunday-.",
     "Do not pin the dated PDF; verify target week's filename and masthead before accepting.",
-    "20/11/2026: confirmed on homepage direct PDF link Bulletin-Sunday-15th-November-2026.pdf. Restrict match to Bulletin-Sunday- only; the replay matcher is OR across patterns so a generic .pdf admits unrelated files."
+    "20/11/2026: confirmed on homepage direct PDF link Bulletin-Sunday-15th-November-2026.pdf. Restrict match to Bulletin-Sunday- only; the replay matcher is OR across patterns so a generic .pdf admits unrelated files.",
+    "21/11/2026: inspected 15 November post /parish-bulletin/bulletin-sunday-15th-november-2026/: actual PDF /wp-content/uploads/2026/11/Bulletin-Sunday-15th-November-2026.pdf is embedded INSIDE article, not linked directly by homepage. Two-stage dynamic click homepage -> latest dated bulletin post -> bulletin PDF. Do not use homepage-only http scrape."
   ],
   "do_not": [
     "Do not go back to failed /category/parish-bulletin/ as primary scrape.",
     "Do not harvest donation, finance, school or GDPR PDFs.",
-    "Do not harvest Facebook or a future-dated post typo."
+    "Do not harvest Facebook or a future-dated post typo.",
+    "Do not assume the latest PDF is directly linked from the homepage."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
