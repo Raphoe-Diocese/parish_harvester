@@ -119,6 +119,46 @@ def verify_file(raw: bytes, url: str) -> str:
     return ""
 
 
+
+def wordpress_media_candidates(page_url: str, sunday: date) -> list[str]:
+    """Find dated newsletter files in the WordPress REST media library.
+
+    Many WordPress homepages expose no PDF links. Only a dated *filename or
+    title* matching the requested Sunday is accepted, never an upload date.
+    """
+    parsed = urlparse(page_url)
+    if not parsed.hostname:
+        return []
+    api = f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/media?per_page=75&orderby=date&order=desc"
+    raw, kind, _resolved = fetch(api, MAX_HTML, timeout=12)
+    if not raw or ("json" not in kind and not raw.lstrip().startswith(b"[")):
+        return []
+    try:
+        payload = json.loads(raw.decode("utf-8", "replace"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return []
+    if not isinstance(payload, list):
+        return []
+    results = []
+    for entry in payload:
+        if not isinstance(entry, dict):
+            continue
+        url = str(entry.get("source_url") or "")
+        title = entry.get("title") or {}
+        if isinstance(title, dict):
+            title = str(title.get("rendered") or "")
+        combined = urlparse(url).path.rsplit("/", 1)[-1] + " " + str(title)
+        if not allowed(url) or not FILES.search(url):
+            continue
+        if BAD.search(combined) or not GOOD.search(combined):
+            continue
+        filename = urlparse(url).path.rsplit("/", 1)[-1]
+        issue = parse_issue_date(filename, sunday.year) or parse_issue_date(str(title), sunday.year)
+        if issue == sunday:
+            results.append(url)
+    return list(dict.fromkeys(results))[:5]
+
+
 def probe_one(item: dict, sunday: date) -> dict:
     initial = str(item.get("url") or "")
     result = {"parish": item.get("matched_parish"), "name": item.get("name"),
@@ -193,7 +233,11 @@ def probe_one(item: dict, sunday: date) -> dict:
         if found != sunday:
             continue
         candidates.append(url)
-    for url in candidates[:3]:
+    if not candidates:
+        # Broadly reusable recovery: WordPress media often holds the current
+        # parish PDF when its homepage and archive pages have none.
+        candidates.extend(wordpress_media_candidates(final, sunday))
+    for url in candidates[:5]:
         body, ctype, resolved = fetch(url, MAX_FILE, timeout=20)
         file_kind = verify_file(body, resolved or url)
         if not file_kind:
