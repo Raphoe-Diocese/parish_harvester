@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "bangorparish",
   "display_name": "Bangor",
   "diocese": "down_and_connor",
@@ -8,30 +8,17 @@
     {
       "action": "goto",
       "url": "https://www.bangorparish.com/parish-bulletin/"
-    },
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
-      "text": "Download Parish Newsletter",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download"
     }
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
+  "playbook_type": "http_scrape_newest_pdf",
   "site_type": "http_scrape_newest_pdf",
-  "href_patterns": ["bulletin", "newsletter"],
+  "href_patterns": [
+    "bulletin"
+  ],
   "example_url": "https://www.bangorparish.com/wp-content/uploads/06-SEPT-2026-bulletin.pdf",
-  "recorded_date": "2026-08-10",
+  "recorded_date": "2026-11-21",
   "operator_notes": [
     "SUPERSEDES the 2026-06-27 version — that recipe had a goto step",
     "hardcoded to the literal 14-June-2026-NEWSLETTER.pdf with NO",
@@ -50,7 +37,8 @@
     "nothing from July/August present) — genuinely stale, not a scraper",
     "bug. This recipe will now pick up whatever is newest automatically",
     "once the parish resumes posting; re-check manually if it persists at",
-    "outcome=stale for many more weeks."
+    "outcome=stale for many more weeks.",
+    "21/11/2026: batch discovery run 44843929761 independently fetched valid 15 Nov bulletin bytes for this parish; old recipe selected previous-week or unrelated file. Dynamic strategy now uses dated URL rewrite, parish listing or WP media matching rather than pinning the 15 Nov PDF. Recheck with a live targeted harvest; do not declare automatically recovered from recipe change alone."
   ],
   "operator_notes_2026_08_18": [
     "Recheck: wp-json media newest NEWSLETTER is still 14-June-2026-NEWSLETTER.pdf. Later Document_260811_*.pdf files are camera-upload timestamps, not weekly newsletters (opaque, already ignored). Parish-Newsletter-Notice-August-Sept-2026.docx is a notice, not the Sunday bulletin. Genuinely stale.",
@@ -58,6 +46,7 @@
   ],
   "do_not": [
     "Do not pin a dated filename in the selector — it breaks every week.",
-    "Do not pick 'Download Missalette' links — that's a different weekly document."
+    "Do not pick 'Download Missalette' links — that's a different weekly document.",
+    "Do not pin a specific Sunday PDF or accept previous-week content as fresh."
   ]
 }
