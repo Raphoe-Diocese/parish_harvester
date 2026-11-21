@@ -14,7 +14,7 @@ from pathlib import Path
 from PyPDF2 import PdfReader
 
 from harvester.ai_summaries import summarise_bulletin
-from harvester.events_extractor import extract_events, write_events_json
+from harvester.events_extractor import extract_events_with_status, write_events_json
 from harvester.weekly_diff import diff_bulletins
 from harvester.diocese_intro import lookup_internal_href
 from harvester.parish_aliases import collapse_named_links
@@ -798,12 +798,14 @@ def _write_parish_reader_outputs(
         parish_ocr = parish_chunks.get(parish_key) or ""
         prev_parish_ocr = previous_chunks.get(parish_key) or ""
 
-        if summaries_disabled:
+        if not parish_ocr.strip():
+            summary_payload = {"bullets": None, "error": "parish_text_missing"}
+        elif summaries_disabled:
             summary_payload = {"bullets": None, "error": "ai_summaries_disabled"}
         else:
             if idx > 0:
                 time.sleep(0.5)
-            summary_result = summarise_bulletin(parish_ocr or ocr_text, parish_name, mistral_api_key)
+            summary_result = summarise_bulletin(parish_ocr, parish_name, mistral_api_key)
             if summary_result is None:
                 missing_api_key = not (mistral_api_key or "").strip()
                 if missing_api_key:
@@ -817,27 +819,30 @@ def _write_parish_reader_outputs(
         _write_json(SUMMARIES_DIR / diocese / f"{parish_key}.json", summary_payload)
         _update_bulletins_index(SUMMARIES_DIR, diocese, parish_key, bulletin_date)
 
-        if prior_missing:
+        if prior_missing or not prev_parish_ocr.strip() or not parish_ocr.strip():
             diff_payload = {
                 "added_lines": [],
                 "removed_lines": [],
                 "kept_count": 0,
-                "note": "no_prior_bulletin_found",
+                "note": "no_prior_bulletin_found" if parish_ocr.strip() else "parish_text_missing",
             }
         else:
-            diff_payload = diff_bulletins(parish_ocr or ocr_text, prev_parish_ocr)
+            diff_payload = diff_bulletins(parish_ocr, prev_parish_ocr)
         _write_json(DIFFS_DIR / diocese / f"{parish_key}.json", diff_payload)
         _update_bulletins_index(DIFFS_DIR, diocese, parish_key, bulletin_date)
 
-        events = extract_events(parish_ocr or ocr_text, parish_name, parish_key, diocese)
+        events, provider, error = (
+            extract_events_with_status(parish_ocr, parish_name, parish_key, diocese)
+            if parish_ocr.strip() else ([], None, "parish_text_missing")
+        )
         write_events_json(
             events=events,
             parish_key=parish_key,
             parish_name=parish_name,
             diocese=diocese,
             bulletin_date=bulletin_date,
-            ai_provider=None,
-            error=None,
+            ai_provider=provider,
+            error=error,
             repo_root=REPO_ROOT,
         )
 

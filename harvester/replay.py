@@ -955,7 +955,7 @@ def recipe_path_for(parish_key: str, parishes_dir: Path = PARISHES_DIR) -> Path:
 
 def load_recipe(path: Path) -> dict:
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
     except FileNotFoundError as exc:
         raise RecipeReplayError(f"Recipe not found: {path}") from exc
     except Exception as exc:
