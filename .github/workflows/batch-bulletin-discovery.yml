@@ -30,25 +30,40 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies and verify probe safety
+      - name: Install dependencies
         run: |
           set -euo pipefail
           pip install -r requirements.txt
-          python -m py_compile scripts/batch_bulletin_probe.py
-          python -m unittest discover -s tests -p test_batch_bulletin_probe.py -v
+
+      - name: Verify probe safety (preserve results even if tests fail)
+        id: probe_tests
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p _batch_diagnostics
+          python -m py_compile scripts/batch_bulletin_probe.py 2>&1 | tee _batch_diagnostics/compile.log
+          python -m unittest discover -s tests -p test_batch_bulletin_probe.py -v 2>&1 | tee _batch_diagnostics/tests.log
 
       - name: Probe 120 unresolved sources in parallel
+        id: probe_run
+        if: always()
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           set -euo pipefail
-          python scripts/batch_bulletin_probe.py --limit 120 --workers 16
+          mkdir -p _batch_diagnostics
+          python scripts/batch_bulletin_probe.py --limit 120 --workers 16 2>&1 | tee _batch_diagnostics/scan.log
 
-      - name: Preserve machine-readable result
+      - name: Preserve results and diagnostics even after failure
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: batch-bulletin-probes-${{ github.run_id }}
-          path: docs/discovery/batch-bulletin-probes.json
+          path: |
+            docs/discovery/batch-bulletin-probes.json
+            parishes/batch_probe_cursor.json
+            _batch_diagnostics/
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Commit cursor and results, retry concurrent harvest pushes
@@ -67,3 +82,11 @@ jobs:
             git rebase origin/main || { git rebase --abort; exit 1; }
           done
           exit 1
+
+      - name: Surface failed tests and scan as a red workflow
+        if: always()
+        run: |
+          if [ "${{ steps.probe_tests.outcome }}" = "failure" ] || [ "${{ steps.probe_run.outcome }}" = "failure" ]; then
+            echo "::error::Batch discovery failed a check. Diagnostics were preserved in the workflow artefact."
+            exit 1
+          fi
