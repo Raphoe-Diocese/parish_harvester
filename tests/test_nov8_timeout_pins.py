@@ -17,17 +17,14 @@ def _recipe(path: str) -> dict:
 
 
 class Nov8TimeoutPinTests(unittest.TestCase):
-    def test_ballyfermot_pins_8_november_sunday_message(self) -> None:
+    def test_ballyfermot_discovers_sunday_message_media_each_week(self) -> None:
         recipe = _recipe("parishes/recipes/dublin/ballyfermotassumption.json")
-        self.assertIn(
-            "Sunday-Messge-32nd-Sunday-in-Ordinary-time-8-Nov-2026-A4-Double.pdf",
-            recipe["start_url"],
-        )
-        self.assertNotIn("1-Nov", recipe["start_url"])
-        self.assertNotIn("SHARE", recipe["start_url"])
-        self.assertEqual(recipe["site_type"], "wordpress")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["start_url"], "https://assumptionballyfermot.ie/")
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["playbook_type"], "wp_json_newest_media")
+        self.assertIn("Sunday-Mess", recipe["href_patterns"])
+        self.assertNotIn("Sunday-Messge-32nd-Sunday", recipe["start_url"])
+        self.assertEqual(recipe["steps"][0]["action"], "goto")
 
     def test_ballymun_pins_8_november_webp(self) -> None:
         recipe = _recipe("parishes/recipes/dublin/ballymunroad.json")
