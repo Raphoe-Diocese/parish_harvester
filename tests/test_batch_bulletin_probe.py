@@ -262,6 +262,21 @@ class BatchProbeTests(TestCase):
                    "document_url": HOME + path, "name": "Example", "parish": "example"}
             self.assertEqual(batch.audit_existing_candidate(row)["reason"], expected)
 
+    def test_final_batch_only_processes_remaining_leads(self):
+        queue = {"leads": [
+            {"url": HOME + str(i), "matched_parish": str(i),
+             "status_hint": "failed", "validation": "unverified_seed"}
+            for i in range(3)
+        ]}
+        with patch.object(batch, "probe_one",
+                          side_effect=lambda row, sunday: {
+                              "seed": row["url"], "verdict": "not_verified"
+                          }) as scan:
+            report, cursor = batch.run(queue, {"offset": 2}, SUNDAY, 120, 3)
+        self.assertEqual(report["summary"]["probed"], 1)
+        self.assertEqual(cursor["offset"], 0)
+        self.assertEqual(scan.call_count, 1)
+
     def test_one_broken_parish_does_not_abort_120_source_batch(self):
         queue = {"leads": [
             {"name": "Broken", "url": HOME + "broken", "matched_parish": "broken",
