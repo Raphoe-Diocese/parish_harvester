@@ -218,6 +218,24 @@ class BatchProbeTests(TestCase):
             result = batch.probe_one(sample(), SUNDAY)
         self.assertEqual(result["verdict"], "not_verified")
 
+    def test_cumulative_ledger_demotes_cross_parish_pdf(self):
+        row = {"verdict": "candidate_verified_masthead", "file_kind": "pdf",
+               "document_url": HOME + "Gurteen-Parish-Newsletter-15-November-2026.pdf",
+               "name": "Headford", "parish": "headford", "masthead_verified": True}
+        checked = batch.audit_existing_candidate(row)
+        self.assertEqual(checked["verdict"], "candidate_requires_manual_review")
+        self.assertEqual(checked["reason"], "different_parish_named_in_file")
+
+    def test_cumulative_ledger_demotes_small_and_page_two_images(self):
+        for path, expected in (
+            ("Newsletter-15-November-2026-front-180x180.png", "thumbnail_not_full_bulletin"),
+            ("20261115-Newsletter-Page-2.jpg", "only_later_page_found"),
+        ):
+            row = {"verdict": "candidate_verified_bytes_and_link_date", "file_kind": "png"
+                   if path.endswith(".png") else "jpeg",
+                   "document_url": HOME + path, "name": "Example", "parish": "example"}
+            self.assertEqual(batch.audit_existing_candidate(row)["reason"], expected)
+
     def test_one_broken_parish_does_not_abort_120_source_batch(self):
         queue = {"leads": [
             {"name": "Broken", "url": HOME + "broken", "matched_parish": "broken",
