@@ -151,6 +151,73 @@ class BatchProbeTests(TestCase):
             result = batch.probe_one(sample(), SUNDAY)
         self.assertEqual(result["verdict"], "not_verified")
 
+
+    def test_undated_newsletter_pdf_requires_current_masthead(self):
+        undated = HOME + "wp-content/uploads/newsletter.pdf"
+        html = ('<html><a href="' + undated + '">Weekly Parish Newsletter</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            return b"%PDF-1.5\n" + b"X" * 6000, "application/pdf", undated
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            with patch("harvester.bulletin_freshness.heading_date_in_pdf_bytes",
+                       return_value=SUNDAY):
+                result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "candidate_verified_masthead")
+        self.assertEqual(result["document_url"], undated)
+
+    def test_undated_newsletter_pdf_with_old_masthead_not_accepted(self):
+        undated = HOME + "wp-content/uploads/newsletter.pdf"
+        html = ('<html><a href="' + undated + '">Weekly Parish Newsletter</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            return b"%PDF-1.5\n" + b"X" * 6000, "application/pdf", undated
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            with patch("harvester.bulletin_freshness.heading_date_in_pdf_bytes",
+                       return_value=date(2026, 11, 8)):
+                result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "not_verified")
+
+    def test_thumbnail_uses_full_size_image_when_available(self):
+        small = HOME + "wp-content/uploads/Newsletter-15-November-2026-front-180x180.png"
+        full = HOME + "wp-content/uploads/Newsletter-15-November-2026-front.png"
+        html = ('<html><a href="' + small + '">Parish Newsletter 15 November 2026</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            if url == small:
+                return b"\x89PNG\r\n\x1a\n" + b"X" * 4000, "image/png", small
+            if url == full:
+                return b"\x89PNG\r\n\x1a\n" + b"Y" * 8000, "image/png", full
+            return b"", "", ""
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["document_url"], full)
+        self.assertEqual(result["file_kind"], "png")
+
+    def test_page_two_only_image_is_not_complete_newsletter(self):
+        page = HOME + "images/newsletter/2026-11-15-Newsletter-Page-2.jpg"
+        html = ('<html><a href="' + page + '">Parish Bulletin 15 November 2026</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            return b"\xff\xd8\xff" + b"X" * 6000, "image/jpeg", page
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "not_verified")
+
+    def test_wrong_named_parish_pdf_not_misassigned(self):
+        other = HOME + "wp-content/uploads/Gurteen-Parish-Newsletter-15-November-2026.pdf"
+        html = ('<html><a href="' + other + '">Weekly Parish Newsletter 15 November 2026</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == HOME:
+                return html, "text/html", HOME
+            return b"%PDF-1.5\n" + b"X" * 6000, "application/pdf", other
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            result = batch.probe_one(sample(), SUNDAY)
+        self.assertEqual(result["verdict"], "not_verified")
+
     def test_one_broken_parish_does_not_abort_120_source_batch(self):
         queue = {"leads": [
             {"name": "Broken", "url": HOME + "broken", "matched_parish": "broken",
