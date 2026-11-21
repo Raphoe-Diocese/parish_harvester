@@ -34,12 +34,14 @@ class Leftover0811PinTests(unittest.TestCase):
             recipe["start_url"].rstrip("/"), "https://www.stlukesparishd15.com"
         )
 
-    def test_stjohnsfallsroad_pins_8_november_pdf(self) -> None:
+    def test_stjohnsfallsroad_predicts_week_from_old_wp_upload_folder(self) -> None:
         recipe = _recipe("parishes/recipes/down_and_connor/stjohnsfallsroad.json")
-        self._assert_wordpress_direct(recipe, "Sunday-8th-Nov-2026-ws.pdf")
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["playbook_type"], "predicted_dated_pdf")
+        self.assertIn("Sunday-8th-Nov-2026-ws.pdf", recipe["start_url"])
         self.assertIn("/2022/06/", recipe["start_url"])
+        self.assertGreaterEqual(int(recipe["weeks_ahead"]), 1)
         self.assertNotIn("index.php/bulletin", recipe["start_url"])
-        self.assertNotIn("1st-Nov", recipe["start_url"])
 
     def test_gurranabraher_has_dynamic_sunday_pdf_archive_not_eighth_nov_pin(self) -> None:
         recipe = _recipe("parishes/recipes/cork_and_ross/gurranabraher.json")
@@ -363,27 +365,15 @@ class Leftover0811PinTests(unittest.TestCase):
         self.assertNotIn("1st-Nov", recipe.get("example_url") or "")
         self.assertNotIn("15th-Nov", recipe.get("example_url") or "")
 
-    def test_booterstown_pins_8_nov_hash_pdf_not_1st_or_15th(self) -> None:
+    def test_booterstown_discovers_current_media_not_fixed_old_hash(self) -> None:
         recipe = _recipe("parishes/recipes/dublin/booterstown.json")
-        self._assert_wordpress_direct(
-            recipe, "bp-bfecaa62bd5afda614093164719472b3a0b43a547d953544eeaff018f7075ffc.pdf"
-        )
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["playbook_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["start_url"], "https://booterstownparish.ie/")
+        self.assertIn("Booterstown-Weekly-Newsletter", recipe["href_patterns"])
+        self.assertEqual(recipe["steps"][0]["action"], "goto")
         self.assertFalse(recipe.get("skip"))
-        self.assertIn("/2026/11/", recipe["start_url"])
-        self.assertNotIn("Sun-1-November", recipe["start_url"])
-        self.assertNotIn("0611d240bb768134", recipe["start_url"])
-        self.assertNotIn("Sun-15-November", recipe["start_url"])
-        self.assertNotIn("babb21616eacec4f1d0084b7ccad62ec55905d779e5e12e04b2eccf0d06e16d0", recipe["start_url"])
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertNotEqual(
-            recipe["start_url"].rstrip("/"), "https://booterstownparish.ie"
-        )
-        verdict = check_bulletin_freshness(
-            "Sun-8-November-2026-Booterstown-Weekly-Newsletter.pdf",
-            date(2026, 11, 8),
-        )
-        self.assertEqual(verdict.status, "fresh")
-        self.assertEqual(verdict.extracted_date, date(2026, 11, 8))
+        self.assertNotIn("bp-bfecaa62bd5afda", recipe["start_url"])
 
     def test_moyraverty_pins_8_nov_wix_pdf_not_october_button(self) -> None:
         recipe = _recipe("parishes/recipes/dromore/moyraverty.json")
