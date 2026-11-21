@@ -1490,6 +1490,13 @@ async def _try_http_first_html_print(
     body, headers = hit
     if not _http_body_is_html(body, headers):
         return None
+    if recipe.get("weekly_html_archive") == "dated_sunday_h1":
+        from .weekly_html_archive import write_weekly_html_issue
+
+        if not target_date or not write_weekly_html_issue(body.decode("utf-8", "replace"), target_date, dest):
+            return None
+        _verify_bulletin_pdf(dest, recipe.get("max_bulletin_pages"), target=target_date)
+        return url, "print_to_pdf"
     html = _inject_html_base_href(body.decode("utf-8", "ignore"), url)
     context = await browser.new_context(accept_downloads=True)
     page = await context.new_page()
