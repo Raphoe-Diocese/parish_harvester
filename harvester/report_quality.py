@@ -6,6 +6,7 @@ PDFs or genuine parish newsletter articles. Used at harvest and mega stitch.
 from __future__ import annotations
 
 from urllib.parse import urlparse
+from datetime import date
 import re
 
 _DIOCESE_DIRECTORY_HOSTS = {
@@ -61,4 +62,47 @@ def reject_directory_downloads(report: dict) -> int:
     summary["downloaded"] = len(good)
     summary["failed"] = len(report["failed"])
     summary["directory_html_rejected"] = len(rejected)
+    return len(rejected)
+
+
+def reject_future_dated_downloads(report: dict) -> int:
+    """A 22 November PDF must never be counted in the 15 November harvest.
+
+    Relies on an explicit issue date already extracted by the harvester.
+    Unknown dates are not guessed. Sunday or weekday editions from the
+    current week remain eligible for the existing freshness referee.
+    """
+    try:
+        target = date.fromisoformat(str(report.get("target_date") or ""))
+    except ValueError:
+        return 0
+    good = []
+    rejected = []
+    for row in report.get("downloaded") or []:
+        if not isinstance(row, dict):
+            continue
+        raw_date = str(row.get("bulletin_date") or "")
+        try:
+            issue = date.fromisoformat(raw_date)
+        except ValueError:
+            issue = None
+        if issue is None or issue <= target:
+            good.append(row)
+            continue
+        rejected.append({
+            "parish": row.get("parish"),
+            "display_name": row.get("display_name"),
+            "url": row.get("url"),
+            "bulletin_date": raw_date,
+            "reason": "date_ahead_of_target",
+            "error": f"Bulletin date {raw_date} is later than harvest target {target}",
+        })
+    if not rejected:
+        return 0
+    report["downloaded"] = good
+    report.setdefault("stale_rejected", []).extend(rejected)
+    summary = report.setdefault("summary", {})
+    summary["downloaded"] = len(good)
+    summary["stale_rejected"] = len(report["stale_rejected"])
+    summary["future_dated_rejected"] = len(rejected)
     return len(rejected)
