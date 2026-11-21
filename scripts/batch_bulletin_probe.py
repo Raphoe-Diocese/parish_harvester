@@ -299,7 +299,7 @@ def probe_one(item: dict, sunday: date) -> dict:
         # Avoid accepting Gurteen's bulletin as Headford's merely because
         # the shared ChurchTV host returned a current PDF.
         named = re.search(
-            r"^([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
+            r"(?:^|[-_/])([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
             basename, re.I,
         )
         if named:
@@ -356,7 +356,7 @@ def audit_existing_candidate(row: dict) -> dict:
         if re.search(r"page[-_ ]?0?[2-9](?!\d)", filename, re.I):
             issue = "only_later_page_found"
     named = re.search(
-        r"^([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
+        r"(?:^|[-_/])([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
         filename, re.I,
     )
     if named:
