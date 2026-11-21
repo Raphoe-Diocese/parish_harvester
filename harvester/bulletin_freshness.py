@@ -1496,6 +1496,27 @@ def freshness_verdict_for_ok_result(
             ):
                 return verdict_for_extracted_date(url_date, target)
             return verdict_for_extracted_date(too_old, target)
+        # A permanent overwritten weekly PDF can live under an old uploads
+        # directory (Balally: /uploads/2020/06/Newsletter-14th-15th-November.pdf).
+        # The archive folder is not its ISSUE date. When the shared PDF reader
+        # confirms an issue stamp printed on the paper for this exact week,
+        # accept that proof over the stale URL/report date. Do not allow a
+        # year merely mentioned in a notice, or a URL-derived date, to do this.
+        if verdict.status == "stale":
+            printed, proof = saved_bulletin_issue_date(
+                path, target=target, url=url or None
+            )
+            if printed is not None and proof in {
+                "front_page", "later_page", "liturgical", "ocr"
+            }:
+                printed_verdict = verdict_for_extracted_date(printed, target)
+                if printed_verdict.status == "fresh" and printed <= target:
+                    return FreshnessVerdict(
+                        status="fresh",
+                        extracted_date=printed,
+                        reason="printed_current_issue_overrides_old_source",
+                        days_from_target=(printed - target).days,
+                    )
         body_verdict = pdf_body_heading_verdict(path, target)
         if body_verdict is not None and body_verdict.status == "fresh":
             return issue_date_verdict(verdict, body_verdict)
@@ -1594,6 +1615,17 @@ def reclassify_stale_downloaded_in_report(
             stub, target, report_bulletin_date=report_date
         )
         if verdict.status != "stale":
+            if (
+                verdict.reason == "printed_current_issue_overrides_old_source"
+                and verdict.extracted_date is not None
+            ):
+                # A reused 2020 WordPress path must not leave a 2020 date on
+                # the 2026 website after its actual weekly PDF was verified.
+                from .utils import format_uk_date as _format_issue_date
+
+                actual_date = verdict.extracted_date.isoformat()
+                item["bulletin_date"] = actual_date
+                item["bulletin_date_uk"] = _format_issue_date(actual_date)
             kept.append(item)
             continue
 
