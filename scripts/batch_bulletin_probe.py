@@ -18,7 +18,9 @@ import re
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
+from harvester.config import target_sunday
 from harvester.utils import extract_date_from_string, extract_date_from_slug
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +34,7 @@ BAD = re.compile(r"gdpr|consent|standing.order|gift.aid|donat|privacy|cookie|saf
 GOOD = re.compile(r"newsletter|bulletin|parish.news|sunday|mass.sheet|weekly", re.I)
 FILES = re.compile(r"\.(pdf|jpe?g|png)(?:$|[?#])", re.I)
 SOCIAL = {"facebook.com", "instagram.com", "youtube.com", "x.com", "twitter.com", "tiktok.com"}
+SHARED_UPLOAD_HOSTS = {"dioceseofkerry.ie"}
 MAX_HTML = 1_250_000
 MAX_FILE = 12_000_000
 
@@ -200,6 +203,7 @@ def probe_one(item: dict, sunday: date) -> dict:
         path = urlparse(final).path.lower()
         host_name = host(final)
         if ("/wp-content/uploads/" in path
+                and host_name not in SHARED_UPLOAD_HOSTS
                 and "cdn" not in host_name
                 and "google" not in host_name
                 and "wordpress.com" not in host_name):
@@ -368,6 +372,8 @@ def audit_existing_candidate(row: dict) -> dict:
         )
         if source and source not in expected:
             issue = "different_parish_named_in_file"
+    if row.get("fallback_website") and host(url) in SHARED_UPLOAD_HOSTS:
+        issue = "shared_diocesan_upload_without_parish_listing"
     if issue:
         row["previous_verdict"] = row["verdict"]
         row["verdict"] = "candidate_requires_manual_review"
@@ -422,14 +428,21 @@ def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tup
     return report, {"offset": (offset + len(batch)) % len(unique), "target_date": sunday.isoformat()}
 
 
+def discovery_sunday(today: date) -> date:
+    """Start the upcoming issue's discovery batch on Saturday."""
+    if today.weekday() == 5:
+        return today + timedelta(days=1)
+    return target_sunday(today)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=120)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--date", default="")
     args = ap.parse_args()
-    now = datetime.now(timezone.utc).date()
-    sunday = date.fromisoformat(args.date) if args.date else now - timedelta(days=(now.weekday() + 1) % 7)
+    today = datetime.now(ZoneInfo("Europe/Dublin")).date()
+    sunday = date.fromisoformat(args.date) if args.date else discovery_sunday(today)
     queue = json.loads(QUEUE.read_text(encoding="utf-8"))
     if ADDITIONAL.exists():
         extra = json.loads(ADDITIONAL.read_text(encoding="utf-8"))

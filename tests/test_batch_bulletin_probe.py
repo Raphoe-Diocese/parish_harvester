@@ -19,6 +19,28 @@ def sample(url=HOME):
 
 
 class BatchProbeTests(TestCase):
+    def test_discovery_rolls_forward_on_saturday(self):
+        for day, expected in ((20, 15), (21, 22), (22, 22), (23, 22)):
+            with self.subTest(day=day):
+                self.assertEqual(batch.discovery_sunday(date(2026, 11, day)),
+                                 date(2026, 11, expected))
+
+    def test_stale_kerry_pdf_does_not_search_other_parishes_uploads(self):
+        stale = "https://www.dioceseofkerry.ie/wp-content/uploads/2026/11/Old.pdf"
+        with patch.object(batch, "fetch", return_value=(b"%PDF-1.5", "application/pdf", stale)) as fetch:
+            result = batch.probe_one(sample(stale), SUNDAY)
+        self.assertEqual(result["reason"], "direct_pdf_stale_or_undated")
+        fetch.assert_called_once_with(stale, batch.MAX_FILE)
+
+    def test_saved_kerry_root_fallback_requires_identity_review(self):
+        row = batch.audit_existing_candidate({
+            "verdict": "candidate_verified_masthead",
+            "document_url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/11/Bulletin.pdf",
+            "fallback_website": "https://www.dioceseofkerry.ie/",
+            "file_kind": "pdf",
+        })
+        self.assertEqual(row["verdict"], "candidate_requires_manual_review")
+
     def test_current_pdf_requires_signature_and_week(self):
         html = ('<html><a href="' + PDF + '">Sunday 15th November 2026 Bulletin</a></html>').encode()
         def fake_fetch(url, limit, timeout=12):
