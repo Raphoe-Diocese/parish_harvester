@@ -1,39 +1,36 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "irvinestown",
   "display_name": "Irvinestown (Devenish)",
   "diocese": "clogher",
   "start_url": "https://www.devenishparishirvinestown.com/weekly-bulletin",
-  "playbook_type": "wix_html",
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "recorded_date": "2026-08-22",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf"
+  ],
+  "href_skip_patterns": [
+    "rota"
+  ],
+  "playbook_type": "direct_download",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-11-10",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.devenishparishirvinestown.com/weekly-bulletin"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='_files/ugd/'][href$='.pdf']",
-      "pick_strategy": "newest_dated",
-      "fallback_selectors": [
-        "a[href$='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "Wix weekly-bulletin page. Hashed /_files/ugd/ PDFs — date is in the link text, not the URL.",
-    "Newest on 22/08/2026 is the 23rd August 2026 PDF (HTTP 200, 1175064 bytes).",
-    "pick_strategy:newest_dated on the dated link text. Do not pin a hashed URL."
+    "10/11/2026: the weekly bulletin page links a Wix /_files/ugd/ PDF whose link text is 08th November 2026. Proved GET 200 application/pdf 1057699 bytes. The hash changes every week. Scrape the listing and read the link text. Do not pin the hash."
   ],
   "do_not": [
     "Do not pin a hashed Wix PDF — it changes every week.",
     "Do not download the View Rota PDFs.",
-    "Do not use http_scrape_newest_pdf — hashed filenames have no date."
-  ]
+    "Do not harvest Facebook."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
