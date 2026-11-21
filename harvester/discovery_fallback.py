@@ -11,6 +11,8 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .utils import mcn_upload_church_id
+
 _LEDGER = Path(__file__).resolve().parent.parent / "docs" / "discovery" / "batch-bulletin-probes.json"
 _SHARED_HOSTS = {
     "churchtv.ie",
@@ -59,6 +61,10 @@ def eligible_discovery_url(
         url = str(row.get("document_url") or "").strip()
         parsed = urlparse(url)
         host = _host(url)
+        if host == "d3gxiup807zlof.cloudfront.net":
+            church_id = mcn_upload_church_id(url)
+            if not church_id or not any(mcn_upload_church_id(o) == church_id for o in origins if o):
+                continue
         if (
             parsed.scheme != "https"
             or not parsed.path.lower().endswith(".pdf")

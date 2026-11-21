@@ -19,6 +19,22 @@ def sample(url=HOME):
 
 
 class BatchProbeTests(TestCase):
+    def test_mcn_identity_must_match_before_and_after_fetch(self):
+        seed = "https://d3gxiup807zlof.cloudfront.net/live/Uploads/606/NewsLetter/old.pdf"
+        current = seed.replace("old.pdf", "new.pdf")
+        other = current.replace("/606/", "/607/")
+        for url, resolved in [(other, other), (current, other), (current, current)]:
+            with (
+                self.subTest(url=url, resolved=resolved),
+                patch("harvester.webcam_bulletin_dig._http_json", return_value={"newsletter": {"newsLetterUrl": url}}),
+                patch.object(batch, "fetch", return_value=(b"%PDF-" + b"x"*4000, "application/pdf", resolved)) as fetch,
+                patch("harvester.bulletin_freshness.heading_date_in_pdf_bytes", return_value=SUNDAY),
+            ):
+                result = batch.probe_one(sample(seed), SUNDAY)
+                self.assertEqual(result["verdict"] == "candidate_verified_masthead", resolved == current)
+                if url == other:
+                    fetch.assert_not_called()
+
     def test_discovery_rolls_forward_on_saturday(self):
         for day, expected in ((20, 15), (21, 22), (22, 22), (23, 22)):
             with self.subTest(day=day):

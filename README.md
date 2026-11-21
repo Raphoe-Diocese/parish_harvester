@@ -9,8 +9,8 @@ New here? Read [WHAT_IS_THIS.md](WHAT_IS_THIS.md). How agents work: [AGENTS.md](
 
 ## What exists today
 
-- **Four live dioceses:** Raphoe, Derry, Clogher, Down & Connor. Other diocese pages are stubs.
-- **Sunday harvest** at 09:00 UTC (`harvest.yml`). Mega PDF stays on.
+- **Coverage:** 26 diocesan landing pages. The [21 November forensic review](docs/WEBSITE_OCR_BACKLOG.md#forensic-review-and-publication-order-21-november-2026) records verified coverage, missing sources and the publication plan.
+- **Sunday harvest** at 14:00 Irish time (`harvest.yml`). Mega PDF stays on.
 - **OCR viewer** on each live diocese page (PDF + text). Irish stays Irish.
 - **Parish Trainer 1.61.28** — zip, extract, Load unpacked. No auto-update.
 - Harvest truth is only `parishes/parish_status.json`.

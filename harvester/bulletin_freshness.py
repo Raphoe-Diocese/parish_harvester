@@ -418,6 +418,9 @@ def _nonempty_text_lines(text: str) -> list[str]:
 
 def _parse_short_adjacent_date_line(line: str) -> date | None:
     """Parse a short date/liturgical neighbour; skip long body paragraphs."""
+    # Numbered parish diary entries can sit next to a liturgical heading.
+    if re.match(r"^\d+[.)]\s+.*\b20\d{2}\s*:\s*\S", line):
+        return None
     if len(line) > _MAX_ADJACENT_DATE_LINE_CHARS:
         return None
     if len(line.split()) > _MAX_ADJACENT_DATE_LINE_WORDS:

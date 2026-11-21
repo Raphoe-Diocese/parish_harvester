@@ -2400,6 +2400,15 @@ def extract_mcn_church_id(html: str) -> str | None:
     return match.group(1) or match.group(2) or None
 
 
+def mcn_upload_church_id(url: str) -> str | None:
+    """Identify the church that owns a newsletter on MCN's shared file host."""
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or parsed.netloc.lower() != "d3gxiup807zlof.cloudfront.net":
+        return None
+    match = re.fullmatch(r"/live/Uploads/([1-9][0-9]*)/NewsLetter/[^/]+\.pdf", parsed.path, re.I)
+    return match.group(1) if match else None
+
+
 def mcn_profile_data_url(camera_page_url: str, church_id: str | int) -> str:
     """Build POST URL for ``/Website/ProfileDataByJson/{churchId}``."""
     parsed = urlparse((camera_page_url or "").strip())

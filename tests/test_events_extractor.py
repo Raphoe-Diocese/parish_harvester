@@ -91,10 +91,10 @@ class ParseEventsJsonTests(unittest.TestCase):
         self.assertEqual(_parse_events_json("[]"), [])
 
     def test_no_json(self) -> None:
-        self.assertEqual(_parse_events_json("Sorry, no events found."), [])
+        self.assertIsNone(_parse_events_json("Sorry, no events found."))
 
     def test_invalid_json(self) -> None:
-        self.assertEqual(_parse_events_json("[{invalid}]"), [])
+        self.assertIsNone(_parse_events_json("[{invalid}]"))
 
 
 class ExtractEventsTests(unittest.TestCase):

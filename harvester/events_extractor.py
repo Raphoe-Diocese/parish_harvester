@@ -81,7 +81,7 @@ def _validate_event(item: Any) -> dict | None:
     }
 
 
-def _parse_events_json(raw: str) -> list[dict]:
+def _parse_events_json(raw: str) -> list[dict] | None:
     """Try to extract a JSON array from the AI response text."""
     text = raw.strip()
     # Strip markdown code fences if present
@@ -92,11 +92,11 @@ def _parse_events_json(raw: str) -> list[dict]:
     start = text.find("[")
     end = text.rfind("]")
     if start == -1 or end == -1 or end <= start:
-        return []
+        return None
     try:
         return json.loads(text[start : end + 1])
     except json.JSONDecodeError:
-        return []
+        return None
 
 
 def extract_events(
@@ -106,30 +106,17 @@ def extract_events(
     diocese: str,
     ai_router: Any = None,
 ) -> list[dict]:
-    """Extract dated events from bulletin OCR text using the AI router.
+    """Return events for callers that consume only the list."""
+    return extract_events_with_status(text, parish_name, parish_key, diocese, ai_router)[0]
 
-    Parameters
-    ----------
-    text:
-        Raw OCR text from the bulletin.
-    parish_name:
-        Human-readable parish name for logging.
-    parish_key:
-        Machine-readable key (used in file paths / UIDs).
-    diocese:
-        Diocese key (e.g. ``"derry"``).
-    ai_router:
-        Module or object with a ``call_ai(prompt) -> (text, provider)``
-        callable.  If ``None``, the default ``harvester.ai_router`` is used.
 
-    Returns
-    -------
-    list[dict]
-        Validated events; empty list on AI failure or if none found.
-    """
+def extract_events_with_status(
+    text: str, parish_name: str, parish_key: str, diocese: str, ai_router: Any = None,
+) -> tuple[list[dict], str | None, str | None]:
+    """Return validated events, the responding provider and any extraction error."""
     if os.getenv("PARISH_EVENTS_DISABLE", "").strip() == "1":
         print(f"[events_extractor] Skipped for {parish_key} — PARISH_EVENTS_DISABLE=1")
-        return []
+        return [], None, "extraction_disabled"
 
     if ai_router is None:
         from harvester import ai_router as _default_router  # lazy import
@@ -148,16 +135,16 @@ def extract_events(
         raw_text, provider = ai_router.call_ai(prompt)
     except Exception as exc:  # noqa: BLE001
         print(f"[events_extractor] AI call raised unexpected error for {parish_key}: {exc}")
-        return []
+        return [], None, "provider_error"
 
     if raw_text is None:
         print(f"[events_extractor] AI unavailable for {parish_key} — returning []")
-        return []
+        return [], provider, "provider_unavailable"
 
     raw_items = _parse_events_json(raw_text)
     if not isinstance(raw_items, list):
         print(f"[events_extractor] AI returned non-list for {parish_key} — returning []")
-        return []
+        return [], provider, "invalid_response"
 
     valid: list[dict] = []
     dropped = 0
@@ -174,7 +161,7 @@ def extract_events(
     print(
         f"[events_extractor] {parish_key}: {len(valid)} event(s) extracted via {provider or 'unknown'}."
     )
-    return valid
+    return valid, provider, "invalid_event_items" if dropped else None
 
 
 def write_events_json(

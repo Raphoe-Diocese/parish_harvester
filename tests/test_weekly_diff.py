@@ -20,15 +20,15 @@ class WeeklyDiffTests(unittest.TestCase):
 
         self.assertEqual(1, result["kept_count"])
         self.assertIn(
-            "brand new long announcement for youth retreat registration this friday evening.",
+            "Brand new long announcement for youth retreat registration this Friday evening.",
             result["added_lines"],
         )
         self.assertIn(
-            "another very long notice about volunteers needed for parish hall cleaning.",
+            "Another very long notice about volunteers needed for parish hall cleaning.",
             result["removed_lines"],
         )
 
-    def test_diff_truncates_to_top_30_longest_lines(self) -> None:
+    def test_diff_preserves_first_30_in_printed_order(self) -> None:
         this_week_lines = [
             f"Line number {i} with enough text length to pass the normalization filter and stay included."
             for i in range(MAX_LINES_PER_SIDE + 15)
@@ -38,9 +38,14 @@ class WeeklyDiffTests(unittest.TestCase):
 
         result = diff_bulletins(this_week, last_week)
 
-        self.assertEqual(MAX_LINES_PER_SIDE, len(result["added_lines"]))
+        self.assertEqual(this_week_lines[:MAX_LINES_PER_SIDE], result["added_lines"])
         self.assertEqual([], result["removed_lines"])
         self.assertEqual("truncated_to_30_lines_per_side", result.get("note"))
+
+    def test_short_irish_notice_and_case_only_change(self):
+        result = diff_bulletins("AIFREANN\nFéile Dé hAoine", "Aifreann")
+        self.assertEqual(result["added_lines"], ["Féile Dé hAoine"])
+        self.assertEqual(result["kept_count"], 1)
 
     def test_empty_prior_text_case(self) -> None:
         this_week = "A sufficiently long line about this week's services and community notices."
@@ -50,7 +55,7 @@ class WeeklyDiffTests(unittest.TestCase):
         self.assertEqual(0, result["kept_count"])
         self.assertEqual([], result["removed_lines"])
         self.assertEqual(
-            ["a sufficiently long line about this week's services and community notices."],
+            ["A sufficiently long line about this week's services and community notices."],
             result["added_lines"],
         )
 
