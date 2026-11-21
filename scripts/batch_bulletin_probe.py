@@ -295,14 +295,29 @@ def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tup
         return {"target_date": sunday.isoformat(), "rows": [], "summary": {}}, {"offset": 0}
     offset = int(state.get("offset", 0)) % len(unique)
     batch = (unique + unique)[offset:offset + min(limit, len(unique))]
+    def safe_probe(item: dict) -> dict:
+        try:
+            return probe_one(item, sunday)
+        except Exception as exc:
+            # One broken parser or website must not discard 119 other results.
+            return {
+                "parish": item.get("matched_parish"),
+                "name": item.get("name"),
+                "seed": str(item.get("url") or ""),
+                "status_hint": item.get("status_hint"),
+                "verdict": "probe_exception",
+                "reason": type(exc).__name__,
+            }
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
-        rows = list(pool.map(lambda r: probe_one(r, sunday), batch))
+        rows = list(pool.map(safe_probe, batch))
     verified = [r for r in rows if str(r.get("verdict", "")).startswith("candidate_verified_")]
     report = {"generated_at": datetime.now(timezone.utc).isoformat(),
               "target_date": sunday.isoformat(), "total_unresolved_leads": len(unique),
               "window_start": offset, "rows": rows,
               "summary": {"probed": len(rows), "verified_candidate_links": len(verified),
                           "not_verified": len(rows) - len(verified),
+                          "probe_exceptions": sum(r.get("verdict") == "probe_exception" for r in rows),
                           "requires_masthead_check": sum(not r.get("masthead_verified") for r in verified),
                           "masthead_verified": sum(bool(r.get("masthead_verified")) for r in verified)}}
     return report, {"offset": (offset + len(batch)) % len(unique), "target_date": sunday.isoformat()}
