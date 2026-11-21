@@ -2501,6 +2501,70 @@ async def _fetch_entry(
                 target=target,
             )
 
+        # A trained recipe can be WAF-blocked even though the independent
+        # 120-source scanner has already verified the exact Sunday PDF.
+        # Only use same-host, current-week, readable-masthead PDF bytes.
+        # The discovery file is never trusted without re-downloading and
+        # passing this harvest's ordinary PDF/staleness referee.
+        if target is not None:
+            try:
+                from .discovery_fallback import fetch_verified_discovery_pdf
+
+                discovered_url = await asyncio.to_thread(
+                    fetch_verified_discovery_pdf,
+                    key,
+                    target,
+                    [
+                        str(recipe_meta.get("start_url") or ""),
+                        str(target_url or ""),
+                        str(getattr(entry, "website", "") or ""),
+                    ],
+                    dest,
+                )
+                if discovered_url:
+                    if _is_real_pdf(dest, key, max_pages=recipe_page_limit):
+                        print(
+                            f"  ✅ {key}: recipe failed but batch discovery "
+                            "provided a re-verified current-week PDF"
+                        )
+                        verified_result = FetchResult(
+                            key=key,
+                            display_name=entry.display_name,
+                            status="ok",
+                            url=discovered_url,
+                            file_path=dest,
+                            file_type="pdf",
+                            diagnosis={
+                                "recovery": "batch_discovery_masthead_verified",
+                                "recipe_error": recipe_error or "",
+                            },
+                        )
+                        return await _guard_and_recover_ok_result(
+                            verified_result,
+                            entry,
+                            target,
+                            dest,
+                            browser,
+                            recipe_meta,
+                            host_profile,
+                        )
+                    capped = classify_page_capped_pdf(
+                        dest,
+                        key=key,
+                        display_name=entry.display_name,
+                        url=discovered_url,
+                        target=target,
+                        entry=entry,
+                        max_pages=recipe_page_limit,
+                    )
+                    if capped is not None:
+                        return capped
+                    dest.unlink(missing_ok=True)
+            except Exception as exc:
+                # Source lookup is best-effort; its failure must not turn
+                # a reproducible recipe failure into an unhandled exception.
+                print(f"  ↩️  {key}: batch PDF rescue unavailable: {type(exc).__name__}")
+
         if trained_recipe:
             print(f"  ⛔ {key}: trained recipe failed — skipping legacy fallbacks")
             replay_stage = (
