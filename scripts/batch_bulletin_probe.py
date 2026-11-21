@@ -391,7 +391,9 @@ def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tup
     if not unique:
         return {"target_date": sunday.isoformat(), "rows": [], "summary": {}}, {"offset": 0}
     offset = int(state.get("offset", 0)) % len(unique)
-    batch = (unique + unique)[offset:offset + min(limit, len(unique))]
+    # Finish the tail of the queue without re-scanning the first 90+
+    # sources just to fill a fixed 120-source window.
+    batch = unique[offset:offset + min(limit, len(unique) - offset)]
     def safe_probe(item: dict) -> dict:
         try:
             return probe_one(item, sunday)
