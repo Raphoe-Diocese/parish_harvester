@@ -1,7 +1,7 @@
 """A diocesan parish directory is not a weekly bulletin."""
 import unittest
 
-from harvester.report_quality import is_directory_html_result, reject_directory_downloads
+from harvester.report_quality import is_directory_html_result, reject_directory_downloads, reject_future_dated_downloads
 
 
 class ReportQualityTests(unittest.TestCase):
@@ -28,6 +28,24 @@ class ReportQualityTests(unittest.TestCase):
             "url": "https://parishofroslea.com/parish-bulletin/bulletin-sunday-15th-november-2026/",
             "file_type": "html_render",
         }))
+
+
+    def test_future_edition_rejected_from_prior_sunday(self):
+        report = {
+            "target_date": "2026-11-15",
+            "downloaded": [
+                {"parish": "next_week", "bulletin_date": "2026-11-22", "url": "https://example.com/22.pdf"},
+                {"parish": "this_week", "bulletin_date": "2026-11-15", "url": "https://example.com/15.pdf"},
+                {"parish": "weekday", "bulletin_date": "2026-11-13", "url": "https://example.com/13.pdf"},
+                {"parish": "undated", "url": "https://example.com/latest.pdf"},
+            ],
+            "stale_rejected": [],
+            "summary": {"downloaded": 4, "stale_rejected": 0},
+        }
+        self.assertEqual(reject_future_dated_downloads(report), 1)
+        self.assertEqual(len(report["downloaded"]), 3)
+        self.assertEqual(report["stale_rejected"][0]["reason"], "date_ahead_of_target")
+        self.assertEqual(report["summary"]["downloaded"], 3)
 
     def test_reclassify_without_counting_fake_as_success(self):
         report = {
