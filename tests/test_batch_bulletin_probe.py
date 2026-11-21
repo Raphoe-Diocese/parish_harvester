@@ -94,6 +94,27 @@ class BatchProbeTests(TestCase):
         self.assertEqual(result["verdict"], "not_verified")
 
 
+
+    def test_stale_wordpress_pdf_retries_parish_homepage(self):
+        stale = HOME + "wp-content/uploads/2026/11/Bulletin-8-November-2026.pdf"
+        current = HOME + "wp-content/uploads/2026/11/Bulletin-15-November-2026.pdf"
+        html = ('<html><a href="' + current + '">Parish Bulletin 15 November 2026</a></html>').encode()
+        def fake_fetch(url, limit, timeout=12):
+            if url == stale:
+                return b"%PDF-1.4\\n" + b"Z" * 6000, "application/pdf", stale
+            if url == HOME:
+                return html, "text/html", HOME
+            if url == current:
+                return b"%PDF-1.5\\n" + b"Y" * 6000, "application/pdf", current
+            return b"", "", ""
+        with patch.object(batch, "fetch", side_effect=fake_fetch):
+            with patch("harvester.bulletin_freshness.heading_date_in_pdf_bytes",
+                       side_effect=[date(2026, 11, 8), SUNDAY]):
+                result = batch.probe_one(sample(stale), SUNDAY)
+        self.assertEqual(result["verdict"], "candidate_verified_masthead")
+        self.assertEqual(result["document_url"], current)
+        self.assertEqual(result["fallback_website"], HOME)
+
     def test_direct_pdf_with_stale_masthead_rejected(self):
         source = "https://exampleparish.ie/Bulletin-15-November-2026.pdf"
         pdf = b"%PDF-1.4\n" + b"X" * 6000
