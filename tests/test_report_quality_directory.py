@@ -1,6 +1,9 @@
 """A diocesan parish directory is not a weekly bulletin."""
 import unittest
+import tempfile
+from pathlib import Path
 
+from harvester.parish_status import build_parish_status
 from harvester.report_quality import is_directory_html_result, reject_directory_downloads, reject_future_dated_downloads, reject_known_diocesan_admin_downloads
 
 
@@ -77,6 +80,37 @@ class ReportQualityTests(unittest.TestCase):
         self.assertEqual(report["summary"]["downloaded"], 1)
         self.assertEqual(report["summary"]["failed"], 1)
         self.assertEqual(reject_directory_downloads(report), 0)
+
+
+    def test_status_rejects_saved_false_successes_without_rewriting_report(self):
+        """Old 15 November rows must not inflate the Problems-tab success count."""
+        directory = "https://www.dioceseofmeath.ie/map-of-parishes"
+        admin = "https://www.kandle.ie/wp-content/uploads/2026/02/Safeguarding-Sunday-Newsletter-2026.pdf"
+        report = {
+            "target_date": "2026-11-15",
+            "downloaded": [
+                {"parish": "ballivor", "url": directory, "file_type": "html_render"},
+                {"parish": "beauparc", "url": "https://parish.ie/news.pdf",
+                 "file_type": "pdf", "bulletin_date": "2026-11-22"},
+                {"parish": "admin", "url": admin, "file_type": "pdf"},
+                {"parish": "genuine", "url": "https://parish.ie/15-November-2026.pdf",
+                 "file_type": "pdf", "bulletin_date": "2026-11-15"},
+            ],
+            "failed": [], "stale_rejected": [], "html_links": [], "skipped": [],
+        }
+        with tempfile.TemporaryDirectory() as temp:
+            status = build_parish_status(
+                report, parishes_dir=Path(temp),
+                consecutive_failures={}, disabled_keys=set(),
+            )
+        self.assertEqual(status["summary"]["ok"], 1)
+        self.assertEqual(status["parishes"]["genuine"]["outcome"], "ok")
+        self.assertEqual(status["parishes"]["ballivor"]["outcome"], "failed")
+        self.assertEqual(status["parishes"]["beauparc"]["outcome"], "stale")
+        self.assertEqual(status["parishes"]["admin"]["outcome"], "failed")
+        self.assertTrue(status["parishes"]["ballivor"]["actionable"])
+        self.assertEqual(len(report["downloaded"]), 4)  # No report mutation.
+        self.assertEqual(report["failed"], [])
 
 
 if __name__ == "__main__":
