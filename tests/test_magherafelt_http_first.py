@@ -160,6 +160,32 @@ class MagherafeltHttpFirstTests(unittest.TestCase):
         self.assertIn("html", (headers.get("content-type") or "").lower())
         self.assertEqual(uas, ["Mozilla/5.0", "curl/8.5.0"])
 
+    def test_batch_discovery_user_agent_recovers_siteground_waf(self) -> None:
+        attempts: list[str] = []
+
+        def fake_urlopen(req, timeout=None, context=None, cookie_jar=None):
+            ua = req.get_header("User-agent") or ""
+            attempts.append(ua)
+            if ua == "ParishPress-BatchDiscovery/1.0 (+https://www.parishpress.ie/)":
+                resp = MagicMock()
+                resp.status = 200
+                resp.read.return_value = MAGHERAFELT_HTML
+                resp.headers = {"Content-Type": "text/html; charset=UTF-8"}
+                resp.__enter__.return_value = resp
+                resp.__exit__.return_value = False
+                return resp
+            raise HTTPError(req.full_url, 403, "Forbidden", EmailMessage(), BytesIO(b"403"))
+
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen):
+            hit = _fetch_short_ua_hit(MAGHERAFELT_URL, 5)
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], MAGHERAFELT_HTML)
+        self.assertEqual(
+            attempts,
+            ["Mozilla/5.0", "curl/8.5.0",
+             "ParishPress-BatchDiscovery/1.0 (+https://www.parishpress.ie/)"],
+        )
+
     def test_replay_prints_fetched_html_without_goto(self) -> None:
         import asyncio
 
