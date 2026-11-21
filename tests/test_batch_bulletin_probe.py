@@ -19,6 +19,25 @@ def sample(url=HOME):
 
 
 class BatchProbeTests(TestCase):
+    def test_kerry_shared_upload_without_printed_parish_identity_is_demoted(self):
+        row = {
+            "parish": "adrigole", "name": "Adrigole",
+            "verdict": "candidate_verified_masthead", "masthead_verified": True,
+            "document_url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/11/newsletter-22nd-Nov-2026.pdf",
+        }
+        result = batch.audit_existing_candidate(row)
+        self.assertEqual(result["verdict"], "candidate_requires_manual_review")
+        self.assertEqual(result["reason"], "shared_kerry_upload_parish_identity_unverified")
+        self.assertEqual(result["previous_verdict"], "candidate_verified_masthead")
+
+    def test_kerry_shared_upload_with_printed_parish_identity_is_retained(self):
+        row = {
+            "parish": "adrigole", "name": "Adrigole", "body_text": "Adrigole Parish Newsletter",
+            "verdict": "candidate_verified_masthead", "masthead_verified": True,
+            "document_url": "https://www.dioceseofkerry.ie/wp-content/uploads/2026/11/newsletter.pdf",
+        }
+        self.assertEqual(batch.audit_existing_candidate(row)["verdict"], "candidate_verified_masthead")
+
     def test_image_with_valueless_alt_has_an_empty_caption(self):
         page = batch.Links()
         page.feed('<img src="newsletter.jpg" alt>')

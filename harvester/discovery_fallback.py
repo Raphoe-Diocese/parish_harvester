@@ -20,6 +20,7 @@ _SHARED_HOSTS = {
     "parishestogether.ie",
     "bantryfamilyofparishes.ie",
     "sma.ie",
+    "dioceseofkerry.ie",
 }
 
 
