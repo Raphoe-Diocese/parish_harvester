@@ -2715,25 +2715,19 @@ class HarvestMissRecipeTests(unittest.TestCase):
             self.assertEqual(int(recipe["weeks_back"]), 0, rel)
             self.assertEqual(int(recipe["weeks_ahead"]), 0, rel)
 
-    def test_edgeworthstown_rathowen_use_8_november(self) -> None:
-        edge = json.loads(
-            Path("parishes/recipes/ardagh/edgeworthstown.json").read_text(encoding="utf-8")
-        )
-        self.assertEqual(edge["site_type"], "predicted_dated_pdf")
-        self.assertIn("08-11-2026-edgeworthstown_compressed.pdf", edge["start_url"])
-        self.assertNotIn("01-11-2026", edge["start_url"])
-        self.assertNotIn("rathowenstreete", edge["start_url"])
-        self.assertEqual(int(edge["weeks_back"]), 0)
-        self.assertEqual(int(edge["weeks_ahead"]), 0)
-        rathowen = json.loads(
-            Path("parishes/recipes/ardagh/rathowen.json").read_text(encoding="utf-8")
-        )
-        self.assertEqual(rathowen["site_type"], "predicted_dated_pdf")
-        self.assertIn("08-11-2026-rathowenstreete_compressed.pdf", rathowen["start_url"])
-        self.assertNotIn("01-11-2026", rathowen["start_url"])
-        self.assertNotIn("edgeworthstown_compressed", rathowen["start_url"])
-        self.assertEqual(int(rathowen["weeks_back"]), 0)
-        self.assertEqual(int(rathowen["weeks_ahead"]), 0)
+    def test_edgeworthstown_and_rathowen_discover_newest_parish_specific_media(self) -> None:
+        for parish, token, other in (
+            ("edgeworthstown", "edgeworthstown_compressed.pdf", "rathowenstreete_compressed.pdf"),
+            ("rathowen", "rathowenstreete_compressed.pdf", "edgeworthstown_compressed.pdf"),
+        ):
+            recipe = json.loads(
+                Path(f"parishes/recipes/ardagh/{parish}.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+            self.assertEqual(recipe["start_url"], "https://edgeworthstownparish.ie/")
+            self.assertEqual(recipe["href_patterns"], [token])
+            self.assertNotIn(other, recipe["href_patterns"])
+            self.assertFalse(any("08-11-2026" in str(step) for step in recipe["steps"]))
 
     def test_termon_bree_kilmoremoy_use_8_november(self) -> None:
         termon = json.loads(
