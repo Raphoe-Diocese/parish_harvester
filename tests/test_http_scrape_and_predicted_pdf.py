@@ -2037,19 +2037,14 @@ class LisnaskeaRecipeTests(unittest.TestCase):
     )
     RECIPE = Path("parishes/recipes/clogher/lisnaskeamaguiresbridge.json")
 
-    def test_recipe_scrapes_listing_and_does_not_pin_dated_file(self) -> None:
-        raw = self.RECIPE.read_text(encoding="utf-8")
-        data = json.loads(raw)
-        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
-        self.assertEqual(data["start_url"], self.LISTING)
-        self.assertIn("onewebmedia", data.get("href_patterns") or [])
-        self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
+    def test_recipe_uses_proved_dated_onewebmedia_pdf_prediction(self) -> None:
+        data = json.loads(self.RECIPE.read_text(encoding="utf-8"))
+        self.assertEqual(data["site_type"], "predicted_dated_pdf")
+        self.assertIn("onewebmedia/15112026.pdf", data["start_url"])
+        self.assertEqual(data["href_patterns"], ["onewebmedia"])
+        self.assertGreaterEqual(int(data["weeks_ahead"]), 1)
         self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
-        steps_blob = json.dumps(data.get("steps") or [])
-        self.assertNotIn("23082026.pdf", data["start_url"])
-        self.assertNotIn("23082026.pdf", steps_blob)
-        self.assertNotIn("16082026.pdf", steps_blob)
-        self.assertNotIn("do not use http_scrape", raw.lower())
+        self.assertNotIn("23082026.pdf", json.dumps(data["steps"]))
 
     def test_listing_scores_ddmmyyyy_filename(self) -> None:
         scored = _score_http_scrape_pdf_hrefs(
@@ -2426,29 +2421,17 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
         self.assertIn("Newsletter-sept-6th-3-2.pdf", recipe["example_url"])
 
-    def test_crossmolina_uses_own_parish_media_not_churchtv(self) -> None:
+    def test_crossmolina_predicts_parish_owned_dated_pdf_not_churchtv(self) -> None:
         recipe = json.loads(
-            Path("parishes/recipes/killala/crossmolina.json").read_text(
-                encoding="utf-8"
-            )
+            Path("parishes/recipes/killala/crossmolina.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "wordpress")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["playbook_type"], "predicted_dated_pdf")
         self.assertIn("crossmolinaparish.com", recipe["start_url"])
         self.assertNotIn("churchtv.ie", recipe["start_url"])
-        self.assertIn(
-            "8th-November-Crossmolina-Parish-Newsletter.pdf",
-            recipe["start_url"],
-        )
-        self.assertNotIn("15th-November", recipe["start_url"])
-        self.assertIn(
-            "8th-November-Crossmolina-Parish-Newsletter.pdf",
-            recipe.get("example_url") or "",
-        )
+        self.assertIn("8th-November-Crossmolina-Parish-Newsletter.pdf", recipe["start_url"])
+        self.assertGreaterEqual(int(recipe["weeks_ahead"]), 1)
         self.assertNotIn("/2021/02/", recipe["start_url"])
-        self.assertNotIn("/2021/02/", recipe.get("example_url") or "")
-        do_not = " ".join(recipe.get("do_not") or []).lower()
-        self.assertIn("churchtv", do_not)
 
     def test_four_nov8_pdfs_replace_1_november_examples(self) -> None:
         cases = {
@@ -2491,12 +2474,14 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertIn("Newsletter-8th-November-2026.pdf", dermot["start_url"])
         self.assertNotIn("October", " ".join(dermot.get("href_patterns") or []))
 
-    def test_navan_road_and_firhouse_use_8_november_pdfs(self) -> None:
+    def test_navan_road_discovers_latest_media_and_firhouse_keeps_proved_pin(self) -> None:
         navan = json.loads(
             Path("parishes/recipes/dublin/navanroad.json").read_text(encoding="utf-8")
         )
-        self.assertIn("8th-November-2026.pdf", navan["start_url"])
-        self.assertNotIn("September", " ".join(navan.get("href_patterns") or []))
+        self.assertEqual(navan["site_type"], "wp_json_newest_media")
+        self.assertEqual(navan["start_url"], "https://navanroadparish.com/")
+        self.assertIn("Sunday", navan["href_patterns"])
+        self.assertNotIn("September", " ".join(navan["href_patterns"]))
         firhouse = json.loads(
             Path("parishes/recipes/dublin/firhouse.json").read_text(encoding="utf-8")
         )
@@ -2871,15 +2856,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertNotIn("af-news", kilbride["start_url"])
         self.assertNotIn("af-news", json.dumps(kilbride["steps"]))
 
-    def test_portmarnock_uses_8_november_pdf(self) -> None:
+    def test_portmarnock_scrapes_live_newsletter_listing_instead_of_old_pin(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/dublin/portmarnock.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertIn("Newsletter%20November%208th%202026.pdf", recipe["start_url"])
-        self.assertNotIn("/newsletters/", recipe["start_url"])
-        self.assertEqual(int(recipe["weeks_back"]), 0)
-        self.assertEqual(int(recipe["weeks_ahead"]), 0)
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["start_url"], "https://www.portmarnockparish.ie/newsletters/")
+        self.assertIn("Newsletter", recipe["href_patterns"])
+        self.assertEqual(recipe["steps"][0]["action"], "goto")
+        self.assertNotIn("Newsletter%20November%208th%202026.pdf", recipe["start_url"])
 
     def test_falcarragh_uses_mcn_camera_not_a_pinned_pdf(self) -> None:
         recipe = json.loads(
