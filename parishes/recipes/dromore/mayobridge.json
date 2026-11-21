@@ -2,24 +2,20 @@
   "parish_key": "mayobridge",
   "display_name": "St Patrick’s Clonallon (Mayobridge)",
   "diocese": "dromore",
-  "recorded_date": "2026-11-13",
+  "recorded_date": "2026-11-21",
   "start_url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf",
-  "site_type": "wordpress",
+  "site_type": "predicted_dated_pdf",
   "example_url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf",
-  "playbook_type": "direct_download",
+  "playbook_type": "predicted_dated_pdf",
   "status": "active",
   "skip": false,
   "steps": [
-    {
-      "action": "goto",
-      "url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf"
-    },
     {
       "action": "download",
       "url": "http://www.mayobridgeparish.com/wp-content/uploads/2014/07/Parish-Bulletin-8-November-2026.pdf"
     }
   ],
-  "version": 4,
+  "version": 5,
   "timeout_ms": 45000,
   "total_timeout_s": 120,
   "bulletin_layout": {
@@ -28,11 +24,18 @@
   },
   "operator_notes": [
     "13/11/2026: predicted_dated_pdf harvest 43347610567 timed out (urllib 403 here). Browser download of Parish-Bulletin-8-November-2026.pdf instead.",
-    "Do not start on /parish-newsletter/."
+    "Do not start on /parish-newsletter/.",
+    "21/11/2026: batch discovery run 44843929761 independently fetched valid 15 Nov bulletin bytes for this parish; old recipe selected previous-week or unrelated file. Dynamic strategy now uses dated URL rewrite, parish listing or WP media matching rather than pinning the 15 Nov PDF. Recheck with a live targeted harvest; do not declare automatically recovered from recipe change alone."
   ],
   "do_not": [
     "Do not start on /parish-newsletter/ — it times out.",
     "Do not use predicted_dated_pdf — GitHub urllib 403/timeout.",
-    "Do not harvest Facebook."
+    "Do not harvest Facebook.",
+    "Do not pin a specific Sunday PDF or accept previous-week content as fresh."
+  ],
+  "weeks_back": 0,
+  "weeks_ahead": 1,
+  "href_patterns": [
+    "Parish-Bulletin-"
   ]
 }
