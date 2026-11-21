@@ -1401,7 +1401,14 @@ def _fetch_short_ua_hit(
     Foxrock's WAF 403s that same short browser token from some cloud IPs and
     still returns the PDF to ``curl/8.5.0``.
     """
-    for user_agent in ("Mozilla/5.0", "curl/8.5.0"):
+    # Batch discovery run 44843561638 recovered real current-week files on
+    # three SiteGround/WAF parishes using this third, truthful project UA while
+    # their WAF replay recipes failed under Chrome/short/curl tokens.
+    for user_agent in (
+        "Mozilla/5.0",
+        "curl/8.5.0",
+        "ParishPress-BatchDiscovery/1.0 (+https://www.parishpress.ie/)",
+    ):
         request = Request(
             quote_http_url(url),
             headers={"User-Agent": user_agent, "Accept": "*/*"},
