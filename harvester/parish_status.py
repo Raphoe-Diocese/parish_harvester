@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -334,7 +335,24 @@ def build_parish_status(
 ) -> dict:
     """
     Merge report buckets into one parish_status.json document.
+
+    Re-apply the same quality gate used by the harvest and mega stitch. Older
+    reports and partial parish patches may still contain false successful
+    directory prints, future-week files or diocesan admin documents. The
+    extension must never call those rows "ok" simply because the report has
+    not yet been rebuilt by a full harvest. Keep the caller\'s report intact.
     """
+    from .report_quality import (
+        reject_directory_downloads,
+        reject_future_dated_downloads,
+        reject_known_diocesan_admin_downloads,
+    )
+
+    report = deepcopy(report)
+    reject_directory_downloads(report)
+    reject_future_dated_downloads(report)
+    reject_known_diocesan_admin_downloads(report)
+
     parishes_dir = parishes_dir or PARISHES_DIR
     consecutive_failures = consecutive_failures or _load_json(
         parishes_dir / "consecutive_failures.json", {}
