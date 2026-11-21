@@ -927,15 +927,26 @@ def issue_date_from_pages(
     return None, ""
 
 
-def _pdf_page_texts(reader: object, max_pages: int | None) -> list[str]:
+def _pdf_page_texts(reader: object, max_pages: int | None, source: Path | bytes | None = None) -> list[str]:
     pages = getattr(reader, "pages", [])
     chosen = pages if max_pages is None else pages[:max_pages]
     chunks: list[str] = []
-    for page in chosen:
+    failed = []
+    for index, page in enumerate(chosen):
         try:
             chunks.append(page.extract_text() or "")
         except Exception:
+            failed.append(index)
             chunks.append("")
+    if failed and source is not None:
+        # Some valid Unicode font maps cannot be decoded by PyPDF2.
+        import fitz
+        try:
+            with (fitz.open(stream=source, filetype="pdf") if isinstance(source, bytes) else fitz.open(source)) as doc:
+                for index in failed:
+                    chunks[index] = doc[index].get_text()
+        except (RuntimeError, ValueError, IndexError):
+            pass
     return chunks
 
 
@@ -1026,9 +1037,9 @@ def heading_date_in_pdf_bytes(
     except Exception:
         return None
     if target is None:
-        return _date_from_pdf_text("\n".join(_pdf_page_texts(reader, max_pages)), None)
+        return _date_from_pdf_text("\n".join(_pdf_page_texts(reader, max_pages, data)), None)
     found, _way = issue_date_from_pages(
-        _pdf_page_texts(reader, None),
+        _pdf_page_texts(reader, None, data),
         target,
         url=url,
     )
@@ -1043,7 +1054,7 @@ def read_pdf_page_texts(path: Path, max_pages: int | None = None) -> list[str]:
         reader = PdfReader(str(path))
     except Exception:
         return []
-    return _pdf_page_texts(reader, max_pages)
+    return _pdf_page_texts(reader, max_pages, path)
 
 
 def heading_date_in_pdf(
@@ -1069,19 +1080,7 @@ def read_pdf_text_head(path: Path, max_pages: int = 4) -> str:
     ``pypdf`` here failed silently on GitHub Actions, returned empty text,
     and let Ardara/Attymass skip the body stale gate (08/10/2026).
     """
-    try:
-        from PyPDF2 import PdfReader
-
-        reader = PdfReader(str(path))
-    except Exception:
-        return ""
-    chunks: list[str] = []
-    for page in reader.pages[:max_pages]:
-        try:
-            chunks.append(page.extract_text() or "")
-        except Exception:
-            chunks.append("")
-    return "\n".join(chunks)
+    return "\n".join(read_pdf_page_texts(path, max_pages))
 
 
 def verdict_from_ancient_body_years(
