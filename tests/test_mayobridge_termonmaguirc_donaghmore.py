@@ -40,18 +40,15 @@ class PasteHitRecipePinsTests(unittest.TestCase):
         self.assertTrue(recipe.get("ignore_https_errors"))
         self.assertFalse(any("8th-November-2026.pdf" in str(step) for step in recipe["steps"]))
 
-    def test_milltown_pins_8_november_pdf(self) -> None:
+    def test_milltown_uses_latest_weekly_wordpress_media(self) -> None:
         recipe = json.loads(
-            Path("parishes/recipes/dublin/milltowndublin.json").read_text(
-                encoding="utf-8-sig"
-            )
+            Path("parishes/recipes/dublin/milltowndublin.json").read_text(encoding="utf-8-sig")
         )
-        self.assertIn(
-            "Weekly-Bulletin-Sunday-November-8th-2026.pdf", recipe["start_url"]
-        )
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
-        self.assertNotIn("/newsletter/", recipe["start_url"])
+        self.assertEqual(recipe["start_url"], "https://milltownparish.ie/")
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["playbook_type"], "wp_json_newest_media")
+        self.assertIn("Weekly-Bulletin-Sunday-", recipe["href_patterns"])
+        self.assertNotIn("Weekly-Bulletin-Sunday-November-8th-2026.pdf", recipe["start_url"])
 
     def test_mohill_pins_7th_november_html(self) -> None:
         recipe = json.loads(
