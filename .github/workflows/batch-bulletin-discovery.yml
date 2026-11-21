@@ -30,6 +30,23 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Initialise persistent scanner run status
+        run: |
+          mkdir -p docs/discovery _batch_diagnostics
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          from pathlib import Path
+          Path("docs/discovery/batch-probe-run-status.json").write_text(
+              json.dumps({
+                  "status": "started",
+                  "utc_started_at": datetime.now(timezone.utc).isoformat(),
+                  "workflow": "batch-bulletin-discovery",
+                  "result_path": "docs/discovery/batch-bulletin-probes.json",
+              }, indent=2) + "\\n", encoding="utf-8"
+          )
+          PY
+
       - name: Install dependencies
         run: |
           set -euo pipefail
@@ -54,6 +71,31 @@ jobs:
           mkdir -p _batch_diagnostics
           python scripts/batch_bulletin_probe.py --limit 120 --workers 16 2>&1 | tee _batch_diagnostics/scan.log
 
+      - name: Record scanner result status
+        if: always()
+        env:
+          TEST_OUTCOME: ${{ steps.probe_tests.outcome }}
+          SCAN_OUTCOME: ${{ steps.probe_run.outcome }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from datetime import datetime, timezone
+          path = Path("docs/discovery/batch-probe-run-status.json")
+          original = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+          results = Path("docs/discovery/batch-bulletin-probes.json")
+          outcome = os.environ.get("SCAN_OUTCOME", "unknown")
+          original.update({
+              "status": "completed" if outcome == "success" else "failed",
+              "utc_finished_at": datetime.now(timezone.utc).isoformat(),
+              "tests": os.environ.get("TEST_OUTCOME", "unknown"),
+              "scan": outcome,
+              "results_file_exists": results.exists(),
+          })
+          path.write_text(json.dumps(original, indent=2) + "\\n", encoding="utf-8")
+          PY
+
       - name: Preserve results and diagnostics even after failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,17 +103,20 @@ jobs:
           name: batch-bulletin-probes-${{ github.run_id }}
           path: |
             docs/discovery/batch-bulletin-probes.json
+            docs/discovery/batch-probe-run-status.json
             parishes/batch_probe_cursor.json
             _batch_diagnostics/
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Commit cursor and results, retry concurrent harvest pushes
+      - name: Commit cursor, results and persistent run status
+        if: always()
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/discovery/batch-bulletin-probes.json parishes/batch_probe_cursor.json
+          git add docs/discovery/batch-probe-run-status.json
+          git add docs/discovery/batch-bulletin-probes.json parishes/batch_probe_cursor.json 2>/dev/null || true
           git diff --cached --quiet && exit 0
           git commit -m "discovery: inspect unresolved bulletin sources in batches [skip ci]"
           for attempt in 1 2 3 4; do
