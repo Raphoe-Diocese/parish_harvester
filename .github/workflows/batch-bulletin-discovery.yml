@@ -86,8 +86,9 @@ jobs:
           original = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
           results = Path("docs/discovery/batch-bulletin-probes.json")
           outcome = os.environ.get("SCAN_OUTCOME", "unknown")
+          tests = os.environ.get("TEST_OUTCOME", "unknown")
           original.update({
-              "status": "completed" if outcome == "success" else "failed",
+              "status": "completed" if outcome == "success" and tests == "success" else "failed",
               "utc_finished_at": datetime.now(timezone.utc).isoformat(),
               "tests": os.environ.get("TEST_OUTCOME", "unknown"),
               "scan": outcome,
