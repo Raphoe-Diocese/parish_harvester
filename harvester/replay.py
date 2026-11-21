@@ -3334,6 +3334,7 @@ async def _try_wp_json_newest_media(
     href_patterns: list[str],
     target_date: date,
     href_skip_patterns: list[str] | None = None,
+    weeks_ahead: int = 1,
 ) -> tuple[str, str] | None:
     """Download the newest dated media PDF from /wp-json/wp/v2/media.
 
@@ -3391,7 +3392,7 @@ async def _try_wp_json_newest_media(
     # would lose to an older PalmSunday-29th-March-2026.pdf (proved 01/10/2026).
     scored: list[tuple[date, str]] = []
     image_scored: list[tuple[date, str]] = []
-    ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
+    ahead = target_date + timedelta(weeks=weeks_ahead)
     for item in items:
         if not isinstance(item, dict):
             continue
@@ -5967,12 +5968,14 @@ async def replay_recipe(
                 "No scanner photo on or before "
                 f"{target_date.isoformat()} in the media library"
             )
+        _, media_weeks_ahead = _recipe_week_span(recipe, ahead_default=1)
         found = await _try_wp_json_newest_media(
             start_url,
             dest,
             href_patterns=href_patterns,
             target_date=target_date,
             href_skip_patterns=href_skip_patterns or None,
+            weeks_ahead=media_weeks_ahead,
         )
         if found:
             return dest, found[1], found[0]

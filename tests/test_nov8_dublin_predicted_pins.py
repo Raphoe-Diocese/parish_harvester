@@ -29,30 +29,53 @@ class Nov8DublinPredictedPinTests(unittest.TestCase):
         self.assertNotIn("November-1st", recipe["start_url"])
         self.assertTrue(recipe["start_url"].lower().endswith(".pdf"))
 
-    def test_foxrock_stops_predicted_8_november_404(self) -> None:
+    def test_foxrock_uses_dated_media_titles_without_looking_ahead(self) -> None:
         recipe = _load("dublin/foxrock.json")
-        # No 08/11 parish PDF (November-8th 404). Latest parish file is All Saints.
-        self.assertEqual(recipe["site_type"], "wordpress")
-        self.assertNotEqual(recipe["site_type"], "predicted_dated_pdf")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
-        self.assertIn("Newsletter-November-1st-2026.pdf", recipe["start_url"])
-        self.assertEqual(recipe.get("example_url"), recipe["start_url"])
-        self.assertTrue(recipe["start_url"].lower().endswith(".pdf"))
-        self.assertNotIn("November-8th", recipe["start_url"])
-        self.assertNotIn("Share2026", recipe["start_url"])
-        self.assertNotIn("/2026/11/", recipe["start_url"])
-        self.assertTrue(recipe.get("ignore_https_errors"))
+        self.assertEqual(recipe["start_url"], "https://foxrockparish.ie/news/")
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["href_patterns"], ["Parish newsletter"])
+        self.assertEqual(recipe["weeks_ahead"], 0)
+        self.assertIn("Share2026", recipe["href_skip_patterns"])
         self.assertFalse(recipe.get("skip"))
-        self.assertNotEqual(str(recipe.get("status") or "").lower(), "inactive")
-        self.assertEqual(len(recipe["steps"]), 1)
-        self.assertEqual(recipe["steps"][0]["action"], "download")
-        self.assertIn("Newsletter-November-1st-2026.pdf", recipe["steps"][0]["url"])
-        self.assertTrue(recipe["steps"][0].get("use_captured_url"))
-        self.assertTrue(recipe["steps"][0].get("skip_listing_nav"))
-        do_not = " ".join(recipe.get("do_not") or [])
-        self.assertIn("predicted_dated_pdf", do_not)
-        self.assertIn("Share", do_not)
-        self.assertIn("skip", do_not.lower())
+
+    def test_foxrock_media_titles_select_requested_sunday(self) -> None:
+        import asyncio
+        import tempfile
+        from datetime import date
+        from unittest.mock import AsyncMock, patch
+
+        from harvester.replay import replay_recipe
+
+        urls = {
+            15: "https://foxrockparish.ie/wp-content/uploads/2026/11/00-6deb3f519f45.pdf",
+            22: "https://foxrockparish.ie/wp-content/uploads/2026/11/00-f628df971e80.pdf",
+        }
+        payload = [
+            {"source_url": url, "title": {"rendered": f"Parish newsletter 2026-11-{day}"}}
+            for day, url in urls.items()
+        ]
+
+        def fetch(url, **_kwargs):
+            if "media_type=application" in url:
+                return json.dumps(payload).encode(), {"content-type": "application/json"}
+            if url in urls.values():
+                return b"%PDF-1.7 mock newsletter", {"content-type": "application/pdf"}
+            return None
+
+        with tempfile.TemporaryDirectory() as tmp, patch(
+            "harvester.replay._try_sunday_upload_pdf", new_callable=AsyncMock,
+            return_value=None,
+        ), patch("harvester.replay._fetch_bytes_with_retries", side_effect=fetch):
+            for day, url in urls.items():
+                with self.subTest(day=day):
+                    destination = Path(tmp) / f"foxrock-{day}.pdf"
+                    result = asyncio.run(replay_recipe(
+                        Path("parishes/recipes/dublin/foxrock.json"),
+                        destination,
+                        None,
+                        target_date=date(2026, 11, day),
+                    ))
+                    self.assertEqual(result, (destination, "pdf", url))
 
     def test_foxrock_last_week_pin_is_fetched_over_http(self) -> None:
         import asyncio

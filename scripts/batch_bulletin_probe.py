@@ -34,7 +34,7 @@ BAD = re.compile(r"gdpr|consent|standing.order|gift.aid|donat|privacy|cookie|saf
 GOOD = re.compile(r"newsletter|bulletin|parish.news|sunday|mass.sheet|weekly", re.I)
 FILES = re.compile(r"\.(pdf|jpe?g|png)(?:$|[?#])", re.I)
 SOCIAL = {"facebook.com", "instagram.com", "youtube.com", "x.com", "twitter.com", "tiktok.com"}
-SHARED_UPLOAD_HOSTS = {"dioceseofkerry.ie"}
+SHARED_UPLOAD_HOSTS = {"churchtv.ie", "dioceseofkerry.ie"}
 MAX_HTML = 1_250_000
 MAX_FILE = 12_000_000
 
@@ -373,7 +373,7 @@ def audit_existing_candidate(row: dict) -> dict:
         if source and source not in expected:
             issue = "different_parish_named_in_file"
     if row.get("fallback_website") and host(url) in SHARED_UPLOAD_HOSTS:
-        issue = "shared_diocesan_upload_without_parish_listing"
+        issue = "shared_upload_without_parish_listing"
     if issue:
         row["previous_verdict"] = row["verdict"]
         row["verdict"] = "candidate_requires_manual_review"
