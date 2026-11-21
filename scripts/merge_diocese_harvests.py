@@ -20,7 +20,7 @@ from harvester.bulletin_freshness import (  # noqa: E402
 )
 from harvester.parish_status import write_parish_status  # noqa: E402
 from harvester.report import merge_diocese_reports  # noqa: E402
-from harvester.report_quality import reject_directory_downloads, reject_future_dated_downloads  # noqa: E402
+from harvester.report_quality import (reject_directory_downloads, reject_future_dated_downloads, reject_known_diocesan_admin_downloads)  # noqa: E402
 from harvester.stitcher import stitch_mega_pdf  # noqa: E402
 
 
@@ -102,6 +102,9 @@ def main() -> int:
     future_rejected = reject_future_dated_downloads(merged)
     if future_rejected:
         print(f"  🕐 Sunday referee: rejected {future_rejected} next-week bulletins from previous-week mega")
+    admin_rejected = reject_known_diocesan_admin_downloads(merged)
+    if admin_rejected:
+        print(f"  ⛔ Document referee: rejected {admin_rejected} one-off diocesan admin documents")
     parts = str(merged.get("target_date") or "").split("-")
     target = (
         date(int(parts[0]), int(parts[1]), int(parts[2]))
