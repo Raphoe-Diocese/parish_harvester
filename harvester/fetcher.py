@@ -2095,7 +2095,7 @@ def _legacy_fallbacks_enabled(recipe_path: Path, recipe_meta: dict) -> bool:
 
 def _load_recipe_metadata(recipe_path: Path) -> dict:
     try:
-        data = json.loads(recipe_path.read_text(encoding="utf-8"))
+        data = json.loads(recipe_path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return data if isinstance(data, dict) else {}

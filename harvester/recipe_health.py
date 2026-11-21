@@ -45,7 +45,7 @@ def apply_dns_inactive_flags(
 
     for recipe_path in _recipe_paths(parishes_dir):
         try:
-            meta = json.loads(recipe_path.read_text(encoding="utf-8"))
+            meta = json.loads(recipe_path.read_text(encoding="utf-8-sig"))
         except Exception:
             continue
         if not isinstance(meta, dict):
