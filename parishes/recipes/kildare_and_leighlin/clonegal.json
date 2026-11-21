@@ -1,19 +1,32 @@
 {
   "parish_key": "clonegal",
-  "display_name": "Clonegal",
+  "display_name": "Clonegal & Kildavin",
   "diocese": "kildare_and_leighlin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.kandle.ie/parish/clonegal/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No separate this-week bulletin file proved yet on 03/10/2026. Do not invent a Facebook PDF.",
+  "recorded_date": "2026-11-21",
+  "start_url": "https://www.clonegalkildavin.ie/pages2/l_news.htm",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "http_scrape_newest_pdf",
+  "status": "active",
+  "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.kandle.ie/parish/clonegal/"
+      "url": "https://www.clonegalkildavin.ie/pages2/l_news.htm"
     }
   ],
-  "version": 1
+  "version": 3,
+  "href_patterns": [
+    "parish_news"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 160,
+  "operator_notes": [
+    "21/11/2026: batch discovery run 44844430031 downloaded valid 15 November 2026 masthead PDF at https://www.clonegalkildavin.ie/pages2/parish_newsletter/parish_news151126.pdf from parish's own newsletter archive, whereas previous recipe was inactive and pointed to Kildare diocesan parish directory.",
+    "Weekly files in /pages2/parish_newsletter/parish_newsDDMMYY.pdf are dated in the filename. Scrape archive and select newest target-week file. Do not pin parish_news151126.pdf; targeted harvest to verify replay."
+  ],
+  "do_not": [
+    "Do not harvest Kildare diocesan directory or generic parish listing.",
+    "Do not pin a dated PDF permanently.",
+    "Do not publish old or mismatched masthead PDF as current issue."
+  ]
 }
