@@ -915,6 +915,14 @@ async def _try_force_html_to_pdf(
     Uses archive-aware navigation + content-region print.
     """
     key = entry.key
+    from .report_quality import is_directory_html_result
+
+    # An address/card page on a diocese site is not a parish newsletter.
+    # Repeatedly printing these pages produced 140 false "downloads" in the
+    # 15 November report. Block before launching Chromium.
+    if is_directory_html_result({"url": url, "file_type": "html_render"}):
+        print(f"  ⛔ {key}: refusing to print diocesan directory as newsletter: {url}")
+        return None
     navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
     wait_after_load_ms = int(host_profile.get("wait_after_load_ms", 3000))
     context = await new_harvester_context(browser)
@@ -926,6 +934,9 @@ async def _try_force_html_to_pdf(
             await page.wait_for_load_state("networkidle", timeout=min(navigation_timeout_ms, 12_000))
         except PlaywrightTimeoutError:
             pass
+        if is_directory_html_result({"url": page.url, "file_type": "html_render"}):
+            print(f"  ⛔ {key}: navigation reached diocesan directory, not a bulletin")
+            return None
 
         async def _do_print(p: Page, d: Path) -> None:
             await _print_page_to_pdf(p, d)
