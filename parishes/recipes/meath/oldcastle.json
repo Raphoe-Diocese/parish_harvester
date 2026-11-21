@@ -1,19 +1,46 @@
 {
   "parish_key": "oldcastle",
-  "display_name": "Oldcastle",
+  "display_name": "Oldcastle & Moylagh",
   "diocese": "meath",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://www.dioceseofmeath.ie/map-of-parishes",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No this-week PDF or JPEG proved on 03/10/2026. Do not invent a Facebook PDF.",
+  "recorded_date": "2026-11-21",
+  "start_url": "https://oldcastlemoylaghparish.ie/",
+  "site_type": "pdf_download_list",
+  "playbook_type": "pdf_download_list",
+  "status": "active",
+  "skip": false,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.dioceseofmeath.ie/map-of-parishes"
+      "url": "https://oldcastlemoylaghparish.ie/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/newsletters/parish-newsletter-']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/wp-content/uploads/'][href$='.pdf']",
+      "pick_strategy": "first_match"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "version": 2,
+  "timeout_ms": 55000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 8,
+  "operator_notes": [
+    "21/11/2026: independently verified parish's Sunday 15 November bulletin at /newsletters/parish-newsletter-sunday-15th-november-2026/ and downloaded /wp-content/uploads/2026/11/15th-nov-26.pdf. PDF has valid embedded text, the Oldcastle/Moylagh parish masthead, '33rd Sunday in Ordinary Time', and Mass intentions 14th-22nd Nov. Old inactive diocesan directory card is NOT a bulletin source.",
+    "Dynamic two-hop homepage -> newest dated parish-newsletter post -> post's PDF; do not pin 15 November PDF. Harvest target-Sunday and freshness referee must reject previous week's PDF. This recipe has not yet passed a live automated harvest."
+  ],
+  "do_not": [
+    "Do not use Meath diocese directory as bulletin.",
+    "Do not pin a specific dated PDF or article URL.",
+    "Do not accept a PDF with a previous Sunday masthead as fresh.",
+    "Do not print the full parish homepage or generic daily readings as a bulletin."
+  ]
 }
