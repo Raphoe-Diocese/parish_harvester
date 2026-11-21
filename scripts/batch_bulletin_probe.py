@@ -150,7 +150,11 @@ def wordpress_media_candidates(page_url: str, sunday: date) -> list[str]:
         combined = urlparse(url).path.rsplit("/", 1)[-1] + " " + str(title)
         if not allowed(url) or not FILES.search(url):
             continue
-        if BAD.search(combined) or not GOOD.search(combined):
+        bulletin_directory = bool(re.search(
+            r"/(?:newsletters?|bulletins?|parish-news|weekly-news)/",
+            urlparse(url).path, re.I
+        ))
+        if BAD.search(combined) or not (GOOD.search(combined) or bulletin_directory):
             continue
         filename = urlparse(url).path.rsplit("/", 1)[-1]
         issue = parse_issue_date(filename, sunday.year) or parse_issue_date(str(title), sunday.year)
@@ -245,7 +249,14 @@ def probe_one(item: dict, sunday: date) -> dict:
         seen.add(url)
         name = urlparse(url).path.rsplit("/", 1)[-1]
         blob = f"{name} {caption}"
-        if BAD.search(blob) or not GOOD.search(blob):
+        # Some parishes use only a date as the PDF filename, e.g.
+        # /images/newsletter/15.11.2026.pdf. Trust a known bulletin directory
+        # as a *candidate hint*, never as evidence of a current edition.
+        bulletin_directory = bool(re.search(
+            r"/(?:newsletters?|bulletins?|parish-news|weekly-news)/",
+            urlparse(url).path, re.I
+        ))
+        if BAD.search(blob) or not (GOOD.search(blob) or bulletin_directory):
             continue
         found = parse_issue_date(name, sunday.year) or parse_issue_date(caption, sunday.year)
         # Strict: only Sunday issue dates are automatically tagged as current.
