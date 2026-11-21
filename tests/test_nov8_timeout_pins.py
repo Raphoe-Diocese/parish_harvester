@@ -114,24 +114,21 @@ class Nov8TimeoutPinTests(unittest.TestCase):
         self.assertEqual(recipe["site_type"], "wordpress")
         self.assertEqual(recipe["playbook_type"], "direct_download")
 
-    def test_cloyne_pins_8_november_file(self) -> None:
+    def test_cloyne_discovers_current_newsletter_in_wordpress_media(self) -> None:
         recipe = _recipe("parishes/recipes/cloyne/cloyneparish.json")
-        self.assertIn("Newsletter-8th-November-2026-All-Saints.pdf", recipe["start_url"])
-        self.assertNotIn("1st-November", recipe["start_url"])
-        self.assertEqual(recipe["site_type"], "wordpress")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
-        self.assertFalse(recipe["skip"])
+        self.assertEqual(recipe["start_url"], "https://cloyneparish.com/")
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["playbook_type"], "wp_json_newest_media")
+        self.assertIn("Newsletter-", recipe["href_patterns"])
+        self.assertFalse(recipe.get("skip", False))
 
-    def test_crossmolina_pins_8_november_not_15(self) -> None:
+    def test_crossmolina_predicts_new_week_using_parish_owned_document(self) -> None:
         recipe = _recipe("parishes/recipes/killala/crossmolina.json")
-        self.assertIn(
-            "/2026/11/8th-November-Crossmolina-Parish-Newsletter.pdf",
-            recipe["start_url"],
-        )
-        self.assertNotIn("15th-November", recipe["start_url"])
+        self.assertIn("/2026/11/8th-November-Crossmolina-Parish-Newsletter.pdf", recipe["start_url"])
         self.assertNotIn("churchtv.ie", recipe["start_url"])
-        self.assertEqual(recipe["site_type"], "wordpress")
-        self.assertEqual(recipe["playbook_type"], "direct_download")
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["playbook_type"], "predicted_dated_pdf")
+        self.assertGreaterEqual(int(recipe["weeks_ahead"]), 1)
 
     def test_same_dated_images_do_not_mix_weeks(self) -> None:
         mixed = _same_dated_image_group(
