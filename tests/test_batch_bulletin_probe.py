@@ -226,6 +226,19 @@ class BatchProbeTests(TestCase):
         self.assertEqual(checked["verdict"], "candidate_requires_manual_review")
         self.assertEqual(checked["reason"], "different_parish_named_in_file")
 
+    def test_same_parish_after_month_prefix_is_not_falsely_rejected(self):
+        row = {
+            "verdict": "candidate_verified_masthead", "file_kind": "pdf",
+            "document_url": HOME + "15th-November-Crossmolina-Parish-Newsletter.pdf",
+            "name": "Crossmolina", "parish": "crossmolina", "masthead_verified": True,
+        }
+        self.assertEqual(batch.audit_existing_candidate(row)["verdict"], "candidate_verified_masthead")
+
+    def test_malformed_source_url_is_a_miss_not_batch_exception(self):
+        from http.client import InvalidURL
+        with patch.object(batch, "urlopen", side_effect=InvalidURL("bad URL")):
+            self.assertEqual(batch.fetch(HOME, 1024), (b"", "", ""))
+
     def test_dated_prefix_cannot_disguise_another_parish(self):
         row = {
             "verdict": "candidate_verified_masthead",
