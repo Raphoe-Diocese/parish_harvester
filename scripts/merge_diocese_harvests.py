@@ -20,6 +20,7 @@ from harvester.bulletin_freshness import (  # noqa: E402
 )
 from harvester.parish_status import write_parish_status  # noqa: E402
 from harvester.report import merge_diocese_reports  # noqa: E402
+from harvester.report_quality import reject_directory_downloads  # noqa: E402
 from harvester.stitcher import stitch_mega_pdf  # noqa: E402
 
 
@@ -95,6 +96,9 @@ def main() -> int:
         raise SystemExit(f"No report.json files under {args.slices_dir}")
 
     merged = merge_diocese_reports(reports)
+    directory_rejected = reject_directory_downloads(merged)
+    if directory_rejected:
+        print(f"  ⛔ Directory referee: rejected {directory_rejected} fake HTML bulletin PDFs")
     parts = str(merged.get("target_date") or "").split("-")
     target = (
         date(int(parts[0]), int(parts[1]), int(parts[2]))
