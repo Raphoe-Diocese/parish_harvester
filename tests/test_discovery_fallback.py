@@ -81,6 +81,11 @@ class DiscoveryFallbackTests(unittest.TestCase):
                 "stpatricksbelfast", self.TARGET,
                 ["https://churchtv.ie"], ledger_path=path
             ))
+            self._ledger(path, document_url="https://www.dioceseofkerry.ie/wp-content/uploads/2026/11/newsletter.pdf")
+            self.assertIsNone(eligible_discovery_url(
+                "stpatricksbelfast", self.TARGET,
+                ["https://www.dioceseofkerry.ie/parish/adrigole/"], ledger_path=path
+            ))
 
     def test_rechecks_pdf_masthead_before_writing_to_disk(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

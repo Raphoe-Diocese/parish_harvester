@@ -87,7 +87,7 @@ class Links(HTMLParser):
                 self.links.append((src, attrs.get("title") or ""))
         elif tag == "img":
             src = attrs.get("src", "")
-            alt = attrs.get("alt", "")
+            alt = attrs.get("alt") or ""
             if src:
                 self.links.append((src, alt))
 
@@ -398,6 +398,14 @@ def audit_existing_candidate(row: dict) -> dict:
             issue = "different_parish_named_in_file"
     if row.get("fallback_website") and host(url) in SHARED_UPLOAD_HOSTS:
         issue = "shared_upload_without_parish_listing"
+    # Kerry's diocesan media library serves bulletins for many parishes. A
+    # current printed Sunday alone cannot establish which parish issued it.
+    if host(url) == "dioceseofkerry.ie":
+        parish = re.sub(r"[^a-z0-9]", "", str(row.get("parish") or "").lower())
+        name = re.sub(r"[^a-z0-9]", "", str(row.get("name") or "").lower())
+        body = re.sub(r"[^a-z0-9]", "", str(row.get("body_text") or "").lower())
+        if not body or not any(token and token in body for token in (parish, name)):
+            issue = "shared_kerry_upload_parish_identity_unverified"
     if issue:
         row["previous_verdict"] = row["verdict"]
         row["verdict"] = "candidate_requires_manual_review"
