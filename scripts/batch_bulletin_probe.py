@@ -241,6 +241,7 @@ def probe_one(item: dict, sunday: date) -> dict:
         expanded.extend((urljoin(suburl or article, href), text) for href, text in subpage.links)
 
     candidates = []
+    undated_candidates = []
     seen = set()
     for href, caption in expanded:
         url = urljoin(final, href.strip())
@@ -259,19 +260,56 @@ def probe_one(item: dict, sunday: date) -> dict:
         if BAD.search(blob) or not (GOOD.search(blob) or bulletin_directory):
             continue
         found = parse_issue_date(name, sunday.year) or parse_issue_date(caption, sunday.year)
-        # Strict: only Sunday issue dates are automatically tagged as current.
-        if found != sunday:
-            continue
-        candidates.append(url)
+        # Dated URLs/captions are the strongest leads. For permanent
+        # newsletter.pdf links, inspect the PDF's actual masthead instead:
+        # an undated filename alone NEVER establishes freshness.
+        if found == sunday:
+            candidates.append(url)
+        elif found is None and urlparse(url).path.lower().endswith(".pdf"):
+            undated_candidates.append(url)
     if not candidates:
         # Broadly reusable recovery: WordPress media often holds the current
         # parish PDF when its homepage and archive pages have none.
         candidates.extend(wordpress_media_candidates(final, sunday))
+    # Fetch at most five. Dated links win; undated links need body proof.
+    candidates.extend(u for u in undated_candidates if u not in candidates)
     for url in candidates[:5]:
         body, ctype, resolved = fetch(url, MAX_FILE, timeout=20)
         file_kind = verify_file(body, resolved or url)
         if not file_kind:
             continue
+        # WordPress automatically generates low-resolution image thumbnails.
+        # Prefer the full image before accepting a one-page newsletter scan.
+        picture_path = urlparse(resolved or url).path
+        thumbnail = re.search(r"-(\\d{2,4})x(\\d{2,4})(?=\\.(?:png|jpe?g)$)", picture_path, re.I)
+        if file_kind in ("png", "jpeg") and thumbnail:
+            original_url = re.sub(
+                r"-(\\d{2,4})x(\\d{2,4})(?=\\.(?:png|jpe?g)$)",
+                "", resolved or url, flags=re.I,
+            )
+            full, _full_type, full_url = fetch(original_url, MAX_FILE, timeout=20)
+            if verify_file(full, full_url or original_url) == file_kind and len(full) > len(body):
+                body, resolved = full, full_url or original_url
+            elif min(int(thumbnail.group(1)), int(thumbnail.group(2))) < 500:
+                continue
+        # A second-page scan by itself is not a complete parish bulletin.
+        basename = urlparse(resolved or url).path.rsplit("/", 1)[-1]
+        if file_kind in ("png", "jpeg") and re.search(r"page[-_ ]?0?[2-9](?!\\d)", basename, re.I):
+            continue
+        # Avoid accepting Gurteen's bulletin as Headford's merely because
+        # the shared ChurchTV host returned a current PDF.
+        named = re.search(
+            r"^([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
+            basename, re.I,
+        )
+        if named:
+            source_name = re.sub(r"[^a-z0-9]", "", named.group(1).lower())
+            requested_name = re.sub(
+                r"[^a-z0-9]", "", (str(item.get("name") or "") + " " +
+                                   str(item.get("matched_parish") or "")).lower()
+            )
+            if source_name and source_name not in requested_name:
+                continue
         masthead_date = None
         if file_kind == "pdf":
             from harvester.bulletin_freshness import heading_date_in_pdf_bytes
@@ -279,6 +317,9 @@ def probe_one(item: dict, sunday: date) -> dict:
             # An older masthead invalidates a current-looking filename.
             if masthead_date is not None and masthead_date != sunday:
                 continue
+        # An undated newsletter.pdf is accepted only with genuine body proof.
+        if url in undated_candidates and masthead_date != sunday:
+            continue
         confirmed_masthead = masthead_date == sunday
         result.update(
             verdict=("candidate_verified_masthead" if confirmed_masthead
