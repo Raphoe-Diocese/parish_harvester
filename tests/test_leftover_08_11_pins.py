@@ -161,18 +161,14 @@ class Leftover0811PinTests(unittest.TestCase):
             recipe["start_url"].rstrip("/"), "https://www.faughartparish.ie"
         )
 
-    def test_headford_pins_7th_8th_nov_churchtv_pdf(self) -> None:
+    def test_headford_discovers_each_issue_from_its_official_website(self) -> None:
         recipe = _recipe("parishes/recipes/tuam/headford.json")
-        self._assert_wordpress_direct(recipe, "Newsletter-7th-8th-November-2026.pdf")
-        self.assertIn("/2021/02/", recipe["start_url"])
-        self.assertNotIn("14th-15th-November", recipe["start_url"])
-        self.assertNotIn("31st-October", recipe["start_url"])
-        self.assertNotIn("1st-November", recipe["start_url"])
-        self.assertNotIn("September", recipe["start_url"])
-        self.assertNotEqual(recipe["site_type"], "http_scrape_newest_pdf")
-        self.assertNotEqual(
-            recipe["start_url"].rstrip("/"), "https://headfordchurch.com"
-        )
+        self.assertEqual(recipe["start_url"], "https://headfordchurch.com/")
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(recipe["post_slug_patterns"], ["/newsletter/newsletter-"])
+        self.assertEqual(recipe["href_patterns"], ["/_emdash/api/media/file/"])
+        self.assertEqual(recipe["steps"], [{"action": "goto", "url": recipe["start_url"]}])
+        self.assertFalse(recipe.get("skip"))
 
     def test_bekan_pins_8_november_png_not_listing(self) -> None:
         recipe = _recipe("parishes/recipes/tuam/bekan.json")

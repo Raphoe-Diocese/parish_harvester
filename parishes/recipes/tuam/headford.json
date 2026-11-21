@@ -1,47 +1,39 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "headford",
   "display_name": "Headford-Claran (Killursa & Killower)",
   "diocese": "tuam",
-  "start_url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
-  "site_type": "wordpress",
-  "playbook_type": "direct_download",
+  "start_url": "https://headfordchurch.com/",
+  "site_type": "http_scrape_newest_pdf",
+  "playbook_type": "http_scrape_newest_pdf",
   "status": "active",
   "skip": false,
   "max_bulletin_pages": 16,
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-11-13",
-  "example_url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
+  "recorded_date": "2026-11-21",
+  "example_url": "https://headfordchurch.com/_emdash/api/media/file/01M7WM0TT5FHKAFW5JX40DPCVJ.01M7WM0VG6T6PNCEMPWJ6A9F79.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf"
-    },
-    {
-      "action": "download",
-      "url": "https://www.churchtv.ie/wp-content/uploads/2021/02/Newsletter-7th-8th-November-2026.pdf",
-      "use_captured_url": true
+      "url": "https://headfordchurch.com/"
     }
   ],
   "operator_notes": [
-    "13/11/2026 leftover FAILED: http_scrape of headfordchurch.com still had September href_patterns and newest WP media was Newsletter-26th-27th-September-2026.pdf. Kitchen-sink: ChurchTV stores Killursa & Killower sheets under /wp-content/uploads/2021/02/. GET 200 application/pdf Newsletter-7th-8th-November-2026.pdf 4338649 bytes magic %PDF-1.7. Freshness in_bulletin_week 08/11/2026. PDF streams include mailto:info@headfordchurch.com and info@headfordns.ie. The 2021/02 folder is ChurchTV's store, not the Sunday. Do not scrape headfordchurch.com. Do not pin Newsletter-14th-15th-November-2026.pdf (GET 200, also Headford, next weekend; ChurchTV /headford/ currently links that one)."
+    "21/11/2026: official homepage links dated newsletter articles; their PDF download link uses an opaque EmDash media URL. Live HTTP replay selected separate three-page Headford and Claran PDFs for 15 and 22 November (4,327,644 and 4,326,039 bytes). The 22 November article is /newsletter/newsletter-21st-22nd-november-2026/ and the PDF prints 21st & 22nd November 2026."
   ],
   "do_not": [
-    "Do not pin Newsletter-14th-15th-November-2026.pdf — that is 14/15 November.",
-    "Do not pin Newsletter-31st-October-1st-November-2026.pdf — All Saints 01/11 is stale.",
-    "Do not invent Newsletter-8th-November-2026.pdf — that path redirects to the ChurchTV homepage.",
-    "Do not scrape headfordchurch.com or keep September in href_patterns.",
-    "Do not use predicted_dated_pdf.",
-    "Do not date-rewrite the 2021/02 folder.",
-    "Do not harvest Facebook."
+    "Do not pin a dated PDF or guess its opaque media URL.",
+    "Do not use generic ChurchTV uploads, which can belong to another parish."
   ],
   "href_patterns": [
-    "Newsletter-7th-8th-November-2026",
-    ".pdf"
+    "/_emdash/api/media/file/"
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "post_slug_patterns": [
+    "/newsletter/newsletter-"
+  ]
 }
