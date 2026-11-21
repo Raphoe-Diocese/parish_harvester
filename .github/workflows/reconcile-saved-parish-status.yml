@@ -1,0 +1,73 @@
+name: Reconcile saved parish status quality
+
+# A code fix must also correct the persisted status read by the Problems tab.
+# This is a status-only regeneration, not a new harvest or mega-PDF rebuild.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'harvester/parish_status.py'
+      - 'harvester/report_quality.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reconcile-saved-parish-status
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+
+      - name: Recompute status using quality referees
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from harvester.parish_status import write_parish_status
+          path = Path("parishes/parish_status.json")
+          old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+          before = old.get("summary", {}).get("ok", 0)
+          updated = write_parish_status()
+          after = updated.get("summary", {}).get("ok", 0)
+          print(f"Previously marked ok: {before}, quality-checked ok: {after}")
+          if after > before and before:
+              raise SystemExit("Status reconciliation unexpectedly increased successes")
+          PY
+
+      - name: Preserve corrected status without overwriting concurrent harvests
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add parishes/parish_status.json
+          git diff --cached --quiet && exit 0
+          git commit -m "status: correct saved false-positive parish successes [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Concurrent status edit conflict; not overwriting other parish results"
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep "$attempt"
+          done
+          echo "::error::Could not publish corrected status after safe retries"
+          exit 1
