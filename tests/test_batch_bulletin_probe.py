@@ -19,6 +19,12 @@ def sample(url=HOME):
 
 
 class BatchProbeTests(TestCase):
+    def test_discovery_rolls_forward_on_saturday(self):
+        for day, expected in ((20, 15), (21, 22), (22, 22), (23, 22)):
+            with self.subTest(day=day):
+                self.assertEqual(batch.discovery_sunday(date(2026, 11, day)),
+                                 date(2026, 11, expected))
+
     def test_current_pdf_requires_signature_and_week(self):
         html = ('<html><a href="' + PDF + '">Sunday 15th November 2026 Bulletin</a></html>').encode()
         def fake_fetch(url, limit, timeout=12):

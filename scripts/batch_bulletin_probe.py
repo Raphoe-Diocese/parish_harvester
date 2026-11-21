@@ -18,7 +18,9 @@ import re
 from urllib.error import HTTPError, URLError
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
+from harvester.config import target_sunday
 from harvester.utils import extract_date_from_string, extract_date_from_slug
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -422,14 +424,21 @@ def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tup
     return report, {"offset": (offset + len(batch)) % len(unique), "target_date": sunday.isoformat()}
 
 
+def discovery_sunday(today: date) -> date:
+    """Start the upcoming issue's discovery batch on Saturday."""
+    if today.weekday() == 5:
+        return today + timedelta(days=1)
+    return target_sunday(today)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=120)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--date", default="")
     args = ap.parse_args()
-    now = datetime.now(timezone.utc).date()
-    sunday = date.fromisoformat(args.date) if args.date else now - timedelta(days=(now.weekday() + 1) % 7)
+    today = datetime.now(ZoneInfo("Europe/Dublin")).date()
+    sunday = date.fromisoformat(args.date) if args.date else discovery_sunday(today)
     queue = json.loads(QUEUE.read_text(encoding="utf-8"))
     if ADDITIONAL.exists():
         extra = json.loads(ADDITIONAL.read_text(encoding="utf-8"))
