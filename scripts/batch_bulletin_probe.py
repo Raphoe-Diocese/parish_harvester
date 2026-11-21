@@ -337,6 +337,43 @@ def probe_one(item: dict, sunday: date) -> dict:
     return result
 
 
+def audit_existing_candidate(row: dict) -> dict:
+    """Demote incomplete or cross-parish matches already stored in the ledger.
+
+    The discovery file is cumulative: tightening a rule must also correct
+    older scan rows, without re-fetching every website.
+    """
+    if not str(row.get("verdict") or "").startswith("candidate_verified_"):
+        return row
+    url = str(row.get("document_url") or "")
+    filename = urlparse(url).path.rsplit("/", 1)[-1]
+    kind = row.get("file_kind")
+    issue = ""
+    if kind in ("png", "jpeg"):
+        tiny = re.search(r"-(\d{2,4})x(\d{2,4})(?=\.(?:png|jpe?g)$)", filename, re.I)
+        if tiny and min(int(tiny.group(1)), int(tiny.group(2))) < 500:
+            issue = "thumbnail_not_full_bulletin"
+        if re.search(r"page[-_ ]?0?[2-9](?!\d)", filename, re.I):
+            issue = "only_later_page_found"
+    named = re.search(
+        r"^([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
+        filename, re.I,
+    )
+    if named:
+        source = re.sub(r"[^a-z0-9]", "", named.group(1).lower())
+        expected = re.sub(
+            r"[^a-z0-9]", "", (str(row.get("name") or "") + " " +
+                               str(row.get("parish") or "")).lower()
+        )
+        if source and source not in expected:
+            issue = "different_parish_named_in_file"
+    if issue:
+        row["previous_verdict"] = row["verdict"]
+        row["verdict"] = "candidate_requires_manual_review"
+        row["reason"] = issue
+    return row
+
+
 def run(queue: dict, state: dict, sunday: date, limit: int, workers: int) -> tuple[dict, dict]:
     leads = [r for r in queue.get("leads", []) if r.get("status_hint") != "downloaded"
              and r.get("validation") == "unverified_seed"]
@@ -429,6 +466,18 @@ def main() -> int:
                 str(row.get("verdict", "")).startswith("candidate_verified_")
                 for row in ledger.values()
             )
+    report["rows"] = [audit_existing_candidate(row) for row in report["rows"]]
+    verified_now = [row for row in report["rows"] if
+                    str(row.get("verdict") or "").startswith("candidate_verified_")]
+    report["summary"]["total_checked_this_week"] = len(report["rows"])
+    report["summary"]["total_verified_links_this_week"] = len(verified_now)
+    report["summary"]["total_masthead_verified_this_week"] = sum(
+        row.get("masthead_verified") is True for row in verified_now
+    )
+    report["summary"]["total_candidates_needing_identity_review"] = sum(
+        row.get("verdict") == "candidate_requires_manual_review"
+        for row in report["rows"]
+    )
     OUTPUT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     CURSOR.write_text(json.dumps(new_state, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report["summary"], indent=2))
