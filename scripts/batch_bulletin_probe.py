@@ -187,7 +187,26 @@ def probe_one(item: dict, sunday: date) -> dict:
                           reason="Direct PDF has target-Sunday masthead; parish identity still needs checking")
         else:
             result["reason"] = "direct_pdf_stale_or_undated"
-        return result
+        if result["verdict"] == "candidate_verified_masthead":
+            return result
+        # A dated old PDF is a historical pointer, NOT the weekly source.
+        # Recover from its own WordPress parish host rather than immediately
+        # discarding the entire lead; never pivot into a generic CDN or Drive.
+        path = urlparse(final).path.lower()
+        host_name = host(final)
+        if ("/wp-content/uploads/" in path
+                and "cdn" not in host_name
+                and "google" not in host_name
+                and "wordpress.com" not in host_name):
+            root = urlparse(final)
+            website = f"{root.scheme}://{root.netloc}/"
+            content, kind, final = fetch(website, MAX_HTML)
+            if not content:
+                result["reason"] = "stale_pdf_and_website_unreachable"
+                return result
+            result["fallback_website"] = website
+        else:
+            return result
     if "html" not in kind and not content[:200].lstrip().lower().startswith((b"<!doctype", b"<html")):
         result["reason"] = "not_html"
         return result
