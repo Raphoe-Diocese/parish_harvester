@@ -11,6 +11,7 @@ import argparse
 import concurrent.futures
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
+from http.client import InvalidURL
 import json
 from pathlib import Path
 import re
@@ -61,7 +62,7 @@ def fetch(url: str, limit: int, timeout: int = 12) -> tuple[bytes, str, str]:
             if len(data) > limit:
                 return b"", kind, final
             return data, kind, final
-    except (HTTPError, URLError, TimeoutError, OSError, ValueError):
+    except (HTTPError, URLError, TimeoutError, OSError, ValueError, InvalidURL):
         return b"", "", ""
 
 
@@ -299,7 +300,7 @@ def probe_one(item: dict, sunday: date) -> dict:
         # Avoid accepting Gurteen's bulletin as Headford's merely because
         # the shared ChurchTV host returned a current PDF.
         named = re.search(
-            r"(?:^|[-_/])([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
+            r"(?:^|[-_/])([a-z][a-z0-9]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
             basename, re.I,
         )
         if named:
@@ -356,7 +357,7 @@ def audit_existing_candidate(row: dict) -> dict:
         if re.search(r"page[-_ ]?0?[2-9](?!\d)", filename, re.I):
             issue = "only_later_page_found"
     named = re.search(
-        r"(?:^|[-_/])([a-z][a-z0-9_-]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
+        r"(?:^|[-_/])([a-z][a-z0-9]{2,32})[-_ ]+parish[-_ ]+(?:newsletter|bulletin)",
         filename, re.I,
     )
     if named:
