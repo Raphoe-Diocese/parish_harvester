@@ -4,6 +4,11 @@ name: Batch parish bulletin discovery
 on:
   schedule:
     - cron: '15 2,8,14,20 * * *'
+    # Cover the full unresolved-source queue before the 14:00 Ireland Sunday harvest.
+    # Five runs x 120 leads cover at least 600 distinct sources (currently 507).
+    # Explicit local timezone avoids shifting past harvest during Irish summer time.
+    - cron: '15 9,10,11,12,13 * * 0'
+      timezone: 'Europe/Dublin'
   push:
     branches: [main]
     paths:
