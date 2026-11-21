@@ -739,6 +739,12 @@ jobs:
           else
             echo '{"summary":{"ok":0},"parishes":{}}' > _guard/parish_status_before.json
           fi
+          # Keep the 10% loss guard, but compare against *genuine* previous
+          # bulletin successes. Directory pages and future issues were
+          # mislabelled 'ok' in earlier reports and must not inflate baseline.
+          PYTHONPATH="$GITHUB_WORKSPACE" python scripts/normalise_guard_baseline.py \
+            --status _guard/parish_status_before.json \
+            --report Bulletins/report.json
 
       - name: Merge slices, status, mega PDFs
         env:
