@@ -457,14 +457,9 @@ def _is_real_pdf(
 
 def extract_pdf_bulletin_date(path: Path) -> date | None:
     """Read a bulletin heading date from the first pages of a PDF."""
-    try:
-        reader = PdfReader(str(path))
-    except Exception:
-        return None
-    chunks: list[str] = []
-    for page in reader.pages[:4]:
-        chunks.append(page.extract_text() or "")
-    return extract_bulletin_date_from_text("\n".join(chunks))
+    from .bulletin_freshness import read_pdf_text_head
+    return extract_bulletin_date_from_text(read_pdf_text_head(path))
+
 
 
 # Global MAX_BULLETIN_PAGES stays 4 for undated or unproved files. A heading
@@ -2095,7 +2090,7 @@ def _legacy_fallbacks_enabled(recipe_path: Path, recipe_meta: dict) -> bool:
 
 def _load_recipe_metadata(recipe_path: Path) -> dict:
     try:
-        data = json.loads(recipe_path.read_text(encoding="utf-8"))
+        data = json.loads(recipe_path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {}
     return data if isinstance(data, dict) else {}

@@ -3,6 +3,8 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from ocr import generate_bulletin_pages as pages
 
 from ocr.generate_bulletin_pages import (
     PDF_INPAGE_VIEWER_VERSION,
@@ -31,6 +33,23 @@ from ocr.generate_bulletin_pages import (
 
 
 class OcrBulletinPageTests(unittest.TestCase):
+    def test_missing_parish_section_never_generates_diocesan_events_or_changes(self):
+        with (
+            patch.object(pages, "_load_parish_entries", return_value=[("missing", "Missing Parish")]),
+            patch.object(pages, "_find_previous_viewer_path", return_value=None),
+            patch.object(pages, "split_ocr_by_parish", return_value={}),
+            patch.object(pages, "summarise_bulletin") as summary,
+            patch.object(pages, "extract_events_with_status") as extract,
+            patch.object(pages, "_write_json") as write,
+            patch.object(pages, "_update_bulletins_index"),
+            patch.object(pages, "write_events_json") as events,
+        ):
+            pages._write_parish_reader_outputs("derry", "2026-11-22", "Another parish's notices", [])
+        summary.assert_not_called()
+        extract.assert_not_called()
+        self.assertEqual(events.call_args.kwargs["error"], "parish_text_missing")
+        self.assertEqual(write.call_args.args[1]["added_lines"], [])
+
     def test_format_uk_date(self) -> None:
         self.assertEqual(format_uk_date("2026-05-21"), "21/05/2026")
         self.assertEqual(format_uk_date("bad-date"), "bad-date")

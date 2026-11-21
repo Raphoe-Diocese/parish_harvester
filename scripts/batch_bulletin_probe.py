@@ -81,6 +81,10 @@ class Links(HTMLParser):
         if tag == "a":
             self.href = attrs.get("href", "")
             self.text = []
+        elif tag in {"iframe", "embed", "object"}:
+            src = attrs.get("data" if tag == "object" else "src")
+            if src:
+                self.links.append((src, attrs.get("title") or ""))
         elif tag == "img":
             src = attrs.get("src", "")
             alt = attrs.get("alt", "")
@@ -175,7 +179,27 @@ def probe_one(item: dict, sunday: date) -> dict:
     if not allowed(initial):
         result["reason"] = "unsupported_or_social_source"
         return result
-    if item.get("source_type") in ("mcn_live", "churchmedia", "google_drive"):
+    from harvester.utils import mcn_upload_church_id
+    church_id = mcn_upload_church_id(initial)
+    if church_id:
+        from harvester.webcam_bulletin_dig import _http_json
+        from harvester.utils import mcn_newsletter_url_from_profile, mcn_profile_data_url
+        from harvester.bulletin_freshness import heading_date_in_pdf_bytes
+
+        profile = _http_json(mcn_profile_data_url("https://mcn.live", church_id), method="POST")
+        current = mcn_newsletter_url_from_profile(profile)
+        if not current or mcn_upload_church_id(current) != church_id:
+            return {**result, "reason": "no_matching_mcn_profile_document"}
+        body, _, resolved = fetch(current, MAX_FILE)
+        if (mcn_upload_church_id(resolved) == church_id
+                and verify_file(body, resolved) == "pdf"
+                and heading_date_in_pdf_bytes(body, target=sunday) == sunday):
+            return {**result, "verdict": "candidate_verified_masthead",
+                    "document_url": resolved, "file_kind": "pdf", "bytes": len(body),
+                    "issue_date": sunday.isoformat(), "masthead_verified": True,
+                    "reason": "Same MCN church ID and requested printed Sunday"}
+        return {**result, "reason": "mcn_file_or_issue_date_unverified"}
+    if host(initial) in {"drive.google.com", "churchmedia.tv"}:
         result["reason"] = "specialised_api_needed"
         return result
 
