@@ -1517,7 +1517,7 @@ def freshness_verdict_for_ok_result(
         and saved_pdf is not None
         and pdf_sha256(saved_pdf) == previous_digest
     ):
-        body_issue_date = extract_pdf_bulletin_date(saved_pdf)
+        body_issue_date = pdf_date_before_harvest_week(saved_pdf, target)
         if _previous_sunday_issue_covers_target_sunday(
             saved_pdf, target, body_issue_date
         ):
