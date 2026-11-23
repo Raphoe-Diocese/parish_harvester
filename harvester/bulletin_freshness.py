@@ -1491,7 +1491,20 @@ def _issue_schedule_covers_target_sunday(
         rf"|\b{re.escape(numeric_date_alt)}\b.{{0,16}}\b{weekday}\b)"
         rf".{{0,24}}{time}"
     )
-    return re.search(word_date, text) is not None or re.search(numeric, text) is not None
+    # Tabular parish schedules often show "Sun 22nd 10.00am" beneath a
+    # newsletter masthead which supplies the month. The printed issue date
+    # already constrains the bulletin to this week, so the weekday + day +
+    # time is sufficient in this table format.
+    day_schedule = (
+        rf"(?:\b{weekday}\b.{{0,10}}\b{day_token}\b"
+        rf"|\b{day_token}\b.{{0,10}}\b{weekday}\b)"
+        rf".{{0,24}}{time}"
+    )
+    return (
+        re.search(word_date, text) is not None
+        or re.search(numeric, text) is not None
+        or re.search(day_schedule, text) is not None
+    )
 
 
 def freshness_verdict_for_ok_result(
