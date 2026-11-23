@@ -28,7 +28,7 @@ def test_blocked_stitch_preserves_candidate_without_approving_it_for_ocr():
     root = Path(__file__).resolve().parents[1]
     workflow = (root / ".github/workflows/harvest.yml").read_text(encoding="utf-8")
     ocr = (root / ".github/workflows/ocr-bulletin.yml").read_text(encoding="utf-8")
-    stitch = workflow.split("\\n  stitch:", 1)[1]
+    stitch = workflow[workflow.index("  stitch:"):]
 
     candidate = "- name: Preserve unapproved stitch candidate"
     guard = "- name: Guard ok count (block big drop)"
