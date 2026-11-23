@@ -1362,7 +1362,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
   <main class=\"content\">
     <div class=\"intro\">
       <h1>Welcome to Parish Press</h1>
-      <p>Parish Press is experimental, and bulletin coverage may vary as we improve the service. If a bulletin is missing, use the parish links at the bottom of its diocesan page. Searchable text is generated automatically; please check Mass times and notices against the original PDF.</p>
+      <p>Parish Press is an ongoing project in experimental mode. Coverage may vary as we improve the service; missing bulletins are linked at the bottom of each diocesan page. Searchable text is automatic and may be incomplete, so please check details against the original PDF.</p>
     </div>
     <p class=\"section-title\">Live dioceses</p>
     <section class=\"live-grid\">{live_cards_html}</section>
