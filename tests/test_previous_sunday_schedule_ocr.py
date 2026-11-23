@@ -2,9 +2,14 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
-from harvester.bulletin_freshness import _issue_schedule_covers_target_sunday
+from harvester.bulletin_freshness import (
+    FreshnessVerdict,
+    _issue_schedule_covers_target_sunday,
+    freshness_verdict_for_ok_result,
+)
 
 
 def test_previous_sunday_scanned_bulletin_can_prove_current_sunday_schedule(tmp_path: Path) -> None:
@@ -71,3 +76,44 @@ def test_week_end_date_without_target_schedule_stays_rejected(tmp_path: Path) ->
         assert not _issue_schedule_covers_target_sunday(
             pdf, target, date(2026, 11, 28)
         )
+
+def test_future_dated_weekly_issue_is_accepted_only_when_schedule_covers_target(
+    tmp_path: Path,
+) -> None:
+    pdf = tmp_path / "kincasslagh-weekly-range.pdf"
+    pdf.write_bytes(b"%PDF-test")
+    target = date(2026, 11, 22)
+    result = SimpleNamespace(
+        url="https://example.org/Newsletter-20th-28th-November.pdf",
+        file_path=pdf,
+        key="",
+    )
+    with (
+        patch(
+            "harvester.bulletin_freshness.check_bulletin_freshness",
+            return_value=FreshnessVerdict(
+                status="stale",
+                extracted_date=date(2026, 11, 28),
+                reason="date_ahead_of_target",
+            ),
+        ),
+        patch("harvester.bulletin_freshness._parish_status_row", return_value={}),
+        patch("harvester.bulletin_freshness._pdf_file_bytes", return_value=9),
+        patch(
+            "harvester.bulletin_freshness.saved_bulletin_issue_date",
+            return_value=(date(2026, 11, 28), "front_page"),
+        ),
+        patch(
+            "harvester.bulletin_freshness.pdf_date_before_harvest_week",
+            return_value=None,
+        ),
+        patch(
+            "harvester.bulletin_freshness.read_pdf_page_texts",
+            return_value=["Kincasslagh Parish Newsletter 20th–28th November", "Sun 22nd 10.00am Mass"],
+        ),
+    ):
+        verdict = freshness_verdict_for_ok_result(result, target)
+
+    assert verdict.status == "fresh"
+    assert verdict.reason == "printed_weekly_schedule_covers_target"
+    assert verdict.extracted_date == date(2026, 11, 28)
