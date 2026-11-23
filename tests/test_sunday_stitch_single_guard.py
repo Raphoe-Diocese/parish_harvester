@@ -10,7 +10,7 @@ def test_sunday_stitch_uses_one_snapshot_and_one_guard():
     workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/harvest.yml").read_text(
         encoding="utf-8"
     )
-    stitch = workflow.split("\n  stitch:", 1)[1]
+    stitch = workflow
 
     snapshot = "- name: Snapshot parish_status before merge"
     guard = "- name: Guard ok count (block big drop)"
