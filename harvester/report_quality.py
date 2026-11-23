@@ -6,7 +6,8 @@ PDFs or genuine parish newsletter articles. Used at harvest and mega stitch.
 from __future__ import annotations
 
 from urllib.parse import urlparse
-from datetime import date
+from datetime import date, timedelta
+from pathlib import Path
 import re
 
 _DIOCESE_DIRECTORY_HOSTS = {
@@ -65,17 +66,25 @@ def reject_directory_downloads(report: dict) -> int:
     return len(rejected)
 
 
-def reject_future_dated_downloads(report: dict) -> int:
-    """A 22 November PDF must never be counted in the 15 November harvest.
+def reject_future_dated_downloads(
+    report: dict, *, current_dir: Path | None = None
+) -> int:
+    """Reject unproved future issues, while retaining a verified weekly range.
 
-    Relies on an explicit issue date already extracted by the harvester.
-    Unknown dates are not guessed. Sunday or weekday editions from the
-    current week remain eligible for the existing freshness referee.
+    A weekly bulletin can be dated at the end of its coverage range (for
+    example 20–28 November) even though it contains the target Sunday. Keep
+    that exception narrow: the issue date must be within seven days, and the
+    saved PDF must explicitly show the target Sunday and a Mass time.
     """
     try:
         target = date.fromisoformat(str(report.get("target_date") or ""))
     except ValueError:
         return 0
+
+    if current_dir is None:
+        repo_current = Path(__file__).resolve().parent.parent / "Bulletins" / "current"
+        current_dir = repo_current if repo_current.is_dir() else None
+
     good = []
     rejected = []
     for row in report.get("downloaded") or []:
@@ -89,6 +98,30 @@ def reject_future_dated_downloads(report: dict) -> int:
         if issue is None or issue <= target:
             good.append(row)
             continue
+
+        pdf_path = None
+        if current_dir is not None:
+            key = str(row.get("parish") or "").strip()
+            file_name = str(row.get("file") or f"{key}.pdf").strip() or f"{key}.pdf"
+            for candidate in (
+                Path(current_dir) / file_name,
+                Path(current_dir) / f"{key}.pdf",
+                Path(current_dir).parent / f"{key}.pdf",
+            ):
+                if candidate.is_file():
+                    pdf_path = candidate
+                    break
+
+        if (
+            issue <= target + timedelta(days=7)
+            and pdf_path is not None
+        ):
+            from .bulletin_freshness import _issue_schedule_covers_target_sunday
+
+            if _issue_schedule_covers_target_sunday(pdf_path, target, issue):
+                good.append(row)
+                continue
+
         rejected.append({
             "parish": row.get("parish"),
             "display_name": row.get("display_name"),

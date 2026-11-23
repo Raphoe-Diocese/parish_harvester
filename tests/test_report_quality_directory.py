@@ -2,6 +2,7 @@
 import unittest
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 from harvester.parish_status import build_parish_status
 from harvester.report_quality import is_directory_html_result, reject_directory_downloads, reject_future_dated_downloads, reject_known_diocesan_admin_downloads
@@ -49,6 +50,37 @@ class ReportQualityTests(unittest.TestCase):
         self.assertEqual(len(report["downloaded"]), 3)
         self.assertEqual(report["stale_rejected"][0]["reason"], "date_ahead_of_target")
         self.assertEqual(report["summary"]["downloaded"], 3)
+
+    def test_future_weekly_range_with_target_mass_schedule_is_kept(self):
+        target = "2026-11-22"
+        issue = "2026-11-28"
+        with tempfile.TemporaryDirectory() as temp:
+            current = Path(temp) / "current"
+            current.mkdir()
+            pdf = current / "kincasslagh.pdf"
+            pdf.write_bytes(b"%PDF-test")
+            report = {
+                "target_date": target,
+                "downloaded": [{
+                    "parish": "kincasslagh",
+                    "file": "kincasslagh.pdf",
+                    "url": "https://kincasslagh.ie/app/uploads/2026/11/Nesletter-21-28-Nov-1.pdf",
+                    "bulletin_date": issue,
+                }],
+                "stale_rejected": [],
+                "summary": {"downloaded": 1, "stale_rejected": 0},
+            }
+            with patch(
+                "harvester.bulletin_freshness._issue_schedule_covers_target_sunday",
+                return_value=True,
+            ) as schedule_proof:
+                self.assertEqual(
+                    reject_future_dated_downloads(report, current_dir=current), 0
+                )
+            schedule_proof.assert_called_once()
+            self.assertEqual(len(report["downloaded"]), 1)
+            self.assertEqual(report["summary"]["downloaded"], 1)
+            self.assertEqual(report["stale_rejected"], [])
 
     def test_repeated_diocesan_safeguarding_pdf_rejected(self):
         admin = "https://www.kandle.ie/wp-content/uploads/2026/02/Safeguarding-Sunday-Newsletter-2026.pdf"
