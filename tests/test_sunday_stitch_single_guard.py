@@ -55,7 +55,7 @@ def test_matrix_slice_keeps_parish_pdfs_until_stitch_downloads_them():
     matrix_harvest = matrix_harvest.split("      - name: Date blank ok bulletins", 1)[0]
     assert 'HARVEST_KEEP_CURRENT_PDFS: "1"' in matrix_harvest
 
-    cleanup = main.split("# Stitch per-Diocese Mega PDFs", 1)[1]
+    cleanup = main.split("# Stitch per-diocese mega PDFs", 1)[1]
     cleanup = cleanup.split('print("\\n── Manifest', 1)[0]
     keep_flag = 'os.environ.get(\n                        "HARVEST_KEEP_CURRENT_PDFS", "0"'
     assert keep_flag in cleanup
