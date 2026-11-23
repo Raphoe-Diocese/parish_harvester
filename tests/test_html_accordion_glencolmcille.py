@@ -28,6 +28,7 @@ def test_source_and_recipe_are_registered_once():
     assert recipe["start_url"] == source
     assert recipe["steps"][-1]["action"] == "html"
     assert recipe["steps"][-1]["only_current_accordion"] is True
+    assert recipe["steps"][-1]["allow_previous_sunday_issue"] is True
     assert source in EVIDENCE.read_text(encoding="utf-8")
     assert CONTACTS.is_file()
     assert json.loads(CONTACTS.read_text(encoding="utf-8"))["glencolmcille"]["website"] == source
@@ -51,8 +52,28 @@ def test_current_sunday_passes_exact_date_to_browser():
     assert found["heading"] == "14 / 15 November 2026"
     script, args = page.evaluate.await_args.args
     assert script == _ISOLATE_CURRENT_ACCORDION_JS
-    assert args == {"sunday": 15, "month": "november", "monthAbbr": "nov", "year": 2026}
+    assert args == {
+        "sunday": 15, "month": "november", "monthAbbr": "nov", "year": 2026,
+        "previousSunday": 8, "previousMonth": "november",
+        "previousMonthAbbr": "nov", "previousYear": 2026,
+        "allowPreviousSunday": False,
+    }
 
+
+
+def test_opt_in_previous_sunday_issue_passes_prior_panel_date():
+    page = type("FakePage", (), {})()
+    page.evaluate = AsyncMock(return_value={"ok": True, "chars": 580, "heading": "14 / 15 November 2026"})
+    found = asyncio.run(isolate_current_accordion_bulletin(
+        page, date(2026, 11, 22), allow_previous_sunday_issue=True
+    ))
+    assert found["heading"] == "14 / 15 November 2026"
+    _, args = page.evaluate.await_args.args
+    assert args["sunday"] == 22
+    assert args["previousSunday"] == 15
+    assert args["previousMonth"] == "november"
+    assert args["previousYear"] == 2026
+    assert args["allowPreviousSunday"] is True
 
 def test_no_current_panel_fails_without_ever_printing_archive():
     page = type("FakePage", (), {})()
