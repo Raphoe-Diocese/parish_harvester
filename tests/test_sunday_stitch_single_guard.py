@@ -45,3 +45,19 @@ def test_blocked_stitch_preserves_candidate_without_approving_it_for_ocr():
     assert "retention-days: 14" in stitch[stitch.index(candidate) : stitch.index(guard)]
     assert 'test("mega-bulletin-pdf"; "i")' in ocr
     assert "mega-bulletin-pdf" not in candidate_name
+
+def test_matrix_slice_keeps_parish_pdfs_until_stitch_downloads_them():
+    root = Path(__file__).resolve().parents[1]
+    workflow = (root / ".github/workflows/harvest.yml").read_text(encoding="utf-8")
+    main = (root / "main.py").read_text(encoding="utf-8")
+
+    matrix_harvest = workflow.split("      - name: Harvest one diocese", 1)[1]
+    matrix_harvest = matrix_harvest.split("      - name: Date blank ok bulletins", 1)[0]
+    assert 'HARVEST_KEEP_CURRENT_PDFS: "1"' in matrix_harvest
+
+    cleanup = main.split("# Stitch per-Diocese Mega PDFs", 1)[1]
+    cleanup = cleanup.split('print("\\n── Manifest', 1)[0]
+    keep_flag = 'os.environ.get(\n                        "HARVEST_KEEP_CURRENT_PDFS", "0"'
+    assert keep_flag in cleanup
+    assert "Keeping parish PDFs for stitch artifact" in cleanup
+    assert cleanup.index("if keep_for_stitch:") < cleanup.index("candidate.unlink()")
