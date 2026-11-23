@@ -139,6 +139,36 @@ class ClassifyPageCappedPdfTests(unittest.TestCase):
             self.assertNotIn("No valid content found", result.error)
             self.assertNotEqual(result.status, "ok")
 
+    def test_previous_sunday_long_pdf_is_kept_when_target_schedule_is_proven(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "weekly-range.pdf"
+            self._long_pdf(pdf, "Bulletin Sunday 9th August 2026", pages=6)
+            target = date(2026, 8, 16)
+            with patch(
+                "harvester.fetcher._issue_schedule_covers_target_sunday",
+                return_value=True,
+            ) as schedule_proof:
+                result = classify_page_capped_pdf(
+                    pdf,
+                    key="weeklyparish",
+                    display_name="Weekly Parish",
+                    url="https://example.org/bulletin-16-08-2026.pdf",
+                    target=target,
+                    entry=self._entry(),
+                    max_pages=4,
+                )
+                self.assertEqual(
+                    _fresh_five_page_heading_date(pdf, target),
+                    date(2026, 8, 9),
+                )
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertEqual(result.status, "ok")
+            self.assertFalse(result.is_stale)
+            self.assertEqual(result.file_path, pdf)
+            self.assertTrue(pdf.exists())
+            self.assertGreaterEqual(schedule_proof.call_count, 2)
+
     def test_current_week_oversized_pdf_with_fresh_heading_is_ok(self) -> None:
         """6 pages whose heading is this Sunday is ok, and the file is kept.
 
