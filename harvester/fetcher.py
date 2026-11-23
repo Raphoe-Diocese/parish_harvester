@@ -2144,6 +2144,28 @@ def freshness_after_unknown_url(url: str, dest: Path, target: date) -> Freshness
         printed_date, date_method = saved_bulletin_issue_date(dest, target=target, url=None)
         if printed_date is not None and date_method == "ocr":
             body_verdict = verdict_for_extracted_date(printed_date, target)
+
+    # Some parishes issue a weekly bulletin on the previous Sunday but include
+    # this target Sunday's Mass schedule. Keep that issue only when its printed
+    # date is within seven days and the saved PDF proves the target Sunday and
+    # a Mass time. Applying this here matters because the in-fetch stale retry
+    # runs before the later safety-net gate.
+    if (
+        body_verdict is not None
+        and body_verdict.status == "stale"
+        and body_verdict.extracted_date is not None
+        and _issue_schedule_covers_target_sunday(
+            dest, target, body_verdict.extracted_date
+        )
+    ):
+        issue_date = body_verdict.extracted_date
+        return FreshnessVerdict(
+            status="fresh",
+            extracted_date=issue_date,
+            reason="previous_sunday_issue_contains_target_schedule",
+            days_from_target=(issue_date - target).days,
+        )
+
     return issue_date_verdict(verdict, body_verdict)
 
 
