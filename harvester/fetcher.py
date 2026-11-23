@@ -57,6 +57,7 @@ from .browser_launch import (
 )
 from .bulletin_freshness import (
     FreshnessVerdict,
+    _issue_schedule_covers_target_sunday,
     check_bulletin_freshness,
     extract_bulletin_date_from_text,
     mark_result_stale,
@@ -488,7 +489,9 @@ def _fresh_five_page_heading_date(path: Path, target: date) -> date | None:
     if body_date is None:
         return None
     verdict = verdict_for_extracted_date(body_date, target)
-    if verdict.status != "fresh":
+    if verdict.status != "fresh" and not _issue_schedule_covers_target_sunday(
+        path, target, body_date
+    ):
         return None
     return body_date
 
@@ -558,7 +561,9 @@ def classify_page_capped_pdf(
     body_date = extract_pdf_bulletin_date(dest)
     if body_date is not None:
         verdict = verdict_for_extracted_date(body_date, target)
-        if verdict.status == "stale":
+        if verdict.status == "stale" and not _issue_schedule_covers_target_sunday(
+            dest, target, body_date
+        ):
             print(
                 f"  {key}: downloaded PDF body date is still "
                 f"{body_date.isoformat()}, not this week"
