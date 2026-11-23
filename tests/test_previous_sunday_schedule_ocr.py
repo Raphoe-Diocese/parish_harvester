@@ -101,7 +101,7 @@ def test_future_dated_weekly_issue_is_accepted_only_when_schedule_covers_target(
         patch("harvester.bulletin_freshness._pdf_file_bytes", return_value=9),
         patch(
             "harvester.bulletin_freshness.saved_bulletin_issue_date",
-            return_value=(date(2026, 11, 28), "front_page"),
+            return_value=(None, "unknown"),
         ),
         patch(
             "harvester.bulletin_freshness.pdf_date_before_harvest_week",
