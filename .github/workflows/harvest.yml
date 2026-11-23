@@ -495,8 +495,15 @@ jobs:
             SHORT="${HARVEST_DIOCESE%_diocese}"
             mkdir -p docs/mega_pdf
             if [ -f "mega_pdf/${SHORT}_mega_bulletin.pdf" ]; then
+              INDEX="mega_pdf/${SHORT}_mega_bulletin.pages.json"
+              if [ ! -f "${INDEX}" ]; then
+                echo "::error::Missing page index for ${SHORT}_mega_bulletin.pdf; refusing to publish an OCR-incomplete bulletin."
+                exit 1
+              fi
               cp -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+              cp -f "${INDEX}" "docs/mega_pdf/${SHORT}_mega_bulletin.pages.json"
               git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+              git add -f "${INDEX}" "docs/mega_pdf/${SHORT}_mega_bulletin.pages.json"
               # p1.jpg must match new PDF page 1 (08/10/2026: PDF Annagry-first, preview still Ardara).
               if [ -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" ]; then
                 cp -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg"
@@ -651,7 +658,13 @@ jobs:
           SHORT="${HARVEST_DIOCESE%_diocese}"
           mkdir -p docs/mega_pdf
           if [ -f "mega_pdf/${SHORT}_mega_bulletin.pdf" ]; then
+            INDEX="mega_pdf/${SHORT}_mega_bulletin.pages.json"
+            if [ ! -f "${INDEX}" ]; then
+              echo "::error::Missing page index for ${SHORT}_mega_bulletin.pdf; refusing to publish an OCR-incomplete bulletin."
+              exit 1
+            fi
             cp -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf"
+            cp -f "${INDEX}" "docs/mega_pdf/${SHORT}_mega_bulletin.pages.json"
           fi
           if [ -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" ]; then
             cp -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg"
@@ -660,6 +673,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f Bulletins/report.json Bulletins/report.txt parishes/parish_status.json parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
           git add -f "mega_pdf/${SHORT}_mega_bulletin.pdf" "docs/mega_pdf/${SHORT}_mega_bulletin.pdf" 2>/dev/null || true
+          git add -f "mega_pdf/${SHORT}_mega_bulletin.pages.json" "docs/mega_pdf/${SHORT}_mega_bulletin.pages.json" 2>/dev/null || true
           git add -f "mega_pdf/${SHORT}_mega_bulletin_p1.jpg" "docs/mega_pdf/${SHORT}_mega_bulletin_p1.jpg" 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No changes for ${HARVEST_DIOCESE}"
