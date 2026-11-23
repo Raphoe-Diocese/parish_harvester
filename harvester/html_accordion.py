@@ -13,14 +13,14 @@ _ISOLATE_CURRENT_ACCORDION_JS = r"""
   const selectors = 'button, summary, [role="tab"], .accordion-toggle, .accordion-header, .rlta-panel-title';
   const candidates = Array.from(document.querySelectorAll(selectors));
   const matchesDate = (text, day, monthName, monthShort, issueYear) => {
-    if (!new RegExp('\\\\b' + issueYear + '\\\\b').test(text)) return false;
-    if (!new RegExp('\\\\b' + monthName + '\\\\b|\\\\b' + monthShort + '\\\\b').test(text)) return false;
-    const days = Array.from(text.matchAll(/\\b(\\d{1,2})(?:st|nd|rd|th)?\\b/g))
+    if (!new RegExp('\\b' + issueYear + '\\b').test(text)) return false;
+    if (!new RegExp('\\b' + monthName + '\\b|\\b' + monthShort + '\\b').test(text)) return false;
+    const days = Array.from(text.matchAll(/\b(\d{1,2})(?:st|nd|rd|th)?\b/g))
       .map(match => Number(match[1]));
     return days.includes(day);
   };
   const current = (value) => {
-    const text = String(value || '').replace(/\\s+/g, ' ').toLowerCase().trim();
+    const text = String(value || '').replace(/\s+/g, ' ').toLowerCase().trim();
     if (!text || text.length > 180) return false;
     return matchesDate(text, sunday, month, monthAbbr, year) ||
       (allowPreviousSunday && matchesDate(
