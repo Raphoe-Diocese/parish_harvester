@@ -1426,6 +1426,43 @@ def _heading_date_before_harvest_week(
     return extracted < start
 
 
+def _previous_sunday_issue_covers_target_sunday(
+    path: Path, target: date, issue_date: date | None
+) -> bool:
+    """Allow last Sunday's dated bulletin only when it prints this Sunday's schedule.
+
+    Many parish bulletins are issued on Sunday and contain the Mass and events
+    for the coming week, including the next Sunday. A previous-Sunday cover date
+    alone is not enough to call the file current: the PDF must explicitly pair
+    the target date with Sunday in its printed text.
+    """
+    if target.weekday() != 6 or issue_date != target - timedelta(days=7):
+        return False
+    text = " ".join(
+        unicodedata.normalize("NFKC", read_pdf_text_head(path, max_pages=8))
+        .lower()
+        .split()
+    )
+    day = target.day
+    day_token = rf"{day}(?:st|nd|rd|th)?"
+    month = target.strftime("%B").lower()
+    month_token = rf"(?:{month}|{month[:3]})"
+    weekday = r"sun(?:day)?"
+    word_date = (
+        rf"(?:\b{weekday}\b.{{0,40}}\b{day_token}\s+{month_token}\b"
+        rf"|\b{day_token}\s+{month_token}\b.{{0,40}}\b{weekday}\b)"
+    )
+    numeric_date = target.strftime("%d/%m/%Y")
+    numeric_date_alt = target.strftime("%d-%m-%Y")
+    numeric = (
+        rf"(?:\b{weekday}\b.{{0,32}}\b{re.escape(numeric_date)}\b"
+        rf"|\b{re.escape(numeric_date)}\b.{{0,32}}\b{weekday}\b"
+        rf"|\b{weekday}\b.{{0,32}}\b{re.escape(numeric_date_alt)}\b"
+        rf"|\b{re.escape(numeric_date_alt)}\b.{{0,32}}\b{weekday}\b)"
+    )
+    return re.search(word_date, text) is not None or re.search(numeric, text) is not None
+
+
 def freshness_verdict_for_ok_result(
     result: FetchResult,
     target: date,
@@ -1480,6 +1517,16 @@ def freshness_verdict_for_ok_result(
         and saved_pdf is not None
         and pdf_sha256(saved_pdf) == previous_digest
     ):
+        body_issue_date = extract_pdf_bulletin_date(saved_pdf)
+        if _previous_sunday_issue_covers_target_sunday(
+            saved_pdf, target, body_issue_date
+        ):
+            return FreshnessVerdict(
+                status="fresh",
+                extracted_date=body_issue_date,
+                reason="previous_sunday_issue_contains_target_schedule",
+                days_from_target=-7,
+            )
         return FreshnessVerdict(status="stale", reason="unchanged_pdf_from_prior_week")
 
     url_changed = bulletin_url_changed(previous_harvest_url(key), url)
@@ -1499,6 +1546,13 @@ def freshness_verdict_for_ok_result(
             continue
         too_old = pdf_date_before_harvest_week(path, target)
         if too_old is not None:
+            if _previous_sunday_issue_covers_target_sunday(path, target, too_old):
+                return FreshnessVerdict(
+                    status="fresh",
+                    extracted_date=too_old,
+                    reason="previous_sunday_issue_contains_target_schedule",
+                    days_from_target=-7,
+                )
             url_date = extract_bulletin_date(url) if url else None
             week_start, week_end = week_window(target)
             last_sunday = target - timedelta(days=7)
