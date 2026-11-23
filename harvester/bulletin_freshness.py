@@ -1426,18 +1426,21 @@ def _heading_date_before_harvest_week(
     return extracted < start
 
 
-def _previous_sunday_issue_covers_target_sunday(
+def _issue_schedule_covers_target_sunday(
     path: Path, target: date, issue_date: date | None
 ) -> bool:
-    """Allow last Sunday's dated bulletin only when it prints this Sunday's schedule.
+    """Prove a Sunday bulletin covers the target Sunday with its printed schedule.
 
-    Many parish bulletins are issued on Sunday and contain the Mass and events
-    for the coming week, including the next Sunday. A previous-Sunday cover date
-    alone is not enough to call the file current: the PDF must explicitly pair
-    the target date with Sunday and a time. Textless scan pages are checked with
-    local Tesseract, using the same strict wording check as born-digital PDFs.
+    Parishes may date a bulletin at either end of a weekly range. A bulletin
+    dated within seven days of the target is current only when the PDF explicitly
+    pairs the target date with Sunday and a Mass time. Textless scans are checked
+    with local Tesseract using the same strict wording check as born-digital PDFs.
     """
-    if target.weekday() != 6 or issue_date != target - timedelta(days=7):
+    if (
+        target.weekday() != 6
+        or issue_date is None
+        or abs((issue_date - target).days) > 7
+    ):
         return False
     pages = read_pdf_page_texts(path, max_pages=8)
     if not pages:
@@ -1546,14 +1549,21 @@ def freshness_verdict_for_ok_result(
         and pdf_sha256(saved_pdf) == previous_digest
     ):
         body_issue_date = pdf_date_before_harvest_week(saved_pdf, target)
-        if _previous_sunday_issue_covers_target_sunday(
-            saved_pdf, target, body_issue_date
+        # Scanned PDFs sometimes hide their issue date from PDF text extraction.
+        # In that case, the last successful harvest date can anchor the schedule
+        # check, but only when this is the identical PDF and it was last current
+        # exactly one week ago.
+        schedule_issue_date = body_issue_date
+        if schedule_issue_date is None and previous_week == target - timedelta(days=7):
+            schedule_issue_date = previous_week
+        if _issue_schedule_covers_target_sunday(
+            saved_pdf, target, schedule_issue_date
         ):
             return FreshnessVerdict(
                 status="fresh",
-                extracted_date=body_issue_date,
-                reason="previous_sunday_issue_contains_target_schedule",
-                days_from_target=-7,
+                extracted_date=schedule_issue_date,
+                reason="weekly_issue_contains_target_schedule",
+                days_from_target=(schedule_issue_date - target).days,
             )
         return FreshnessVerdict(status="stale", reason="unchanged_pdf_from_prior_week")
 
@@ -1574,7 +1584,7 @@ def freshness_verdict_for_ok_result(
             continue
         too_old = pdf_date_before_harvest_week(path, target)
         if too_old is not None:
-            if _previous_sunday_issue_covers_target_sunday(path, target, too_old):
+            if _issue_schedule_covers_target_sunday(path, target, too_old):
                 return FreshnessVerdict(
                     status="fresh",
                     extracted_date=too_old,
@@ -1610,6 +1620,17 @@ def freshness_verdict_for_ok_result(
                         status="fresh",
                         extracted_date=printed,
                         reason="printed_current_issue_overrides_old_source",
+                        days_from_target=(printed - target).days,
+                    )
+                # Some newsletters are dated at the end of their coverage range
+                # (for example 20–28 November) but contain this Sunday's schedule.
+                # A schedule match is accepted only when the printed issue date is
+                # within seven days and the PDF names the target Sunday and a time.
+                if _issue_schedule_covers_target_sunday(path, target, printed):
+                    return FreshnessVerdict(
+                        status="fresh",
+                        extracted_date=printed,
+                        reason="printed_weekly_schedule_covers_target",
                         days_from_target=(printed - target).days,
                     )
         body_verdict = pdf_body_heading_verdict(path, target)
