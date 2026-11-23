@@ -9,7 +9,7 @@ from datetime import date, timedelta
 
 _ISOLATE_CURRENT_ACCORDION_JS = r"""
 (args) => {
-  const {sunday, month, monthAbbr, year} = args;
+  const {sunday, month, monthAbbr, year, previousSunday, previousMonth, previousMonthAbbr, previousYear, allowPreviousSunday} = args;
   const selectors = 'button, summary, [role="tab"], .accordion-toggle, .accordion-header, .rlta-panel-title';
   const candidates = Array.from(document.querySelectorAll(selectors));
   const current = (value) => {
@@ -84,15 +84,23 @@ _ISOLATE_CURRENT_ACCORDION_JS = r"""
 """
 
 
-async def isolate_current_accordion_bulletin(page, target: date) -> dict:
+async def isolate_current_accordion_bulletin(
+    page, target: date, *, allow_previous_sunday_issue: bool = False
+) -> dict:
     """Keep the target Sunday issue only, or raise rather than print old issues."""
     if not isinstance(target, date) or target.weekday() != 6:
         raise ValueError("Current accordion capture requires a Sunday harvest date")
+    previous = target - timedelta(days=7)
     args = {
         "sunday": target.day,
         "month": target.strftime("%B").lower(),
         "monthAbbr": target.strftime("%b").lower(),
         "year": target.year,
+        "previousSunday": previous.day,
+        "previousMonth": previous.strftime("%B").lower(),
+        "previousMonthAbbr": previous.strftime("%b").lower(),
+        "previousYear": previous.year,
+        "allowPreviousSunday": bool(allow_previous_sunday_issue),
     }
     result = await page.evaluate(_ISOLATE_CURRENT_ACCORDION_JS, args)
     if not isinstance(result, dict) or result.get("ok") is not True:
