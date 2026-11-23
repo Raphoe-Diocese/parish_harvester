@@ -65,6 +65,32 @@ class ReportQualityTests(unittest.TestCase):
         self.assertEqual(report["downloaded"][0]["parish"], "real")
         self.assertEqual(report["summary"]["downloaded"], 1)
 
+    def test_historical_kincasslagh_pdf_is_not_counted_as_current(self):
+        report = {
+            "downloaded": [
+                {
+                    "parish": "kincasslagh",
+                    "display_name": "Kincasslagh",
+                    "url": "https://kincasslagh.ie/app/uploads/2017/07/april-easter-2014.pdf",
+                    "file_type": "pdf",
+                },
+                {
+                    "parish": "real",
+                    "display_name": "Real",
+                    "url": "https://example.com/newsletter-2026-11-22.pdf",
+                    "file_type": "pdf",
+                },
+            ],
+            "failed": [],
+            "summary": {"downloaded": 2, "failed": 0},
+        }
+        self.assertEqual(reject_known_diocesan_admin_downloads(report), 1)
+        self.assertEqual([row["parish"] for row in report["downloaded"]], ["real"])
+        self.assertEqual(
+            report["failed"][0]["reason"], "historical_bulletin_false_positive"
+        )
+        self.assertEqual(report["summary"]["downloaded"], 1)
+
     def test_reclassify_without_counting_fake_as_success(self):
         report = {
             "downloaded": [
