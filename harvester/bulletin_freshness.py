@@ -1434,12 +1434,34 @@ def _previous_sunday_issue_covers_target_sunday(
     Many parish bulletins are issued on Sunday and contain the Mass and events
     for the coming week, including the next Sunday. A previous-Sunday cover date
     alone is not enough to call the file current: the PDF must explicitly pair
-    the target date with Sunday in its printed text.
+    the target date with Sunday and a time. Textless scan pages are checked with
+    local Tesseract, using the same strict wording check as born-digital PDFs.
     """
     if target.weekday() != 6 or issue_date != target - timedelta(days=7):
         return False
+    pages = read_pdf_page_texts(path, max_pages=8)
+    if not pages:
+        pages = [read_pdf_text_head(path, max_pages=8)]
+    schedule_pages: list[str] = []
+    try:
+        import shutil
+        if shutil.which("tesseract"):
+            from ocr.sparse_page_ocr import ocr_pdf_page_lines
+
+            for index, page_text in enumerate(pages[:8]):
+                if page_text.strip():
+                    schedule_pages.append(page_text)
+                else:
+                    try:
+                        schedule_pages.append("\\n".join(ocr_pdf_page_lines(path, index)))
+                    except Exception:
+                        schedule_pages.append("")
+        else:
+            schedule_pages = list(pages[:8])
+    except Exception:
+        schedule_pages = list(pages[:8])
     text = " ".join(
-        unicodedata.normalize("NFKC", read_pdf_text_head(path, max_pages=8))
+        unicodedata.normalize("NFKC", " ".join(schedule_pages))
         .lower()
         .split()
     )
