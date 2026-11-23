@@ -38,6 +38,7 @@ from playwright.async_api import (
 from PyPDF2 import PdfReader
 
 from .bulletin_freshness import (
+    _issue_schedule_covers_target_sunday,
     bulletin_url_changed,
     check_bulletin_freshness,
     extract_bulletin_date,
@@ -5694,6 +5695,21 @@ async def replay_recipe(
 
                 card = check_bulletin_freshness(candidate_url, target_date)
                 body = pdf_body_heading_verdict(dest, target_date)
+                # A previous-Sunday MCN issue can still be current if this exact
+                # PDF prints the target Sunday's schedule. Use its printed issue
+                # date when available, otherwise the date embedded in the MCN URL;
+                # never accept an undated card or a schedule with no matching day.
+                schedule_issue_date = (
+                    body.extracted_date
+                    if body is not None and body.extracted_date is not None
+                    else card.extracted_date
+                )
+                weekly_schedule_covers_target = (
+                    schedule_issue_date is not None
+                    and _issue_schedule_covers_target_sunday(
+                        dest, target_date, schedule_issue_date
+                    )
+                )
                 dated_current = (
                     card.status == "fresh"
                     and not (body and body.status == "stale")
@@ -5701,7 +5717,7 @@ async def replay_recipe(
                     card.status == "unknown"
                     and body is not None
                     and body.status == "fresh"
-                )
+                ) or weekly_schedule_covers_target
                 if dated_current:
                     return dest, candidate_kind, candidate_url
                 # An older MCN newsletter does not prevent the independent
