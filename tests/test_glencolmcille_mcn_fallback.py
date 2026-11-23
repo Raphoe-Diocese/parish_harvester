@@ -54,6 +54,26 @@ def test_old_mcn_card_is_not_accepted_and_html_is_attempted(tmp_path, date_suffi
     assert not dest.exists(), "Old MCN PDF must be removed before the HTML fallback"
 
 
+def test_previous_sunday_mcn_issue_with_target_schedule_is_accepted(tmp_path):
+    _camera()
+    dest = tmp_path / "glencolmcille.pdf"
+    url = "https://d3gxiup807zlof.cloudfront.net/live/Uploads/661/NewsLetter/previous-sunday.pdf?bulletin_date=2026-11-15"
+    with (
+        patch("harvester.replay._try_mcn_live_newsletter", new_callable=AsyncMock, return_value=(url, "pdf")),
+        patch(
+            "harvester.bulletin_freshness.pdf_body_heading_verdict",
+            return_value=FreshnessVerdict(status="stale", extracted_date=date(2026, 11, 15)),
+        ),
+        patch("harvester.replay._issue_schedule_covers_target_sunday", return_value=True) as schedule_check,
+    ):
+        result = asyncio.run(
+            replay_recipe(RECIPE, dest, object(), target_date=date(2026, 11, 22))
+        )
+
+    assert result == (dest, "pdf", url)
+    schedule_check.assert_called_once_with(dest, date(2026, 11, 22), date(2026, 11, 15))
+
+
 def test_new_mcn_card_does_not_overrule_stale_printed_heading(tmp_path):
     _camera()
     dest = tmp_path / "glencolmcille.pdf"
