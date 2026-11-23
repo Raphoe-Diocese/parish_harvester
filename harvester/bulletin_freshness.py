@@ -1448,17 +1448,23 @@ def _previous_sunday_issue_covers_target_sunday(
     month = target.strftime("%B").lower()
     month_token = rf"(?:{month}|{month[:3]})"
     weekday = r"sun(?:day)?"
+    time = (
+        r"(?:\b(?:[01]?\d|2[0-3])(?:[:.]\d{2})?\s*[ap]\.?m\.?\b"
+        r"|\b(?:[01]?\d|2[0-3]):[0-5]\d\b|\bnoon\b)"
+    )
     word_date = (
-        rf"(?:\b{weekday}\b.{{0,40}}\b{day_token}\s+{month_token}\b"
-        rf"|\b{day_token}\s+{month_token}\b.{{0,40}}\b{weekday}\b)"
+        rf"(?:\b{weekday}\b.{{0,16}}\b{day_token}\s+{month_token}\b"
+        rf"|\b{day_token}\s+{month_token}\b.{{0,16}}\b{weekday}\b)"
+        rf".{{0,24}}{time}"
     )
     numeric_date = target.strftime("%d/%m/%Y")
     numeric_date_alt = target.strftime("%d-%m-%Y")
     numeric = (
-        rf"(?:\b{weekday}\b.{{0,32}}\b{re.escape(numeric_date)}\b"
-        rf"|\b{re.escape(numeric_date)}\b.{{0,32}}\b{weekday}\b"
-        rf"|\b{weekday}\b.{{0,32}}\b{re.escape(numeric_date_alt)}\b"
-        rf"|\b{re.escape(numeric_date_alt)}\b.{{0,32}}\b{weekday}\b)"
+        rf"(?:\b{weekday}\b.{{0,16}}\b{re.escape(numeric_date)}\b"
+        rf"|\b{re.escape(numeric_date)}\b.{{0,16}}\b{weekday}\b"
+        rf"|\b{weekday}\b.{{0,16}}\b{re.escape(numeric_date_alt)}\b"
+        rf"|\b{re.escape(numeric_date_alt)}\b.{{0,16}}\b{weekday}\b)"
+        rf".{{0,24}}{time}"
     )
     return re.search(word_date, text) is not None or re.search(numeric, text) is not None
 
