@@ -130,7 +130,7 @@ def reject_known_diocesan_admin_downloads(report: dict) -> int:
         if not isinstance(row, dict):
             continue
         url = str(row.get("url") or "").lower()
-        matched = next(((reason, marker) for marker, reason in suspects.items() if marker in url), None)
+        matched = next((details for marker, details in suspects.items() if marker in url), None)
         if matched is None:
             good.append(row)
             continue
