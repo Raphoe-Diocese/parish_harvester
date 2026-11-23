@@ -1,12 +1,12 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "drive-1jmslbrliw",
   "display_name": "Raphoe",
   "diocese": "raphoe",
-  "start_url": "https://parishofraphoe.ie/bulletin/raphoe/test-parish",
-  "site_type": "permanent_redirect_document",
+  "start_url": "https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view",
+  "site_type": "google_drive_static",
   "playbook_type": "direct_download",
-  "recorded_date": "2026-11-13",
+  "recorded_date": "2026-11-23",
   "timeout_ms": 45000,
   "total_timeout_s": 120,
   "fallback_document_urls": [
@@ -15,23 +15,17 @@
   "steps": [
     {
       "action": "download",
-      "url": "https://parishofraphoe.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/test-parish/bulletin.pdf",
-      "use_target_url": true
+      "url": "https://drive.usercontent.google.com/download?id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&export=download",
+      "use_captured_url": true
     }
   ],
   "operator_notes": [
-    "13/11/2026: test-parishraphoe 404. This Week's Bulletin is test-parish. GET 200 433490 bytes Sunday 8 November 2026.",
-    "https://parishofraphoe.ie/bulletin/raphoe/test-parish 301/302 to bulletin.pdf. GET 200 application/pdf 433490 bytes magic %PDF-1.7. Last-Modified Thu, 12 Nov 2026 15:55:42 GMT.",
-    "Also pin https://parishofraphoe.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/test-parish/bulletin.pdf. No ?t= on the download URL.",
-    "Same pattern as Kilbarron and Newtown Killea. Download bulletin.pdf first. use_target_url keeps the permanent path as-is.",
-    "Old Google Drive pin 1jmslbrliw is retired. Do not harvest that Drive file."
+    "23/11/2026: official https://parishofraphoe.ie/ homepage links its Bulletin item to this public Google Drive file.",
+    "The previous /bulletin/raphoe/test-parish route was documented as 404 and is no longer used.",
+    "Freshness must be proven from the downloaded PDF's own text/schedule; an unchanged Drive file is rejected as stale."
   ],
   "do_not": [
-    "Do not pin the old Google Drive file 1jmslbrliw.",
-    "Do not use https://parishofraphoe.ie/bulletin/raphoe/test-parishraphoe. That slug is 404.",
-    "Do not set start_url to https://parishofraphoe.ie/bulletin/ or /newsletter/.",
-    "Do not pin a dated wp-content/uploads/YYYY/MM/ filename.",
-    "Do not add a ?t= cache-buster on bulletin.pdf.",
-    "Do not print an empty No bulletin available page as a PDF."
+    "Do not use the dead https://parishofraphoe.ie/bulletin/raphoe/test-parish path.",
+    "Do not accept the file solely because the Drive URL is unchanged or the site links to it; require the target Sunday schedule proof."
   ]
 }
