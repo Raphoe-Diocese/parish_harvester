@@ -114,22 +114,33 @@ def reject_known_diocesan_admin_downloads(report: dict) -> int:
     This does not reject genuine parish weekly editions with 'safeguarding'
     in a notice; the exact document identity is required.
     """
-    suspect = "kandle.ie/wp-content/uploads/2026/02/safeguarding-sunday-newsletter-2026.pdf"
+    suspects = {
+        "kandle.ie/wp-content/uploads/2026/02/safeguarding-sunday-newsletter-2026.pdf": (
+            "Generic February diocesan Safeguarding Sunday file is not a current parish newsletter",
+            "diocesan_admin_document_false_positive",
+        ),
+        "kincasslagh.ie/app/uploads/2017/07/april-easter-2014.pdf": (
+            "Historical 2014 Kincasslagh PDF is not a current weekly bulletin",
+            "historical_bulletin_false_positive",
+        ),
+    }
     good = []
     rejected = []
     for row in report.get("downloaded") or []:
         if not isinstance(row, dict):
             continue
         url = str(row.get("url") or "").lower()
-        if suspect not in url:
+        matched = next(((reason, marker) for marker, reason in suspects.items() if marker in url), None)
+        if matched is None:
             good.append(row)
             continue
+        error, reason = matched
         rejected.append({
             "parish": row.get("parish"),
             "display_name": row.get("display_name"),
             "url": row.get("url"),
-            "error": "Generic February diocesan Safeguarding Sunday file is not a current parish newsletter",
-            "reason": "diocesan_admin_document_false_positive",
+            "error": error,
+            "reason": reason,
         })
     if not rejected:
         return 0
