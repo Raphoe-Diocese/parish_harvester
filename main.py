@@ -633,23 +633,31 @@ def main() -> int:
                 )
                 print(f"  📖 {short} mega PDF : {diocese_pdf}")
                 if harvest_mega:
-                    # Only delete per-parish PDFs when mega mode is on.
-                    deleted = 0
-                    for result in d_results:
-                        if result.status != "ok" or not result.file_path:
-                            continue
-                        for candidate in (
-                            CURRENT_DIR / result.file_path.name,
-                            RAW_DIR / result.file_path.name,
-                        ):
-                            try:
-                                if candidate.exists():
-                                    candidate.unlink()
-                                    deleted += 1
-                            except OSError:
-                                pass
-                    if deleted:
-                        print(f"  🗑️  Deleted {deleted} single PDF file(s) for {short}")
+                    # Matrix diocese jobs upload these files as stitch inputs.
+                    # Keep them until the downstream stitch job has merged all
+                    # slices; standalone runs retain the historical cleanup.
+                    keep_for_stitch = os.environ.get(
+                        "HARVEST_KEEP_CURRENT_PDFS", "0"
+                    ).strip().lower() in {"1", "true", "yes"}
+                    if keep_for_stitch:
+                        print(f"  📦 Keeping parish PDFs for stitch artifact: {short}")
+                    else:
+                        deleted = 0
+                        for result in d_results:
+                            if result.status != "ok" or not result.file_path:
+                                continue
+                            for candidate in (
+                                CURRENT_DIR / result.file_path.name,
+                                RAW_DIR / result.file_path.name,
+                            ):
+                                try:
+                                    if candidate.exists():
+                                        candidate.unlink()
+                                        deleted += 1
+                                except OSError:
+                                    pass
+                        if deleted:
+                            print(f"  🗑️  Deleted {deleted} single PDF file(s) for {short}")
             except Exception as exc:
                 print(f"  ⚠️  {short} mega PDF failed (non-fatal): {exc}")
 
