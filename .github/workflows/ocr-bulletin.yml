@@ -172,18 +172,45 @@ jobs:
           if not pdfs:
               raise SystemExit("::error::No mega PDFs in the selected harvest artefact.")
 
+          staged_count = 0
           for pdf in pdfs:
               index = pdf.with_suffix(".pages.json")
               if not index.is_file():
-                  raise SystemExit(f"::error::No page index in the harvest artefact for {pdf.name}.")
-              metadata = json.loads(index.read_text(encoding="utf-8"))
+                  # Some stitch artefacts contain PDFs but omit the matching page map.
+                  # Recover only a map committed with the current checkout and validate
+                  # its target week and PDF name before pairing it with the artefact.
+                  for candidate in (Path("mega_pdf") / index.name, Path("docs/mega_pdf") / index.name):
+                      if not candidate.is_file():
+                          continue
+                      try:
+                          candidate_metadata = json.loads(candidate.read_text(encoding="utf-8"))
+                      except (OSError, json.JSONDecodeError):
+                          continue
+                      if candidate_metadata.get("date") == week.isoformat() and candidate_metadata.get("pdf") == pdf.name:
+                          shutil.copy2(candidate, index)
+                          print(f"::warning::Recovered missing artefact page map for {pdf.name} from {candidate}.")
+                          break
+              if not index.is_file():
+                  print(f"::warning::No matching page map for {pdf.name}; skipping this diocese.")
+                  continue
+              try:
+                  metadata = json.loads(index.read_text(encoding="utf-8"))
+              except (OSError, json.JSONDecodeError) as exc:
+                  print(f"::warning::Invalid page map for {pdf.name}: {exc}; skipping this diocese.")
+                  continue
               if metadata.get("date") != week.isoformat() or metadata.get("pdf") != pdf.name:
-                  raise SystemExit(f"::error::Wrong week or PDF name in {index.name}.")
+                  print(f"::warning::Wrong week or PDF name in {index.name}; skipping this diocese.")
+                  continue
               with pdf.open("rb") as source:
                   if source.read(5) != b"%PDF-":
-                      raise SystemExit(f"::error::Invalid PDF signature in {pdf.name}.")
+                      print(f"::warning::Invalid PDF signature in {pdf.name}; skipping this diocese.")
+                      continue
               shutil.copy2(pdf, staged / pdf.name)
               shutil.copy2(index, staged / index.name)
+              staged_count += 1
+
+          if staged_count == 0:
+              raise SystemExit("::error::No valid current-week PDF and page-map pairs were staged.")
 
           Path("Bulletins").mkdir(exist_ok=True)
           shutil.copy2(report_path, "Bulletins/report.json")
@@ -245,8 +272,7 @@ jobs:
             exit 1
           fi
           if [ "${FAILURES}" -gt 0 ]; then
-            echo "::error::OCR failed for ${FAILURES} diocese(s). Existing viewers were kept."
-            exit 1
+            echo "::warning::OCR failed for ${FAILURES} diocese(s); successful diocesan viewers will still be published."
           fi
 
       - name: Update OCR quota dashboard
