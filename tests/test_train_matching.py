@@ -520,7 +520,8 @@ https://www.antrimparish.com
                     )
                     if edition != sunday:
                         self.assertNotEqual(result.returncode, 0)
-                        self.assertIn("Wrong week or PDF name", result.stderr)
+                        self.assertIn("Wrong week or PDF name", result.stdout)
+                        self.assertIn("No valid current-week PDF and page-map pairs were staged", result.stderr)
                         self.assertFalse(output.exists())
                     else:
                         self.assertEqual(result.returncode, 0, result.stderr)
