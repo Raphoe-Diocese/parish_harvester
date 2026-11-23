@@ -1635,17 +1635,21 @@ def freshness_verdict_for_ok_result(
                         reason="printed_current_issue_overrides_old_source",
                         days_from_target=(printed - target).days,
                     )
-                # Some newsletters are dated at the end of their coverage range
-                # (for example 20–28 November) but contain this Sunday's schedule.
-                # A schedule match is accepted only when the printed issue date is
-                # within seven days and the PDF names the target Sunday and a time.
-                if _issue_schedule_covers_target_sunday(path, target, printed):
-                    return FreshnessVerdict(
-                        status="fresh",
-                        extracted_date=printed,
-                        reason="printed_weekly_schedule_covers_target",
-                        days_from_target=(printed - target).days,
-                    )
+            # Some newsletters are dated at the end of their coverage range
+            # (for example 20–28 November) but contain this Sunday's schedule.
+            # The PDF may not expose a parseable date in its text, so use the
+            # URL/report date only as a bounded hint; the downloaded PDF must
+            # still name the target Sunday and a Mass time.
+            schedule_date = printed or verdict.extracted_date
+            if schedule_date is not None and _issue_schedule_covers_target_sunday(
+                path, target, schedule_date
+            ):
+                return FreshnessVerdict(
+                    status="fresh",
+                    extracted_date=schedule_date,
+                    reason="printed_weekly_schedule_covers_target",
+                    days_from_target=(schedule_date - target).days,
+                )
         body_verdict = pdf_body_heading_verdict(path, target)
         if body_verdict is not None and body_verdict.status == "fresh":
             return issue_date_verdict(verdict, body_verdict)
