@@ -64,17 +64,18 @@ permissions:
   contents: write
   issues: write
 
-# Sunday and a manual "all dioceses" share harvest-full-matrix.
-# They queue. They do not cancel each other.
-# One diocese and Send & test use their own groups, so they cannot
-# cancel Sunday or sit in front of it. On 07/10/2026 one shared
-# harvest-full group held the full run for about 34 hours before it
-# even started. The work itself was about one hour.
-# Each matrix diocese commits its own mega as soon as it finishes.
-# Stitch still runs at the end to merge any slice whose push failed.
+# Sunday and manual "all dioceses" runs normally queue in harvest-full-matrix.
+# One-diocese runs use their own groups and cannot cancel or block a full run.
+# The explicit [replace-harvest] marker is reserved for a forensic replacement
+# run when an already queued/running full harvest uses known-broken code.
+# Each matrix diocese commits its own output; stitch merges any failed pushes.
 concurrency:
   group: ${{ github.event_name == 'schedule' && 'harvest-full-matrix' || (github.event.inputs.target_parish != '' && format('harvest-parish-{0}', github.event.inputs.target_parish)) || (github.event.inputs.diocese != 'all' && format('harvest-diocese-{0}', github.event.inputs.diocese)) || 'harvest-full-matrix' }}
-  cancel-in-progress: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_parish != '' }}
+  cancel-in-progress: >-
+    ${{
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.target_parish != '') ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[replace-harvest]'))
+    }}
 
 jobs:
   harvest:
