@@ -2419,7 +2419,14 @@ class HarvestMissRecipeTests(unittest.TestCase):
         ]
         self.assertFalse(any("Newsletter-21st-Aug.pdf" in url for url in download_urls))
         self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
-        self.assertIn("Newsletter-sept-6th-3-2.pdf", recipe["example_url"])
+        self.assertEqual(recipe["start_url"], "https://kincasslagh.ie/")
+        click = recipe["steps"][0]
+        self.assertEqual(click["selector"], 'a:has-text("Download Latest Bulletin")')
+        self.assertEqual(click["pick_strategy"], "first_match")
+        self.assertEqual(
+            recipe["example_url"],
+            "https://kincasslagh.ie/app/uploads/2026/11/Nesletter-21-28-Nov-1.pdf",
+        )
 
     def test_crossmolina_predicts_parish_owned_dated_pdf_not_churchtv(self) -> None:
         recipe = json.loads(
