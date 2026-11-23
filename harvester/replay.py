@@ -6544,7 +6544,10 @@ async def replay_recipe(
                     from .html_accordion import isolate_current_accordion_bulletin
 
                     try:
-                        await isolate_current_accordion_bulletin(page, target_date)
+                        await isolate_current_accordion_bulletin(
+                            page, target_date,
+                            allow_previous_sunday_issue=bool(step.get("allow_previous_sunday_issue")),
+                        )
                     except ValueError as exc:
                         raise RecipeReplayError(f"Current accordion bulletin not verified: {exc}") from exc
                     await _print_page_to_pdf(page, dest)
