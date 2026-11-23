@@ -12,14 +12,20 @@ _ISOLATE_CURRENT_ACCORDION_JS = r"""
   const {sunday, month, monthAbbr, year, previousSunday, previousMonth, previousMonthAbbr, previousYear, allowPreviousSunday} = args;
   const selectors = 'button, summary, [role="tab"], .accordion-toggle, .accordion-header, .rlta-panel-title';
   const candidates = Array.from(document.querySelectorAll(selectors));
-  const current = (value) => {
-    const text = String(value || '').replace(/\s+/g, ' ').toLowerCase().trim();
-    if (!text || text.length > 180) return false;
-    if (!new RegExp('\\b' + year + '\\b').test(text)) return false;
-    if (!new RegExp('\\b' + month + '\\b|\\b' + monthAbbr + '\\b').test(text)) return false;
-    const days = Array.from(text.matchAll(/\b(\d{1,2})(?:st|nd|rd|th)?\b/g))
+  const matchesDate = (text, day, monthName, monthShort, issueYear) => {
+    if (!new RegExp('\\\\b' + issueYear + '\\\\b').test(text)) return false;
+    if (!new RegExp('\\\\b' + monthName + '\\\\b|\\\\b' + monthShort + '\\\\b').test(text)) return false;
+    const days = Array.from(text.matchAll(/\\b(\\d{1,2})(?:st|nd|rd|th)?\\b/g))
       .map(match => Number(match[1]));
-    return days.includes(sunday);
+    return days.includes(day);
+  };
+  const current = (value) => {
+    const text = String(value || '').replace(/\\s+/g, ' ').toLowerCase().trim();
+    if (!text || text.length > 180) return false;
+    return matchesDate(text, sunday, month, monthAbbr, year) ||
+      (allowPreviousSunday && matchesDate(
+        text, previousSunday, previousMonth, previousMonthAbbr, previousYear
+      ));
   };
   for (const title of candidates) {
     const label = String(title.innerText || title.textContent || '').replace(/\s+/g, ' ').trim();
