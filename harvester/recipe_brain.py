@@ -728,7 +728,10 @@ def load_skip_recipes(recipes_dir: Path | None = None) -> list[dict[str, Any]]:
     return rows
 
 
-def candidate_probe_urls(start_url: str) -> list[tuple[str, str, str]]:
+def candidate_probe_urls(
+    start_url: str,
+    target: date | None = None,
+) -> list[tuple[str, str, str]]:
     """Return (url, site_type, pattern_key) probes from remembered tricks.
 
     Does not invent Facebook or diocese-directory files.
@@ -770,7 +773,7 @@ def candidate_probe_urls(start_url: str) -> list[tuple[str, str, str]]:
             "wp_json_newest_media",
             "wp_json+direct_download",
         )
-        sunday = target_sunday()
+        sunday = target or target_sunday()
         for day in (sunday, sunday - timedelta(days=7)):
             for url, site_type, pattern_key in _sunday_guess_probes(origin, day):
                 add(url, site_type, pattern_key)

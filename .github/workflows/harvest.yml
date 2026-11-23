@@ -759,6 +759,27 @@ jobs:
           python -c "from harvester.parish_status import write_parish_status; write_parish_status()"
           python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
 
+      # Keep a forensic copy even when the quality guard blocks publication.
+      # This name deliberately does not match ocr-bulletin.yml's
+      # "mega-bulletin-pdf" approval artefact check, so it cannot trigger OCR.
+      - name: Preserve unapproved stitch candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: harvest-diagnostic-candidate-${{ github.run_id }}
+          path: |
+            Bulletins/report.json
+            Bulletins/report.txt
+            Bulletins/all_bulletins_*.pdf
+            Bulletins/all_bulletins_*.pages.json
+            mega_pdf/*_mega_bulletin.pdf
+            mega_pdf/*_mega_bulletin.pages.json
+            parishes/parish_status.json
+            docs/manifest.json
+            docs/index.html
+            docs/dioceses/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Guard ok count (block big drop)
         env:
           PYTHONPATH: ${{ github.workspace }}

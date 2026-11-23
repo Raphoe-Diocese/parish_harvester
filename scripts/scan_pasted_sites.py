@@ -16,6 +16,7 @@ if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
 from harvester.bulletin_freshness import extract_bulletin_date  # noqa: E402
+from harvester.config import target_sunday  # noqa: E402
 from harvester.recipe_brain import (  # noqa: E402
     _http_get,
     accepted_hunt_dates,
@@ -30,7 +31,7 @@ _DIRECT_FILE = (".pdf", ".jpg", ".jpeg", ".png")
 LIST_PATH = REPO / "parishes" / "cloud_sites_2026-10-29.json"
 PRIOR_HITS_PATH = REPO / "parishes" / "pasted_sites_scan.json"
 OUT_PATH = REPO / "parishes" / "pasted_brain_scan.json"
-TARGET = date(2026, 11, 8)
+TARGET = target_sunday()
 
 
 def _facebook(url: str) -> bool:
@@ -65,7 +66,7 @@ def _keep_probe(url: str, target: date = TARGET) -> bool:
     return True
 
 
-def _extra_urls(page_url: str) -> list[str]:
+def _extra_urls(page_url: str, target: date = TARGET) -> list[str]:
     """Newsletter links on the pasted page, plus the WordPress file list."""
     found: list[str] = []
     seen: set[str] = set()
@@ -114,7 +115,7 @@ def brain_probe_urls(page_url: str, target: date = TARGET) -> list[str]:
         seen.add(url)
         bucket.append(url)
 
-    for url, _site, _pattern in candidate_probe_urls(page_url):
+    for url, _site, _pattern in candidate_probe_urls(page_url, target):
         path = urlparse(url).path.lower()
         if path.endswith(_DIRECT_FILE):
             add(direct, url)
@@ -151,8 +152,17 @@ def skip_reason(row: dict, parishes: dict, prior_hit_keys: set[str], target: dat
     return None
 
 
-def rows_to_probe(rows: list[dict], parishes: dict, prior_hit_keys: set[str]) -> list[dict]:
-    return [row for row in rows if skip_reason(row, parishes, prior_hit_keys) is None]
+def rows_to_probe(
+    rows: list[dict],
+    parishes: dict,
+    prior_hit_keys: set[str],
+    target: date = TARGET,
+) -> list[dict]:
+    return [
+        row
+        for row in rows
+        if skip_reason(row, parishes, prior_hit_keys, target) is None
+    ]
 
 
 def load_prior_hit_keys(path: Path | None = None, *, target: date | None = None) -> set[str]:
@@ -197,7 +207,7 @@ def _one(row: dict, accepted: set[date], target: date = TARGET) -> dict:
         if proved is None:
             try_url(url)
         if proved is None:
-            for extra in _extra_urls(url):
+            for extra in _extra_urls(url, target):
                 try_url(extra)
                 if proved is not None:
                     break
