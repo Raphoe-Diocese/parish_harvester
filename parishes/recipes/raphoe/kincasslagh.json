@@ -3,18 +3,14 @@
   "parish_key": "kincasslagh",
   "display_name": "Kincasslagh",
   "diocese": "raphoe",
-  "start_url": "https://www.kincasslagh.ie/?post_type=kbp_bulletins",
+  "start_url": "https://kincasslagh.ie/",
   "steps": [
     {
       "action": "click",
-      "selector": "a[href$='.pdf']",
-      "text": "",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
+      "selector": "a:has-text(\"Download Latest Bulletin\")",
+      "text": "Download Latest Bulletin",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top"
     },
     {
       "action": "download",
@@ -28,15 +24,15 @@
   "playbook_type": "pdf_download_list",
   "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
-    "newsletter",
     ".pdf"
   ],
-  "example_url": "https://kincasslagh.ie/app/uploads/2026/09/Newsletter-sept-6th-3-2.pdf",
+  "example_url": "https://kincasslagh.ie/app/uploads/2026/11/Nesletter-21-28-Nov-1.pdf",
   "operator_notes": [
     "08/09/2026: this-week file is /2026/09/Newsletter-sept-6th-3-2.pdf (HTTP 200, 1391716). Newsletter-6th-Sept.pdf is HTML, not a PDF.",
     "Harvest 07/09 pinned Newsletter-21st-Aug.pdf. site_type:http_scrape_newest_pdf plus predicted fallback from example_url. Do not pin August.",
     "20/11/2026: Removed pinned September PDF from click/download steps. Select newest dated newsletter link from archive and download captured link; verify live archive and PDF before merge.",
-    "20/11/2026: archive displays an explicit 14th-21st November issue label. Select links by both newsletter name and PDF extension, allowing numeric upload filenames; score named bounded date-range labels against target Sunday. Printed PDF date/fingerprint remains the final freshness check."
+    "20/11/2026: archive displays an explicit 14th-21st November issue label. Select links by both newsletter name and PDF extension, allowing numeric upload filenames; score named bounded date-range labels against target Sunday. Printed PDF date/fingerprint remains the final freshness check.",
+    "23/11/2026: The archive recipe selected a 2014 PDF. The parish homepage has a labelled 'Download Latest Bulletin' link to the current 20th–28th November issue; target that link directly and validate the printed issue date/schedule."
   ],
   "do_not": [
     "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
@@ -46,5 +42,5 @@
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-09-08"
+  "recorded_date": "2026-11-23"
 }
