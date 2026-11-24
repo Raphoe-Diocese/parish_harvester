@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Roslea Bulletin</title>
+  <title>Roslea Bulletin — 22/11/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -45,7 +46,12 @@
       line-height: 1.25;
     }
     .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
-    .stale-note { color: #7a3b00; font-size: 1rem; font-weight: 600; margin: 0.35rem 0 0.7rem; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
     .download-link-top {
       display: inline-block;
       margin-top: 4px;
@@ -100,20 +106,37 @@
       margin-bottom: 4px;
     }
 
-    .quiet-links {
-      display: flex;
-      justify-content: flex-end;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
+    .ocr-open-text {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 8px;
+      padding: 8px 14px;
+      background: #14524f;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
     }
-    .quiet-links a { color: #1a6b6b; }
+    .ocr-open-text:hover { background: #0e3b39; color: #fff; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -139,21 +162,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -180,6 +209,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -188,6 +225,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -202,6 +240,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -216,7 +260,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -225,16 +272,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -244,6 +298,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -258,7 +313,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -437,8 +495,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -459,6 +516,11 @@
     }
     .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
     .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
     .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
     .diocese-intro h3 {
       margin: 14px 0 8px;
@@ -519,12 +581,12 @@
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
     
     #ocr-panel {
-      background: #eef1f0;
-      color: #1a1f1e;
+      background: #f3f5f4;
+      color: #141918;
       font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
       font-size: calc(1.125rem * var(--ocr-scale, 1));
-      line-height: 1.65;
-      max-width: min(72ch, 100%);
+      line-height: 1.7;
+      max-width: min(68ch, 100%);
       margin-left: auto;
       margin-right: auto;
       overflow-x: hidden;
@@ -551,21 +613,34 @@
       margin-top: 1.5em;
     }
     #ocr-panel h3.b-head, #ocr-panel .b-head {
-      font-size: 1.12em;
-      color: #134e9c;
-      margin: 1.1em 0 0.35em;
-    }
-    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
-      font-size: 1.04em;
-      color: #1f6f4a;
-      margin: 0.95em 0 0.3em;
-    }
-    #ocr-panel h3, #ocr-panel h4 {
-      color: #1a6b6b;
-      margin: 1.1em 0 0.35em;
+      font-size: 1.2em;
+      color: #0a3333;
+      margin: 1.5em 0 0.5em;
+      padding: 0.35em 0.55em 0.35em 0.65em;
+      border-left: 4px solid #1a6b6b;
+      border-bottom: 1px solid #cfd8d4;
+      background: #e7ecea;
       font-weight: 700;
       line-height: 1.35;
       max-width: 100%;
+      letter-spacing: 0.01em;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.08em;
+      color: #145a3d;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.2em 0 0.4em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.95em;
     }
     #ocr-panel h3.ocr-page-heading,
     #ocr-panel .page-label {
@@ -588,9 +663,21 @@
     }
     #ocr-panel strong { color: #0f2b5b; }
     #ocr-panel a {
-      color: #1a6b6b;
-      font-weight: 600;
+      color: #1554b0;
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 0.1em;
+      text-underline-offset: 0.16em;
       overflow-wrap: anywhere;
+    }
+    #ocr-panel a:visited { color: #6535a5; }
+    #ocr-panel a:hover, #ocr-panel a:focus-visible {
+      color: #103b80;
+      text-decoration-thickness: 0.15em;
+    }
+    #ocr-panel a:focus-visible {
+      outline: 2px solid #103b80;
+      outline-offset: 2px;
     }
     #ocr-panel mark {
       background: #fef08a;
@@ -669,8 +756,9 @@
     #ocr-panel h3.b-head {
       margin-top: 1.45em;
       margin-bottom: 0.5em;
-      padding-bottom: 0.12em;
+      padding-bottom: 0.2em;
       border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
     }
 
 
@@ -788,7 +876,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -799,23 +890,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -838,8 +920,9 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
-      .quiet-links { justify-content: center; }
+      .ocr-open-text { margin-left: 0; width: 100%; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
       #ocr-panel {
         padding: 16px 14px 28px;
@@ -864,7 +947,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20261018a" defer></script>
 </head>
 <body>
   <div class="page">
@@ -872,36 +955,32 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Roslea Parish Bulletin</h1>
-      <p class="stale-note">Latest bulletin we have: 13/09/2026 (not this week)</p>
-      <p class="meta">Latest bulletin we have: 08/11/2026 (not this week).</p>
       
+      <p class="meta">This week&#x27;s bulletin for Roslea — 22/11/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="roslea.pdf" download="roslea.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        
-        <a href="roslea-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="roslea.pdf" title="Roslea bulletin PDF"></iframe>
+        <iframe data-pdf-url="roslea.pdf" title="Roslea bulletin PDF"></iframe>
         
-        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="">
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="roslea.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              
-              
+              <a class="pdf-open-newtab" href="roslea.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="roslea.pdf" download="roslea.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -932,19 +1011,127 @@
           <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
           <span class="ocr-zoom-hint">or pinch to zoom</span>
         </div>
+        <a class="ocr-open-text" href="roslea-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div class="quiet-links">
-        <a href="roslea-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
-      <div id="ocr-panel"><header data-issue-iso="2026-08-23" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-roslea" data-parish-name="Roslea"><h2 class="ocr-parish-name">Roslea</h2></header>
-<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p></div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-roslea" data-parish-name="Roslea"><h2 class="ocr-parish-name">Roslea</h2><p class="ocr-parish-date">22/11/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>Parish of Roslea (St. Tierney’s &amp; St. Mary’s) St. Tierney’s, Roslea: (028) 6721 8532 ( <a href="tel:+3534867218532" style="color:#1d4ed8;font-weight:600;">048 6721 8532</a> from Ro I) Parish Mobile: 00 353 83 809 1990 <a href="https://www.parishofroslea.com" target="_blank" rel="noopener noreferrer">www.parishofroslea.com</a></p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:roslea@clogherparishes.ie" target="_blank" rel="noopener noreferrer">roslea@clogherparishes.ie</a> Parish Secretary: Mrs. Ann O’Harte</p>
+<h3 class="b-head">Parish Office</h3>
+<p>Hours: Mondays, Tuesdays, Thursday and Fridays 9.30am to 1.30pm . Church Webcams: <a href="https://www.churchservices.tv/roslea" target="_blank" rel="noopener noreferrer">www.churchservices.tv/roslea</a> <a href="https://www.churchservices.tv/smithborough" target="_blank" rel="noopener noreferrer">www.churchservices.tv/smithborough</a></p>
+<p>Sunday 22nd November 2026 – 34th Week in Ordinary Time This Weekend on the Feast of Our Lord Jesus Christ, King of Universe, Clogher don Óige will have two statements read aloud at Masses, the first announcing World Youth Day in South Korea in August 2027 at which young people from the Diocese of Clogher and pilgrims will j oin Pope Leo.</p>
+<p>The theme is from St. John 16: “Take courage!</p>
+<p>I have overcome the world.” See <a href="https://www.wydseoul.org" target="_blank" rel="noopener noreferrer">www.wydseoul.org</a> . The second statement concerns the launch of a new Strategic Plan for Clogher don Óige, the diocesan youth and young adult ministry organisation, for the years 2026 – 2031. Please take a flier with you from the church.</p>
+<p>Congratulations to the Parish’s Pope John Paul Recipients: Congratulations to Katie Elliott, Rebecca Reilly, Sean Toal, Niamh Galligan and Eoghan Croarkin on receiving their Papal Cross Award and Lily Masses &amp; Intentions for the Coming Week in St. Tierney’ s Church:</p>
+<p>Sun 22nd Nov: Feast of Our Lord Jesus Christ, King of the Universe. 10.30am: Mass: For the People of the Parish.</p>
+<p>Bridie McCabe, Mullinahinch Road, Tattinbar.</p>
+<p>Hugh &amp; Brigid Morrow, Kilcorn. James &amp; Mary McAleer, Cornagilla and their son James Eddie, Cornagilla, and their daughter Kathleen, Lough Egish.</p>
+<p>Tues 24th Nov: 9.30am: Mass: Private Intention.</p>
+<p>Thurs 26th Nov: 9.30am: Mass: Eugene &amp; Rose McCaffrey, Tattenbar</p>
+<p>Fri 27th Nov: 10 – 1.00pm: Exposition of the Blessed Sacrament – sacristy 4pm – 6pm: Exposition of the Blessed Sacrament – sacristy 6pm – 6.50pm: Exposition of the Blessed Sacrament &amp; Rosary 7.00pm: Mass: 1st Ann: Margaret Kelly, Eshnadarragh and her husband Dessie.</p>
+<p>Petie and Eilish Flynn and the Flynn Family, Kilcreen.</p>
+<p>Sun 29th Nov: First Sunday of Advent: 10.30am: Mass: For the People of the Parish. 1st Ann: Eamonn Connolly, Shanroe.</p>
+<p>John &amp; Margaret Clarke, St. Patrick’s Park.</p>
+<p>Annie &amp; Tom Clarke and Family, Tullycorbett.</p>
+<p>Masses &amp; Intentions for the Coming Week in St. Mary’s Church</p>
+<p>Sat 21st Nov: Feast of Our Lord Jesus Christ, King of the Universe. Vigil 6.00pm: Mass: For the People of the Parish. John McDonald, Drumully, Smithboro.</p>
+<p>Wed 25th Nov: 10.00.am: Mass: 10.30 –12 noon: Exposition of the Blessed Sacrament. 7pm – 8pm: Exposition of the Blessed Sacrament.</p>
+<p>Sat 28th Nov: First Sunday of Advent. Vigil 6.00pm: Mass: For the People of the Parish.</p>
+<p>William &amp; Margaret and Elizabeth Smyth, Derrintonny, and Margaret Boyle, Birmingham. Roslea <a href="http://www.parishofroslea.com/" target="_blank" rel="noopener noreferrer">http://www.parishofroslea.com/</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Callaghan and Katie McAree on receiving their Gold Award at the p resentation night in St. Joseph’s Church, Monaghan last Friday night.</p>
+<p>The awards were presented by Bishop Larry Duffy.</p>
+<p>Both Sean Toal and a second award recipient who addressed the gathering on the night stated that the prompt for participating in the award came from their parents.</p>
+<p>So, to parents of children in Transition Year and GCSE, prompt your son and daughter to undertake the Pope John Paul Award.</p>
+<p>It may be the best choice they have made so far!</p>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Anna Diver née Wilson , Castle Street, Irvinestown and formerly Killavilla, Roslea, sister of Mary Grant, Inver Close, Joe, St. Patrick’s Park , Liam, Mullaghconnolly.</p>
+<p>Katie Lynch , 15 Lisroon Road, Mullinahinch, Roslea a month short of her 102nd birthday, mother of Paddy &amp; Phyllis, Mullinahinch.</p>
+<p>Deepest sympathy to their families and may eternal light shine upon the dead . Altar Serving in St. Mary’s Church: Boys and girls from 3rd Class to 6th Class are invited to enrol as altar servers at the Vigil Mass.</p>
+<p>Training will be provided. Please contact the Parish Office or Fr. Chester.</p>
+<p>Contributions on 14th / 15th November: Upkeep: £ 719.29 &amp; €733.45, Baskets: £177.58 &amp; €379.51, Priests: £155 &amp; €75, World Mission Sunday: €5, St. Tierney’s shrine, Weekly : £65.70 &amp; €40.50, St. Mary’s Shrine, fortnightly: £8.36 &amp; €182.06. Received with thanks!</p>
+<p>Christmas Mass Bouquets are available after weekend Masses and at the Parish Office during office hours.</p>
+<p>Clogher don Óige Christmas Cards: Cards will be on sale in both churches of the parish after Mass on the weekend of 28th/29th November.</p>
+<p>The winning designs from the 2025 Christmas Card Competition a re printed and packed and will be on sale in parishes across the diocese!</p>
+<p>Packs of six cards cost just €5/£5 and all proceeds support the work of Clogher don Óige.</p>
+<p>The 2026 Christmas Card Competition is also now open for entries!</p>
+<p>More details at <a href="https://www.clogherdonoige.org" target="_blank" rel="noopener noreferrer">www.clogherdonoige.org</a> . Roslea Shamrocks’ Big Breakfast ,</p>
+<p>Sunday 22nd November, after Mass as part of the fundraising efforts to bring Ciaran&#x27;Roots&#x27; Rooney home. Roslea Cross Community Playgroup Open Day:</p>
+<p>Thursday 3rd December 10.00am – 11.00am. Come along and see our Playgroup and see what it has to offer.</p>
+<p>Meet our friendly staff. Exp lore our playgroup and find out more about the fun-loving activities provided.</p>
+<p>Roslea Cross Community Playgroup are holding a Craft Fair on</p>
+<p>Sunday 6th December at 11.00am in Roslea Community Centre, we have a special guest, Father Christmas will be paying a visit.</p>
+<p>Anybody interested in taking a table please send us a message on Facebook or phone us on 028 677 51 10 5 between 9.00am - 1.45pm Monday - Friday.</p>
+<p>Strategic Plan 2026 – 2031 of Clogher don Óige: Next weekend, as we celebrate the Feast of Christ the King and World Youth Sunday, Clogher don Óige will launch its new Str ategic Plan 2026 –2031. The plan sets out an exciting vision for youth ministry across our diocese over the n ext five years, creating opportunities for young people to grow in faith, leadership, and service.</p>
+<p>Please keep our young people and this important work in your prayers.</p>
+<p>More details at <a href="https://www.clogherdonoige.org" target="_blank" rel="noopener noreferrer">www.clogherdonoige.org</a> . Online Safety Information Session for Parents &amp; Carers : Join Digiwise at Clones Family Resource Centre for an informative session on keeping children safe online,</p>
+<p>Thursday 26th November 6.30pm – 8.30pm in Clones Family Resource Centre.</p>
+<p>To book your place, call <a href="tel:+3534752919" style="color:#1d4ed8;font-weight:600;">047 52 919</a> . Naíscoil an Traonaigh (Irish Medium Playgoup), Drumbrughas Nort h, Lisnaskea – Open Evening for pre preschool children and their parents on</p>
+<p>Thursday 26th November 6.00pm – 7.00pm. If you have an interest in Irish Immersion Education, feel free to come along, meet staf f and see our lovely indoor / outdoor settings.</p>
+<p>Breakfast Club available onsite during the school year for all preschool children from 8.15am daily.</p>
+<p>For further information, contact Naíscoil an Traonaigh on 028 67 7 29 090 or <a href="mailto:naiscoilantraonaigh@gmail.com" target="_blank" rel="noopener noreferrer">naiscoilantraonaigh@gmail.com</a> . Fáilte roimh cách.</p>
+<p>Cavan Institute Information Day |</p>
+<p>Saturday 28th November 11.00am –1.00pm . Explore PLC, Apprenticeship &amp; Tertiary Degree options, meet staff and students, and discover pathways to further study and employment.</p>
+<p>Your future starts here! <a href="https://www.cavaninstitute.ie" target="_blank" rel="noopener noreferrer">www.cavaninstitute.ie</a> <a href="tel:+353494332633" style="color:#1d4ed8;font-weight:600;">049 433 2633</a></p>
+<p>THE MEADOWS RESIDENTS’ ASSOCIATION – CAKE SALE: The Meadows Residents’ Association will hold a cake sale on</p>
+<p>Sunday 29th November in Smithboro Community Hall to raise funds for the benefit of estate.</p>
+<p>All baking donations will be greatly appreciated and will help support our fundraising efforts.</p>
+<p>If you would like to contribute any cakes, buns or other baked treats, please contact our Secretary, Annette, on <a href="tel:+353879951597" style="color:#1d4ed8;font-weight:600;">087 995 1597</a> . Doors open at 9.00am for donation of bakes and doors open for Cake Sa le at 10.30am. Thank you for your support and generosity!</p>
+<p>St Tierney’s Primary School: Is your child starting school in Sep tember 202 7? Then we would love to welcome you, and your child, to our Open Morning on</p>
+<p>Thursday 3rd December 2026 from 9.30am – 11.00am. Meet our staff and pupils and see around our wonderful school.</p>
+<p>For more informati on the school or admissions process please visit <a href="https://www.sttierneyspsroslea.com" target="_blank" rel="noopener noreferrer">https://www.sttierneyspsroslea.com</a> or contact the school office.</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Santa’s Visit to Smithborough hosted by The Meadows Residents Associations on</p>
+<p>Sunday 13th December from 1.30pm with Santa arriving 1.45pm-2.00pm. December Coffee Mornings: There will be two coffee-mornings held in the Heritage Centre, Roslea on Sunday, 13th and Sunday, 20th December from 11.00am to 1.00pm. Proceeds will be shared between Air Ambulance Northern Ireland and Air Ambulance Ireland.</p>
+<p>Tyrone Trad Fest returns to Ballygawley from</p>
+<p>Friday 4th -</p>
+<p>Sunday 6th December . Set Dancing Céilí in Ballygawley Hall on the Friday night from 9.00pm. Saturday: Irish Traditional music workshops taking place in St Ciara n’s College from 12.00pm – 3.00pm. Saturday night: Festival Mass in the Church of the Immaculate Conception, Ballygawley town at 7.00pm. Concert in Ballygawley Hall at 7:30pm featuring a host of curren t all Ireland champions with Stevie Dunne &amp; Band and 3 on The Bund from Kerry.</p>
+<p>Sunday: Folk/trad concert in Canavan’s at 4.00pm with the very popular “Railway Boys” Friday to Sunday: Traditional Music Seisiún Trail in all the local bars in the village of Ballygawley and Canav an’s from that are free to join in with, so, take your instruments in!</p>
+<p>All tickets are available from Eventbright.co.uk Aisling Centre’s Annual Hope Healing Growth Well-being Conference celebrates its 10th anniversary with a day of inspiration on</p>
+<p>Saturday 23rd January 2027 . Tickets are now on sale from the Ardhowen Theatre.</p>
+<p>Our new book “Harnessing Hope ” featuring some highlights of the past 10 years is also on at the Aisling Centre (it would make a wonderful Christmas Present) Could You Help Share the True Spirit of Christmas?</p>
+<p>Each year, volunteers in parishes across the north of Ireland set up a small stall after Masses to sell Trócaire’s Gifts of Change — meaningful gifts that make a real difference to families living in poverty around the world.</p>
+<p>We provide everything you need including training and support.</p>
+<p>All we ask is a little time and a big heart.</p>
+<p>Last Christmas, 50 parishes took part — and we would love to grow that number even more this year!</p>
+<p>If you would like to find out more about how you can help, please email Mark at <a href="mailto:mark.mcmahon@trocaire.org" target="_blank" rel="noopener noreferrer">mark.mcmahon@trocaire.org</a> or call <a href="tel:+442890808030" style="color:#1d4ed8;font-weight:600;">028 9080 8030</a> . Save the Date - Diocese of Clogher Lourdes Pilgrimage Gala Ball – The Diocesan Gala Ball in Aid of the Diocesan Lourdes Pilgrimage Fund will take place on</p>
+<p>Friday 19th February. Tickets €70 per person.</p>
+<p>Contact Olga Gilliland at <a href="mailto:olgagilliland@hotmail.com" target="_blank" rel="noopener noreferrer">olgagilliland@hotmail.com</a> or mobile 00 353 87 6126 201. Tickets selling fast!</p>
+<p>Shrines of France Pilgrimage: Fully escorted pilgrimage – Lisieux, Ruede Bac, Nevers, Paris, Rocamadour and Lourdes, 11th – 18th June 2027. 7 Nights, flying from Dublin to Paris/Lourdes to Dublin.</p>
+<p>Incl udes visits to the home of the Miraculous Medal, the body of St. Catherine Labouré and St. Bern adette.</p>
+<p>Visit Sacre Coeur in Paris and Lourdes, plus more.</p>
+<p>Comprehensive Travel Insurance is EXTRA at £35. Cost £1,200 per person sharing.</p>
+<p>Single room supplement is £345. Spiritual Director Fr. Joe McGuigan. £250 deposit secures a seat!</p>
+<p>For further details contact Jean Reynolds <a href="tel:+3537729402" style="color:#1d4ed8;font-weight:600;">077 29 402</a> 311 or email <a href="mailto:jeanreynolds@hotmail.co.uk" target="_blank" rel="noopener noreferrer">jeanreynolds@hotmail.co.uk</a> . WORLD YOUTH DAY SEOUL 2027 - Interested in joining Clogher don Óige for World Youth Day in Seoul, South Korea , next summer?</p>
+<p>Our proposed pilgrimage dates are 24th July –10th August 2027 , with a projected cost of approximately €2,500 per person . The pilgrimage is open to those born on or before 31st December 2008 . Places are limited.</p>
+<p>Find out more and submit an Expression of Interest at <a href="https://www.clogherdonoige.org/wyd2027" target="_blank" rel="noopener noreferrer">www.clogherdonoige.org/wyd2027</a> Join the Pope John Paul Award with Clogher don Óige: We are excited to let you know that Applications for the Pope John Paul Award are now open.</p>
+<p>Young people over 16 are eligible. We have a strong tradition in our parishes of young people participating, and hope this will continue.</p>
+<p>Please visit our website where you will find the registration form - Clogher don Óige website: <a href="https://www.clogherdonoige.org" target="_blank" rel="noopener noreferrer">www.clogherdonoige.org</a> . Parents and Grandparents please encourage participation in this worthwhile Award.</p>
+<p>If you have any questions, please email <a href="mailto:jp2award@clogherdonoige.org" target="_blank" rel="noopener noreferrer">jp2award@clogherdonoige.org</a> or telephone (047) 72784. <a href="https://www.theway.ie" target="_blank" rel="noopener noreferrer">www.theway.ie</a> – helping people to discover, live and pass on the Cath olic faith.</p>
+<p>Opportunity for Young Adults in Rome: The Pontifical Irish College Lay Formation Programme offers a transformative year of academic, spiritual, pastoral, and human formatio n for young adults aged 20-30. This is a unique opportunity for young adults who are interested in deep ening their faith, developing, their leadership potential , and experiencing life at the heart of the Church in Rome.</p>
+<p>Participa nts will live in community at the Pontifical Irish College while studying at one of Rome’s pontifical universities and eng aging with the rich spiritual and cultural life of the Eternal City.</p>
+<p>Applications are now open for September 2027 intake.</p>
+<p>Places are limited so young adults interested in the course are encouraged to make contact as early as possible.</p>
+<p>Further information and applications details can be found at <a href="https://irishcollege.org/lay/Al-Anon" target="_blank" rel="noopener noreferrer">https://irishcollege.org/lay/Al-Anon</a> – Struggling with Alcohol Addiction?</p>
+<p>For further information contact the confidential Al-Anon hel pline on 0800 0086 811 or email <a href="mailto:helpline@al-anonuk.org.uk" target="_blank" rel="noopener noreferrer">helpline@al-anonuk.org.uk</a> alternatively contact Belfast at <a href="tel:+442890682368" style="color:#1d4ed8;font-weight:600;">028 9068 2368</a> . Low-Cost Service: A low-cost service for adults and young people from 13 to 18 years of age is now available at Clones Family Resource Centre . This confidential service is only a ‘phone call away.</p>
+<p>All our counsellors are experien ced and fully accre dited by IACP or BACP. Prompt appointments offered.</p>
+<p>For further information or to make an appointment call Angela on <a href="tel:+353861785710" style="color:#1d4ed8;font-weight:600;">086 178 5710</a> . Supported by Tusla, Child and Family Agency.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>Panic Buttons for Older People: If you are aged over 66 and are interested in applying for a Panic Button under the SAS Pobal Scheme, please contact Anne Davey, Clones Family Resource Centre on <a href="tel:+3534752919" style="color:#1d4ed8;font-weight:600;">047 52 919</a> for more information or to make your application.</p>
+<p>Areas covered in Clones, Smithboro, Newbliss, Drum and Scotshouse . The panic Buttons can be used with either landlines or mobiles.</p>
+<p>Radio Maria Ireland is an Irish-run Catholic Talk-Radio Station who enjoy commercia l free broadcasting – Prayer, Catechesis, Uplifting music, Talks, Interviews and Testimonies.</p>
+<p>Visit <a href="https://www.radiomaria.ie" target="_blank" rel="noopener noreferrer">www.radiomaria.ie</a> for more information and how you can listen.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="dromore"><a class="parish-link" href="dromore.html" target="_blank" rel="noopener noreferrer">Dromore</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -996,9 +1183,9 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20261018a"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20261018a';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1452,11 +1639,16 @@
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
@@ -1490,23 +1682,8 @@
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

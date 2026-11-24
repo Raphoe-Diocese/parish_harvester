@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Waterford and Lismore Diocese Text Bulletin — 22/11/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f3f5f4;
+      color: #141918;
+      line-height: 1.7;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(68ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #141918;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #f3f5f4;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #f3f5f4;
+      color: #141918;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.7;
+      max-width: min(68ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.2em;
+      color: #0a3333;
+      margin: 1.5em 0 0.5em;
+      padding: 0.35em 0.55em 0.35em 0.65em;
+      border-left: 4px solid #1a6b6b;
+      border-bottom: 1px solid #cfd8d4;
+      background: #e7ecea;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+      letter-spacing: 0.01em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.08em;
+      color: #145a3d;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.2em 0 0.4em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.95em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1554b0;
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 0.1em;
+      text-underline-offset: 0.16em;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body a:visited { color: #6535a5; }
+    .ocr-body a:hover, .ocr-body a:focus-visible {
+      color: #103b80;
+      text-decoration-thickness: 0.15em;
+    }
+    .ocr-body a:focus-visible {
+      outline: 2px solid #103b80;
+      outline-offset: 2px;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #141918; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="waterford_and_lismore-2026-11-22.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">WATERFORD AND LISMORE Text Bulletin · 22/11/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-clonmel-ss-peter-paul" data-parish-name="Clonmel - SS Peter &amp; Paul"><h2 class="ocr-parish-name">Clonmel - SS Peter &amp; Paul</h2></header>
+<p class="page-label">Page 1</p>
+<p>Peter and Vauis, Clonmel OF) one 108(m Radio 4, Parish Newsletter <a href="https://www.churchservices.tv" target="_blank" rel="noopener noreferrer">www.churchservices.tv</a> $ i ‘Clonmelpeterpaul 81 Ah) acer aeind our Parish Shop 61 22138 Brendan Crowley PF. Fr. Deo Mayanja | continue!</p>
+<p>Resurrection: 61 27747 | CCEV Cameras/Live Stream Masses are live | 4 others.</p>
+<p>Pay Zone for online 47 seamed and broadcast on Church Services TV | Rosa Parks Donations on : : Peter Pauls Clonmel If you are a new Parishioner or just visiting Ss Peter and Paul&#x27;s church, you!“and on our Webpage are very welcome and we hope you fecl at home here.</p>
+<p>If you are new sspeterandpatll parish, Please make yourself known to Fr John Treacy Fr Deo Mayanja or Fr Brendan Crowley PE lexypaymets The I&quot; word!</p>
+<p>We know this story well. The most important letter in&#x27;jf&#x27; is Jesus identifies himself with the people he is talking about, He doesn&#x27;t say people were in prison and you visited them, or sick or naked, He says Twho am in prison, sick or naked.</p>
+<p>I&#x27;s even more than being a brother or sister of Jesus, He identifies with each of us especially in need.</p>
+<p>Created as we are in the image of God, Jesus sees right through us to see God.</p>
+<p>God is the divine life of God in each person.</p>
+<p>That makes the difference. We don&#x27;t help the needy person only because he or she is needy, but because each is in the image of God and Jesus sees him or hey and says ‘that&#x27;s me.</p>
+<p>This can be a programme for life. For the young - can you make a decision for your life that includes deep care from your love of those in need?</p>
+<p>For those in their busy lives already and who Ihave chosen their way - how can you show deep care for those in need.</p>
+<p>For the elderly - can you pray those in need each day und encourage those more active to care for them?</p>
+<p>Did you feed the hungry, give drink to the thirsty, welcome the stranger, care for the sick and visit the prisoner?</p>
+<p>Lord Jesus, may your kingdom come - The reign af equality, justice, peace and love.</p>
+<p>Confessions [Watchful Hearts-One Dav Retreat at Glenstal | Sat 12pm to Tpm and 7pm to 7.25pm [Sth December 2026. Guided by monks through prayer, | Exposition of Blessed Sacrament reflection and the of monastic life, Wed and Fri 12pm-Ipm this Advent Retreat offers a space for stillness, ine Grib at Holy Family Mideep listening and spiritual renewal Sundty Gtk December 3 ane Hele Eamity Email events(aiglenstal com / <a href="tel:+35361621005" style="color:#1d4ed8;font-weight:600;">061 621005</a></p>
+<p>Mission, Glencomeragh House, Kilsheelan, ‘November Novenas for the Dead Co, Tipperary E9THS84. Free of charge ‘he Novena in SS Peter and Pauls runs from this week lots of fun for all the family — hot chocolate, Jon the 22nd November to the 30th.</p>
+<p>Envelopes and list Christmas Carols and a very special guest for names of those remembered are available in both ppearance from Santa! churches.</p>
+<p>Offerings may be enclosed with the lists Envelopes may be returned to the Parish Shop or putsnd 22nd of November at 2.30pm. in the weekly collection bags! baskets.</p>
+<p>Prizes and refreshments. Our Novernber table to honour our dead is up and SS_PETER &amp; PAUL&#x27;S CHURCH | running.</p>
+<p>Pictures of your loved ones can be dropped in ‘CLONMEL lat any time to place on the table where it will stay fo i : the month of November. tiv € inas fora magical inchaise visit with Santa Felesigned especially for children with additional needs | sti é Concert Trey a py seasory friendly environrvent with on lighting, gentle sounds, and plenty of time for eacl ‘The Clonmel Gncert Band child tecet Santa pt thers own pace, Families can Gedi Gatoicns capture special memories in a relaxed, understanding geting where very child can experince the joy of nas comfortably.</p>
+<p>Any questions pleasc be sure sesunday 6th Decembe to get in touch Evelyn <a href="tel:+353833000639" style="color:#1d4ed8;font-weight:600;">0833000639</a> á commencing at 70pm ‘Medjugorje Pilgrimage - May 2027 “ seaeeenet rere one, [13th May 2027 — 7 nights.</p>
+<p>Spiritual Director: Fr F Saissa McEneaney. €929. €100 off per person if paid in full ab Baby 30th November 2026. ‘Travelling with Joc Walsh Mm 4 ‘Tours.</p>
+<p>For more info: Helen <a href="tel:+353861678027" style="color:#1d4ed8;font-weight:600;">086 1678027</a></p>
+<p>30pm Pat Ryan (Anniv) Sean Gunne (1st Anniv) 11.00ain Novena (1) 12,30pm Liam Prendergast (Anniv) Ted Boyle and parents Michael and Kitty Boyle (A ‘Church of the Resurrection 10.00 am Tony Me Girath (Sth Anniv) and Deceasec Members of the McGrath and Fahey Family Masses Next Weekend Ss.</p>
+<p>Peter &amp; Paul&#x27;s Church 7.30pm Liam Brady (Months Mind) 11,00am Novena (8) 12.30pm Patrick Phelan (Anniv) Ann Fahy (Anniv) Church of the Resurrection 10.00 am People of the Parish Readers Rota ‘This Week 21st/22nd November Team Bridie Mullins, Bobby Walsh, Martina Flavin, Brian O&#x27;Keeffe ‘Next Week 28th/29th November Team A Michael O&#x27;Gorman, Ruairi O&#x27;Caisiean, Mary Terry Sr Margaret Quirke, Maria Cummins. ‘This Week 21st/22nd November Team 3 Kearney, Cuddihy, K Griffin, so Slattery, Souza, M Berrigan. age Wasioe, Ann Laycock, Jean Law,‘Ann O&#x27;Brien, Bernard Mbembe.</p>
+<p>C-Saw Tipperary Bereavement Listening Service will take place an the Ist Wednesday of every jonth from 7-8pm at C-Saw House, 24 William Strec Clonmel, Co. Tipperary.</p>
+<p>Walk-In Free Service, Non-Judgemental and Totally Confidential.</p>
+<p>ns) C-Saw Free Coffee Morning YS 24 William St. Clonmel. Monday and</p>
+<p>Wednesday 10.30am to 12.30pm Raising Hope Caring for our Common Home Together.</p>
+<p>A Laudato Si’ Conference for the Diocese of Cloyne, Cork and Ross, Waterford and Lismore.</p>
+<p>In the midst of environmental crises, how can parish communities are more deeply for Gods creation?</p>
+<p>Join us for a da 0 equip yourself and your parish community to wal more gently on the earth, with dynamic speakers, practical workshops and a ‘marketplace’ of support. aturday 21st November from 10am to 4pm. Clayter Hotel, Silversprings, Tivoli, Cork, T23 E244 Foregister please email maria. murphy @trocaire org ‘Suggested Donation of €10 on the Day.</p>
+<p>P ‘Active Retirement Group ES, Takes place on</p>
+<p>Thursday 26th of ‘November in Place4U at 3pm. (Alcoholics Ga Lashed You&#x27;re not Alone.</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353872894567" style="color:#1d4ed8;font-weight:600;">087 2894567</a> .</p>
+<p>HE BEOEYWg Pe Nancy O&#x27;Driscoll (née Finneran), Powerstown, Clonmel and late Taughmaconnell, Roscommon.</p>
+<p>John Hartigan, Powerstown, Clonmel. Paddy O&#x27;Keeffe, Melview, Clonmel</p>
+<h3 class="b-head">Months Mind</h3>
+<p>Daniel O&#x27;Mahony, Shcila O&#x27;Dea, Patrick Burke, Susan McCormack.</p>
+<p>Anniversaries of ‘Tom Hannigan, Pat Ryan, Mary Duggan, Leahy, Tony McGrath, McGrath and Fahey Familics, Sean Gunne, Liam Prendergast, Eddie O&#x27;Neill, Philip Deady, Ted Boyle and Parents Michael and Kitty, Alice Cunningham, Annie Fanning, PJ Slattery, Judy Blanche, Roseann Hogan, Michael Burke, Arthur Deady.</p>
+<p>Weekly Collections: Envelopes: €995 Collection: €1.545 ONMI BRAR i On the Tast Wed of every month at 2pm. Join us for a screening offs from yesteryear.</p>
+<p>Tea&#x27;b ext Date: ovemb: We welcome to the Parish and the Christian Community Maja Anna Jankowska ay Jan Piotr Jankowski Sak Theo Rhys O&#x27;Donovan &quot;Youth 2000 Christmas Retreat | 11th-13th December 2026 Calhag all young people aged 16 35! Join us at the Youth 2000 Christmas Rctreat in Newbridge College, Co. Kildare.</p>
+<p>This a donation-only event, with free buses across the country and all meals included Expect inspiring talks and workshops, Mass, nusic, prayer, and plenty of opportunities to chill ut and meet other young Catholics.</p>
+<p>Whether you re new to the faith or looking to be refreshed, all are welcome.</p>
+<p>To rane or find out more, visit outh2000.ic or follow @Youth2000|reland. se ME p E1 &amp; PALI ST PETER &amp; PAULs 2 + CHOIR anes TMAS SI Bet URBs Ref PI cáis! etns 4 (-</p>
+<p>SUNDAY 13th DECEMBER.) DOVE HILL SHOPPING VILLAGE : - Cardiac Risk in The Young J</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-clonmel-st-mary-s" data-parish-name="Clonmel - St. Mary&#x27;s"><h2 class="ocr-parish-name">Clonmel - St. Mary&#x27;s</h2><p class="ocr-parish-date">22/11/2026</p></header>
+<p class="page-label">Page 2</p>
+<p>St Mary’s Parish News Link 22nd November 2026 Thirty-Fourth Sunday in Ordinary Time Parish Website: <a href="https://www.stmarysparishclonmel.ie" target="_blank" rel="noopener noreferrer">www.stmarysparishclonmel.ie</a> Webcam : <a href="https://www.churchservices.tv/clonmel" target="_blank" rel="noopener noreferrer">www.churchservices.tv/clonmel</a> Parish Radio Link: 106.5 Our Lord Jesus Christ, King of the Universe The Solemnity of Our Lord Jesus Christ, King of the Universe, brin gs the Church’s liturgical year to a beautiful and meaningful conclusion.</p>
+<p>On this day, we proclaim that Jesus Christ is the King of all creation, the King of our hearts, and the Lord of lives.</p>
+<p>Yet His kingship is very diīerent from the kingship we usually associate with power, auth ority and worldly success.</p>
+<p>Jesus does not rule from a throne of gold, surrounded by wealt h and earthly glory.</p>
+<p>His throne is the Cross. His crown is made of thorns, and His greateste xpression of power is His willingness to love, forgive and give His life for othe rs.</p>
+<p>He is a King who does not come to be served, but to serve; a King who does not conquer through vi olence, but through love; a King whose kingdom is built not on fear, but on mercy, truth and compassion.</p>
+<p>In the Gospel, we see Jesus hanging on the Cross.</p>
+<p>Above His head is wriƩen: “This is the King of the Jews.” To those who were watching, His death appeared to be a defeat.</p>
+<p>Yet, at that very moment, Jesus revealed the true nature of His kingdom.</p>
+<p>Even in suīering, He continued to forgive.</p>
+<p>Even in His Įnal moments, He oīered hope to the repentant thief, promising him: “Today you will be with me in paradise.” This Gospel invites us to ask ourselves an important question: Is Jesus truly the King of my life?</p>
+<p>It is easy to call Him our King when everything is going well , when our prayers are answered and life follows the path we have chosen.</p>
+<p>But do we allo w Him to guide us when we face diĸculties, disappointments, uncertainty or suīering?</p>
+<p>Do we allow His words to inŇuence our decisions, our relationships and the way we treat other people?</p>
+<p>To recognise Christ as our King means more than simply believing in Him.</p>
+<p>It means allowing Him to have a place in our everyday lives.</p>
+<p>It means choosing fo rgiveness instead of resentment, kindness instead of indiīerence, honesty instead of convenience, and generosity instead of selĮshness.</p>
+<p>It means allowing the values o f the Gospel to shape our families, our homes and our communities.</p>
+<p>Christ&#x27;s kingdom begins wherever love is stronger than hatred, where forgiveness overcomes biƩerness, where the lonely are welcomed, the poor are helped and the dignity of every human person is respected.</p>
+<p>As we celebrate this great solemnity, let us remember that we do not simply wait for the Kingdom of God to come at the end of time.</p>
+<p>We are called to build it here and now, through the small but meaningful choices we make every day.</p>
+<p>May Christ be the King of our hearts, the centre of our families and foundation of our lives.</p>
+<p>And may we never be afraid to follow Him, because His is the only kingdom that will never pass away.</p>
+<p>Fr. Desiderio Our online payment system is now up and running.</p>
+<p>You can Įnd the link on the home page of our website at <a href="https://www.stmarysparishclonmel.ie" target="_blank" rel="noopener noreferrer">www.stmarysparishclonmel.ie</a> There are several options to select from, the Weekly Oīertory, a one-oī Donation, Mass Oīerings and the various Special Collections.</p>
+<p>If you have any questions, please contact the Parish Oĸce on <a href="tel:+353526122773" style="color:#1d4ed8;font-weight:600;">052 6122773</a></p>
+<p>Parish Team Parish Administrator: Fr. Desiderio A. <a href="tel:+353899760478" style="color:#1d4ed8;font-weight:600;">0899760478</a></p>
+<p>Parish Team: Fr. Deo, Fr Rozo Palic and Fr. Godfrey, Fr. Billy Meehan Deacon for Clonmel Pastoral Area: Rev. Lazarus Gidolf Custodian of St. Patrick’s Well: Davy Flannery Sacristan: Maria Cooke Sacristy: <a href="tel:+353526187915" style="color:#1d4ed8;font-weight:600;">052 6187915</a> (Mass Times) Parish Delegate Child Protection: Ita O’Brien &amp; Mathúin O’ Caoimh</p>
+<h3 class="b-head">Parish Office</h3>
+<p>Pastoral Centre Parish Manager: Maria Cooke Parish Secretary: Joyce Dolan</p>
+<h3 class="b-head">Parish Office</h3>
+<p>Phone No: <a href="tel:+353526122773" style="color:#1d4ed8;font-weight:600;">052 61 22773</a></p>
+<p>Open: Mon. – Fri. 9.30am – 1.00pm</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:pastoralcentreclonmel@gmail.com" target="_blank" rel="noopener noreferrer">pastoralcentreclonmel@gmail.com</a> SVP, Mulcahy House: <a href="tel:+353526123878" style="color:#1d4ed8;font-weight:600;">052 6123878</a></p>
+<p>Diocesan website: <a href="https://www.waterfordlismore.com" target="_blank" rel="noopener noreferrer">www.waterfordlismore.com</a> Priest on Duty: Fr. Desiderio <a href="tel:+353899760478" style="color:#1d4ed8;font-weight:600;">089 9760478</a></p>
+<p>Hospital Radio Link: 93.7FM Readings for Sunday: Page 158 120 CCT V Cameras/Live Stream Please note that for the protection and security of everyone CCTV Cameras are in operation in this Church.</p>
+<p>All our Masses are live streamed and are broadcast on Church Services TV. Dear Brothers and Sisters, thank you for your continued support of our Parish.</p>
+<p>As you know our Church is an iconic building in Clonmel.</p>
+<p>I firmly believe the works we are currently undertaking enable us to showcase the beauty of our Church and continue to serve the people who make up our community.</p>
+<p>To achieve this and play our part in the wider responsibilities of our faith community I want to establish a fundraising pledge.</p>
+<p>Brothers and Sisters, today I invite you to prayerfully contemplate a financial pledge to our fund.</p>
+<p>Over the next twelve months, for example, if 250 people could pledge €20 a month together, we could raise €60.000. I encourage you to take time to reflect and discuss this with your family and make a decision that is right for you.</p>
+<p>If you have any questions, please do not hesitate to contact the Paris h Office on <a href="tel:+353526122773" style="color:#1d4ed8;font-weight:600;">052 61 22773</a> . We look forward with optimism and hope and ask for your prayers and en thusiastic support in this endeavour.</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Died Recently John Hartigan Paddy O&#x27;Keeīe</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Month’s Mind Bridie Fleming Sheila O’Dea Susan McCormack Tim Barry Seamus &amp; Maura Gavigan Michael &amp; Emily Bogue Donald O’Dwyer Joe (Jodie) O’Brien Paddy O’Shea Christy Browne Ellen Quinlivan Seamus &amp; Maura Gavigan Geraldine O’ Donnell Thomas &amp; Sean O’Neill John &amp; Rosaleen O’Flynn Margaret Williams Phil &amp; Annie Fanning Josie Kavanagh Kathleen &amp; Michael Hickey Collections Last Weekends Oīertory : € 1585 .00 Envelopes: €335.00 Sacramental Moments Baptisms: Every</p>
+<p>Saturday 3.30 pm. Other arrangements can be made with any of the Priests.</p>
+<p>Marriage: Three months’ notice must be given to Parish and Registrar of Marriages at the Clinic, Western Rd.</p>
+<p>Register of Marriages: When making arrangements to meet registrar you will need a Civil Birth Certificate, Passport or Driving Licence, Util ity bill and €200.00 for fee.</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353526177204" style="color:#1d4ed8;font-weight:600;">052 6177204</a></p>
+<p>Church Requirements: Book Church. Fill up Pre–marriage enquiry form with Priest of your Parish.</p>
+<p>You will need a recent Baptismal Certificate / Confirmation Cert &amp; letter of freedom from any Parish you may have lived in for six months since reaching the age of 18. Pre – Marriage Course: It is strongly recommended to partake in a Pre– marriage course organised by ACCORD (Catholic Marriage Advisory Council) for bookings and information contact <a href="tel:+353526124144" style="color:#1d4ed8;font-weight:600;">052 6124144</a></p>
+<p>Reconciliation Service: First Saturday of the month at 10.00 am. All are welcome.</p>
+<p>No need to be worried or anxious about past experiences or how long away you may have been.</p>
+<p>Padre Pio Prayer Group, Legion of Mary:</p>
+<p>Contact: Pastoral Centre <a href="tel:+353526122773" style="color:#1d4ed8;font-weight:600;">052 6122773</a></p>
+<p>Devotion Exposition of the Blessed Sacrament:</p>
+<p>Saturday 10.30am to £.00pm Padre Pio Devotions: First Monday of the month at 6.30 pm. Novena Mass: Mother of Perpetual Help -</p>
+<p>Wednesday 7.00pm Divine Mercy: Friday 3pm Sanctuary Candle this Week: Phil &amp; Annie Fanning Masses this Weekend:</p>
+<p>Saturday 21st Nov 10:00am Holy Souls Novena 6:15pm Joe (Jodie) O’ Brien (1st Anniv) Ned, Chrissie &amp; John Smith (RIP) Paddy O’Shea (Anniv) Christy Browne (Anniv)</p>
+<p>Sunday 22nd Nov 10.30am Bridie Fleming (Month’s Mind) Sheila O’Dea (Month’s Mind) Susan McCormack (Month’s Mind) 12:00 noon Ellen Quinlivan (8th Anniv) Seamus &amp; Maura Gavigan (Anniv) Masses for coming week:</p>
+<p>Monday 23rd Nov 7:45am Thanksgiving for baby Lily 10:00am Geraldine O’ Donnell (Anniv) Thomas &amp; Sean O’ Neill (Anniv)</p>
+<p>Tuesday 24th Nov 7:45am 10:00am John &amp; Rosaleen O’Flynn (Anniv)</p>
+<p>Wednesday 25th Nov 7:45am Tim Barry (Month’s Mind) 10:00am Margaret Williams (Anniv) 7:00pm Phil &amp; Annie Fanning (Anniv)</p>
+<p>Thursday 26th Nov 7:45am 10:00am Josie Kavanagh (Anniv) 7.00pm Remembrance Evening</p>
+<p>Friday 27th Nov 7:45am 10:00am Kathleen &amp; Michael Hickey (Anniv) 7.00pm</p>
+<p>Saturday 28th Nov 10:00am Thanksgiving Mass Ministries next Weekend: 29th Nov 2026 Minister of the Eucharist: Team B Minister of the Word: Team A Church Services</p>
+<h3 class="b-head">Mass Times</h3>
+<p>Sundays: Vigil (Sat) 6:15pm. 10:30am, 12:00 noon Weekdays: Mon—Fri 7.45am, 10am Wednesday: 7pm Novena to Our Mother of Perpetual Help Saturdays: 10am &amp; 6.15pm Vigil Holy Days: When Holy day falls on Saturday, Vigil Mass at 6.15pm on</p>
+<p>Friday 10:00am and 6.15pm. Parish Shop: The Parish Shop is open Monday to Thursday, 9.30am to 1.30pm. And</p>
+<p>Friday 9.30am to 1pm. Pop in and have a browse.</p>
+<p>Mass Cards, statues, rosary beads, water bottles and fonts, Bibles and pl enty more available.</p>
+<p>C-Saw Tipperary Bereavement Listening Service take place on the 1st Wednesday of every month from 7pm to 8pm C-Saw House, 24 William Street, Clonmel E91 NX34. Walk-in free service, totally confidential and non-judgemental.</p>
+<p>Sensory Santa Experience Join us for a magical inclusive visit with Santa designed especia lly for children with additional needs.</p>
+<p>Enjoy a calm, sensory-friendly environment with soft lighting, gentle sounds, and plenty of ti me for each child to meet Santa at their own pace.</p>
+<p>Families can capture special memories in a relaxed, understanding setting where every child can experience the joy of Christmas comfortably.</p>
+<p>Any questions please be sure to get in touch Evelyn <a href="tel:+353833000639" style="color:#1d4ed8;font-weight:600;">0833000639</a> . MARY&#x27;S MEALS - OUTREACH INITIATIVE - At next weekend masses Nov 21st/22nd), Pat Meaney will speak about the Charity&#x27;Mary&#x27;s Meals&#x27;, which operates in 16 of the poorest countries in the world.</p>
+<p>The Mission of&#x27;Mary&#x27;s Meals&#x27; is that every child gets one nutritional meal a in a place of education.</p>
+<p>One nutritional meal cost 11 cents (not a misprint).</p>
+<p>You will be invited to take a Mary&#x27;s Meals envelope and leafle t home with you.</p>
+<p>If you wish to contribute, simply place your contribution in the envelope and return it the following weekend by placing it in the collection basket with your normal envelope/offering.</p>
+<p>Thank you.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>b The Parables of Jesus often used parables to teach people about God, faith, love, forgiveness and the Kingdom of Heaven.</p>
+<p>A parable is a simple story taken from everyday life, but it carries a much deeper spiritual meaning.</p>
+<p>Jesus spoke about farmers, Įshermen, shepherds, servants, parents and ordinary people because He wanted everyone to understand that God&#x27;s message is not reserved for scholars or religious experts.</p>
+<p>It is meant for every human heart. Some of the most beautiful teachings of Jesus are found in His parables.</p>
+<p>In the Parable of the Good Samaritan, He teaches us that our neighbour is not simply someone who lives near us or be longs to our community, but anyone who needs our compassion and help.</p>
+<p>In the Parable of the Prodigal Son, we discover the unconditional love and mercy of God, who never stops waiting for His children to return to Him.</p>
+<p>Through the Parable of the Sower, Jesus reminds us that God&#x27;s Word is constantly being oīered to us, but it depends on the condition of our hearts whether that Word will grow and bear fruit.</p>
+<p>The parables are not merely beautiful stories from the past. They are invitations to examine our own lives.</p>
+<p>When we hear about the unforgiving servant, we must ask ourselves whether we are truly willing to forgive others.</p>
+<p>When we hear about the wise and foolis h virgins, we are challenged to consider whether we are spiritually prepared to meet the Lord.</p>
+<p>And when we hear about the talents, we are reminded that God expects us to use the gifts He has given us rather than hide them out of fear or laziness.</p>
+<p>One important characteristic of the parables is that Jesus does not simply give us information; He challenges us to decide.</p>
+<p>His stories invite us to look beyond appearances, question our aƫtudes and recognise what truly maƩers in life.</p>
+<p>Sometimes their message comforts us, but at other times it challenges and even because God&#x27;s Word calls us to conversion.</p>
+<p>As we study the parables of Jesus, we should not ask only, &quot;What did Jesus mean when He told this story?</p>
+<p>We should also ask, &quot;What is Jesus saying to me through this parable today?</p>
+<p>The purpose of understanding the parables is not simply to know more about the Gospel, but to allow the Gospel to transform the way we think, speak and live.</p>
+<p>Every parable contains an invitation: to know God more deeply, to love more sincerely and to become more faithful disciples of Jesus.</p>
+<p>The Holy Eucharist is the heart and centre of the Catholic faith.</p>
+<p>A ccording to the Catechism of the Catholic Church, the Eucharist is the source and summit of the Christian life (CCC 1324).</p>
+<p>It is not simply a religious ceremony or a symbolic meal, but the greatest gift Jesus Christ has left to His Church: His own Body and Blood.</p>
+<p>At the Last Supper, Jesus took bread and wine, blessed them, and gave them to His disciples, saying: “This is my body, which is given for you.</p>
+<p>Do this in remembrance of me” (Luke 22:19).</p>
+<p>Through these words, Jesus established the Eucharist and entrusted it to the Church as a lasting memorial of His sacriĮce.</p>
+<p>The Catechism teaches that, during the celebration of the Mass, through the power of the Holy Spirit and the words of consecration, the bread and wine become the Body and Blood of Christ. This change is called transubstantiation.</p>
+<p>Although the appearance of bread and wine re mains, Christ is truly, really and substantially present in the Eucharist (CCC 1374 – 1376).</p>
+<p>The Eucharist is also the memorial of Christ&#x27;s sacriĮce on the Cross.</p>
+<p>Every time we celebrate Mass, we do not repeat Christ&#x27;s sacriĮce but make present that one sacriĮce through which Jesus oīered Himself for salvation of the world.</p>
+<p>At the altar, heaven and earth meet, and we are invited to participate in the love and self-giving of Christ. Receiving Holy Communion is much more than fulĮlling a religio us obligation.</p>
+<p>It is entering into a personal relationship with Jesus, allowing Him to become part of our lives, strengthen our faith, forgive our weaknesses and transform our hearts.</p>
+<p>The Eucharist also unites with one another, making us one body in Christ. We cannot truly receive Jes us in Communion while remaining indiīerent to the needs, suīer ing and dignity of other people.</p>
+<p>The Catechism reminds us that we should prepare ourselves prop erly to receive Holy Communion, approaching the sacrament with faith, reverence and a heart free from grave sin.</p>
+<p>We are also encouraged to spend time in prayer and thanksgiving after receiving the Eucharist. Finally, the Eucharist is a promise of eternal life.</p>
+<p>Jesus gives Himself to us as the Bread of Life, nourishing us on our earthly journey and preparing us for the heavenly banquet.</p>
+<p>The Eucharist is not simply something we receive; it is Someone we receive.</p>
+<p>Every Mass is an invitation to encounter Jesus, to remain close to Him and to allow His presence to change the way we live, love and serve others.</p>
+<p>Our Lord Jesus Christ, King of the Universe What is the Kingdom of God?</p>
+<p>What is the Kingdom of Christ the King? The Kingdom of God is a space.</p>
+<p>It exists in every home where parents and children love each other.</p>
+<p>It exists in every region and country that cares for its weak and vulnerable.</p>
+<p>It exists in every parish that reaches out to the needy.</p>
+<p>The Kingdom of God is a time. It happens whenever someone feeds a hungry person, or shelters a homeless person, or shows care to a neglected person.</p>
+<p>It happens whenever we overturn an unjust law , or correct an injustice, or avert a war.</p>
+<p>It happens whenever people join in the struggle to overcome poverty, to erase ignorance, to pass on the Faith.</p>
+<p>The Kingdom of God is in the past (in the life and work of Jesus of Nazareth); it is in the present (in the work of the Church and in t he eīorts of many others to create a world of goodness and justice); it is in the future (reaching its completion in the age to come).</p>
+<p>The Kingdom of God is a condition. Its symptoms are love, justice, and peace.</p>
+<p>Jesus Christ is king! We pray today that God may free all the world to rejoice in his peace, to glory in his justice, to live in his love.</p>
+<p>Christ the King The solemnity of Christ the King marks the end of the Church’s liturgical year.</p>
+<p>This feast was instituted by Pope Pius XI in 1925 to promote devotion to the Universal Lordship of Christ in response to the growing secularism of the Western world.</p>
+<p>In 1969, Pope Paul VI gave it a new title, ‘Jesus Christ, King of the Universe’ and raised its status from a feast to a ‘Solemnity.</p>
+<p>At a time when many people have scant regard for monarchs or kings, we need to ask ourselves what does it mean to honour Jesus Christ as King?</p>
+<p>What kind of kingship are we celebrating?</p>
+<p>St. Mary’s Lourdes 40th Annual Pilgrimage 2027 This year’s pilgrimage to Lourdes will take place from</p>
+<p>Friday 30th July to</p>
+<p>Wednesday 4th August 2027. Departing from Cork: €1,220 per person sharing.</p>
+<p>Costs include transport from Clonmel to Cork, check-in 20kg bag, coach transfer to Lourdes on arrival, city tax, sanctuary levy and travel insurance.</p>
+<p>Residing at Hotel Agena – full board. Collections/bookings every Saturday after the 6.15 p.m. mass commencing</p>
+<p>Saturday 16th January 2027. Gift vouchers are now available.</p>
+<p>Contact Seamus 087) 9650651 or Edel 085) 7327950. A Blessing – by St Columbanus Feast 23 November Lord, may everything we do this day begin with Your blessing and continue with Your help.</p>
+<p>May everything we say this day begin with Your love and continue with Your grace.</p>
+<p>May everything we plan this day begin with Your inspiration and continue with Your peace.</p>
+<p>So that throughout our lives all that we begin in You may by You be happily ended, and all that we seek through You may</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>[Grab your reader’s attention with a great quote from the document or use this space to emphasize a key point.</p>
+<p>To place this text box anywhere on the page, just drag it.] Anybody who would like to donate to the Painting Fund can use the QR code: The donations for this week were €3167*.00 Thank you for your contributions.</p>
+<p>The Holy Trinity – A Model of Family Love The mystery of the Holy Trinity teaches us something beautiful and essen tial about family life: love is not simply something we feel; it is something we give, receive and share.</p>
+<p>God is Father, Son and Holy Spirit – three Persons in one God, united in perfect love, c ommunion and self-giving.</p>
+<p>Although we can never fully understand this mystery, it oīers Christian families a wonderful model for how to live together.</p>
+<p>In the Trinity, no Person lives for Himself.</p>
+<p>The Father loves t he Son, the Son loves the Father, and the Holy Spirit is the bond of love between them.</p>
+<p>Their relationship is not based on competition, selĮshness or the desire to dominate, but on complete trust, respect and mutual giving.</p>
+<p>This is the kind of love that every Christian family is called to reŇect.</p>
+<p>Family life is one of the Įrst places where children discover what love really means.</p>
+<p>They learn not only from what their paren ts tell them, but especially from what they see every day.</p>
+<p>When children witn ess their parents forgiving one another, speaking with kindness, h elping each other and making sacriĮces for the good of the family, they begin to understand the love of God.</p>
+<p>Of course, no family is perfect. There are moments of disagreement, tire dness, misunderstanding and impatience.</p>
+<p>Parents sometimes make mistakes, and children do not always behave as they should.</p>
+<p>But a Christian family is not a family without problems; it is a family that continually chooses to love despite its diĸculties.</p>
+<p>Saying “I am sorr oīering forgiveness, listening patiently and making peace are small but powerful ways of reŇecting the love of the Holy Trinity.</p>
+<p>The Holy Trinity also reminds us that unity does not mean that be the same.</p>
+<p>Each family member has diīerent gifts, talen ts, personalities and needs.</p>
+<p>Children should be encouraged to discov er and develop their individuality while learning to respec t others.</p>
+<p>A loving family is a place where everyone feels accepted, valued and importan t.</p>
+<p>Parents have a special responsibility to make God present in thei r homes.</p>
+<p>Through family prayer, Sunday Mass, reading the Gospel to gether and simple acts of kindness, they help their children discover that God is not distant but lives among those who love one another.</p>
+<p>Perhaps the most important lesson of the Holy Trinity for every family is this: a home becomes a reŇection of God when love is at its centre.</p>
+<p>When family members learn to give rather than demand, forgi ve rather than blame, and serve rather than seek aƩention, their home becomes a place where God&#x27;s presence can truly be experienced.</p>
+<p>Our families may never be perfect, but with God&#x27;s grace, they can become schools of love, unity and faith.</p>
+<p>And through the love we share at home, our children can begin to discover the greatest truth of all: Go d Himself is love.</p>
+<p>Advertisement Space Available Please Contact</p>
+<h3 class="b-head">Parish Office</h3>
+<p>on <a href="tel:+353526122773" style="color:#1d4ed8;font-weight:600;">052 61 22773</a></p>
+<p>Kickham Street, Clonmel (opp Dunnes Oakville)</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353526121013" style="color:#1d4ed8;font-weight:600;">052 6121013</a></p>
+<p>Mob. <a href="tel:+353838718010" style="color:#1d4ed8;font-weight:600;">083-8718010</a></p>
+<p>For the removal of corns, ingrown toenails, hard skin and the treatment of fungal nails John O’Donoghue &amp; Sons Funeral Directors 60a Kickham Street, Clonmel, Co. Tipperary</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353526121809" style="color:#1d4ed8;font-weight:600;">052 61 21809</a></p>
+<p>Est. 1921 Mobile: 086 259 56 58</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:jaodonoghuefd@gmail.com" target="_blank" rel="noopener noreferrer">jaodonoghuefd@gmail.com</a> Every Blooming Thing Ph: <a href="tel:+353526127000" style="color:#1d4ed8;font-weight:600;">052 6127000</a> - <a href="tel:+353526124201" style="color:#1d4ed8;font-weight:600;">052 6124201</a> 7</p>
+<p>Irishtown, Clonmel Wedding Specialists Funeral Flower Tributes, Interflora world wide delivery. <a href="https://www.everybloomingthingclonmel" target="_blank" rel="noopener noreferrer">www.everybloomingthingclonmel</a> . Visit our Facebook Page Cllr Richie Molloy, Independent Member of Tipperary County Cou ncil Phone: <a href="tel:+353861967482" style="color:#1d4ed8;font-weight:600;">0861967482</a></p>
+<p>Commissioner for Oaths /Peace Commissioner Available to sign Statutory documents</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:richie.molloy@cllr.tip" target="_blank" rel="noopener noreferrer">richie.molloy@cllr.tip</a> perarycoco.ie</p>
+<h4 class="b-sub">Web</h4>
+<p>www .richiemollloy.ie A. Fennessy &amp; Son Funeral Directors “ 1-2 Kickham Street Clonmel, Co. Tipperary Cllr.</p>
+<p>Sio bhán Ambrose, Tipperary County Cou ncil, Dela hunty Square, Clonmel, Co. Tipperary. (086) 3850242 pp Presentation Sisters invite enquiries from women searching for a radical Gospel life choice <a href="mailto:enquiry@presprone.com" target="_blank" rel="noopener noreferrer">enquiry@presprone.com</a> <a href="https://www.presentationsistersne.com" target="_blank" rel="noopener noreferrer">www.presentationsistersne.com</a> Join Presentation Congratulations to St. Mary’s of Clonmel as they won the AIB Munster Club IHC Semi-final against Abbeydorney.</p>
+<p>Their 18-point win means the Clonmel team will play Dromin Athlacca from Limerick, who beat Clarecastle by a point in Sunday’s other semi- Įnal, in the provincial Įnal on November 29.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-tramore-carbally" data-parish-name="Tramore &amp; Carbally"><h2 class="ocr-parish-name">Tramore &amp; Carbally</h2></header>
+<p class="page-label">Page 6</p>
+<p>Ne Sunda</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>Holy Cross Tramore Saturday: 1am &amp; 7.30pm (Vigil) Sunday: §.30am &amp; llam Monday -</p>
+<p>Friday 10.002m</p>
+<h3 class="b-head">CONFESSIONS</h3>
+<p>Saturday 10 30am and upon Request NOVENA TO OUR LADY OF PERPETUAL HELP Mondays after 10am Mazz HOLY FACE DEVOTION Tuesday after 1am Maze DIVINE MERCY Wednesdays at 3pm EXPOSITION OF THE BLESSED SACRAMENT ‘Thursday after 10am Maze until Spm Church closes at 4pm Monday — Wednesday and Friday &amp; Spm Thursday PRAYERS FOR HOLY SOULS Friday after 10am Maz: Our Lady’: Church, Carbally Sunday Nov 29" NO MASS Church of the Immaculate Conception Fenor Sat Nov 185 6pm Sacred Heart Church, Dunhill Sunday Nov 29 NO MASS ‘COVID-19 itis recommended that all Parishioners continue to sanitize their hands on entry and exit from the church Priest on Duty <a href="tel:+353866004384" style="color:#1d4ed8;font-weight:600;">086-6004384</a></p>
+<p>ftyes cant | 224 November 2026 || eich, ives ‘Jesus Christ, King of the vnfevy Universe bey Sate Woe Our Lord Jesus Christ, King of the Universe The 1’ word!</p>
+<p>We know this story well. The most important letter in “ifis&quot;. Jesus identifies himself with the people he is talking about.</p>
+<p>He doesnt say people were in prison and you visited them, or sick or naked.</p>
+<p>He says who am in prison, sick or naked.</p>
+<p>Its even more than being a brother or sister of Jesus.</p>
+<p>He identifies with each of us especially in need.</p>
+<p>Created as we are in the image of God, Jesus sees right through us to see God.</p>
+<p>God is the divine fe of God in each person. ‘That makes the difference.</p>
+<p>We don&#x27;t help the needy person only because he or she is needy, but because each is in the image of God and Jesus sees him or her and says thats me’ This can be a programme for ite.</p>
+<p>For the young - can you make a decision for your life that includes deep care from your love of those in need?</p>
+<p>For those in their busy lives already and who have chosen their way - how can you show deep care for those in need.</p>
+<p>For the elderly - can you pray for those in need each day and ‘encourage those more active to care for them?</p>
+<p>Did you feed the hungry, give drink to the thirsty, welcome the stranger, care for the sick and visit the prisoner?</p>
+<p>Lord Jesus, may your kingdom come - The reign of equality, justice, peace and love.</p>
+<p>Donal Neary SJ Remembrance Mass The Remembrance Mass for all who died in our parishes in the past twelve months takes place in Tramore on</p>
+<p>Thursday 26 Nov at 7.30pm This Mass allows anyone who has lost a loved one, either recently or over the years, to come and remember them and to light a candle for them in front of the altar in this the month of the Holy Souls. (Candles will be provided) If you would like anyone who passed away in the last 12 months remembered, please give the name in to the parish office <a href="tel:+35351386477" style="color:#1d4ed8;font-weight:600;">051-386477</a> . Holy Cross Church Christmas Tree of Remembrance Again, this year we are decorating our Christmas tree in the church with siver Christmas decoration cards If you would lke a loved one remembered, the name will be added to the card and it will be placed on the tree in their memory.</p>
+<p>Please drop in to the Parish office and we wil be happy to assist you Donation for each remembrance card, in aid of Church Restoration Fund.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>

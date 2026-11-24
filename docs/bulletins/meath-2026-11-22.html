@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Meath Diocese Bulletin Viewer — 22/11/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="../mega_pdf/meath_mega_bulletin_p1.jpg?d=2026-11-22&amp;h=20261124T0108" as="image">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #f4f6f6;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a6b6b;
+    }
+
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
+    .section-heading {
+      margin: 34px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .viewer-block {
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .ocr-open-text {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      margin-left: 8px;
+      padding: 8px 14px;
+      background: #14524f;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .ocr-open-text:hover { background: #0e3b39; color: #fff; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
+
+    .pdf-frame-wrap {
+      position: relative;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      max-width: 100%;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px !important;
+      min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+
+
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .search-clear {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 4px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
+    .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
+    .diocese-intro {
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }
+    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
+    .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
+    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
+    .diocese-intro h3 {
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: #14524f;
+    }
+    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
+    .diocese-intro .intro-names {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+    .diocese-intro .intro-names li { margin: 0 0 4px; }
+    
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .ocr-zoom-bar button {
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
+    }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
+    .ocr-zoom-pct {
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    
+    #ocr-panel {
+      background: #f3f5f4;
+      color: #141918;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.7;
+      max-width: min(68ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h2.b-title, #ocr-panel .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    #ocr-panel h3.b-head, #ocr-panel .b-head {
+      font-size: 1.2em;
+      color: #0a3333;
+      margin: 1.5em 0 0.5em;
+      padding: 0.35em 0.55em 0.35em 0.65em;
+      border-left: 4px solid #1a6b6b;
+      border-bottom: 1px solid #cfd8d4;
+      background: #e7ecea;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+      letter-spacing: 0.01em;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.08em;
+      color: #145a3d;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.2em 0 0.4em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.95em;
+    }
+    #ocr-panel h3.ocr-page-heading,
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    #ocr-panel hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    #ocr-panel strong { color: #0f2b5b; }
+    #ocr-panel a {
+      color: #1554b0;
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-thickness: 0.1em;
+      text-underline-offset: 0.16em;
+      overflow-wrap: anywhere;
+    }
+    #ocr-panel a:visited { color: #6535a5; }
+    #ocr-panel a:hover, #ocr-panel a:focus-visible {
+      color: #103b80;
+      text-decoration-thickness: 0.15em;
+    }
+    #ocr-panel a:focus-visible {
+      outline: 2px solid #103b80;
+      outline-offset: 2px;
+    }
+    #ocr-panel mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    #ocr-panel mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+      max-width: 100%;
+      height: auto;
+    }
+    #ocr-panel > :first-child {
+      margin-top: 0;
+    }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      border: 1px solid #d4ddd9;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .note-box {
+      margin-top: 12px;
+      color: #8a3b3b;
+      font-weight: 400;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 4px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .empty-state[hidden],
+    #parish-empty[hidden] { display: none !important; }
+    .parish-section {
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
+    }
+    .parish-section h2.section-heading {
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+    .parish-filter {
+      width: 100%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
+    }
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: #1a6b6b;
+      font-weight: 700;
+    }
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
+    }
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
+    footer {
+      margin-top: 40px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
+      }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
+      /* Tap targets big enough for a thumb. */
+      .az-letter,
+      .ocr-zoom-bar button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
+      .download-link-top { display: none; }
+      .ocr-open-text { margin-left: 0; width: 100%; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
+      #ocr-panel {
+        padding: 16px 14px 28px;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      .ocr-search-tools button {
+        min-height: 44px;
+        width: 100%;
+      }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="/assets/pdf-inpage-viewer.js?v=20261018a" defer></script>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html" target="_blank" rel="noopener noreferrer">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">MEATH</p>
+      <h1>Meath Collated Bulletin</h1>
+      
+      <p class="meta">Generated for 22/11/2026.</p>
+      <a class="download-link-top pdf-force-download" href="../mega_pdf/meath_mega_bulletin.pdf?d=2026-11-22&amp;h=20261124T0108" download="meath_mega_bulletin.pdf">Download PDF</a>
+    </header>
+    
+
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+    </div>
+
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ardcath|Ashbourne-Donaghmore|Athboy" title="Ardcath, Ashbourne-Donaghmore, Athboy" aria-label="Jump to Ardcath">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballinabrackey|Ballivor|Ballymore|Ballynacargy|Beauparc|Bohermeen" title="Ballinabrackey, Ballivor, Ballymore, Ballynacargy, Beauparc, Bohermeen" aria-label="Jump to Ballinabrackey">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Carnaross|Castlepollard|Castletown-Geoghegan|Castletown-Kilpatrick|Clara|Clonmellon|Collinstown|Coole|Curraha" title="Carnaross, Castlepollard, Castletown-Geoghegan, Castletown-Kilpatrick, Clara, Clonmellon, Collinstown, Coole, Curraha" aria-label="Jump to Carnaross">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Dangan|Delvin|Donore|Drogheda (Holy Family)|Drogheda (St Mary&#x27;s)|Drumconrath|Drumraney|Duleek|Dunboyne &amp; Kilbride|Dunderry|Dunshaughlin &amp; Culmullen|Dysart" title="Dangan, Delvin, Donore, Drogheda (Holy Family), Drogheda (St Mary&#x27;s), Drumconrath, Drumraney, Duleek, Dunboyne &amp; Kilbride, Dunderry, Dunshaughlin &amp; Culmullen, Dysart" aria-label="Jump to Dangan">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Eglish" title="Eglish" aria-label="Jump to Eglish">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Johnstown" title="Johnstown" aria-label="Jump to Johnstown">J</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kells|Kilbeg|Kilbeggan|Kilcloon|Kilcormac|Killina|Killucan-Raharney|Kilmessan-Dunsany|Kilskyre|Kingscourt-Corlea-Muff|Kinnegad-Clonard-Coralstown" title="Kells, Kilbeg, Kilbeggan, Kilcloon, Kilcormac, Killina, Killucan-Raharney, Kilmessan-Dunsany, Kilskyre, Kingscourt-Corlea-Muff, Kinnegad-Clonard-Coralstown" aria-label="Jump to Kells">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Laytown|Lobinstown|Longwood" title="Laytown, Lobinstown, Longwood" aria-label="Jump to Laytown">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Milltown|Mountnugent|Moynalty|Moynalvey|Mullingar (Cathedral of Christ the King)|Multyfarnham" title="Milltown, Mountnugent, Moynalty, Moynalvey, Mullingar (Cathedral of Christ the King), Multyfarnham" aria-label="Jump to Milltown">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Navan (St Mary&#x27;s)|Nobber" title="Navan (St Mary&#x27;s), Nobber" aria-label="Jump to Navan (St Mary&#x27;s)">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Oldcastle|Oristown" title="Oldcastle, Oristown" aria-label="Jump to Oldcastle">O</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Rathkenny|Rathmolyon|Ratoath|Rochfortbridge" title="Rathkenny, Rathmolyon, Ratoath, Rochfortbridge" aria-label="Jump to Rathkenny">R</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Skryne|Slane|Stamullen" title="Skryne, Slane, Stamullen" aria-label="Jump to Skryne">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Taghmon|Trim &amp; Boardsmill|Tubber - Rosemount|Tullamore - Durrow" title="Taghmon, Trim &amp; Boardsmill, Tubber - Rosemount, Tullamore - Durrow" aria-label="Jump to Taghmon">T</button></nav>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe data-pdf-url="../mega_pdf/meath_mega_bulletin.pdf?d=2026-11-22&amp;h=20261124T0108" title="Meath Diocese bulletin PDF"></iframe>
+        
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../mega_pdf/meath_mega_bulletin.pdf?d=2026-11-22&amp;h=20261124T0108" data-pdf-preview="../mega_pdf/meath_mega_bulletin_p1.jpg?d=2026-11-22&amp;h=20261124T0108">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a class="pdf-open-newtab" href="../mega_pdf/meath_mega_bulletin.pdf?d=2026-11-22&amp;h=20261124T0108" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="../mega_pdf/meath_mega_bulletin.pdf?d=2026-11-22&amp;h=20261124T0108" download="meath_mega_bulletin.pdf">Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="../mega_pdf/meath_mega_bulletin_p1.jpg?d=2026-11-22&amp;h=20261124T0108" alt="" style="display:block;width:100%;height:auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="ocr-sticky-chrome">
+      <div class="ocr-search-bar">
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+        </div>
+      </div>
+      </div>
+      <div class="ocr-controls-row">
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ardcath|Ashbourne-Donaghmore|Athboy" title="Ardcath, Ashbourne-Donaghmore, Athboy" aria-label="Jump to Ardcath">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballinabrackey|Ballivor|Ballymore|Ballynacargy|Beauparc|Bohermeen" title="Ballinabrackey, Ballivor, Ballymore, Ballynacargy, Beauparc, Bohermeen" aria-label="Jump to Ballinabrackey">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Carnaross|Castlepollard|Castletown-Geoghegan|Castletown-Kilpatrick|Clara|Clonmellon|Collinstown|Coole|Curraha" title="Carnaross, Castlepollard, Castletown-Geoghegan, Castletown-Kilpatrick, Clara, Clonmellon, Collinstown, Coole, Curraha" aria-label="Jump to Carnaross">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Dangan|Delvin|Donore|Drogheda (Holy Family)|Drogheda (St Mary&#x27;s)|Drumconrath|Drumraney|Duleek|Dunboyne &amp; Kilbride|Dunderry|Dunshaughlin &amp; Culmullen|Dysart" title="Dangan, Delvin, Donore, Drogheda (Holy Family), Drogheda (St Mary&#x27;s), Drumconrath, Drumraney, Duleek, Dunboyne &amp; Kilbride, Dunderry, Dunshaughlin &amp; Culmullen, Dysart" aria-label="Jump to Dangan">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Eglish" title="Eglish" aria-label="Jump to Eglish">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Johnstown" title="Johnstown" aria-label="Jump to Johnstown">J</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kells|Kilbeg|Kilbeggan|Kilcloon|Kilcormac|Killina|Killucan-Raharney|Kilmessan-Dunsany|Kilskyre|Kingscourt-Corlea-Muff|Kinnegad-Clonard-Coralstown" title="Kells, Kilbeg, Kilbeggan, Kilcloon, Kilcormac, Killina, Killucan-Raharney, Kilmessan-Dunsany, Kilskyre, Kingscourt-Corlea-Muff, Kinnegad-Clonard-Coralstown" aria-label="Jump to Kells">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Laytown|Lobinstown|Longwood" title="Laytown, Lobinstown, Longwood" aria-label="Jump to Laytown">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Milltown|Mountnugent|Moynalty|Moynalvey|Mullingar (Cathedral of Christ the King)|Multyfarnham" title="Milltown, Mountnugent, Moynalty, Moynalvey, Mullingar (Cathedral of Christ the King), Multyfarnham" aria-label="Jump to Milltown">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Navan (St Mary&#x27;s)|Nobber" title="Navan (St Mary&#x27;s), Nobber" aria-label="Jump to Navan (St Mary&#x27;s)">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Oldcastle|Oristown" title="Oldcastle, Oristown" aria-label="Jump to Oldcastle">O</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Rathkenny|Rathmolyon|Ratoath|Rochfortbridge" title="Rathkenny, Rathmolyon, Ratoath, Rochfortbridge" aria-label="Jump to Rathkenny">R</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Skryne|Slane|Stamullen" title="Skryne, Slane, Stamullen" aria-label="Jump to Skryne">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Taghmon|Trim &amp; Boardsmill|Tubber - Rosemount|Tullamore - Durrow" title="Taghmon, Trim &amp; Boardsmill, Tubber - Rosemount, Tullamore - Durrow" aria-label="Jump to Taghmon">T</button></nav>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+        <a class="ocr-open-text" href="meath-2026-11-22-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-athboy" data-parish-name="Athboy"><h2 class="ocr-parish-name">Athboy</h2><p class="ocr-parish-date">22/11/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>OUR LORD JESUS CHRIST, KING OF THE UNIVERSE</p>
+<p>Sunday 22nd November 2026 An Evening of Seasonal Music in Athboy Church, at 7.30pm</p>
+<p>Friday 11th December, featuring Credo, O&#x27;Growney NS Choir &amp; Trim Brass Band.</p>
+<p>Tickets €10 on sale after Masses next weekend and also available in the Darnley Lodge.</p>
+<p>Promises to be a great night. Tax Reclaim Forms: are being given to parishioners who contributed €250 or more to parish funds during 2025, via standing order, weekly envelope or annual contribution.</p>
+<p>Athboy Parish is a registered charity and can apply to the Revenue Commissioner for a rebate on contributions from parishioners who pay income tax.</p>
+<p>If you receive a form and are eligible, we would be grateful if you could sign and return it to the Parochial House.</p>
+<p>Please note, there is no cost involved. Thank you for your ongoing generosity. 40 Hours Eucharistic Adoration: in the Cathedral of Christ the King, Mullingar, concluding today, 22nd November, at 4 pm with sung Vespers and Benediction.</p>
+<p>Bishop Fintan Monahan of Killaloe will preach the homily.</p>
+<p>Christ the King: “At the end of our earthly life we will be judged on how we have lived and acted.</p>
+<p>At the end of time the Kingdom of God will be established through the saving work of Christ. Then the Shepherd King will come to judge how we have loved.</p>
+<p>Our lives are to be characterised by a love that welcomes Christ in those most in need, and by joyful expectation of his glorious coming.” - Liturgical Calendar The Season of Advent begins next weekend.</p>
+<p>Christmas Triduum Mass cards available from sacristy after Mass or from Parochial House.</p>
+<p>Parish Cemeteries: the Parish Finance Committee has introduced an internment ( re- opening) fee, similar to other parishes, for burials in Athboy &amp; Rathmore cemeteries.</p>
+<p>Santa will arrive in the Darnley Hotel next</p>
+<p>Sunday 29th Nov at 1:30pm until 4pm. Presents for children €10 each and €5 for babies.</p>
+<p>Athboy Twinning Association: Christmas Craft Fair in the Darnley Lodge Hotel, 6:30pm - 9pm on</p>
+<p>Thursday 3rd December. Everyone welcome.</p>
+<p>Free entry. Mulled wine and mince pies served.</p>
+<p>ATHBOY PARISH Pastoral Area includes Ballivor, Clonmellon, Delvin &amp; Kildalkey Athboy Parochial House</p>
+<h4 class="b-sub">Tel</h4>
+<p><a href="tel:+353469432184" style="color:#1d4ed8;font-weight:600;">046 9432184</a></p>
+<p>Website: <a href="https://www.athboyparish.ie" target="_blank" rel="noopener noreferrer">www.athboyparish.ie</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:athboyensis@gmail.com" target="_blank" rel="noopener noreferrer">athboyensis@gmail.com</a></p>
+<h3 class="b-head">Parish Office</h3>
+<p>hours: Thursday &amp; Friday 9am-1pm &amp; 2-4pm.</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>this week: Sunday: 9am Rathmore 10.15am Rathcairn 11.30am Athboy Monday 8am Wed, Thursday &amp;</p>
+<p>Friday 9.30am Saturday 10am, Vigil 6.15pm Confessions:</p>
+<p>Saturday 5.45pm MASS INTENTIONS this week: Saturday Vigil 6.15pm: Tom(MM) &amp; Marilyn Smith Dan &amp; Patricia O’Shea Christopher &amp; Catherine Ennis Sunday 9am: Ellen, Edward &amp; Tony Wallace 10.15am Seamus &amp; Delia Uí Ghríofa Michelín Chonraí MM 11.30am : Mary &amp; Patrick O’Neill, son Martin Paddy, John &amp; Annie Halton Annie &amp; John Conroy Next Saturday Vigil 6.15pm: Bríd Fox MM Johnny Carey Bartley &amp; Maureen Folan Next Sunday 9am: Kathleen Wallace 11.30am : Sarah Howell, née Lodge Denis MacCann Ellen Murphy &amp; daughter Geraldine Baby Christopher McDonagh Baptisms:</p>
+<p>contact Parish Office Offertory Collection</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-ballinabrackey" data-parish-name="Ballinabrackey"><h2 class="ocr-parish-name">Ballinabrackey</h2></header>
+<p class="page-label">Page 2</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-ballivor" data-parish-name="Ballivor"><h2 class="ocr-parish-name">Ballivor</h2></header>
+<p class="page-label">Page 4</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-ballymore" data-parish-name="Ballymore"><h2 class="ocr-parish-name">Ballymore</h2></header>
+<p class="page-label">Page 6</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-ballynacargy" data-parish-name="Ballynacargy"><h2 class="ocr-parish-name">Ballynacargy</h2></header>
+<p class="page-label">Page 8</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-beauparc" data-parish-name="Beauparc"><h2 class="ocr-parish-name">Beauparc</h2></header>
+<p class="page-label">Page 10</p>
+<p>BEAUPARC &amp; KENTSTOWN PARISH 22 November 2026 – CHRIST THE KING - YEAR A St Patrick’s Pastoral Area comprising of the Parishes of Beauparc, Duleek, Rathk enny &amp; Slane FR DAVID BRENNAN , 041 982 52 76 <a href="mailto:bkyfparish@gmail.com" target="_blank" rel="noopener noreferrer">bkyfparish@gmail.com</a> 087 997 32 64</p>
+<p>FR PETER FARRELLY , 046 902 41 14</p>
+<p>KENTSTOWN C HURCH OF THE ASSUMPTION Eircode C15 ED21 Web Cam: <a href="https://mcn.live/Camera/churchof-the-assumption-kentstown" target="_blank" rel="noopener noreferrer">https://mcn.live/Camera/churchof-the-assumption-kentstown</a> SATURDAY NO VIGIL MASS IN KENTSTOWN IN NOVEMBER</p>
+<p>SUNDAY 9:00am – CONFIRMATION PROGRAM MASS Anthony, Nancy &amp; Francis Mullen - Mark Gargan Tuesday &amp; Wednesday at 10am SATURDAY NO VIGIL MASS IN KENTSTOWN IN NOVEMBER<br>
+SUNDAY 9:00am – MASS FOR DECEASED BENEFACTORS Margaret Bruton BEAUPARC C HURCH OF THE ASSUMPTION Eircode C15 YX22 Web Cam: <a href="https://www.mcn.live/Camera/churchof-the-assumption" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/churchof-the-assumption</a></p>
+<p>SATURDAY 6:00pm – CONFIRMATION PROGRAM MASS Patsy Daly, 1st Anv – Eamonn Kennedy, 1st Anv Margaret Mullen – Anne &amp; Richie Kearns</p>
+<p>SUNDAY 11:00am – Maisie Smith &amp; Rose Brennan - Richard &amp; Maureen Crinion &amp; Family Monday 9am &amp; Thursday at 7pm (REMEMBRANCE MASS) &amp; Friday at 10am</p>
+<p>SATURDAY 6:00pm – Kathleen Byrne, 1st Anniv. Weldon</p>
+<p>SUNDAY 11:00am – John Joe Curran – Hugh, Molly, Tony &amp; Teresa Neary</p>
+<h3 class="b-head">AR DHEIS DÉ GO RAIBH A ANAM</h3>
+<p>CAROLAN , Carnaross, (brother of Anne &amp; Eileen Carney) Our ANNUAL REMEMBRANCE MASS will take place at 7pm this</p>
+<p>THURSDAY 26 NOVEMBER IN BEAUPARC CHURCH . During this Mass we will remember the parishioners whose funeral Mass took place i n Beauparc &amp; Kentstown parish during the past year – Kathleen Byrne, Kathleen Bennett, Mary Keating, Carol Dixon, Tony Pain, Frances McKeever, Phil Smyth, Declan Wall, Bernie Crosse, Mary McDonnell, Kathleen Collier, Mary McGrath, Paddy Owens, Eamonn O’ Brien, Padraic Gilligan, Mary McCarthy, John Munnelly, Dolores Farr ell.</p>
+<p>The Mass will be followed by a cuppa &amp; refreshments in the hall.</p>
+<p>THANK YOU TO OUR DECEASED BENEFACTORS who have been kind enough to remember our parish in their wills.</p>
+<p>PRAYER TO THE HOLY SPIRIT of God, grant me: the gift of WISDOM to see the world through your eyes, the gift of COUNSEL to make difficult decisions, the gifts of KNOWLEDGE and UNDERSTANDING to use my mind to know you and to love you, the gift of FORTITUDE to have the courage to live in the faith despite the difficulties and disappointments, the gift of PIETY to be able to express my special love and commitment to you, and the right kind of AWESOME FEAR that makes me pause to wonder and revere God’s love.</p>
+<p>Amen. SAINT JOSEPH&#x27;S YOUNG PRIEST SOCIETY EUCHARISTIC ADORATION FOR VOCATIONS TO THE PRIESTHOOD in Kentstown church this</p>
+<p>Sun 22 Nov from 3pm to 4pm . If you’ d like to become a member of Saint Joseph&#x27;s Young Priest Society call Marie on 041 98 25 153</p>
+<p>Join our PARISH WALK2W IN CHALLENGE . Each day we’ll randomly pick a distance between 1km &amp; 5km which you must Walk (Jog or Run) in a single session before midnight of the following day.</p>
+<p>The distance to be completed each day will be posted on our Facebook page.</p>
+<p>If you are interested in entering the 50/50 version of this challenge for the month of December starting on</p>
+<p>Tues 1 Dec with a chance to win up to €250 contact Fr David for the terms &amp; conditions.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-bohermeen" data-parish-name="Bohermeen"><h2 class="ocr-parish-name">Bohermeen</h2></header>
+<p class="page-label">Page 11</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 12</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-carnaross" data-parish-name="Carnaross"><h2 class="ocr-parish-name">Carnaross</h2></header>
+<p class="page-label">Page 13</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 14</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-castlepollard" data-parish-name="Castlepollard"><h2 class="ocr-parish-name">Castlepollard</h2></header>
+<p class="page-label">Page 15</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 16</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-castletown-geoghegan" data-parish-name="Castletown-Geoghegan"><h2 class="ocr-parish-name">Castletown-Geoghegan</h2></header>
+<p class="page-label">Page 17</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 18</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-castletown-kilpatrick" data-parish-name="Castletown-Kilpatrick"><h2 class="ocr-parish-name">Castletown-Kilpatrick</h2></header>
+<p class="page-label">Page 19</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 20</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-clara" data-parish-name="Clara"><h2 class="ocr-parish-name">Clara</h2></header>
+<p class="page-label">Page 21</p>
+<p>Confession available on Saturday mornings after Mass or any time on request.</p>
+<h3 class="b-head">Mass times for the week</h3>
+<p>ahead</p>
+<h3 class="b-head">MASS INTENTIONS</h3>
+<p>Saturday 21st November @7.00pm Clara Anthony Kinahan &amp; deceased of Kinahan &amp; Delaney families. Liam McCaffrey. Johnny Carroll.</p>
+<p>Sunday 22nd November @10.00am Horseleap Bernadette &amp; deceased of Digan family.</p>
+<p>Sunday 22nd November @11.30am Clara Joe Rabbette.</p>
+<p>Tuesday 24th November @7.30pm Clara St. Andrew Dung-Lac &amp; Vietnamese Martyrs No Intention.</p>
+<p>Wednesday 25th November @7.30pm Clara St. Colman. St. Clement I Genevive Rabbette. Jo, Ann &amp; deceased of Feery family.</p>
+<p>Thursday 26th November @10.00am Clara May Geoghegan.</p>
+<p>Friday 27th November @10.00am Clara St. Fergal of Salzburg No Intention.</p>
+<p>Saturday 28th November @10.00am Clara No Intention.</p>
+<p>Saturday 28th November @7.00pm Clara John Sammon (Month’s Mind).</p>
+<p>George Meares (Month’s Mind). Seamus Melia (Month’s Mind).</p>
+<p>Peter &amp; Mary Jane Flanagan. Anne Dunne. Brendan &amp; Baby Bernadette Egan.</p>
+<p>Sunday 29th November @10.00am Horseleap John &amp; May Petite. Patrick Gleeson. Joe &amp; Sheila Mather.</p>
+<p>Sunday 29th November @11.30am Clara Gerard Tracey.</p>
+<p>John Mulholland. Michael O’Brien &amp; deceased of Minnock &amp; O’Brien families.</p>
+<p>Eileen &amp; PJ Fleming. Deceased of Dempsey family.</p>
+<hr>
+<p class="page-label">Page 22</p>
+<p>Adoration of the Blessed Eucharist CLARA: Monday &amp; Friday – 5.00pm-6.00pm CLARA: Tuesday– 8.00pm-9.00pm CLARA : Wednesday – after 7.30pm Mass to 9.00pm HORSELEAP: Tuesday– 7.00pm-8.00pm All are welcome!</p>
+<p>Come and  nd peace in the Lord. Also on the First Saturday of every month- First Sa turday Devotions with the Devine Mercy Chaplet, Rosary &amp; Quite Meditation be fore the Blessed Sacrament.</p>
+<p>Join us for even a brief period of time.</p>
+<p>For all our Beloved Dead; We commend them to the Love and Mercy of God, Our Father.</p>
+<p>We pray for those who mourn the death of a loved one.</p>
+<p>Lord of a ll gentleness, surround us with your care and comfort us in our sorrow.</p>
+<p>It is our certain faith that your Son Jesus Christ, who died on the cross was raised from the dead.</p>
+<p>Grant through this mystery, that all who have gone to the ir eternal rest in Christ may now share in the joy of His Resurrection.</p>
+<p>We ask this through Christ Our Lord. Amen.</p>
+<p>Honouring Christ, as King of the Universe On the Solemnity of Christ the King, Jesus describes the final judgment as a judgment of love.</p>
+<p>The nati ons are separated according to concrete acts of mercy: feeding the hu ngry, welcoming the stranger, clothing the naked, visi ting the sick and imprisoned.</p>
+<p>The astonishing truth is that Christ id entifies Himself with the least. What is done to them is done to Him.</p>
+<p>Love is not proven mainly by words or feelings, but by deeds.</p>
+<p>In the evening of life, we will be judged on love charity reveals whether we recognized the King hidden in the poor.</p>
+<p>This Gospel asks us to meet Christ where He has chosen to be found.</p>
+<p>Today, choose one work of mercy, however small.</p>
+<p>The King of the universe comes disguised in need.</p>
+<p>To serve the least is not optional kindness; it is reverence toward Christ Himself.</p>
+<p>Le t this reflection become concrete today.</p>
+<p>Choose one small act of faith, conversion, or charity that corresponds to the Gospe l.</p>
+<p>The Lord does not ask for vague admiration, but f or a heart that receives His word and lets it take flesh in ordinary decisio ns.</p>
+<p>We can begin simply: a prayer made with attenti on, a truth accepted without excuse, a person treated with mercy, or a duty carried out with love.</p>
+<p>Grace becomes fruitful when it is welcomed in the present moment.</p>
+<p>If the step seems small, it is still precious when offered to God, because daily fidelity is where the Gospel becomes a real path of holiness.</p>
+<p>The important thing is to re spond today, with humility and trust, while grace is being offered.</p>
+<p>Collections 14th/15th November- Development Fund: €1,190 ; Plate: €1,045 ; October Offerings: €55 . Thank You Very Much!</p>
+<p>For less than the cost of a cup of coffee, you cans upport our parish with a quick and simple donation, by simply clicking the button below:</p>
+<hr>
+<p class="page-label">Page 23</p>
+<p>HSE Midlands Resource office for Suicide Prevention present a session exploring grief following a bere avement by suicide and the supports available to all those who have been a ffected on</p>
+<p>Tuesday 24th November. Online talk 6.30pm-link available on Clara FRC Facebook.</p>
+<p>Young people aged 16 years and over a re welcome to attend when accompanied by a parent o r guardian.</p>
+<p>Calling all young people aged 16–35! Join us at the Youth 2000 Christmas Retreat in Newbridge College.</p>
+<p>This is a donation-only event, with free buses available across the country . Expect inspiring talks and workshops, Mass, music, prayer, and plenty of opportunities to chill out and me et other young Catholics.</p>
+<p>Whether you are new to the faith or looking to be refreshed, all are welcome.</p>
+<p>To register or find out more, visit youth2000.ie or follow @Youth2000Ireland . Athlone Samaritans Christmas Concert : The 36th Annual Samaritan Christmas Concert takes place on</p>
+<p>Thursday 10th December in the Church of Ss Peter and Paul, Athlone at 8.00pm. It features the Army Band of 2 Brigade, Baritone Karl McGuckin, Athlone Pipe Band and Colaiste Chiárain Senior Choi r.</p>
+<p>Tickets €20 Cunninghams’ Pharmacies, Printing.com , St Mary’s Square and Whyte’s Pharmacy.</p>
+<p>The Samaritans are available 24hrs on free call 116 123 for anyone who is lonely, troubled or just needs to talk to someone in confidence.</p>
+<p>Young Adults Retreat Dalgan Park, Navan 4th – 6th December (Friday evening – Sunday afternoon) . Inspiring talks, Holy Mass, Confessions, lovely walks, Eucharistic Adoration.</p>
+<p>Cos t: Donation (full board, own room) Contact: Sr Una (090) 648 1666 or Michael: (086) 245 3123</p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:youthretreats@gmail.com" target="_blank" rel="noopener noreferrer">youthretreats@gmail.com</a> Image by falco from Pixabay ++++ Views: 74</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-clonmellon" data-parish-name="Clonmellon"><h2 class="ocr-parish-name">Clonmellon</h2></header>
+<p class="page-label">Page 24</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 25</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-collinstown" data-parish-name="Collinstown"><h2 class="ocr-parish-name">Collinstown</h2></header>
+<p class="page-label">Page 26</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 27</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-coole" data-parish-name="Coole"><h2 class="ocr-parish-name">Coole</h2></header>
+<p class="page-label">Page 28</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 29</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-curraha" data-parish-name="Curraha"><h2 class="ocr-parish-name">Curraha</h2><p class="ocr-parish-date">22/11/2026</p></header>
+<p class="page-label">Page 30</p>
+<p>WEEKEND MASSES P ARISH OFFICE ARDCATH : 6:30PM (SAT VIGIL) T UES &amp; FRI: 1.00 PM – 3.00 PM CLONALVY : 10.00AM (SUNDAY ) T ELEPHONE : (01) 835 0136</p>
+<p>CURRAHA : 11:30AM (SUNDAY ) MAIL : ACCPARISH @GMAIL . COM CURATE : FR. STEVE CIUBOTARU</p>
+<h4 class="b-sub">WEB</h4>
+<p>CURRAHAPARISH . <a href="mailto:FRSTEVECC@gmail.com" target="_blank" rel="noopener noreferrer">FRSTEVECC@gmail.com</a> <a href="tel:+353873379031" style="color:#1d4ed8;font-weight:600;">0873379031</a></p>
+<h4 class="b-sub">WEB</h4>
+<p>ARDCATH-CLONALVYPARISH . PARISHES OF ST MARY’S ARDCATH , ST JOHN THE BAPTIST CLONALVY , ST ANDREW’S CURRAHA PASTORAL AREA OF ASHBOURNE , ARDCATH /CLONALVY , CURRAGHA , DUNSHAUGHLIN , RATOATH AND SKRYNE Parish Newsletter Our Lord Jesus Christ 22ND NOVEMBER 2026</p>
+<p>Sunday 29th Nov M INISTERS OF THE EUCHARIST M INISTERS OF THE WORD Ardcath 6.30pm Mary Moore Trisha Fox Clonalvy 10.00am Tom Bowler Catherine Campbell Curraha 11.30am Joan Phelan Frances Gargan</p>
+<p>SUNDAY 22ND NOVEMBER OUR LORD JESUS CHRIST THE KING Vigil Ardcath 6.30pm A. V. Pat Connolly Rem partner Maria A. V. John, Hilda &amp; Michael Adams A. V. Charlie &amp; Peggy Moore A. V. Peter &amp; Rose Walsh Sunday Clonalvy 10.00am A. V. Fintan White A. V. John &amp; Patricia Ward A. V. Billly, Ita, Brendan &amp; Johnny Byrne Sunday Curraha 11.30am A. V. Elaine Caffrey A. V. Frank Whyte</p>
+<p>Mon 23rd Curraha 7.30pm Martin Rothwell</p>
+<p>Tues 24th Clonalvy 9.30am Peggy O’Brien Thur 26th Curraha 9.30am Special Intention</p>
+<p>Fri 27th Ardcath 9.30am Michael Tobin, Jim Chawke</p>
+<p>SUNDAY 29TH NOVEMBER FIRST SUNDAY OF ADVENT Vigil Ardcath 6.30pm Sunday Clonalvy 10.00am A. V. John &amp; Mary-Ann Collins Sunday Curraha 11.30am A. V. Peter O’Hanrahan Rem sister Sheila PARISH COLLECTIONS 26th &amp; 27th September 2026 Ardcath Clonalvy Curraha THANK YOU Offertory € 378.20 €176.25 € 401.37 FOR YOUR GENEROUS SUPPORT Envelopes € 70.00 € 20.00 € 90.00 OF THE WORK AND UPKEEP Offerings € 10.00 € 10.00 €120 .00 OF OUR PARISH ENROLMENT 2026/2027: is now enrolling for 2026/2027. Applications are a vailable at <a href="https://www.standrewscurragha.com" target="_blank" rel="noopener noreferrer">www.standrewscurragha.com</a> . For enquiries, email <a href="mailto:office@standrewscurragha.com" target="_blank" rel="noopener noreferrer">office@standrewscurragha.com</a> . Join a welcoming school community where children thrive.</p>
+<p>Early applications are strongly encouraged.</p>
+<p>CURRAHA GAA CHRISTMAS RAFFLE APPEAL: Transition Year students are organising a Christmas raffle to support Curraha GAA and seek prize donati ons from local businesses.</p>
+<p>Following major improvem ents at Joe McDermott Park, fundraising remains vital.</p>
+<p>Vouc hers, products or services are welcome.</p>
+<p>The raffle draw takes place with the final club lotto in December 2026.</p>
+<p>Contact Trish Sweeney: <a href="tel:+353879027405" style="color:#1d4ed8;font-weight:600;">087 902 7405</a> . WELCOME TO OUR PARISH! You have arrived in a rural Catholic community living the Gospel through Eucharist, prayer, and charity.</p>
+<p>Root ed in faith and Irish heritage. Journeying together in Christ: spreading faith, nurturing comm union, sharing God’s blessings.</p>
+<p>May you feel as good as possible among us and benefit from this experience!</p>
+<p>WHY DO</p>
+<h3 class="b-head">WE PRAY FOR THE DEAD</h3>
+<p>? Because prayer unites the Church on earth with the Church in heaven.</p>
+<p>Death does not break the bonds of faith and love.</p>
+<p>By praying for the faithful departed, we share in Christ’s mercy, express Christian hope in the Resurrec tion, and accompany our loved ones with spiritual support toward the fullness of eternal life.</p>
+<p>JESUS STORY: My children, I am Jesus, your King.</p>
+<p>I rule with love, mercy, and truth. Open your hearts to Me and follow My way each day.</p>
+<p>When you serve others, you serve Me. Remain faithful in little things, and I will bless you with greater ones.</p>
+<p>Live in My love, and My Kingdom will be yours forever. 40 HOURS EUCHARISTIC ADORATION: Join the Forty Hours Eucharistic Adoration in the Cathedral of Christ the King, Mullingar, from 20-22 November, concluding on the Feast of Christ the King.</p>
+<p>Confessions will be available on Saturday.</p>
+<p>Each parish is invited to spend an hour before the Blessed Sacrament.</p>
+<p>Our allocated hour is Saturday 3pm . HABITS OF THE HEART: The habit of Jesus&#x27; heart was love in action.</p>
+<p>He pr ayed before He served, listened before He spoke, and forgave before He was asked.</p>
+<p>He welcomed the forgotten, healed the broken, and fed the hungry.</p>
+<p>His heart never hid mercy. When we choose kindness, forgive, and serve quietly, we carry His heart into the world.</p>
+<p>CHRIST THE KING IS NEAR, NOT DISTANT: In our Saint Carlo Acutis teaches that Christ is close, encountered especially in the Eucharist and the poor.</p>
+<p>Saint Teresa of Calcutta encouraged daily adoration to recognize Him in those in need.</p>
+<p>Saint John Vianney captured this closeness: “I look at Jesus and Jesus looks at me.” His kingship reigns through presence, silence, and love.</p>
+<p>ABC OF FAITH: Compassion means showing kindness, mercy, and care to others.</p>
+<p>Jesus the King ruled with a heart full of compassion, reaching out to those who were hurting, lonely, or in need.</p>
+<p>A compassionate heart helps, forgives, and loves generously.</p>
+<p>Through comp assion, we reflect Christ’s love and bring hope and comfort to the world.</p>
+<p>ADVENT invites us to prepare our hearts for Jesus Christ the King through prayer, worship, and reflection on His coming.</p>
+<p>Join the candlelit Rorate Mass every Monday at 7:30pm in St Andrew’s.</p>
+<p>Confession follows Mass on Monday, Tuesday, and Friday.</p>
+<p>Let Advent deepen your faith, renew your hope, and draw you closer to Christ. PARADOX OF CHOICE: Having too many options can make decisions difficu lt and leave us feeling uncertain.</p>
+<p>Jesus the King teaches us to foc us on what truly matters: loving God and serving others.</p>
+<p>A faithful heart does not chase every possi bility but wisely chooses the good.</p>
+<p>Trusting Christ brings clarity, peace, and purpose amid many choices.</p>
+<p>WEEK OF WITNESS FOR PERSECUTED CHRISTIANS: Millions of Christians worldwide face discrimination and persecution for their faith.</p>
+<p>During the Week of Witness (15-22 November), we are in vited to stand in solidarity through prayer and awareness.</p>
+<p>Please rem ember the suffering Church in your prayers, especia lly on Red Wednesday, and support those who courageously live the Gospel amid hardship.</p>
+<p>NOVEMBER NEW LIST OF THE DEAD: Thank you to everyone who entrusted their loved ones to our prayers this past year.</p>
+<p>As a new Altar List of the Dead begins, envelopes are now available in church.</p>
+<p>We invite you to remember those who have gone before us, that they may be remembered at our Masses and First Fridays throughout the year.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-dangan" data-parish-name="Dangan"><h2 class="ocr-parish-name">Dangan</h2></header>
+<p class="page-label">Page 31</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 32</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-donore" data-parish-name="Donore"><h2 class="ocr-parish-name">Donore</h2></header>
+<p class="page-label">Page 33</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 34</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-drogheda-st-mary-s" data-parish-name="Drogheda (St Mary&#x27;s)"><h2 class="ocr-parish-name">Drogheda (St Mary&#x27;s)</h2></header>
+<p class="page-label">Page 35</p>
+<p>Priests: Fr. John Conlon Priest on Duty Fr. Derek Ryan Fr. Emmanuel Ibitoye A. P.</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>SUNDAY: 9:00am, 11:00am, 7:00pm MONDAY TO FRIDAY: 8:00am &amp; 10:00am SATURDAY: 10:00am HOLYDAYS : 8:00am, 10:00am &amp; 7:00pm Mass Intentions for</p>
+<p>Sunday 22nd November - 29th November 2026</p>
+<p>Sun 22nd 9am - 11am Bobby Martin First Anniversary; Jack Judge &amp; deceased members of the Judge &amp; Smith families; Andrew Wilson; William Cifuentes; Tony &amp; Marie Wade; Thomas (Tosh) McGovern; Oliver Plunkett; Patrick &amp; Maura Pentony; Kitty &amp; Barney Woods; Paddy Woods; Carol Kierna n; Christopher Devlin; Lavina Collins, Jim Collins; Patrick &amp; Mary Moroney, Robbie Bromley; 7pm -</p>
+<p>Mon 23rd 8am - 10am Special Intention;</p>
+<p>Tues 24th 8am - 10am Marie Nixon; John Byrne;</p>
+<p>Wed 25th 8am - 10am - Thur 26th 8am Oliver Reid; 10am -</p>
+<p>Fri 27th 8am Patrick Sherwin 10am - 7pm Remembrance Mass</p>
+<p>Sat 28th 10am Julie Lynch; Marie &amp; Jim Callaghan &amp; their parents Michael &amp; Brigid Black; Tom &amp; Josie Call aghan; Maureen &amp; Oliver Halpin; Joseph, Mary &amp; Michael Harvey; Joan Harvey; Maggie &amp; Tom Berril l &amp; Damien Berrill</p>
+<p>Sun 29th 9am Kathleen McDonnell; 11am Cheryl O’Brien Month’s Memory; Tony &amp; Marie Wade; Phil Vaughey; Emma-Jane Matthews; Bill &amp; Greta Thornton &amp; their son Eamon; Gary Martin; Sheila Matthews; Noeleen Monaghan; John McMahon; Keith Tracey Birthday remembrance; John, Joan &amp; Mary Mullen; Deceased members of the Mullen &amp; Mackin families 7pm - St Mary’s Parish, Drogheda A92 XO96 St. Mary’s Parish Office, 24, James Street. 9834587 St. Mary’s Presbytery, Dublin Road. 9838347 Website: <a href="https://www.stmarysdrogheda.ie" target="_blank" rel="noopener noreferrer">www.stmarysdrogheda.ie</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:stmarysdrogheda@gmail.com" target="_blank" rel="noopener noreferrer">stmarysdrogheda@gmail.com</a> Confessions: Saturday after 10am Mass &amp; Sunday after 7:00pm Mass Baptisms:</p>
+<p>Saturday 11:00am &amp;</p>
+<p>Sunday 2:00pm; Call Parish Office Adoration : Every Thursday &amp; Friday from 10am- 7pm in St Mary’s Blessed Sacrament Chapel Supporting St. Mary’s Parish:</p>
+<p>Sun 15th Nov. Offertory: €1,275.00 Dev. Fund: €660.00 Scan to donate St Mary’s : If you have no cash you can just scan your phone over this QR code to contribute to the basket collection.</p>
+<p>Prayer For Vocations in the Diocese of Meath Jesus Christ, King of the Universe, is the Good Shepherd.</p>
+<p>We pray that the future priests of our diocese will &quot;.look for the lost one, bring back the stray, bandage the wounded, and make the weak strong.&quot; (Ezekiel).</p>
+<p>As the late Pope Francis said, &quot;Priests should have on them the smell of the sheep.</p>
+<p>Calvary Cemetery: Rosary recited at 3pm during the month of November.</p>
+<p>REMEMBRANCE MASS - St Mary’s Church: A special commemorative Mass will be held on</p>
+<p>Friday 27th November at 7pm in St Mary’s Church for those who have died in the last year, from November 2025 - November 2026. Letters of Invitation will be sent out to all families in the coming days.</p>
+<p>The se masses are also for family members who have died elsewhere.</p>
+<p>If you would like to have your loved one remembered in this special mass, please contact St. Mary’s Parish Office.</p>
+<p>A candle with their name will be lit during the mass and you may take this candle home with you after the mass and perhaps light it for your loved one at Christmas time or on a family occasi on.</p>
+<h3 class="b-head">Adoration of the Blessed Sacrament</h3>
+<p>Key Times Needed: Thursdays at 10:30am, and Thursdays/Fridays at 1:00pm (ideal for a lunchtime visit).</p>
+<p>Thank you for your continued prayer! During the winter months, the Adoration Chapel will now close at 7pm on Thursdays and Fridays . This adjustment is being made with everyone’s safety in mind, particularly during the darker evenings, and to support those who are responsible for locking up the Church.</p>
+<p>Thank you for your understanding. The Drogheda Male Voice Choir Christmas Concert for 2026 takes place on Friday, Dec 11th at 7:30pm in St. Mary’s Church . Get into the Christmas spirit with David Leddy and the DMVC with Amy Dyer and the Lourdes Youth Choir.</p>
+<p>Tickets cost €27 and are available in St Mary’s</p>
+<h3 class="b-head">Parish Office</h3>
+<p>or online at Eventbrite.ie Holy Family Mass Intentions 21st November - 29th November 2026</p>
+<p>Sat 21st 7.30pm John Madden First Anniversary &amp; his parents Ann &amp; John; Cassie Reilly &amp; her husband Bernard; Martin Taaffe, John &amp; Joan Taaffe; Philip, Michael &amp; Brendan Taaffe, Mary Taaffe Curran; John &amp; Lily Kennedy; John Reid; Peter McCarthy; Paddy &amp; May McKeown; Willie McCarthy; Anna Garry, David Garry; Moira Harrison; Patrick &amp; Bridget Everitt; Joe O’Neill; William &amp; Mary O’Neill; Joan Everitt, Marie Everitt.</p>
+<p>Sun 22nd 10am Peggy Kelly 12pm Violet Lange Month’s Memory; Maurice Neary; Christopher O’ Brien; Gerard Murtagh (Junior) &amp; Gerry Murtagh; Jim Downey, Louise Downey; Philomena Buckley &amp; her husband Raymond; Joe Kelly &amp; his wife May; Kay Rice; Cassie O’ Brien; Doreen Connor, Margaret Brehony; John Harmon; Dodie Lane; Gerard Thornton; Michael &amp; Carol Kiernan; Special Intention, 3 Thanksgiving Intentions</p>
+<p>Mon 23rd 10am Birthday Intention, Peggy Kelly</p>
+<p>Tues 24th 10am Nellie McDonnell</p>
+<p>Wed 25th 10am - Thur 26th 10am Nora Hogan</p>
+<p>Fri 27th 10am Holy Souls, Special Intention</p>
+<p>Sat 28th 7.30pm Johnny Mullen Month’s Memory ; Pauline Kirwan First Anniversary ; John Reilly First Anniversary; John Campbell First Anniversary; Marie Quinn</p>
+<p>Sun 29th 10am - 12pm Mary Kane Month’s Memory; Maidie (Mary) Kellaway Month’s Memory ; Anthony Rooney First Anniversary ; Michael Gregory; Kathleen McDonnell; Patrick Bedford; Kevin Healy; Don Reilly.</p>
+<p>Parish Activities: Eucharistic Adoration : Daily: 3.00pm- with Divine Mercy Chaplet &amp; Holy Rosary Baptisms : Sat – 12pm; Sun – 12.45pm; call Parish Office.</p>
+<p>Confessions : Saturday at 7pm before Vigil Mass.</p>
+<p>Mass intentions : Call into sacristy or leave a message on (041) 9831991. Prayer for Vocations &amp; Priests: Fr. Willie Doyle Prayer Group: Hymns, Holy Rosary, Reflection, Litany for Priests 7pm – 8pm every Thursday.</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>SATURDAY VIGIL: 7:30pm SUNDAY: 10:00am &amp; 12:00pm MONDAY TO FRIDAY: 10:00am HOLYDAYS: 10:00am Holy Family Paris h, Ballsgrove , Drogheda A92 P263 Phone: <a href="tel:+353419831991" style="color:#1d4ed8;font-weight:600;">041-9831991</a></p>
+<p>Website: <a href="https://www.holyfamilydrogheda.ie" target="_blank" rel="noopener noreferrer">www.holyfamilydrogheda.ie</a></p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:holyfamilyballsgrove@outlook.ie" target="_blank" rel="noopener noreferrer">holyfamilyballsgrove@outlook.ie</a> Supporting Holy Family :</p>
+<p>Sun 15th Nov Offertory: €1,787.00 A prayer for those who died in the Parish recently Joseph (Joe) Brady , Marley’s Lane &amp; Late of Dunleer May he rest in peace.</p>
+<p>Scan to donate Holy Family: If you have no cash you can just scan your phone over this QR code to contribute to the basket collection.</p>
+<p>ALONE: Would you be willing to provide companionship or make calls to Older People once a week?</p>
+<p>ALONE are seeking volunteers in your area.</p>
+<p>Full training and support provided. If interested, please sign up here: <a href="https://alone.ie/volunteers/" target="_blank" rel="noopener noreferrer">https://alone.ie/volunteers/</a> for more information, contact Rachel on <a href="tel:+353868249308" style="color:#1d4ed8;font-weight:600;">0868249308</a> or by email <a href="mailto:rachel.christmas@alone.ie" target="_blank" rel="noopener noreferrer">rachel.christmas@alone.ie</a> Youth 2000 Christmas Retreat 11th-13th December 2026 Calling all young people aged 16 –35! Join us at the Youth 2000 Christmas Retreat in Newbridge College, Co. Kildare.</p>
+<p>This is a donation-only event, with free buses available across the country and all meals included.</p>
+<p>Expect inspiring talks and workshops, Mass, music, prayer, and plenty of opportunities to chill out and meet other young Catholics.</p>
+<p>Whether you are new to the faith or looking to be refreshed, all are welcome.</p>
+<p>Samaritans - Drogheda Branch: Our thanks to your parishioners for all the kind support received this last weekend.</p>
+<p>It is extremely appreciated and helps us to keep providing our service to those in emotional distress and with suicidal feelings.</p>
+<p>It is a tough time for a great number of people in our communities.</p>
+<p>We are all volunteers in Drogheda and last year opened another centre in Mona ghan town thanks entirely to contributions from the general public and businesses from the four counties we cover, Louth, Meath, Cavan &amp; Monaghan.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-drumraney" data-parish-name="Drumraney"><h2 class="ocr-parish-name">Drumraney</h2></header>
+<p class="page-label">Page 36</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 37</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-duleek" data-parish-name="Duleek"><h2 class="ocr-parish-name">Duleek</h2></header>
+<p class="page-label">Page 38</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 39</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-dunderry" data-parish-name="Dunderry"><h2 class="ocr-parish-name">Dunderry</h2></header>
+<p class="page-label">Page 40</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 41</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-dunshaughlin-culmullen" data-parish-name="Dunshaughlin &amp; Culmullen"><h2 class="ocr-parish-name">Dunshaughlin &amp; Culmullen</h2><p class="ocr-parish-date">22/11/2026</p></header>
+<p class="page-label">Page 42</p>
+<p>NEWSLETTER Our Lord Jesus Christ, King of The Universe Sunday the 22nd November 2026 Feast of Christ the King At the end of our earthly life we will be judged on how we have lived and acted.</p>
+<p>At the end of time the Kingdom of God will be established through the saving work of Christ. Then the Shepherd King will come to judge how we have loved.</p>
+<p>Our lives are to be characterised by a love that welcomes Christ in those most in need.</p>
+<p>At the end of the day we shall be judged on love.</p>
+<p>St John of the Cross Mass for those who have died in the past year Remembrance Mass for all those who died in our Parish over the past year in St Patrick and St Seachnall’s, Church this Saturday.</p>
+<p>At the Vigil Mass the n ames of the deceased will be read out and a candle will be lighted for each one.</p>
+<p>We pray too for all the bereaved that the Lord may comfort you as you come to terms with your loss.</p>
+<p>Confirmation Children 2027 We welcome the boys and girls to Masses next weekend in Dunshaughlin &amp; Culmullen in preparation for Confirmation.</p>
+<p>O Come, O Come, Emmanuel! An Advent journey of Hope and Expectation You are warmly invited to join us for two special Advent Prayer Evenings on the 7th and the 14th Dec at 7.30 pm in Dun Church.</p>
+<p>We will reflect on the ancient prayers of the Church, the O Antiphons.</p>
+<p>Together we will take time to pause , pray and reflect on Christ, our hope, our light and our peace as we prepare our hearts for Christmas.</p>
+<p>On</p>
+<p>Monday 21st we will gather for a Service of Reconciliation, an, opportunity to seek God’s forgiveness, experience His he aling love and prepare spiritually for the coming of Christ. All are welcome We Remember in Prayer Rhea Roy, who died in India.</p>
+<h3 class="b-head">Rest in Peace</h3>
+<p>. Priests of the Parish; Fr Seán, 01- 825 9114. Fr Joe, P. A. 01- 824 1976</p>
+<h3 class="b-head">Parish Office</h3>
+<p>Telephone 01 - 825 9114 or Email <a href="mailto:office@dcparish.ie" target="_blank" rel="noopener noreferrer">office@dcparish.ie</a> Monday to Friday (10am - 2 pm) Pastoral Centre; 01-8024780</p>
+<p>Email <a href="mailto:pcmanager@dcparish.ie" target="_blank" rel="noopener noreferrer">pcmanager@dcparish.ie</a></p>
+<h3 class="b-head">Mass Times</h3>
+<p>Culmullen: Saturday Vigil Mass 6pm,</p>
+<p>Sunday 10:30am. Dunshaughlin: Saturday Vigil Mass 7pm,</p>
+<p>Sunday 9 am, 12 noon.</p>
+<h3 class="b-head">Weekday Masses</h3>
+<p>Culmullen: 9am, Dunshaughlin: 10am. Confessions : Dunshaughlin: Saturday 12noon - 1pm. Baptisms:</p>
+<hr>
+<p class="page-label">Page 43</p>
+<p>Forty Hours Adoration for Christ the King Adoration in the Cathedral concludes today at 4 pm with Solemn Evening Prayer and Benediction led by Bishop Deenihan, Homily by Bishop Fintan Mon aghan.</p>
+<p>All welcome St Seachnall’s Day -</p>
+<p>Friday 27th Nov The Church of St Seachnall refers to the Ancient Church founded by St Seachnall or Secondinus.</p>
+<p>Seachnall came to Ireland with his brother Auxilius in 439 AD. He established his Church.</p>
+<p>He Became Bishop of the See of Duns haughlin and became known as St Patrick’s bishop.</p>
+<p>Later St Patrick called him to Armagh as Auxiliary Bishop he died at the age of 75 and was buried in St Sea chnall’s Church.</p>
+<p>He wrote two Hymns one in Praise of St Patrick the other about t he Eucharist. A legend says the hymn was performed by Angels in the Cathedral in Dunshaughlin.</p>
+<p>The Historical Society have organised an Ecumenical Ceremony in St Seachnall’s Cof I Church for 11 am Friday There will be Prayers, Readings, poetry and music.</p>
+<p>The event is hosted by Reverend Clement, Cof I Pastor Our Pastoral Area is known as St Seachnall P. A. Youth Retreat Christmas Retreat organised by Youth 2000 in Newbridge College, Co. Kildare 11th to 13th December.</p>
+<p>Email <a href="mailto:office@youth2000.ie" target="_blank" rel="noopener noreferrer">office@youth2000.ie</a> or phone 01 6753690</p>
+<h3 class="b-head">Rest in Peace</h3>
+<p>Almighty God our Father, we firmly believe that your Son died and rose to life.</p>
+<p>We pray for our sisters and brothers who have died in Christ. Raise them up on the last day to share the Glory of the Risen Christ who lives a nd reigns, forever and ever.</p>
+<p>Mass Intentions for the coming week</p>
+<p>Saturday 21st November Cul Vigil 6pm Phyllis Quigley; Maureen Joyce;</p>
+<p>Saturday 21st November Dunsh Vigil 7pm Ulick &amp; Margaret McDonnell Son Ulick &amp; daughters Helen &amp; Phil;</p>
+<p>Sunday 22nd November Dunsh 9am Mary Morrin;</p>
+<p>Sunday 22nd November Cul 10:30am Patrick, Teresa &amp; Joe Bennett;</p>
+<p>Sunday 22nd November Dunsh 12noon Joe &amp; Teresa Mahon;</p>
+<p>Monday 23rd November Cul 9am Thomas, Madalene &amp; Gerard Sheridan;</p>
+<p>Monday 23rd November Dunsh 10am William Pullen; Anna &amp; Paddy O’Sullivan;</p>
+<p>Thursday 26th November Dunsh 10am Margaret Weldon;</p>
+<p>Saturday 28th November Dunsh 10am Patrick &amp; Lana McTigue &amp; Sons Paul &amp; Patrick;</p>
+<p>Saturday 28th November Cul Vigil 6pm Carol Englishby;</p>
+<p>Saturday 28th November Dunsh Vigil 7pm Christy &amp; Mary Foley;</p>
+<p>Sunday 29th November Cul 10:30am Alison Kelly;</p>
+<p>Sunday 29th November Dunsh 12noon Maria Kealy-Johnson; Brendan &amp; Teresa Murray; Cillian Meade;</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-dysart" data-parish-name="Dysart"><h2 class="ocr-parish-name">Dysart</h2></header>
+<p class="page-label">Page 44</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 45</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-johnstown" data-parish-name="Johnstown"><h2 class="ocr-parish-name">Johnstown</h2></header>
+<p class="page-label">Page 46</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 47</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilbeg" data-parish-name="Kilbeg"><h2 class="ocr-parish-name">Kilbeg</h2></header>
+<p class="page-label">Page 48</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 49</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilbeggan" data-parish-name="Kilbeggan"><h2 class="ocr-parish-name">Kilbeggan</h2></header>
+<p class="page-label">Page 50</p>
+<p>God’s People Our Parish KILBEGGAN: Saturday Vigil 7.30 p.m. &amp;</p>
+<p>Sunday 11 a.m. Monday, Tuesday, Thursday &amp;</p>
+<p>Friday 9.30 a.m.</p>
+<p>Wednesday 7.30 p.m. &amp;</p>
+<p>Saturday 10 a.m Confessions:</p>
+<p>Saturday 10.30 a.m. - 11.30 a.m. RAHUGH:</p>
+<p>Sunday 9.30 a.m. Fr. Brendan Corrigan: <a href="tel:+353872618353" style="color:#1d4ed8;font-weight:600;">087 2618353</a></p>
+<h4 class="b-sub">Email</h4>
+<p>brendanf <a href="mailto:corrigan@gmail.com" target="_blank" rel="noopener noreferrer">corrigan@gmail.com</a> W Website and Webcam: <a href="https://www.kilbegganparish.ie" target="_blank" rel="noopener noreferrer">https://www.kilbegganparish.ie</a> TullamorePastoral Area: Kilbeggan / Tullamore / Rahan / Kilcormac / Eglish Feast of Christ the King 7.30 p.m.</p>
+<p>John and Mary Dinnegan and their daughter Mary O’Brien M May and Michael Kelly, Cumminstown A Agnes and Ted Dunne, St Mary’s Avenue.</p>
+<p>B Bridget and JJ Darby 9.30 a.m . Coyne Family, Attyconnor 11 a.m.</p>
+<p>Patrick Seery and his parents Matthew and Bridget D Deceased members of the Clabby Family W William and Peg Connell</p>
+<p>Saturday 10 a.m. Sean, Margaret and John McGuinness First Sunday of Advent 7.30 p.m.</p>
+<p>Tony Fallon and Sonny Phelan J Julia McKenna, Michael McCormack, Martin, Jodie, Nuala, Ned, and Michael Jnr. 9.30 a.m . Jimmy and Alacoque Flanagan and deceased family. 11 a.m.</p>
+<p>Vincent McDonnell, Month’s Mind Please pray for the repose of the soul of Phil Guilfoyle, Tullamore Rd. who died during the week.</p>
+<p>May she rest in peace. Adoration of the Blessed Sacrament - Kilbeggan:</p>
+<p>Monday 10 a.m. - 11</p>
+<p>Wednesday 6.30 p.m. until start of Mass at 7.30 and Rahugh:</p>
+<p>Friday 7 p.m. - 8 p.m. Plate Collection: €1,410; Maintenance: €585; List of Dead: €450; Patron Oīerings: €50; November Oīerings: €330. Thanks to all who are so generous.</p>
+<p>Catholic Newspaper on sale at the entrance for €3.80 per copy . Rahugh NS Parents’ Association are hosting a Christmas Cake Sale &amp; Mini-Fair this</p>
+<p>Sunday 22 November 10am– 2pm in Rahugh Hall . All funds raised will beneĮt the children and support the devel opment of our school playground.</p>
+<p>Please come along and support! If you would like to host a table please contact <a href="tel:+353833273277" style="color:#1d4ed8;font-weight:600;">083-3273277</a> . Forty Hours Adoration for the Solemnity of Christ the King in the Cathedral, Mullingar from</p>
+<p>Friday 20th to Sun. 22nd Nov. The Sacrament of Reconciliation will be available from noon to Midnight on</p>
+<p>Sat 21st. Each parish in the Diocese has been invited to spend one hour in Adoration before the Blessed Sacrament. Our parish hour is</p>
+<hr>
+<p class="page-label">Page 51</p>
+<p>Parish Charity Shop: We have a wide selection of high quality clothing, household goods and Bric-a-brac.</p>
+<p>Open Monday to Friday 10am to 5pm. Thanks to all who support the shop.</p>
+<p>Pope Leo’s prayer intention for November - For the proper use of wealth Let us pray for the proper use of wealth, that not succumbing to the tempt ation of selĮshness, it may always be put at the service for the common good and solidarity of those who have less.</p>
+<p>See Pope’s video and transcript/prayer on our parish website <a href="https://www.kilbegganparish.ie" target="_blank" rel="noopener noreferrer">https://www.kilbegganparish.ie</a> Each and every one of us must respond to the Lord by saying, “Thank you for the talents you have given me!</p>
+<p>I want to use them for the good of all. ” It is likewise also up to each of us to say to our neighbour, “You are a brother or sister to me.</p>
+<p>Let us cultivate together the talents that bear fruits of a good life for this city, our country and the future of justice and peace we wish to build. ” This commitment is summed up in a gesture we make during Holy Mass, when we bring to the altar the fruits of the earth and of human labour.</p>
+<p>The table that the Lord prepares draws us into an exchange of gifts that we present to God so that we may then share them with the world.</p>
+<p>In the light of the Gospel, I invite you, then, to multiply the talents the Lord has entrusted to you by cultiva ting three speciĮc things.</p>
+<p>Above all, cultivate your faith together.</p>
+<p>Be a people who celebrate God’s salvation and heal the wounds of humanity.</p>
+<p>Indeed, the Church uses human words to speak God’s truth; and she preaches the word of God to proclaim the truth about the human person.</p>
+<p>Following the example of Christ, the Word made Ňesh, we can observe everyday reality with the wisdom that comes from the Gospel, opening up a future of righteousness for all.</p>
+<p>This mission begins in prayer and is nourished by the sacraments.</p>
+<p>The work of the whole Church is carried out in families and parishes, in the streets and schools, in hospitals and prisons.</p>
+<p>Seek to multiply the Lord’s gifts everywhere, promoting communion with all men and women of good will.</p>
+<p>Second, I encourage you to cultivate the grandeur of our humanity.</p>
+<p>This commitment applies above all to young people, who are the hope of the Peruvian people.</p>
+<p>It likewise applies to caring for children and protecting the elderly, as well as to solidarity with the poor and the oppressed.</p>
+<p>Doing good requires combating violence with charity and responding to corruption with honesty.</p>
+<p>Where people are healed, the earth Ňourishes, and the culture of charity alleviates moral pollution — which is the cause of every wound inŇicted on creation, our common home.</p>
+<p>Finally, in the face of every trial, always cultivate joy.</p>
+<p>Christians know that this joy does not come from wealth or power, which degrade us like a drug, deceiving the heart and le aving it in anguish.</p>
+<p>True joy comes from faith, because it is founded on God’s grace, which bears fruit in our fraternal self-giving.</p>
+<p>As we go through tribulations and challenges, let us build together a happy, pea ceful and free society, gazing upon the Lord Jesus, who bestows peace from his Cross, taking upon himself each of our diĸcul ties.</p>
+<p>Let us ask him, the Redeemer, to accompany us on our journey, giving us the light of hope.</p>
+<p>May his Mother Mary, the Immaculate Virgin, always comfort and protect you.</p>
+<p>Pope Leo, “Villa Deportiva Regional Ucayali ”, Pucallpa, Peru, Sunday, 15 November 2026 Rahugh drama group are delighted to announce that we’re back on stage with our brand new production of ‘Nobody’s talking to me’ by Tommy Marren.</p>
+<p>Join us on November 27th, 28th or 29th in Rahugh Hall eircode N91 XF20. Join us for a fun night of comedy and belly aching laughs .</p>
+<p>Contact Patricia on <a href="tel:+353863322086" style="color:#1d4ed8;font-weight:600;">086 332 2086</a> ”</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilcloon" data-parish-name="Kilcloon"><h2 class="ocr-parish-name">Kilcloon</h2></header>
+<p class="page-label">Page 52</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 53</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilcormac" data-parish-name="Kilcormac"><h2 class="ocr-parish-name">Kilcormac</h2></header>
+<p class="page-label">Page 54</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 55</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-killina" data-parish-name="Killina"><h2 class="ocr-parish-name">Killina</h2></header>
+<p class="page-label">Page 56</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 57</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilskyre" data-parish-name="Kilskyre"><h2 class="ocr-parish-name">Kilskyre</h2><p class="ocr-parish-date">22/11/2026</p></header>
+<p class="page-label">Page 58</p>
+<p>Home Parish Bulletin Main Menu Home Parish Bulletin Churches Parish Schools Parish Groups Community Groups Marriages History</p>
+<h3 class="b-head">Contact Us</h3>
+<p>Newsletter Guestbook Image Gallery Child Protection Policy Catholic Ireland.net Features Today&#x27;s Mass Readings Sunday&#x27;s Mass Readings Thought for Today Saints of the Day Parish Bulletin 22nd November 2026 KILSKYRE &amp; BALLINLOUGH</p>
+<h3 class="b-head">PARISH NOTICES</h3>
+<p>22nd NOVEMBER 2026 KILSKYRE Sunday 11.30am</p>
+<h3 class="b-head">Months Mind</h3>
+<p>Peter Tunney, Rathniska</p>
+<p>Monday 9.00am Mass for the people</p>
+<p>Tuesday 9.00am NO MASS</p>
+<p>Wednesday 9.00am NO MASS</p>
+<p>Thursday 10.00am Mass</p>
+<p>Sunday 11.30am Anniv: Patrick &amp; Maureen Tunney, Kilskyre &amp; deceased members of the Tunney and O’Neill families BALLINLOUGH</p>
+<p>Saturday 6.00pm Anniv: Christina, John &amp; Mary Madden, Kingsmountain</p>
+<p>Sunday 10.00am Anniv: Michael Reilly, Crossakiel</p>
+<p>Friday 10.00am Mass (followed by Eucharistic Adoration)</p>
+<p>Saturday 6.00pm Anniv: Rose, John, Anna &amp; Sean Nulty, Patrickstown</p>
+<p>Sunday 10.00am Anniv: Nan Carroll COLLECTIONS (Last Weekend) KILSKYRE PLATE: €275 BALLINLOUGH PLATE: €355 ENVELOPES: €400 NOTICES RIP Please pray for the repose of the soul of Maureen O’Halloran (nee Brady), RIP late of Knocknacarra, Co. Galway and formerly Springville, Kilskyre.</p>
+<hr>
+<p class="page-label">Page 59</p>
+<p>Clothes collection fundraiser will take place on</p>
+<p>Wednesday 25th November. Drop off your bags of clothes before 9:30am. Items must be in good, wearable condition.</p>
+<p>Your support would be greatly appreciated.</p>
+<p>Sepsis Information Evening Will take place in Ballinlough GFC Community Centre on</p>
+<p>Monday 30th November at 7:30pm. Everyone welcome.</p>
+<p>Kilskyre Lotto Results Letters DFNX – no winner, 3 letters – none, 5 tickets – Emmett Darcy, Paul Tunney, Olive Owens, Carmel Gaynor and Kit Farrell each get €20. Next draw takes place on 1st December and the jackpot will be €6000. More Articles.</p>
+<p>Parish Bulletin 1st November 2026 Parish Bulletin 25th October 2026 Parish Bulletin 18th October 2026 Designed and developed by Get Online</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kingscourt-corlea-muff" data-parish-name="Kingscourt-Corlea-Muff"><h2 class="ocr-parish-name">Kingscourt-Corlea-Muff</h2></header>
+<p class="page-label">Page 60</p>
+<p>Kingscourt Parish Bulletin Sunday November 22nd, 2026 <a href="https://www.kingscourtparish.ie" target="_blank" rel="noopener noreferrer">www.kingscourtparish.ie</a> <a href="mailto:info@kingscourtparish.ie" target="_blank" rel="noopener noreferrer">info@kingscourtparish.ie</a> f@kingscourtpar <a href="tel:+353429667314" style="color:#1d4ed8;font-weight:600;">042 9667314</a></p>
+<p>Parish House <a href="tel:+353838287147" style="color:#1d4ed8;font-weight:600;">083 8287147</a> (Emergency) Fr. Gerry The Emmaus Pastoral Area November 21st/22nd Saturday Vigil 6 Deirdre Carolan McDaniel, First Anniversary Deceased members of Kingscourt Stars, Kingscourt Harps, Kingscourt Boxing Club, Kingscourt Athletic Club, Kingscourt Handball and Raquetball Clubs Mu2 Vigil 7 Mass Corlea 9 Bridie Smith I. . 10.30 James and Nellie McKeon, Anniversary 12 Noon: Mary and Peter Muldoon and deceased family Ann Lynch, Caroline Lynch and deceased family Peter Bernamont, Anniversary Patricia Finegan, Anniversary Deceased Religious and Priests of the Parish November 28th/29th Saturday Vigil 6 Billy O’Connor, First Anniversary Hearts of Remembrance Mass.</p>
+<p>Mu2 Vigil 7 Mass Corlea 9 Deceased members of The Donoghue Family 10.30 a.m.</p>
+<p>Kathleen McKeon, First Anniversary 12 Noon: Hilda McCormack, Months Memory Marie Clarke, Anniversary Thomas Culleton, Anniversary Noel Murtagh, Anniversary</p>
+<p>Monday 23rd 1 Wedding in Kingscourt</p>
+<p>Tuesday 24th 10 Mickey and Mai Heneghan</p>
+<p>Wednesday 25th 10 Special Intention</p>
+<p>Thursday 26th 10 Thomas &amp; Theresa Rice</p>
+<p>Friday 27th 10 a.m .: Bridget and James Ra3erty Ann Fausto The Parish O2ice: Eternal rest grant unto them O Lord: Reborn through Baptism and The Holy Spirit: One in the Sacrament of Marriage: Supporting the parish: The Parish Repository: The Parish O2ice is open on Monday, Tuesday, and Thursday from 10.30 a.m. to 12.30 p.m.</p>
+<p>All bookings and enquiries can be made during these times.</p>
+<p>All notices to be included in the bulletin should be at The Parish O3ice by 10.00 a.m. on Thursday.</p>
+<p>Marion O’Kelly, Raheny. Congratulations to Dawson Hamilton, Chloe Ei2e and Finn Clarke on their recent Baptisms. Baptisms take place on the 2nd and 4th Saturday of every month at 4 p.m. in Kingscourt Church.</p>
+<p>The next baptism preparation meeting is on</p>
+<p>Thursday 3rd December 2026 at 8 p.m. in The Parish Centre, with Team C. Please note ALL BAPTISMS TAKE PLACE IN KINGSCOURT. Congratulations to Jeannine De Sales and Gerard Mackey on their recent marriage.</p>
+<p>Couples intending marriage in the Diocese of Meath must complete an ACCORD pre marriage workshop, <a href="https://www.accord.ie" target="_blank" rel="noopener noreferrer">www.accord.ie</a> . The 2027 dates for the Navan ACCORD Centre are January 8th/9th, January 29th/30th, April 11th &amp; 18th, Sept. 26th &amp; Oct. 3rd Early booking is essential.</p>
+<p>Development Fund: €2800 Plate: € 1315 Many thanks.</p>
+<hr>
+<p class="page-label">Page 61</p>
+<p>The Emmaus Pastoral Area; Corlea School Open Evening: The Sycamore Faith Programme: Parish Mission Statement: Adoration: Visitation of the sick: Vespers: Hearts of Remembrance: Parish Advent Retreat: Nativity Drama: Kingscourt parish is part of The Emmaus Pastoral area comprising of the six parishes of Kingscourt, Drumconrath / Meath Hill, Lobinstown, Nobber, Castletown Kilpatrick and Kilbeg currently served by five priests.</p>
+<p>In the absence or illness of a priest, the priests of The Pastoral Area will endeavour to offer</p>
+<h3 class="b-head">Sunday Mass</h3>
+<p>at a much-reduced schedule in the particular parish Corlea School, Scoil Náisiúnta Corrliath , is hosng an Open Evening on this Wednesday, 25th November from 5.30 p.m. – 7.30 for all parents, guardians, children, and families interested in having their educaon through the medium of Irish from September 2027. Please call the school on <a href="tel:+353429667338" style="color:#1d4ed8;font-weight:600;">042 9667338</a> . Drumconrath / Meath Hill parish is o, ering The Sycamore Faith programme, for parents of Con.rmaon pupils, for our Emmaus Pastoral Area over the next four weeks from</p>
+<p>Monday 23rd November at 8 p.m. in Drumconrath Community Centre.</p>
+<p>If you wish to explore your faith further, please come along!</p>
+<p>All are welcome. Our Parish endeavours to Deepen Faith, Strengthen Hope, and Enkindle God’s Love in its mission and ministry.</p>
+<p>Adoration of the Blessed Sacrament continues on each Thursday after Mass in Kingscourt.</p>
+<p>We are asking parishioners to consider giving even half an hour in Adoration, praying for the intentions of Pope Leo.</p>
+<p>Visitation of the sick in hospital is a very important part of pastor al support by the priest to families.</p>
+<p>If a member of the family or any parishioner is in hospital, please let Fr. Gerry know.</p>
+<p>All are welcome to attend Vespers and Benediction in Mullingar Cathedral today at 4 p.m. to mark the feast of Christ the King.</p>
+<p>We extend a welcome to all families who attended the recent Bereavement Mass to join us once again on next Saturday night at the 6 p.m.</p>
+<p>Mass in Kin gscourt as part of our continued pastoral outreach to the bereaved when The Hearts of Remembrance will be gifted to the families in memory of their loved ones for Christmas.</p>
+<p>Our parish is hosting a short Advent Retreat from 1st – 3rd December at our 10 a.m.</p>
+<h3 class="b-head">daily Mass</h3>
+<p>as a spiritual preparation for the feast of Christmas.</p>
+<p>All are welcome to attend. Calling all children who wish to be involved in our special Nativity Drama on Christmas Eve at The Young Families Mass . Please come along to The Parish Centre on</p>
+<p>Wednesday 2nd December at 3.15 p.m. , all who wish to take part. All welcome.</p>
+<h3 class="b-head">Community Notices</h3>
+<p>*Kingscourt Christmas Markets next weekend in The Community Centre from 11 a.m. – 6 p.m. with the switching on of the Christmas lights by Santa on Saturday at 5 p.m. at The Market Square . *Navan Theatre Group present The Field in The Solstice from November 24th – 28th. *Congratulations to the u-18 Kingscourt Stars Ladies on their Division 1 League Championship success! *Youth 2000 retreat for those 18 – 35 on December 11th – 13th, call 01 6753690. *Community Co3ee Morning on Friday next in The Red Hall from 11 a.m. – 12.30 p.m.</p>
+<p>Christmas gift vouchers for music classes in piano, guitar, banjo &amp; ukulele available from Gerry Curtis on <a href="tel:+353876399055" style="color:#1d4ed8;font-weight:600;">0876399055</a></p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-lobinstown" data-parish-name="Lobinstown"><h2 class="ocr-parish-name">Lobinstown</h2></header>
+<p class="page-label">Page 62</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 63</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-longwood" data-parish-name="Longwood"><h2 class="ocr-parish-name">Longwood</h2></header>
+<p class="page-label">Page 64</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 65</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-milltown" data-parish-name="Milltown"><h2 class="ocr-parish-name">Milltown</h2></header>
+<p class="page-label">Page 66</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 67</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-mountnugent" data-parish-name="Mountnugent"><h2 class="ocr-parish-name">Mountnugent</h2></header>
+<p class="page-label">Page 68</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 69</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-moynalty" data-parish-name="Moynalty"><h2 class="ocr-parish-name">Moynalty</h2></header>
+<p class="page-label">Page 70</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 71</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-moynalvey" data-parish-name="Moynalvey"><h2 class="ocr-parish-name">Moynalvey</h2></header>
+<p class="page-label">Page 72</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 73</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-mullingar-cathedral-of-christ-the-king" data-parish-name="Mullingar (Cathedral of Christ the King)"><h2 class="ocr-parish-name">Mullingar (Cathedral of Christ the King)</h2></header>
+<p class="page-label">Page 74</p>
+<p>Paróiste na h Ardeaglaise Chríost Rí, An Muileanng Cearr.</p>
+<p>Cathedral of Christ the King, St Paul’s, Walshestown, Brotenstown &amp; Gainstown.</p>
+<p>Mullingar Pastoral Area. Taghmon | Ballynacargy | Dysart | Mullingar.</p>
+<p>Sollúntas Chríost Rí na n Uile. 22ú Samhain 2026. --------------------------------------------------- ----------- 40 Hours Eucharistic Adoration . Our parish community is currently in the midst of a beautiful and grace-filled 40 Hours Adoration in our Cathedral of Christ the King.</p>
+<p>Adoration began on Friday evening with the 7:30pm Mass and continues until Evening Prayer at 4:00pm this Sunday, the Solemnity of Christ the King.</p>
+<p>We warmly encourage everyone to take some quiet time today before the Lord in the Blessed Sacrament.</p>
+<p>Whether for five minutes or an hour, your presence is a gift to God—and his presence is always a gift to us.</p>
+<p>Solemn Vespers &amp; Benediction – this Sunday at 4:00pm in the Cathedral We invite parishioners to return to the Cathedral for the closing Solemn Vespers and Benediction at 4:00pm, presided by Bishop Tom Deenihan.</p>
+<p>We are honoured that the homilist will be Bishop Fintan Monahan of Killaloe, who will preach at Vespers.</p>
+<p>Vespers will be sung by Mullingar Parish Choir, together with the congregational choir of the Meath Diocesan Choir, adding a richness and beauty to our liturgical prayer.</p>
+<p>World Youth Day Christ the King Youth Festival . In his message for today, the 41st World Youth Day, Pope Leo XIV offers young people a powerful invitation centred on the theme: “Take courage!</p>
+<p>I have overcome the world” (John 16:33).</p>
+<p>Acknowledging the challenges facing young people today, including anxiety about the future, pressure to succeed, comparisons on social media and loneliness, the Holy Father reminds them that their worth is not measured by achievements, appearances or the expectations of others.</p>
+<p>He writes: “You are precious because you have been created in the image of God, known by him and loved by him”. Pope Leo encourages young people to discover their true identity and dignity in God rather than in the image they try to create for themselves.</p>
+<p>He reminds them: “We discover who we truly are when we recognize that our hearts were created for God: to love himand, in him, to love our brothers and sisters”. He goes on to offer this reassurance: “Opening your hearts to Christ will not cause you to lose yourselves.</p>
+<p>On the contrary, you will discover more deeply who you are in God’ s eyes and come to know yourselves as he sees you”. Here in Mullingar, 100 young people and youth leaders are celebrating World Youth Day at a diocesan level with our Christ the King Youth Festival this</p>
+<p>Sunday 22nd November in Coláiste Mhuire CBS , as part of our 40 Hours celebration.</p>
+<p>Priests of the Parish Fr. Phil Gaffney, Adm.</p>
+<p>Fr. Barry White, CC. Fr. Marcin Pietras, CC. Fr. Iulian Robert Gherghel, CC. Fr. Francis Musoke, AP.</p>
+<h3 class="b-head">PARISH OFFICE</h3>
+<p>HOURS Monday –Friday 9am-4pm. (closed 1pm-2pm) <a href="tel:+353449348338" style="color:#1d4ed8;font-weight:600;">044 9348338</a> <a href="mailto:office@mullingarparish.ie" target="_blank" rel="noopener noreferrer">office@mullingarparish.ie</a>. W: <a href="https://www.mullingparish.ie" target="_blank" rel="noopener noreferrer">www.mullingparish.ie</a>. CATHEDRAL SHOP Monday—Friday 9am-4pm ( closed 1pm-2pm) Sat. 10am-1pm.</p>
+<h3 class="b-head">DAILY MASS SCHEDULE</h3>
+<p>Cathedral 7.45am &amp; 10am Monday –Saturday. St Paul’s Monday –Friday 9.15am.</p>
+<h3 class="b-head">SUNDAY MASS</h3>
+<p>TIMES Cathedral: Vigil 6pm (Sat) Cathedral 8.30am, 11am, 12.30pm. St Paul’s 10.30 &amp; 12noon. Walshestown 9am. Brotenstown 10am. Gainstown 11am.</p>
+<h3 class="b-head">CONFESSIONS</h3>
+<p>CATHEDRAL Saturday 2pm—3pm. ADORATION OF THE BLESSED SACRAMENT Cathedral 8am-8pm Mon—Fri St Paul’s 4-5pm—Wed.</p>
+<p>CHILD SAFEGUARDING RESPRESNTATIVES Linda Duncan &amp; Fiona Kiernan Contact Parish Office.</p>
+<p>ACCORD COUNSELLING Accord Mullingar Phone <a href="tel:+353449348707" style="color:#1d4ed8;font-weight:600;">044 93 48707</a> or</p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:accordmullingar@gmail.com" target="_blank" rel="noopener noreferrer">accordmullingar@gmail.com</a> . VOCATIONS:</p>
+<hr>
+<p class="page-label">Page 75</p>
+<p>Looking ahead to next year, we look forward to our Meath Diocesan Pilgrimage to Seoul, South Korea, for World Youth Day , 27th July-10th August 2027. There are only a few places left to join the Meath Diocesan group.</p>
+<p>If interested please contact the Parish Office or one of the priests of the parish . A preparation day for Seoul will take place in Dalgan Park, Navan at 3 pm on 13th December . Many priests from our diocese have served as missionaries in Korea and one was martyred there during the Korean War.</p>
+<p>WYD gives us a chance to honour their memory and experience the parishes they established.</p>
+<p>See <a href="https://www.wydseoul.org" target="_blank" rel="noopener noreferrer">www.wydseoul.org</a> . Be a part of our Youth Mass.</p>
+<p>Our Saturday Vigil Mass (6 pm) at the Cathedral is our Youth Mass—a space for young people from CBS, Loreto, St Finian’s and more to serve and grow in faith.</p>
+<p>From bringing up the gifts to proclaiming the Word, every role is a chance to live your faith in action.</p>
+<p>Sign-ups are open now— visit the Parish website under Faith Formation for details . Volunteers will have a walk- through before the first Mass.</p>
+<p>Bible Study: The Advent of the Messiah. This season ready your heart for the coming of Christ. We will explore the meaning of Advent by looking at links between the Old and New Testament - with the promise of the Messiah, the Annunciation and the Visitation.</p>
+<p>Wednesdays, 25 Nov - 2 Dec - 9 Dec | 7.30 - 9 pm | Bethany Space Three sessions to be held; Advent resources will be shared to carry you through to Christmas.</p>
+<p>Questions?</p>
+<h4 class="b-sub">Email</h4>
+<p><a href="mailto:faithformationmp@gmail.com" target="_blank" rel="noopener noreferrer">faithformationmp@gmail.com</a> . Young Adults: Still time to join our group!</p>
+<p>If you’re looking for friends in faith, be a part of the Catholic young adults group (ages 18–30) for our parish.</p>
+<p>We held our first Adoration together last Saturday at the 6pm Vigil Mass.</p>
+<p>Our aim is to grow closer to God, deepen our faith, and journey with other.</p>
+<p>To express your interes t, please</p>
+<h4 class="b-sub">email</h4>
+<p><a href="mailto:faithformationmp@gmail.com" target="_blank" rel="noopener noreferrer">faithformationmp@gmail.com</a> to join the Whats App group.</p>
+<p>Christmas Stock now in our Parish Shop. Walk with Me, ‘A Journey of Prayer for Advent’ now available along with Advent candles &amp; calendars, cribs, Christmas candle centrepieces, Christmas Mass bouquets and especially our Parish Christmas Cards . ----------------------------------------------------------------------------------------------------------------------------- ------------------ Ecumenical Advent Carol Service 29th November at 7pm in All Saints&#x27; Church, Mullingar.</p>
+<p>Irish Midlands Youth Orchestra , Christmas Concert, 5th December, St Paul’s Church, 7pm, Admission free.</p>
+<p>Night Vigil to Knock for the Solemnity of the Immaculate Conception,</p>
+<p>Monday 7th December. To book contact Slevins <a href="tel:+353449372777" style="color:#1d4ed8;font-weight:600;">044-9372777</a> or Ann <a href="tel:+353872233580" style="color:#1d4ed8;font-weight:600;">087-2233580</a> . Healing Masses ,</p>
+<p>Wednesday 25th, La Verna Centre, 7pm &amp;</p>
+<p>Thursday 26th November, 8pm, St Camillus Nursing Centre, Killucan.</p>
+<p>Eircom Mass , Wednesday (25th )6pm, St Paul’s Church Confessions, Thursday, St Paul’s Church, after 9.15am Mass Rosary at the statue in Ginnell Tce,</p>
+<p>Sunday 29th at 6pm. Lecture on Sean Lemass and launch of Iarmhi, Greville,</p>
+<p>Wednesday 25th at 7.30pm. Mullingar Lions Club , Table Quiz,</p>
+<p>Thursday 26th November, 8pm, Greville Arms Hotel. Mass Intentions 21st – 29th November Cathedral Vigil 6pm: Mary Kerrigan, Cullionmore (1st Ann)</p>
+<p>Sunday 22nd November 8.30am: James Geoghegan, Walshestown 12.30pm Nora Walsh, Curraghmore (1st Paul’s 10.30am: Frank Kelly, Chestnut Drive 12noon: Owen Moore, late of St Andrew’s Tce &amp; London Walshestown 9am: May &amp; Gerry Singleton.</p>
+<p>Brotenstown 10am: Kit &amp; Mary O’Reilly. Gainstown 11am: Paddy &amp; Lily Ronan.</p>
+<p>Monday : 10am: Private Intention. 9.15am: David Nevin.</p>
+<p>Tuesday: 7.45am: Anna &amp; Mieczyslaw Sosnowy. 10am: Lily Rattigan. 9.15am: Terry Sweeney.</p>
+<p>Wednesday : 7.45am Patricia McCullagh. 10am: Gerry Smith 9.15am: James Keenan.</p>
+<p>Thursday : 7.45am: Ciaran Joyce 10am: Leo Osbourne. 9.15am: James &amp; Sheila O’Leary.</p>
+<p>Friday: 7.45am: Deceased members of Reeves family. 10am: Brian &amp; Ann Gallagher. 9.15am: Liz &amp; Michael Murray &amp; Thomas Nugent . Saturday: 7.45am: Private Intention. 10am:</p>
+<p>Anniversaries Occurring. Cathedral 6pm Vigil: Ryan Philippe Caberte (1st Ann)</p>
+<p>Sunday 29th November Cathedral 12.30pm Teresa Burke &amp; Francis Dunne, Mullingar.</p>
+<p>St Paul’s 10.30am: Barry Byrne, Monilea (1st Ann) Walshestown 9am: Seamus &amp; Darragh Sullivan &amp; Pat &amp; Ann Sullivan.</p>
+<p>Brotenstown 10am: Catherine, Edward, Kathleen, Patrick &amp; Eamon Drew.</p>
+<p>Gainstown 11am: Michael Lynch &amp; his daughter Anne &amp; Peter &amp; Annie Nea.</p>
+<p>Ar Shlí na Fírinne (RIP). Kathleen Delamere nee Dunning, Beechgrove Brendon K. Colvert, Beechlawns Patrick (Paddy) Gavin, Grange Lawns Michael Devaney , Dalton Park &amp; Late of Patrick St Doreen Smullen nee Byrne , Cathedral View Angela Coyle nee Lacy, late of St Brigid’s Tce James Roche, Bohola, Co. Mayo John Francis (Sean) Hayes , Waterford Ar dheis Dé go raibh a n-anamacha dílse.</p>
+<p>Ceremony of Light.</p>
+<p>Friday 27th November at 7pm in Walshestown Church. Prayer Service for the Deceased in the Walshestown area. Please bring your own light or flashlight.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-multyfarnham" data-parish-name="Multyfarnham"><h2 class="ocr-parish-name">Multyfarnham</h2></header>
+<p class="page-label">Page 76</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 77</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header data-issue-iso="2026-11-09" data-no-bulletin="1" class="ocr-parish-masthead" id="ocr-parish-navan-st-mary-s" data-parish-name="Navan (St Mary&#x27;s)"><h2 class="ocr-parish-name">Navan (St Mary&#x27;s)</h2></header>
+<p class="stale-note" data-no-bulletin="1">There is no bulletin for this Sunday.</p><header class="ocr-parish-masthead" id="ocr-parish-nobber" data-parish-name="Nobber"><h2 class="ocr-parish-name">Nobber</h2></header>
+<p class="page-label">Page 80</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 81</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-oristown" data-parish-name="Oristown"><h2 class="ocr-parish-name">Oristown</h2></header>
+<p class="page-label">Page 82</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 83</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-rathkenny" data-parish-name="Rathkenny"><h2 class="ocr-parish-name">Rathkenny</h2></header>
+<p class="page-label">Page 84</p>
+<p>Home Where we are Parish Bulletin Masses Church Calendar Patron Saint The Angelus Bell Adoration Oratory Prayer Card Sacraments Prayer Devotions Questions/Answers Schools Organizations Web Links Guestbook</p>
+<h3 class="b-head">Contact Us</h3>
+<p>Parish Priest Interactive map Main Menu Today&#x27;s Mass Readings Sunday&#x27;s Mass Readings Thought for Today Saints of the Day Feasts and Notices . . . The Theotokos This child is remembered on 21st November . . Why?</p>
+<p>Click on the pic. above to discover the answer Or click here The Year of St Paul Home Monday, 23 November 2026 Let God&#x27;s light shine forth Benedict XVI Morning sunlight . . through glass . . upon stone Rathkenny Parish Church just after 9am weekday Mass PRAYER CARD Léachtaí an lae ADORATION Léachtaí An Domhnaigh The Month of November Month of the Holy Souls The Church sets aside the month of November, and calls us to pray for those we know, and for all, who are in the purifying fires of Purgatory, and who await the day when they will join the company of the saints in Heaven . . . Read more.</p>
+<p>ORDINARY TIME MASSES YOU CAN ATTEND EACH WEEK Weekdays Rathkenny Monday 9am Wedne sday 9am</p>
+<p>Friday 7.30pm Grangegeeth</p>
+<p>Tuesday 7.30pm Rushwee</p>
+<p>Thursday 7.30pm Sunday: Rushwee (Vigil)</p>
+<p>Saturday 6.30pm Grangegeeth</p>
+<p>Sunday 10.00am Rathkenny</p>
+<p>Sunday 11.30am +++++++++++ Readings of the Day +++++++++++++++++ CI News Catholic Ireland News is no longer available.</p>
+<hr>
+<p class="page-label">Page 85</p>
+<p>The Year for Priests Saint John Paul Live Link to Lourdes The Angelus BELL which first tolled from this church in Rathkenny in 1869, and silent since 1974, rings out once more from the old belfry.</p>
+<p>Read more. Designed and developed by Getonline</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-rathmolyon" data-parish-name="Rathmolyon"><h2 class="ocr-parish-name">Rathmolyon</h2></header>
+<p class="page-label">Page 86</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 87</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-rochfortbridge" data-parish-name="Rochfortbridge"><h2 class="ocr-parish-name">Rochfortbridge</h2></header>
+<p class="page-label">Page 88</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 89</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-skryne" data-parish-name="Skryne"><h2 class="ocr-parish-name">Skryne</h2></header>
+<p class="page-label">Page 90</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 91</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-stamullen" data-parish-name="Stamullen"><h2 class="ocr-parish-name">Stamullen</h2></header>
+<p class="page-label">Page 92</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 93</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-tubber-rosemount" data-parish-name="Tubber - Rosemount"><h2 class="ocr-parish-name">Tubber - Rosemount</h2></header>
+<p class="page-label">Page 94</p>
+<p>Welcome, Fáilte TO THE DIOCESE OF MEATH Vision Statement The Diocese of Meath invites all people to a renewed personal encounter with Jesus Christ. Shaped by sacramental life of the Church, the powerful procla mation of the Gospel message, the work of the Holy Spirit, ca techesis and prayer, we the baptised, will be transformed in to intentional disciples, bearing fruit for God’s king dom.</p>
+<p>Directory Priests Safeguarding Read More Vocations Read More Education Read More Pastoral Resources Read More - Rosemount <a href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">https://www.dioceseofmeath.ie/map-of-parishes</a></p>
+<hr>
+<p class="page-label">Page 95</p>
+<p>Pope Leo Greets Families of the … Pope Leo Welcomed Home Maynooth Honours it&#x27;s 2026 Grad ‘The Way’ is a digital multimedia platform set up by the Irish Bishops Conference dedicated to sharing the Good News and the witness of the Catholic Church in Ireland</p></div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
+    </div>
+
+    <section class="parish-section">
+      <h2 class="section-heading">MEATH Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ardcath"><a class="parish-link" href="https://currahaparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Ardcath</a></li><li class="parish-item" data-name="ashbourne-donaghmore"><a class="parish-link" href="https://ashbourneparish.ie/newsletters/" target="_blank" rel="noopener noreferrer">Ashbourne-Donaghmore</a></li><li class="parish-item" data-name="athboy"><a class="parish-link" href="https://www.athboyparish.ie/current-newsletter/" target="_blank" rel="noopener noreferrer">Athboy</a></li><li class="parish-item" data-name="ballinabrackey"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Ballinabrackey</a></li><li class="parish-item" data-name="ballivor"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Ballivor</a></li><li class="parish-item" data-name="ballymore"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Ballymore</a></li><li class="parish-item" data-name="ballynacargy"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Ballynacargy</a></li><li class="parish-item" data-name="beauparc"><a class="parish-link" href="https://mcn.live/Camera/churchof-the-assumption-beauparc" target="_blank" rel="noopener noreferrer">Beauparc</a></li><li class="parish-item" data-name="bohermeen"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Bohermeen</a></li><li class="parish-item" data-name="carnaross"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Carnaross</a></li><li class="parish-item" data-name="castlepollard"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Castlepollard</a></li><li class="parish-item" data-name="castletown-geoghegan"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Castletown-Geoghegan</a></li><li class="parish-item" data-name="castletown-kilpatrick"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Castletown-Kilpatrick</a></li><li class="parish-item" data-name="clara"><a class="parish-link" href="https://claraparish.com/wp/category/newsletter/" target="_blank" rel="noopener noreferrer">Clara</a></li><li class="parish-item" data-name="clonmellon"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Clonmellon</a></li><li class="parish-item" data-name="collinstown"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Collinstown</a></li><li class="parish-item" data-name="coole"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Coole</a></li><li class="parish-item" data-name="curraha"><a class="parish-link" href="https://currahaparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Curraha</a></li><li class="parish-item" data-name="dangan"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Dangan</a></li><li class="parish-item" data-name="delvin"><a class="parish-link" href="http://www.delvinparish.ie/" target="_blank" rel="noopener noreferrer">Delvin</a></li><li class="parish-item" data-name="donore"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Donore</a></li><li class="parish-item" data-name="drogheda (holy family)"><a class="parish-link" href="https://stmarysdrogheda.ie/" target="_blank" rel="noopener noreferrer">Drogheda (Holy Family)</a></li><li class="parish-item" data-name="drogheda (st mary&#x27;s)"><a class="parish-link" href="https://stmarysdrogheda.ie/" target="_blank" rel="noopener noreferrer">Drogheda (St Mary&#x27;s)</a></li><li class="parish-item" data-name="drumconrath"><a class="parish-link" href="https://drumconrathparish.ie/" target="_blank" rel="noopener noreferrer">Drumconrath</a></li><li class="parish-item" data-name="drumraney"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Drumraney</a></li><li class="parish-item" data-name="duleek"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Duleek</a></li><li class="parish-item" data-name="dunboyne &amp; kilbride"><a class="parish-link" href="https://www.dunboynekilbrideparish.org/" target="_blank" rel="noopener noreferrer">Dunboyne &amp; Kilbride</a></li><li class="parish-item" data-name="dunderry"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Dunderry</a></li><li class="parish-item" data-name="dunshaughlin &amp; culmullen"><a class="parish-link" href="https://dunshaughlin-culmullenparish.ie/current-newsletter/" target="_blank" rel="noopener noreferrer">Dunshaughlin &amp; Culmullen</a></li><li class="parish-item" data-name="dysart"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Dysart</a></li><li class="parish-item" data-name="eglish"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Eglish</a></li><li class="parish-item" data-name="johnstown"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Johnstown</a></li><li class="parish-item" data-name="kells"><a class="parish-link" href="https://www.kellsparish.ie/current-newsletter/" target="_blank" rel="noopener noreferrer">Kells</a></li><li class="parish-item" data-name="kilbeg"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Kilbeg</a></li><li class="parish-item" data-name="kilbeggan"><a class="parish-link" href="https://www.kilbegganparish.ie/current-newsletter/" target="_blank" rel="noopener noreferrer">Kilbeggan</a></li><li class="parish-item" data-name="kilcloon"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Kilcloon</a></li><li class="parish-item" data-name="kilcormac"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Kilcormac</a></li><li class="parish-item" data-name="killina"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Killina</a></li><li class="parish-item" data-name="killucan-raharney"><a class="parish-link" href="https://www.parishofkillucan.ie/" target="_blank" rel="noopener noreferrer">Killucan-Raharney</a></li><li class="parish-item" data-name="kilmessan-dunsany"><a class="parish-link" href="https://www.kilmessanparish.ie/" target="_blank" rel="noopener noreferrer">Kilmessan-Dunsany</a></li><li class="parish-item" data-name="kilskyre"><a class="parish-link" href="https://kilskyreparish.ie/parish-bulletin/" target="_blank" rel="noopener noreferrer">Kilskyre</a></li><li class="parish-item" data-name="kingscourt-corlea-muff"><a class="parish-link" href="https://kingscourtparish.ie/" target="_blank" rel="noopener noreferrer">Kingscourt-Corlea-Muff</a></li><li class="parish-item" data-name="kinnegad-clonard-coralstown"><a class="parish-link" href="https://www.kinnegadparish.ie/" target="_blank" rel="noopener noreferrer">Kinnegad-Clonard-Coralstown</a></li><li class="parish-item" data-name="laytown"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Laytown</a></li><li class="parish-item" data-name="lobinstown"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Lobinstown</a></li><li class="parish-item" data-name="longwood"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Longwood</a></li><li class="parish-item" data-name="milltown"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Milltown</a></li><li class="parish-item" data-name="mountnugent"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Mountnugent</a></li><li class="parish-item" data-name="moynalty"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Moynalty</a></li><li class="parish-item" data-name="moynalvey"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Moynalvey</a></li><li class="parish-item" data-name="mullingar (cathedral of christ the king)"><a class="parish-link" href="https://www.mullingarparish.ie/newsletter" target="_blank" rel="noopener noreferrer">Mullingar (Cathedral of Christ the King)</a></li><li class="parish-item" data-name="multyfarnham"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Multyfarnham</a></li><li class="parish-item" data-name="navan (st mary&#x27;s)"><a class="parish-link" href="https://www.navanparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Navan (St Mary&#x27;s)</a></li><li class="parish-item" data-name="nobber"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Nobber</a></li><li class="parish-item" data-name="oldcastle"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Oldcastle</a></li><li class="parish-item" data-name="oristown"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Oristown</a></li><li class="parish-item" data-name="rathkenny"><a class="parish-link" href="https://rathkennyparish.ie/" target="_blank" rel="noopener noreferrer">Rathkenny</a></li><li class="parish-item" data-name="rathmolyon"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Rathmolyon</a></li><li class="parish-item" data-name="ratoath"><a class="parish-link" href="https://www.ratoathparish.ie/" target="_blank" rel="noopener noreferrer">Ratoath</a></li><li class="parish-item" data-name="rochfortbridge"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Rochfortbridge</a></li><li class="parish-item" data-name="skryne"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Skryne</a></li><li class="parish-item" data-name="slane"><a class="parish-link" href="https://www.slaneparish.ie/" target="_blank" rel="noopener noreferrer">Slane</a></li><li class="parish-item" data-name="stamullen"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Stamullen</a></li><li class="parish-item" data-name="taghmon"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Taghmon</a></li><li class="parish-item" data-name="trim &amp; boardsmill"><a class="parish-link" href="https://www.parishoftrimandboardsmill.com/" target="_blank" rel="noopener noreferrer">Trim &amp; Boardsmill</a></li><li class="parish-item" data-name="tubber - rosemount"><a class="parish-link" href="https://www.dioceseofmeath.ie/map-of-parishes" target="_blank" rel="noopener noreferrer">Tubber - Rosemount</a></li><li class="parish-item" data-name="tullamore - durrow"><a class="parish-link" href="https://www.tullamoreparish.ie/" target="_blank" rel="noopener noreferrer">Tullamore - Durrow</a></li></ul>
+    </section>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
+      });
+    })();
+
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20261018a"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js?v=20261018a';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      if (parishFilter) {
+        parishFilter.addEventListener('input', function (event) {
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {
+              visibleCount += 1;
+            }
+          });
+          if (parishEmpty) {
+            parishEmpty.hidden = visibleCount !== 0;
+          }
+        });
+      }
+      if (parishEmpty) {
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+    
+    (function () {
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
+      }
+      function pageFor(name) {
+        var map = pageIndex();
+        if (map[name]) return map[name];
+        var n = norm(name);
+        var keys = Object.keys(map);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = map[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
+        }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          landInBox(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      document.addEventListener('click', function (ev) {
+        if (!ev.target || !ev.target.closest) return;
+        var btn = ev.target.closest('.az-letter');
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
+      });
+    })();
+    
+  </script>
+  <script type="application/json" id="parish-page-index">{}</script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
