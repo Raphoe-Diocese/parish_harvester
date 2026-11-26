@@ -1,27 +1,34 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "dunshaughlin",
   "display_name": "Dunshaughlin & Culmullen",
   "diocese": "meath",
-  "start_url": "https://dunshaughlin-culmullenparish.ie/current-newsletter/",
-  "site_type": "permanent_redirect_document",
+  "start_url": "https://dunshaughlin-culmullenparish.ie/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    ".pdf"
+  ],
   "playbook_type": "direct_download",
-  "recorded_date": "2026-10-30",
+  "recorded_date": "2026-11-10",
   "timeout_ms": 45000,
   "total_timeout_s": 120,
   "steps": [
     {
-      "action": "download",
-      "url": "https://dunshaughlin-culmullenparish.ie/current-newsletter/",
-      "use_target_url": true
+      "action": "goto",
+      "url": "https://dunshaughlin-culmullenparish.ie/newsletters/"
     }
   ],
   "operator_notes": [
     "03/10/2026: /current-newsletter/ redirects to the current dated PDF. Do not pin the dated file.",
-    "30/10/2026: redirect is 25.10.2026b.pdf (application/pdf 763199). Status was still on 04/10 — re-harvest only."
+    "30/10/2026: redirect is 25.10.2026b.pdf (application/pdf 763199). Status was still on 04/10 — re-harvest only.",
+    "10/11/2026: /newsletters/ lists 08.11.2026a.pdf. Proved GET 200 application/pdf 646732 bytes, date 08/11/2026. Scrape the listing. Do not pin the dated filename."
   ],
   "do_not": [
     "Do not pin the dated PDF.",
     "Do not harvest Facebook."
-  ]
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
