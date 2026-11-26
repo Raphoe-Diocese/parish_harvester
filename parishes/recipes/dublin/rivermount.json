@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "rivermount",
   "display_name": "Rivermount",
   "diocese": "dublin",
-  "recorded_date": "2026-10-03",
-  "start_url": "https://greaterfinglasparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "Official/kitchen-sink site opened. No this-week PDF or JPEG with GET 200 and date on the file.",
+  "start_url": "https://greaterfinglasparish.ie/newsletters/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["weekly.pdf"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-11-10",
+  "example_url": "https://greaterfinglasparish.ie/newsletters/weekly.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://greaterfinglasparish.ie"
+      "url": "https://greaterfinglasparish.ie/newsletters/"
+    },
+    {
+      "action": "download",
+      "url": "https://greaterfinglasparish.ie/newsletters/weekly.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "10/11/2026: https://greaterfinglasparish.ie/newsletters/ lists only weekly.pdf. The ?t= number changes. No dated filename is on the page. Stable GET https://greaterfinglasparish.ie/newsletters/weekly.pdf returned 200 application/pdf, 250394 bytes, %PDF. The PDF title is THE GREATER FINGLAS PARISH NEWSLETTER, 8 November 2026. The page footer says last updated 06/11/2026. The same address is replaced each week.",
+    "Harvest once under rivermount. The sheet also names Finglas West."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not add a recipe for finglas or finglaswest.",
+    "Do not print the HTML page."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
